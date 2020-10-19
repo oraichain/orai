@@ -1,0 +1,14 @@
+# Runtime data
+.oraicli/
+.oraid/
+.oraifiles/
+.images/
+.websocket/
+cosmosjs/node_modules/
+
+signedTx.json
+unsignedTx.json
+test.json
+go.sum
+cosmosjs/package-lock.json
+cosmosjs/.env

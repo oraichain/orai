@@ -1,0 +1,5 @@
+PORT=8000
+URL=http://localhost:1317
+MNEMONIC=chapter joke banner suffer attend casual radio foster boost border stand live photo together sample sick drastic popular dumb frame cloud detect talk mango
+CHAIN_ID=Oraichain
+ACC_ADDRESS=orai1w9agqpd00f3hp8w7vejwfwkqjekyuc94z6xwwz

@@ -1,0 +1,25 @@
+{
+  "name": "orai-sig",
+  "version": "1.0.0",
+  "description": "This is a Javascript application that handles Oraichain accounts and signing txs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Oraichain team",
+  "license": "ISC",
+  "dependencies": {
+    "@cosmostation/cosmosjs": "^0.6.10",
+    "axios": "^0.20.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-validator": "^5.3.1",
+    "express-winston": "^3.4.0",
+    "jsonwebtoken": "^8.5.1",
+    "nodemon": "^2.0.4",
+    "request": "^2.88.2",
+    "validator": "^10.11.0",
+    "winston": "^3.2.1"
+  }
+}

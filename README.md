@@ -1,2 +1,2 @@
-# orai
+orai
 Monolithic repository of everything Oraichain
