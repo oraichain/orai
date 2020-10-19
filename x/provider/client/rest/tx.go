@@ -493,7 +493,7 @@ func setPriceRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// create the message
-		msg := types.NewMsgSetPriceRequest(types.NewMsgSetAIRequest(ksuid.New().String(), req.OracleScriptName, addr, baseReq.Fees.String(), 1, req.Input, req.ExpectedOutput))
+		msg := types.NewMsgSetPriceRequest(types.NewMsgSetAIRequest(ksuid.New().String(), req.OracleScriptName, addr, baseReq.Fees.String(), 2, req.Input, req.ExpectedOutput))
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "GHYK")

@@ -64,6 +64,8 @@ func handleMsgCreateOracleScript(ctx sdk.Context, k keeper.Keeper, msg types.Msg
 	// collect minimum fees required to run the oracle script
 	minimumFees, err := k.GetMinimumFees(ctx, aiDataSources, testCases)
 	if err != nil {
+		// erase because the script file is not properly added into the chain yet
+		k.EraseOracleScriptFile(msg.Name)
 		return nil, err
 	}
 	k.SetOracleScript(ctx, msg.Name, types.NewOracleScript(msg.Name, msg.Owner, msg.Description, minimumFees))
@@ -136,6 +138,12 @@ func handleMsgCreateAIDataSource(ctx sdk.Context, k keeper.Keeper, msg types.Msg
 	k.SetAIDataSource(ctx, msg.Name, aiDataSource)
 	k.AddAIDataSourceFile(msg.Code, msg.Name)
 
+	validators, err := k.RandomValidators(ctx, 2, []byte(msg.Name))
+	if err != nil {
+		return nil, sdkerrors.Wrap(types.ErrCannotRandomValidators, err.Error())
+	}
+	fmt.Println("validators: ", validators)
+
 	// TODO: Define your msg events
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
@@ -181,7 +189,7 @@ func handleMsgEditAIDataSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgEd
 }
 
 func handleMsgSetPriceRequest(ctx sdk.Context, k keeper.Keeper, msg types.MsgSetPriceRequest) (*sdk.Result, error) {
-	validators, err := k.RandomValidators(ctx, msg.MsgAIRequest.ValidatorCount)
+	validators, err := k.RandomValidators(ctx, msg.MsgAIRequest.ValidatorCount, []byte(msg.MsgAIRequest.RequestID))
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrCannotRandomValidators, err.Error())
 	}
@@ -281,7 +289,7 @@ func handleMsgSetPriceRequest(ctx sdk.Context, k keeper.Keeper, msg types.MsgSet
 // handleMsgSetKYCRequest is a function message setting a new AI request
 func handleMsgSetKYCRequest(ctx sdk.Context, k keeper.Keeper, msg types.MsgSetKYCRequest) (*sdk.Result, error) {
 
-	validators, err := k.RandomValidators(ctx, msg.MsgAIRequest.ValidatorCount)
+	validators, err := k.RandomValidators(ctx, msg.MsgAIRequest.ValidatorCount, []byte(msg.MsgAIRequest.RequestID))
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrCannotRandomValidators, err.Error())
 	}

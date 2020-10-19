@@ -166,6 +166,19 @@ func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.Val
 func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) {
 	// 	TODO: fill out if your application requires beginblock, if not you can delete this function
 	//k.AllocateTokens(ctx, req.GetLastCommitInfo().Votes)
+	oldSeed := k.GetRngSeed(ctx)
+	var newSeed []byte
+	if len(oldSeed) == 0 {
+		k.SetRngSeed(ctx, make([]byte, types.RngSeedSize))
+		oldSeed = k.GetRngSeed(ctx)
+	}
+	newSeed = oldSeed[types.NumSeedRemoval:]
+	hash := req.GetHash()
+	// generate a new seed by removing 5 first bytes of the previous seed, and add 5 new bytes from the new hash.
+	for i := 0; i < types.NumSeedRemoval; i++ {
+		newSeed = append(newSeed, hash[i])
+	}
+	k.SetRngSeed(ctx, newSeed)
 	k.DirectAllocateTokens(ctx, req.GetLastCommitInfo().Votes)
 }
 

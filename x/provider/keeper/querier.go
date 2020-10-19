@@ -56,7 +56,7 @@ func queryOracleScript(ctx sdk.Context, path []string, keeper Keeper) ([]byte, e
 	// tsao cho nay lai lay path[0] ?
 	oScript, err := keeper.GetOracleScript(ctx, path[0])
 	if err != nil {
-		return []byte{}, sdkerrors.Wrap(types.ErrOracleScriptNotFound, err.Error())
+		return nil, sdkerrors.Wrap(types.ErrOracleScriptNotFound, err.Error())
 	}
 
 	// get code of the oScript

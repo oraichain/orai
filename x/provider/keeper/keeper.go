@@ -279,6 +279,11 @@ func (k Keeper) AddOracleScriptFile(file []byte, name string) {
 	k.fileCache.AddFile(file, types.OracleScriptStoreKeyString(name))
 }
 
+// EraseOracleScriptFile removes the file in the filecache,
+func (k Keeper) EraseOracleScriptFile(name string) {
+	k.fileCache.EraseFile(types.OracleScriptStoreKeyString(name))
+}
+
 // AddAIDataSourceFile adds the file to filecache,
 func (k Keeper) AddAIDataSourceFile(file []byte, name string) {
 	k.fileCache.AddFile(file, types.DataSourceStoreKeyString(name))
@@ -320,6 +325,16 @@ func (k Keeper) GetAIDataSourceFile(name string) []byte {
 		return []byte{}
 	}
 	return code
+}
+
+// SetRngSeed sets the rolling seed value to be provided value.
+func (k Keeper) SetRngSeed(ctx sdk.Context, rollingSeed []byte) {
+	ctx.KVStore(k.storeKey).Set(types.SeedStoreKey(), rollingSeed)
+}
+
+// GetRngSeed returns the current rolling seed value.
+func (k Keeper) GetRngSeed(ctx sdk.Context) []byte {
+	return ctx.KVStore(k.storeKey).Get(types.SeedStoreKey())
 }
 
 // GetDNamesTcNames is a function that collects test case names and data source names from the oracle script

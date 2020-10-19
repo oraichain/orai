@@ -4,13 +4,14 @@ import (
 	//"fmt"
 
 	"fmt"
-	"math/rand"
+	"math/big"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/staking/exported"
+	"github.com/oraichain/orai/packages/rng"
 	"github.com/oraichain/orai/x/provider/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
@@ -120,80 +121,118 @@ func (k Keeper) DirectAllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo)
 	}
 }
 
-// RandomValidators random a set of validators (currently not based on the voting power) to execute the oracle script
-func (k Keeper) RandomValidators(ctx sdk.Context, size int) ([]sdk.ValAddress, error) {
-	valOperators := []sdk.ValAddress{}
-	k.stakingKeeper.IterateBondedValidatorsByPower(ctx,
-		func(idx int64, val exported.ValidatorI) (stop bool) {
-			valOperators = append(valOperators, val.GetOperator())
-			return false
-		})
-	if len(valOperators) < size {
-		return nil, sdkerrors.Wrapf(
-			types.ErrNotEnoughValidators, "%d < %d", len(valOperators), size)
-	}
-
-	validators := make([]sdk.ValAddress, size)
-	for i := 0; i < size; i++ {
-		validators[i] = valOperators[rand.Intn(size)]
-	}
-	return validators, nil
-}
-
 // // RandomValidators random a set of validators (currently not based on the voting power) to execute the oracle script
 // func (k Keeper) RandomValidators(ctx sdk.Context, size int) ([]sdk.ValAddress, error) {
-
 // 	valOperators := []sdk.ValAddress{}
-// 	maxValidatorSize := 0
-// 	// count the total current validator
 // 	k.stakingKeeper.IterateBondedValidatorsByPower(ctx,
 // 		func(idx int64, val exported.ValidatorI) (stop bool) {
-// 			// the highest staked validator has the highest freq appearance in the list. When random => higher chance of getting picked
-// 			maxValidatorSize++
+// 			valOperators = append(valOperators, val.GetOperator())
 // 			return false
 // 		})
-
-// 	var curVotingP int64
-// 	var prevVotingP int64
-// 	specialIndex := 0 // this index stores the first validator that has equal index to the next val
-
-// 	k.stakingKeeper.IterateBondedValidatorsByPower(ctx,
-// 		func(idx int64, val exported.ValidatorI) (stop bool) {
-// 			// store the prev voting power validator
-// 			prevVotingP = curVotingP
-// 			// collect the new voting power
-// 			curVotingP = val.GetConsensusPower()
-
-// 			// if we meet the equal sistuation the first time then we note down the index
-// 			if prevVotingP == curVotingP {
-// 				// increment the index by one to make up for the index loss of the current validator
-// 				specialIndex++
-// 			} else {
-// 				// reset the index to 0 since the sequence has ended
-// 				specialIndex = 0
-// 			}
-
-// 			// the highest staked validator has the highest freq appearance in the list. When random => higher chance of getting picked
-// 			for i := 0; i < maxValidatorSize+specialIndex; i++ {
-// 				valOperators = append(valOperators, val.GetOperator())
-// 			}
-// 			maxValidatorSize--
-// 			return false
-// 		})
-
 // 	if len(valOperators) < size {
 // 		return nil, sdkerrors.Wrapf(
 // 			types.ErrNotEnoughValidators, "%d < %d", len(valOperators), size)
 // 	}
 
-// 	fmt.Println("All validators: ", valOperators)
-
 // 	validators := make([]sdk.ValAddress, size)
 // 	for i := 0; i < size; i++ {
-// 		validators[i] = valOperators[rand.Intn(len(valOperators))]
+// 		validators[i] = valOperators[rand.Intn(size)]
 // 	}
 // 	return validators, nil
 // }
+
+// RandomValidators random a set of validators (currently not based on the voting power) to execute the oracle script
+func (k Keeper) RandomValidators(ctx sdk.Context, size int, nonce []byte) ([]sdk.ValAddress, error) {
+	var curVotingP int64
+	var prevVotingP int64
+	specialIndex := 0 // this index stores the first validator that has equal index to the next val
+	valOperators := []sdk.ValAddress{}
+	maxValidatorSize := 0
+	totalPowers := int64(0)
+	// store a mapping of validators that have already been chosen
+	chosenVal := make(map[string]string)
+	// count the total current validator
+	k.stakingKeeper.IterateBondedValidatorsByPower(ctx,
+		func(idx int64, val exported.ValidatorI) (stop bool) {
+			// the highest staked validator has the highest freq appearance in the list. When random => higher chance of getting picked
+			maxValidatorSize++
+			totalPowers += val.GetConsensusPower()
+			return false
+		})
+	// if there is no voting power, we return error to prevent x % 0 sampling
+	if totalPowers == int64(0) {
+		return nil, sdkerrors.Wrapf(
+			types.ErrValidatorsHaveNoVotes, "%d < %d", len(valOperators), size)
+	}
+	k.stakingKeeper.IterateBondedValidatorsByPower(ctx,
+		func(idx int64, val exported.ValidatorI) (stop bool) {
+			// store the prev voting power validator
+			prevVotingP = curVotingP
+			// collect the new voting power
+			curVotingP = val.GetConsensusPower()
+
+			// if we meet the equal sistuation the first time then we note down the index
+			if prevVotingP == curVotingP {
+				// increment the index by one to make up for the index loss of the current validator
+				specialIndex++
+			} else {
+				// reset the index to 0 since the sequence has ended
+				specialIndex = 0
+			}
+
+			// the highest staked validator has the highest freq appearance in the list. When random => higher chance of getting picked
+			for i := 0; i < maxValidatorSize+specialIndex; i++ {
+				valOperators = append(valOperators, val.GetOperator())
+			}
+			maxValidatorSize--
+			return false
+		})
+
+	if len(valOperators) < size {
+		return nil, sdkerrors.Wrapf(
+			types.ErrNotEnoughValidators, "%d < %d", len(valOperators), size)
+	}
+
+	fmt.Println("valOperators list: ", valOperators)
+
+	randomGenerator, err := rng.NewRng(k.GetRngSeed(ctx), nonce, []byte(ctx.ChainID()))
+	if err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrSeedinitiation, err.Error())
+	}
+
+	validators := make([]sdk.ValAddress, size)
+	for i := 0; i < size; i++ {
+		// the dividend is randomed to make sure no one can predict the next validator
+		dividend := randomGenerator.RandUint64()
+		divisor := uint64(totalPowers)
+		// this value init makes sure that we at least calculate the modulo once
+		quotient := uint64(len(valOperators))
+		// we keep calculating the new modulo until we get in the range
+		for quotient >= uint64(len(valOperators)) {
+			quotient, err = calucateMol(dividend, divisor)
+			if err != nil {
+				return nil, err
+			}
+			dividend = divisor
+			divisor = quotient
+		}
+		// if the quotient is in the sampling list, and it is not in the chosen validator map range then we pick it
+		valStr := valOperators[quotient].String()
+		fmt.Println("chosen val: ", chosenVal[valStr])
+		fmt.Println("chosen val has existed ? ", chosenVal[valStr] != valStr)
+		if chosenVal[valStr] != valStr {
+			// add to the chosen validator list
+			chosenVal[valStr] = valStr
+			validators[i] = valOperators[quotient]
+		} else {
+			// if it has been chosen already, we decrement the loop index to continue choosing a new one
+			i--
+		}
+		fmt.Println("validator: ", validators[i].String())
+		fmt.Println("All validators: ", validators)
+	}
+	return validators, nil
+}
 
 // // GetValidatorFees calculates the total fees needed for a set of provided validators
 // func (k Keeper) GetValidatorFees(ctx sdk.Context, providedCoins sdk.DecCoins, validators []sdk.ValAddress) (sdk.Coins, error) {
@@ -201,6 +240,18 @@ func (k Keeper) RandomValidators(ctx sdk.Context, size int) ([]sdk.ValAddress, e
 // 		power := k.GetValidator(ctx, validator).GetConsensusPower()
 // 	}
 // }
+
+func calucateMol(dividend, divisor uint64) (uint64, error) {
+	dividendBig := new(big.Int)
+	dividendBig.SetUint64(dividend)
+	divisorBig := new(big.Int)
+	divisorBig.SetUint64(divisor)
+
+	tenmodfour := new(big.Int)
+
+	quotient := tenmodfour.Mod(dividendBig, divisorBig)
+	return quotient.Uint64(), nil
+}
 
 // SetValidator saves the validator into the store
 func (k Keeper) SetValidator(ctx sdk.Context, id string, rep types.Report) {
