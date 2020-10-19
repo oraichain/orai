@@ -12,7 +12,7 @@ require (
 	github.com/golang/mock v1.3.1 // indirect
 	github.com/gorilla/mux v1.7.4
 	github.com/kyokomi/emoji v2.2.4+incompatible
-	github.com/oasisprotocol/oasis-core/go v0.2011.3
+	github.com/oasisprotocol/oasis-core/go v0.0.0-20200730171716-3be2b460b3ac
 	github.com/peterbourgon/diskv v2.0.1+incompatible
 	github.com/segmentio/ksuid v1.0.3
 	github.com/spf13/afero v1.2.2 // indirect
@@ -21,7 +21,7 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/tendermint/go-amino v0.15.1
 	github.com/tendermint/tendermint v0.33.7
-	github.com/tendermint/tm-db v0.6.2
+	github.com/tendermint/tm-db v0.5.1
 	github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8 // indirect
 	gopkg.in/yaml.v2 v2.3.0
 )
