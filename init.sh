@@ -115,12 +115,14 @@ oraid start --minimum-gas-prices 0.025orai
 
 # oraicli tx provider edit-datasource datasource coingecko_btc ./testfiles/coingecko_btc.sh "A data source that fetches the BTC price from Coingecko API" --from ducbean --fees 5000orai
 
-# oraicli tx provider set-oscript oscript_btc ./testfiles/oscript_btc.sh "" --from duc --fees 5000orai
+# oraicli tx provider set-oscript oscript_btc ./testfiles/oscript_btc.sh "An oracle script that fetches and aggregates BTC price from different sources" --from duc --fees 5000orai
 
-# oraicli tx provider set-datasource coindesk_btc ./testfiles/coindesk_btc.sh "" --from duc --fees 5000orai
+# oraicli tx provider set-datasource coindesk_btc ./testfiles/coindesk_btc.sh "A data source that collects BTC price from coindesk" --from duc --fees 5000orai
 
-# oraicli tx provider set-datasource coingecko_btc ./testfiles/coingecko_btc.sh "" --from duc --fees 5000orai
+# oraicli tx provider set-datasource coingecko_btc ./testfiles/coingecko_btc.sh "A data source that fetches the BTC price from Coingecko API" --from duc --fees 5000orai
 
-# oraicli tx provider set-datasource crypto_compare_btc ./testfiles/crypto_compare_btc.sh "" --from duc --fees 5000orai
+# oraicli tx provider set-datasource crypto_compare_btc ./testfiles/crypto_compare_btc.sh "A data source that collects BTC price from crypto compare" --from duc --fees 5000orai
 
-# oraicli tx provider set-testcase testcase_price ./testfiles/testcase_price.sh "" --from duc --fees 5000orai
+# oraicli tx provider set-testcase testcase_price ./testfiles/testcase_price.sh "A sample test case that uses the expected output of users provided to verify the bitcoin price from the datasource" --from duc --fees 5000orai
+
+# curl -XPOST -s http://localhost:8000/api/txs/req_price -H "Content-Type: application/json" --data '{"oscript_name": "oscript_btc","price": "MA==","expected_price": "MA==","fees": "35000"}'
