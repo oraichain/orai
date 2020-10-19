@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ducphamle2/dexai/x/provider/types"
+	"github.com/oraichain/orai/x/provider/types"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	tmtypes "github.com/tendermint/tendermint/types"
 )

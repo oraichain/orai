@@ -18,7 +18,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
-	"github.com/ducphamle2/dexai/x/provider/types"
+	"github.com/oraichain/orai/x/provider/types"
 )
 
 // GetTxCmd returns the transaction commands for this module

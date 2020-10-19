@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ducphamle2/dexai/x/provider/types"
+	"github.com/oraichain/orai/x/provider/types"
 )
 
 // GetAIRequest returns the information of an AI request

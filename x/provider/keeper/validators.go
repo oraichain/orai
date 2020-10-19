@@ -11,7 +11,7 @@ import (
 	distr "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/staking/exported"
-	"github.com/ducphamle2/dexai/x/provider/types"
+	"github.com/oraichain/orai/x/provider/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 

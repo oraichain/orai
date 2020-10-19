@@ -1,4 +1,4 @@
-module github.com/ducphamle2/dexai
+module github.com/oraichain/orai
 
 go 1.13
 
@@ -6,7 +6,6 @@ require (
 	github.com/coreos/go-etcd v2.0.0+incompatible // indirect
 	github.com/cosmos/cosmos-sdk v0.39.1
 	github.com/cosmos/go-bip39 v0.0.0-20180819234021-555e2067c45d
-	github.com/cosmos/sdk-tutorials/nameservice v0.0.0-20200824181426-664b1507ff05
 	github.com/cpuguy83/go-md2man v1.0.10 // indirect
 	github.com/etcd-io/bbolt v1.3.3 // indirect
 	github.com/gogo/protobuf v1.3.1

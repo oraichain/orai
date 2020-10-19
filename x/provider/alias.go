@@ -1,8 +1,8 @@
 package provider
 
 import (
-	"github.com/ducphamle2/dexai/x/provider/keeper"
-	"github.com/ducphamle2/dexai/x/provider/types"
+	"github.com/oraichain/orai/x/provider/keeper"
+	"github.com/oraichain/orai/x/provider/types"
 )
 
 const (

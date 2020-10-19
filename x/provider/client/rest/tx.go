@@ -13,9 +13,9 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/ducphamle2/dexai/packages/filehandling"
-	"github.com/ducphamle2/dexai/x/provider/types"
 	"github.com/gorilla/mux"
+	"github.com/oraichain/orai/packages/filehandling"
+	"github.com/oraichain/orai/x/provider/types"
 	"github.com/segmentio/ksuid"
 
 	"github.com/cosmos/cosmos-sdk/client/context"

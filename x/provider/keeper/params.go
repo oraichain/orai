@@ -1,4 +1,5 @@
 package keeper
+
 /*
 // TODO: Define if your module needs Parameters, if not this can be deleted
 
@@ -6,7 +7,7 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ducphamle2/dexai/x/provider/types"
+	"github.com/oraichain/orai/x/provider/types"
 )
 
 // GetParams returns the total set of provider parameters.

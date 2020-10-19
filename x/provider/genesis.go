@@ -2,7 +2,7 @@ package provider
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ducphamle2/dexai/x/provider/types"
+	"github.com/oraichain/orai/x/provider/types"
 )
 
 // InitGenesis initialize default parameters, can assign some coins in the chain here

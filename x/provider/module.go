@@ -19,10 +19,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/ducphamle2/dexai/x/provider/client/cli"
-	"github.com/ducphamle2/dexai/x/provider/client/rest"
-	"github.com/ducphamle2/dexai/x/provider/keeper"
-	"github.com/ducphamle2/dexai/x/provider/types"
+	"github.com/oraichain/orai/x/provider/client/cli"
+	"github.com/oraichain/orai/x/provider/client/rest"
+	"github.com/oraichain/orai/x/provider/keeper"
+	"github.com/oraichain/orai/x/provider/types"
 )
 
 // Type check to ensure the interface is properly implemented
