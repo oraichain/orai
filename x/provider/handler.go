@@ -138,12 +138,6 @@ func handleMsgCreateAIDataSource(ctx sdk.Context, k keeper.Keeper, msg types.Msg
 	k.SetAIDataSource(ctx, msg.Name, aiDataSource)
 	k.AddAIDataSourceFile(msg.Code, msg.Name)
 
-	validators, err := k.RandomValidators(ctx, 2, []byte(msg.Name))
-	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrCannotRandomValidators, err.Error())
-	}
-	fmt.Println("validators: ", validators)
-
 	// TODO: Define your msg events
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(

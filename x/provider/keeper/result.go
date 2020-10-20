@@ -19,14 +19,17 @@ func (k Keeper) ResolveResult(ctx sdk.Context, req types.AIRequest, rep types.Re
 			k.SetResult(ctx, req.RequestID, types.NewAIRequestResult(req.RequestID, resultList, types.RequestStatusPending))
 		}
 	} else {
-		// if already has result then we add more results
-		result, _ := k.GetResult(ctx, req.RequestID)
-		result.Results = append(result.Results, rep.AggregatedResult)
-		// check if there are enough results from the validators or not
-		if len(req.Validators) == len(result.Results) {
-			result.Status = types.RequestStatusFinished
+		// if there are more than one validators then we add more results
+		if len(req.Validators) > 1 {
+			// if already has result then we add more results
+			result, _ := k.GetResult(ctx, req.RequestID)
+			result.Results = append(result.Results, rep.AggregatedResult)
+			// check if there are enough results from the validators or not
+			if len(req.Validators) == len(result.Results) {
+				result.Status = types.RequestStatusFinished
+			}
+			k.SetResult(ctx, req.RequestID, result)
 		}
-		k.SetResult(ctx, req.RequestID, result)
 	}
 }
 
