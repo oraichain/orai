@@ -52,7 +52,7 @@ module.exports = {
                 "input": input,
                 "expected_output": expectedOutput,
                 "fees": fees,
-                "validator_count": req.body.validator_count
+                "validator_count": req.body.validator_count.toString()
               }, (isSuccess, response, error) => {
                 if (isSuccess) {
                   unsignedTx = response.data;
