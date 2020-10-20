@@ -10,8 +10,8 @@ func (k Keeper) ResolveResult(ctx sdk.Context, req types.AIRequest, rep types.Re
 	// hard code the result first if the request does not have a result
 	if !k.HasResult(ctx, req.RequestID) {
 		// if the the request only needs a validator to return a result from the report then it's finished
-		var resultList [][]byte
-		resultList = append(resultList, rep.AggregatedResult)
+		var resultList types.ValResults
+		resultList = append(resultList, types.NewValResult(rep.Validator.Address, rep.AggregatedResult))
 		if len(req.Validators) == 1 {
 			k.SetResult(ctx, req.RequestID, types.NewAIRequestResult(req.RequestID, resultList, types.RequestStatusFinished))
 		} else {
@@ -23,7 +23,7 @@ func (k Keeper) ResolveResult(ctx sdk.Context, req types.AIRequest, rep types.Re
 		if len(req.Validators) > 1 {
 			// if already has result then we add more results
 			result, _ := k.GetResult(ctx, req.RequestID)
-			result.Results = append(result.Results, rep.AggregatedResult)
+			result.Results = append(result.Results, types.NewValResult(rep.Validator.Address, rep.AggregatedResult))
 			// check if there are enough results from the validators or not
 			if len(req.Validators) == len(result.Results) {
 				result.Status = types.RequestStatusFinished
@@ -59,18 +59,4 @@ func (k Keeper) SetResult(ctx sdk.Context, reqID string, result types.AIRequestR
 
 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(result)
 	store.Set(types.ResultStoreKey(reqID), bz)
-}
-
-// SetAggregatedResult allows users to add new result into the request result into the store
-func (k Keeper) SetAggregatedResult(ctx sdk.Context, reqID string, newResult []byte) error {
-
-	result, err := k.GetResult(ctx, reqID)
-	if err != nil {
-		return err
-	}
-
-	// add new result of the newly sent report
-	result.Results = append(result.Results, newResult)
-	k.SetResult(ctx, reqID, result)
-	return nil
 }

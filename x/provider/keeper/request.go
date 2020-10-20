@@ -36,7 +36,7 @@ func (k Keeper) GetAllAIRequestIDs(ctx sdk.Context) sdk.Iterator {
 func (k Keeper) ResolveExpiredRequest(ctx sdk.Context, reqID string) {
 	// hard code the result first if the request does not have a result
 	if !k.HasResult(ctx, reqID) {
-		k.SetResult(ctx, reqID, types.NewAIRequestResult(reqID, [][]byte{}, types.RequestStatusExpired))
+		k.SetResult(ctx, reqID, types.NewAIRequestResult(reqID, types.ValResults{}, types.RequestStatusExpired))
 	} else {
 		// if already has result then we change the request status to expired
 		result, _ := k.GetResult(ctx, reqID)

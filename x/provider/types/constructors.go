@@ -154,13 +154,24 @@ func NewReward(
 // NewAIRequestResult is a constructor for the ai request result struct
 func NewAIRequestResult(
 	requestID string,
-	results [][]byte,
+	results ValResults,
 	status string,
 ) AIRequestResult {
 	return AIRequestResult{
 		RequestID: requestID,
 		Results:   results,
 		Status:    status,
+	}
+}
+
+// NewValResult is a constructor for the validator result
+func NewValResult(
+	val sdk.ValAddress,
+	result []byte,
+) ValResult {
+	return ValResult{
+		Validator: val,
+		Result:    result,
 	}
 }
 
