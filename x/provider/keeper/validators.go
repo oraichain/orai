@@ -164,6 +164,13 @@ func (k Keeper) RandomValidators(ctx sdk.Context, size int, nonce []byte) ([]sdk
 		return nil, sdkerrors.Wrapf(
 			types.ErrValidatorsHaveNoVotes, "%d < %d", len(valOperators), size)
 	}
+
+	// check the total validator in the system. If less than input then return error
+	if maxValidatorSize < size {
+		return nil, sdkerrors.Wrapf(
+			types.ErrNotEnoughValidators, "%d < %d", maxValidatorSize, size)
+	}
+
 	k.stakingKeeper.IterateBondedValidatorsByPower(ctx,
 		func(idx int64, val exported.ValidatorI) (stop bool) {
 			// store the prev voting power validator
@@ -187,11 +194,6 @@ func (k Keeper) RandomValidators(ctx sdk.Context, size int, nonce []byte) ([]sdk
 			maxValidatorSize--
 			return false
 		})
-
-	if len(valOperators) < size {
-		return nil, sdkerrors.Wrapf(
-			types.ErrNotEnoughValidators, "%d < %d", len(valOperators), size)
-	}
 
 	fmt.Println("valOperators list: ", valOperators)
 
