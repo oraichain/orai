@@ -183,7 +183,7 @@ func handleMsgEditAIDataSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgEd
 }
 
 func handleMsgSetPriceRequest(ctx sdk.Context, k keeper.Keeper, msg types.MsgSetPriceRequest) (*sdk.Result, error) {
-	validators, err := k.RandomValidators(ctx, 2, []byte(msg.MsgAIRequest.RequestID))
+	validators, err := k.RandomValidators(ctx, msg.MsgAIRequest.ValidatorCount, []byte(msg.MsgAIRequest.RequestID))
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrCannotRandomValidators, err.Error())
 	}
