@@ -149,6 +149,7 @@ func (k Keeper) RandomValidators(ctx sdk.Context, size int, nonce []byte) ([]sdk
 	valOperators := []sdk.ValAddress{}
 	maxValidatorSize := 0
 	totalPowers := int64(0)
+	validators := make([]sdk.ValAddress, size)
 	// store a mapping of validators that have already been chosen
 	chosenVal := make(map[string]string)
 	// count the total current validator
@@ -163,75 +164,72 @@ func (k Keeper) RandomValidators(ctx sdk.Context, size int, nonce []byte) ([]sdk
 	if totalPowers == int64(0) {
 		return nil, sdkerrors.Wrapf(
 			types.ErrValidatorsHaveNoVotes, "%d < %d", len(valOperators), size)
-	}
-
-	// check the total validator in the system. If less than input then return error
-	if maxValidatorSize < size {
+	} else if maxValidatorSize < size {
+		fmt.Println("not enough validators")
 		return nil, sdkerrors.Wrapf(
 			types.ErrNotEnoughValidators, "%d < %d", maxValidatorSize, size)
-	}
+	} else {
+		fmt.Println("enough validators")
+		k.stakingKeeper.IterateBondedValidatorsByPower(ctx,
+			func(idx int64, val exported.ValidatorI) (stop bool) {
+				// store the prev voting power validator
+				prevVotingP = curVotingP
+				// collect the new voting power
+				curVotingP = val.GetConsensusPower()
 
-	k.stakingKeeper.IterateBondedValidatorsByPower(ctx,
-		func(idx int64, val exported.ValidatorI) (stop bool) {
-			// store the prev voting power validator
-			prevVotingP = curVotingP
-			// collect the new voting power
-			curVotingP = val.GetConsensusPower()
+				// if we meet the equal sistuation the first time then we note down the index
+				if prevVotingP == curVotingP {
+					// increment the index by one to make up for the index loss of the current validator
+					specialIndex++
+				} else {
+					// reset the index to 0 since the sequence has ended
+					specialIndex = 0
+				}
 
-			// if we meet the equal sistuation the first time then we note down the index
-			if prevVotingP == curVotingP {
-				// increment the index by one to make up for the index loss of the current validator
-				specialIndex++
+				// the highest staked validator has the highest freq appearance in the list. When random => higher chance of getting picked
+				for i := 0; i < maxValidatorSize+specialIndex; i++ {
+					valOperators = append(valOperators, val.GetOperator())
+				}
+				maxValidatorSize--
+				return false
+			})
+
+		fmt.Println("valOperators list: ", valOperators)
+
+		randomGenerator, err := rng.NewRng(k.GetRngSeed(ctx), nonce, []byte(ctx.ChainID()))
+		if err != nil {
+			return nil, sdkerrors.Wrapf(types.ErrSeedinitiation, err.Error())
+		}
+		for i := 0; i < size; i++ {
+			// the dividend is randomed to make sure no one can predict the next validator
+			dividend := randomGenerator.RandUint64()
+			divisor := uint64(totalPowers)
+			// this value init makes sure that we at least calculate the modulo once
+			quotient := uint64(len(valOperators))
+			// we keep calculating the new modulo until we get in the range
+			for quotient >= uint64(len(valOperators)) {
+				quotient, err = calucateMol(dividend, divisor)
+				if err != nil {
+					return nil, err
+				}
+				dividend = divisor
+				divisor = quotient
+			}
+			// if the quotient is in the sampling list, and it is not in the chosen validator map range then we pick it
+			valStr := valOperators[quotient].String()
+			fmt.Println("chosen val: ", chosenVal[valStr])
+			fmt.Println("chosen val has existed ? ", chosenVal[valStr] != valStr)
+			if chosenVal[valStr] != valStr {
+				// add to the chosen validator list
+				chosenVal[valStr] = valStr
+				validators[i] = valOperators[quotient]
 			} else {
-				// reset the index to 0 since the sequence has ended
-				specialIndex = 0
+				// if it has been chosen already, we decrement the loop index to continue choosing a new one
+				i--
 			}
-
-			// the highest staked validator has the highest freq appearance in the list. When random => higher chance of getting picked
-			for i := 0; i < maxValidatorSize+specialIndex; i++ {
-				valOperators = append(valOperators, val.GetOperator())
-			}
-			maxValidatorSize--
-			return false
-		})
-
-	fmt.Println("valOperators list: ", valOperators)
-
-	randomGenerator, err := rng.NewRng(k.GetRngSeed(ctx), nonce, []byte(ctx.ChainID()))
-	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrSeedinitiation, err.Error())
-	}
-
-	validators := make([]sdk.ValAddress, size)
-	for i := 0; i < size; i++ {
-		// the dividend is randomed to make sure no one can predict the next validator
-		dividend := randomGenerator.RandUint64()
-		divisor := uint64(totalPowers)
-		// this value init makes sure that we at least calculate the modulo once
-		quotient := uint64(len(valOperators))
-		// we keep calculating the new modulo until we get in the range
-		for quotient >= uint64(len(valOperators)) {
-			quotient, err = calucateMol(dividend, divisor)
-			if err != nil {
-				return nil, err
-			}
-			dividend = divisor
-			divisor = quotient
+			fmt.Println("validator: ", validators[i].String())
+			fmt.Println("All validators: ", validators)
 		}
-		// if the quotient is in the sampling list, and it is not in the chosen validator map range then we pick it
-		valStr := valOperators[quotient].String()
-		fmt.Println("chosen val: ", chosenVal[valStr])
-		fmt.Println("chosen val has existed ? ", chosenVal[valStr] != valStr)
-		if chosenVal[valStr] != valStr {
-			// add to the chosen validator list
-			chosenVal[valStr] = valStr
-			validators[i] = valOperators[quotient]
-		} else {
-			// if it has been chosen already, we decrement the loop index to continue choosing a new one
-			i--
-		}
-		fmt.Println("validator: ", validators[i].String())
-		fmt.Println("All validators: ", validators)
 	}
 	return validators, nil
 }
