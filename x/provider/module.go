@@ -2,6 +2,7 @@ package provider
 
 import (
 	"encoding/json"
+	"fmt"
 
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/params"
@@ -178,6 +179,7 @@ func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) {
 	for i := 0; i < types.NumSeedRemoval; i++ {
 		newSeed = append(newSeed, hash[i])
 	}
+	fmt.Println("new seed: ", newSeed)
 	k.SetRngSeed(ctx, newSeed)
 	k.DirectAllocateTokens(ctx, req.GetLastCommitInfo().Votes)
 }

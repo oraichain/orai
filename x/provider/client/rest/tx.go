@@ -139,7 +139,7 @@ func setOracleScriptHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		// collect valid address from the request address string
 		addr, err := sdk.AccAddressFromBech32(baseReq.From)
 		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "invalid account address owner")
 			return
 		}
 
@@ -221,7 +221,7 @@ func setDataSourceHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		// collect valid address from the request address string
 		addr, err := sdk.AccAddressFromBech32(baseReq.From)
 		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "invalid account address owner")
 			return
 		}
 
@@ -466,26 +466,7 @@ func setPriceRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
 			return
 		}
-
-		// Collect fees in Coins type. Bug: cannot set fee through json using REST API => This is the workaround
-		var fees sdk.Coins
-		var err error
-		if len(req.Fees) != 0 {
-			fees, err = sdk.ParseCoins(req.Fees)
-			if err != nil {
-				rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request for fees")
-				return
-			}
-		}
-
-		req.BaseReq.Fees = fees
-
 		baseReq := req.BaseReq.Sanitize()
-
-		if !baseReq.ValidateBasic(w) {
-			return
-		}
-
 		// collect valid address from the request address string
 		addr, err := sdk.AccAddressFromBech32(baseReq.From)
 		if err != nil {
@@ -494,13 +475,18 @@ func setPriceRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// create the message
-		msg := types.NewMsgSetPriceRequest(types.NewMsgSetAIRequest(ksuid.New().String(), req.OracleScriptName, addr, baseReq.Fees.String(), req.ValidatorCount, req.Input, req.ExpectedOutput))
+		msg := types.NewMsgSetPriceRequest(types.NewMsgSetAIRequest(ksuid.New().String(), req.OracleScriptName, addr, req.Fees, req.ValidatorCount, req.Input, req.ExpectedOutput))
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "GHYK")
 			return
 		}
-
+		// Collect fees in Coins type. Bug: cannot set fee through json using REST API => This is the workaround
+		fees, _ := sdk.ParseCoins(req.Fees)
+		req.BaseReq.Fees = fees
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
 		utils.WriteGenerateStdTxResponse(w, cliCtx, baseReq, []sdk.Msg{msg})
 	}
 }

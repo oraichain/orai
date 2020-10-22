@@ -122,7 +122,7 @@ func handlePriceRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 				dataSourceResult := types.NewDataSourceResult(aiDataSources[j], []byte(result), types.ResultSuccess)
 
 				// By default, we consider returning null as failure. If any datasource does not follow this rule then it should not be used by any oracle scripts.
-				if result == types.FailedResult {
+				if result == types.FailedResult || len(result) == 0 {
 					// change status to fail so the datasource cannot be rewarded afterwards
 					dataSourceResult.Status = types.ResultFailure
 				}
@@ -298,7 +298,7 @@ func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 				dataSourceResult := types.NewDataSourceResult(aiDataSources[j], []byte(result), types.ResultSuccess)
 
 				// By default, we consider returning null as failure. If any datasource does not follow this rule then it should not be used by any oracle scripts.
-				if result == types.FailedResult {
+				if result == types.FailedResult || len(result) == 0 {
 					// change status to fail so the datasource cannot be rewarded afterwards
 					dataSourceResult.Status = types.ResultFailure
 				}
