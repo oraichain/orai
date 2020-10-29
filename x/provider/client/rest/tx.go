@@ -483,10 +483,11 @@ func setPriceRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 		// Collect fees in Coins type. Bug: cannot set fee through json using REST API => This is the workaround
 		fees, _ := sdk.ParseCoins(req.Fees)
-		req.BaseReq.Fees = fees
+		baseReq.Fees = fees
 		if !baseReq.ValidateBasic(w) {
 			return
 		}
+		fmt.Println("base req: ", baseReq)
 		utils.WriteGenerateStdTxResponse(w, cliCtx, baseReq, []sdk.Msg{msg})
 	}
 }

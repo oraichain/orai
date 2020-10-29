@@ -137,17 +137,21 @@ func NewValidator(
 // NewReward is a constructor for the reward struct
 func NewReward(
 	validators []Validator,
-	dataSourceOwners []sdk.AccAddress,
-	testCaseOwners []sdk.AccAddress,
+	dataSources []AIDataSource,
+	testCases []TestCase,
 	blockHeight int64,
 	totalVotingPower int64,
+	providerFees sdk.Coins,
+	validatorFees sdk.Coins,
 ) Reward {
 	return Reward{
-		Validators:       validators,
-		DataSourceOwners: dataSourceOwners,
-		TestCaseOwners:   testCaseOwners,
-		BlockHeight:      blockHeight,
-		TotalPower:       totalVotingPower,
+		Validators:    validators,
+		DataSources:   dataSources,
+		TestCases:     testCases,
+		BlockHeight:   blockHeight,
+		TotalPower:    totalVotingPower,
+		ProviderFees:  providerFees,
+		ValidatorFees: validatorFees,
 	}
 }
 

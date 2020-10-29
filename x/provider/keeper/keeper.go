@@ -327,16 +327,6 @@ func (k Keeper) GetAIDataSourceFile(name string) []byte {
 	return code
 }
 
-// SetRngSeed sets the rolling seed value to be provided value.
-func (k Keeper) SetRngSeed(ctx sdk.Context, rollingSeed []byte) {
-	ctx.KVStore(k.storeKey).Set(types.SeedStoreKey(), rollingSeed)
-}
-
-// GetRngSeed returns the current rolling seed value.
-func (k Keeper) GetRngSeed(ctx sdk.Context) []byte {
-	return ctx.KVStore(k.storeKey).Get(types.SeedStoreKey())
-}
-
 // GetDNamesTcNames is a function that collects test case names and data source names from the oracle script
 func (k Keeper) GetDNamesTcNames(oscriptPath string) ([]string, []string, error) {
 	//use "data source" as an argument to collect the data source script name

@@ -196,3 +196,8 @@ func StrategyStoreKey(stratID uint64, stratName string) []byte {
 func SeedStoreKey() []byte {
 	return []byte(SeedKeyPrefix + "seed")
 }
+
+// RequeststoreKeyPrefixAll returns the prefix of request key (used to iterate all the requests of all requests
+func RequeststoreKeyPrefixAll() []byte {
+	return []byte(RequestKeyPrefix)
+}

@@ -2,7 +2,6 @@ package provider
 
 import (
 	"encoding/json"
-	"fmt"
 
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/params"
@@ -166,27 +165,13 @@ func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.Val
 // on every begin block
 func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) {
 	// 	TODO: fill out if your application requires beginblock, if not you can delete this function
-	//k.AllocateTokens(ctx, req.GetLastCommitInfo().Votes)
-	oldSeed := k.GetRngSeed(ctx)
-	var newSeed []byte
-	if len(oldSeed) == 0 {
-		k.SetRngSeed(ctx, make([]byte, types.RngSeedSize))
-		oldSeed = k.GetRngSeed(ctx)
-	}
-	newSeed = oldSeed[types.NumSeedRemoval:]
-	hash := req.GetHash()
-	// generate a new seed by removing 5 first bytes of the previous seed, and add 5 new bytes from the new hash.
-	for i := 0; i < types.NumSeedRemoval; i++ {
-		newSeed = append(newSeed, hash[i])
-	}
-	fmt.Println("new seed: ", newSeed)
-	k.SetRngSeed(ctx, newSeed)
-	k.DirectAllocateTokens(ctx, req.GetLastCommitInfo().Votes)
+	k.ResolveRngSeed(ctx, req)
+	k.AllocateTokens(ctx, req.GetLastCommitInfo().Votes)
+	//k.DirectAllocateTokens(ctx, req.GetLastCommitInfo().Votes)
 }
 
 // EndBlocker called every block, process inflation, update validator set.
 func EndBlocker(ctx sdk.Context, k Keeper) {
 	// 	TODO: fill out if your application requires endblock, if not you can delete this function
-
 	k.ProcessReward(ctx)
 }

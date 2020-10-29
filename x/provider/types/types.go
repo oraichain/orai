@@ -106,11 +106,13 @@ type Report struct {
 
 // Reward stores a list of validators, data source owners and test case owners that receive rewards for a specific block height
 type Reward struct {
-	Validators       []Validator      `json:"validators"`
-	DataSourceOwners []sdk.AccAddress `json:"data_source_owners"`
-	TestCaseOwners   []sdk.AccAddress `json:"test_case_owners"`
-	BlockHeight      int64            `json:"block_height"`
-	TotalPower       int64            `json:"total_voting_power"`
+	Validators    []Validator    `json:"validators"`
+	DataSources   []AIDataSource `json:"data_sources"`
+	TestCases     []TestCase     `json:"test_cases"`
+	BlockHeight   int64          `json:"block_height"`
+	TotalPower    int64          `json:"total_voting_power"`
+	ProviderFees  sdk.Coins      `json:"provider_fees"`
+	ValidatorFees sdk.Coins      `json:"validator_fees"`
 }
 
 // AIRequestResult stores the final result after aggregating the results from the reports of an AI request

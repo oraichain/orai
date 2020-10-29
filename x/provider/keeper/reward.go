@@ -26,24 +26,19 @@ func (k Keeper) GetReward(ctx sdk.Context, blockHeight int64) (types.Reward, err
 // ProcessReward collects all the information needed to create a new Reward object
 func (k Keeper) ProcessReward(ctx sdk.Context) {
 	blockHeight := ctx.BlockHeight()
-
 	reports := k.GetReportsBlockHeight(ctx, blockHeight)
-
 	// if there's no report from any validators, we skip
 	if len(reports) == 0 {
 		return
 	}
-
-	reward := types.NewReward([]types.Validator{}, []sdk.AccAddress{}, []sdk.AccAddress{}, blockHeight, int64(0))
+	reward := types.NewReward([]types.Validator{}, []types.AIDataSource{}, []types.TestCase{}, blockHeight, int64(0), sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(0)))), sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(0)))))
 
 	// Collect all the reports in the current block to get all the information for the reward
 	for _, report := range k.GetReportsBlockHeight(ctx, blockHeight) {
-		vals, epOwners, tcOwners, votingPower := k.ResolveRequest(ctx, report, ctx.BlockHeight())
-		reward.Validators = append(reward.Validators, vals...)
-		reward.DataSourceOwners = append(reward.DataSourceOwners, epOwners...)
-		reward.TestCaseOwners = append(reward.TestCaseOwners, tcOwners...)
-		reward.TotalPower = reward.TotalPower + votingPower
+		k.ResolveRequestsFromReports(ctx, report, &reward, ctx.BlockHeight())
 	}
-
-	k.SetReward(ctx, blockHeight, reward)
+	// check if the reward is empty or not
+	if len(reward.Validators) > 0 {
+		k.SetReward(ctx, blockHeight, reward)
+	}
 }

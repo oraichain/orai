@@ -125,10 +125,10 @@ func handlePriceRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 				if result == types.FailedResult || len(result) == 0 {
 					// change status to fail so the datasource cannot be rewarded afterwards
 					dataSourceResult.Status = types.ResultFailure
+				} else {
+					// append an data source result into the list
+					dataSourceResultsTest = append(dataSourceResultsTest, dataSourceResult)
 				}
-
-				// append an data source result into the list
-				dataSourceResultsTest = append(dataSourceResultsTest, dataSourceResult)
 			}
 
 			// add test case result
