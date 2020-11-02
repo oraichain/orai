@@ -84,11 +84,14 @@ func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep types.Report, re
 	if !validation {
 		return
 	}
+
 	// collect data source owners that have their data sources executed to reward
 	for _, dataSourceResult := range rep.DataSourceResults {
-		dataSource, _ := k.GetAIDataSource(ctx, dataSourceResult.Name)
-		reward.DataSources = append(reward.DataSources, dataSource)
-		reward.ProviderFees = reward.ProviderFees.Add(dataSource.Fees...)
+		if dataSourceResult.Status == types.ResultSuccess {
+			dataSource, _ := k.GetAIDataSource(ctx, dataSourceResult.Name)
+			reward.DataSources = append(reward.DataSources, dataSource)
+			reward.ProviderFees = reward.ProviderFees.Add(dataSource.Fees...)
+		}
 	}
 
 	// collect data source owners that have their data sources executed to reward

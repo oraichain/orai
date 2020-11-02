@@ -125,10 +125,9 @@ func handlePriceRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 				if result == types.FailedResult || len(result) == 0 {
 					// change status to fail so the datasource cannot be rewarded afterwards
 					dataSourceResult.Status = types.ResultFailure
-				} else {
-					// append an data source result into the list
-					dataSourceResultsTest = append(dataSourceResultsTest, dataSourceResult)
 				}
+				// append an data source result into the list
+				dataSourceResultsTest = append(dataSourceResultsTest, dataSourceResult)
 			}
 
 			// add test case result
@@ -140,51 +139,56 @@ func handlePriceRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 		// we use dataSourceResultsTest since this list is the complete list of data sources that have passed the test cases
 		for i := range dataSourceResultsTest {
 			// run the data source script
-			cmdTestCase := exec.Command("bash", types.ScriptPath+types.DataSourceStoreKeyString(dataSourceResultsTest[i].Name))
 			var outTestCase bytes.Buffer
-			cmdTestCase.Stdout = &outTestCase
-			err = cmdTestCase.Run()
-			if err != nil {
-				l.Error(":skull: failed to execute data source script: %s", err.Error())
+			var dataSourceResult types.DataSourceResult
+			if dataSourceResultsTest[i].Status == types.ResultSuccess {
+				cmdTestCase := exec.Command("bash", types.ScriptPath+types.DataSourceStoreKeyString(dataSourceResultsTest[i].Name))
+				cmdTestCase.Stdout = &outTestCase
+				err = cmdTestCase.Run()
+				if err != nil {
+					l.Error(":skull: failed to execute data source script: %s", err.Error())
+				}
+				// collect test case result from the script
+				result := strings.TrimSuffix(outTestCase.String(), "\n")
+				fmt.Println("result from data sources: ", result)
+				// By default, we consider returning null as failure. If any datasource does not follow this rule then it should not be used by any oracle scripts.
+				dataSourceResult = types.NewDataSourceResult(dataSourceResultsTest[i].Name, []byte(result), types.ResultSuccess)
+				if len(result) == 0 {
+					// change status to fail so the datasource cannot be rewarded afterwards
+					dataSourceResult.Status = types.ResultFailure
+				} else {
+					finalResultStr = finalResultStr + result + "-"
+				}
+			} else {
+				dataSourceResult = types.NewDataSourceResult(dataSourceResultsTest[i].Name, []byte(dataSourceResultsTest[i].Result), types.ResultFailure)
 			}
-
-			// collect test case result from the script
-			result := strings.TrimSuffix(outTestCase.String(), "\n")
-
-			fmt.Println("result from data sources: ", result)
-
 			// append an data source result into the list
-			dataSourceResults = append(dataSourceResults, types.NewDataSourceResult(dataSourceResultsTest[i].Name, []byte(result), types.ResultSuccess))
-
-			// resultInt, _ := strconv.Atoi(result)
-			// finalResult = finalResult + resultInt
-			finalResultStr = finalResultStr + result + "-"
+			dataSourceResults = append(dataSourceResults, dataSourceResult)
 		}
 
 		fmt.Println("final result string: ", finalResultStr)
 		fmt.Println("final result after trimming: ", strings.TrimSuffix(finalResultStr, "-"))
+		msgReport := NewReport(req.AIRequest.RequestID, c.validator, dataSourceResults, testCaseResults, key.GetAddress(), sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(5000)))), []byte(finalResultStr))
+		if len(finalResultStr) == 0 {
+			msgReport.AggregatedResult = []byte(types.FailedResult)
+			// Create a new MsgCreateReport to the Oraichain
+		} else {
+			// "2" here is the expected output that the user wants to get
+			cmd := exec.Command("bash", oscriptPath, "aggregation", finalResultStr)
+			var res bytes.Buffer
+			cmd.Stdout = &res
+			err = cmd.Run()
+			if err != nil {
+				l.Error(":skull: failed to aggregate results: %s", err.Error())
+			}
 
-		// report := k.GetAllReports(ctx)
-		// fmt.Printf("Report: %v\n", report)
-
-		// "2" here is the expected output that the user wants to get
-		cmd := exec.Command("bash", oscriptPath, "aggregation", strings.TrimSuffix(finalResultStr, "-"))
-		var res bytes.Buffer
-		cmd.Stdout = &res
-		err = cmd.Run()
-		if err != nil {
-			l.Error(":skull: failed to aggregate results: %s", err.Error())
+			// collect data source result from the script
+			ress := strings.TrimSuffix(res.String(), "\n")
+			fmt.Printf("final result from oScript: %s\n", ress)
+			msgReport.AggregatedResult = []byte(ress)
 		}
-
-		// collect data source result from the script
-		ress := strings.TrimSuffix(res.String(), "\n")
-		fmt.Printf("final result from oScript: %s\n", ress)
-
-		msgReport := NewReport(req.AIRequest.RequestID, c.validator, dataSourceResults, testCaseResults, key.GetAddress(), sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(5000)))), []byte(ress))
-
 		// Create a new MsgCreateReport to the Oraichain
 		SubmitReport(c, l, key, msgReport)
-
 	}(l.With("reqid", req.AIRequest.RequestID, "oscriptname", req.AIRequest.OracleScriptName), req)
 }
 
