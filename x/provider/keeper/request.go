@@ -53,12 +53,11 @@ func (k Keeper) CollectRequestFees(ctx sdk.Context, blockHeight int64) (fees sdk
 	requests := k.GetRequestsBlockHeight(ctx, blockHeight)
 	if len(requests) == 0 {
 		return sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(0))))
-	} else {
-		for _, request := range requests {
-			fees = fees.Add(request.Fees...)
-		}
-		return fees
 	}
+	for _, request := range requests {
+		fees = fees.Add(request.Fees...)
+	}
+	return fees
 }
 
 // ResolveExpiredRequest handles requests that have been expired
