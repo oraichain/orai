@@ -171,6 +171,9 @@ func handlePriceRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 
 		fmt.Println("final result string: ", finalResultStr)
 		fmt.Println("final result after trimming: ", strings.TrimSuffix(finalResultStr, "-"))
+		if len(finalResultStr) == 0 {
+			finalResultStr = types.ResultFailure
+		}
 
 		// report := k.GetAllReports(ctx)
 		// fmt.Printf("Report: %v\n", report)
