@@ -26,7 +26,7 @@ func (k Keeper) ResolveRngSeed(ctx sdk.Context, req abci.RequestBeginBlock) {
 	}
 	newSeed = oldSeed[types.NumSeedRemoval:]
 	hash := req.GetHash()
-	// generate a new seed by removing 5 first bytes of the previous seed, and add 5 new bytes from the new hash.
+	// generate a new seed by removing the first byte of the previous seed, and add a new byte from the new hash.
 	for i := 0; i < types.NumSeedRemoval; i++ {
 		newSeed = append(newSeed, hash[i])
 	}

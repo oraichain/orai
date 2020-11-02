@@ -59,7 +59,7 @@ const (
 	RngSeedSize = 64
 
 	// NumSeedRemoval is the number of bytes an old seed is removed to generate a new one
-	NumSeedRemoval = 5
+	NumSeedRemoval = 1
 	// Denom is the denominator of the currency
 	Denom = "orai"
 )
