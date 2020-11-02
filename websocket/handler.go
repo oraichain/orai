@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ducphamle2/dexai/x/provider/types"
+	"github.com/oraichain/orai/x/provider/types"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
@@ -122,13 +122,13 @@ func handlePriceRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 				dataSourceResult := types.NewDataSourceResult(aiDataSources[j], []byte(result), types.ResultSuccess)
 
 				// By default, we consider returning null as failure. If any datasource does not follow this rule then it should not be used by any oracle scripts.
-				if result == types.FailedResult {
+				if result == types.FailedResult || len(result) == 0 {
 					// change status to fail so the datasource cannot be rewarded afterwards
 					dataSourceResult.Status = types.ResultFailure
+				} else {
+					// append an data source result into the list
+					dataSourceResultsTest = append(dataSourceResultsTest, dataSourceResult)
 				}
-
-				// append an data source result into the list
-				dataSourceResultsTest = append(dataSourceResultsTest, dataSourceResult)
 			}
 
 			// add test case result
@@ -298,7 +298,7 @@ func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 				dataSourceResult := types.NewDataSourceResult(aiDataSources[j], []byte(result), types.ResultSuccess)
 
 				// By default, we consider returning null as failure. If any datasource does not follow this rule then it should not be used by any oracle scripts.
-				if result == types.FailedResult {
+				if result == types.FailedResult || len(result) == 0 {
 					// change status to fail so the datasource cannot be rewarded afterwards
 					dataSourceResult.Status = types.ResultFailure
 				}

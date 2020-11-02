@@ -131,13 +131,7 @@ func (msg MsgCreateAIDataSource) ValidateBasic() error {
 	if len(msg.Name) == 0 || len(msg.Code) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "Name and/or Code cannot be empty")
 	}
-	if len(msg.Fees) != 0 {
-		_, err := sdk.ParseCoins(msg.Fees)
-		if err != nil {
-			return sdkerrors.Wrap(ErrInvalidFeeType, err.Error())
-		}
-	}
-	return nil
+	return checkFees(msg.Fees)
 }
 
 // GetSignBytes encodes the message for signing
@@ -186,13 +180,7 @@ func (msg MsgEditAIDataSource) ValidateBasic() error {
 	if len(msg.OldName) == 0 || len(msg.Code) == 0 || len(msg.NewName) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "Name and/or Code cannot be empty")
 	}
-	if len(msg.Fees) != 0 {
-		_, err := sdk.ParseCoins(msg.Fees)
-		if err != nil {
-			return sdkerrors.Wrap(ErrInvalidFeeType, err.Error())
-		}
-	}
-	return nil
+	return checkFees(msg.Fees)
 }
 
 // GetSignBytes encodes the message for signing
@@ -290,13 +278,7 @@ func (msg MsgSetAIRequest) ValidateBasic() error {
 	if len(msg.OracleScriptName) == 0 || msg.ValidatorCount <= 0 {
 		return sdkerrors.Wrap(ErrNameIsEmpty, "Name or / and validator count cannot be empty")
 	}
-	if len(msg.Fees) != 0 {
-		_, err := sdk.ParseCoins(msg.Fees)
-		if err != nil {
-			return sdkerrors.Wrap(ErrInvalidFeeType, err.Error())
-		}
-	}
-	return nil
+	return checkFees(msg.Fees)
 }
 
 // GetSignBytes encodes the message for signing
@@ -383,13 +365,7 @@ func (msg MsgCreateTestCase) ValidateBasic() error {
 	if len(msg.Name) == 0 || len(msg.Code) == 0 {
 		return sdkerrors.Wrap(ErrNameIsEmpty, "Name or/and code cannot be empty")
 	}
-	if len(msg.Fees) != 0 {
-		_, err := sdk.ParseCoins(msg.Fees)
-		if err != nil {
-			return sdkerrors.Wrap(ErrInvalidFeeType, err.Error())
-		}
-	}
-	return nil
+	return checkFees(msg.Fees)
 }
 
 // GetSignBytes encodes the message for signing
@@ -438,13 +414,7 @@ func (msg MsgEditTestCase) ValidateBasic() error {
 	if len(msg.OldName) == 0 || len(msg.Code) == 0 || len(msg.NewName) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "Name and/or Code cannot be empty")
 	}
-	if len(msg.Fees) != 0 {
-		_, err := sdk.ParseCoins(msg.Fees)
-		if err != nil {
-			return sdkerrors.Wrap(ErrInvalidFeeType, err.Error())
-		}
-	}
-	return nil
+	return checkFees(msg.Fees)
 }
 
 // GetSignBytes encodes the message for signing
@@ -459,9 +429,8 @@ func (msg MsgEditTestCase) GetSigners() []sdk.AccAddress {
 
 // MsgCreateReport defines message for creating a report by a reporter of a validator
 type MsgCreateReport struct {
-	RequestID string         `json:"request_id"`
-	Validator sdk.ValAddress `json:"validator"`
-	// DataSourceResults are the actual results, not from the test cases
+	RequestID         string             `json:"request_id"`
+	Validator         sdk.ValAddress     `json:"validator"`
 	DataSourceResults []DataSourceResult `json:"data_source_results"`
 	TestCaseResults   []TestCaseResult   `json:"test_case_results"`
 	Reporter          sdk.AccAddress     `json:"reporter"`
@@ -500,14 +469,13 @@ func (msg MsgCreateReport) Type() string { return "create_report" }
 func (msg MsgCreateReport) ValidateBasic() error {
 	if msg.Reporter.Empty() {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Reporter.String())
-	}
-	if len(msg.RequestID) == 0 || len(msg.Validator) == 0 {
+	} else if len(msg.RequestID) == 0 || msg.Validator.Empty() {
 		return sdkerrors.Wrap(ErrMsgInvalid, "Request ID / validator address cannot be empty")
+	} else if len(msg.DataSourceResults) == 0 || len(msg.TestCaseResults) == 0 || len(msg.AggregatedResult) == 0 {
+		return sdkerrors.Wrap(ErrMsgInvalid, "lengths of the data source and test case must be greater than zero, and there must be an aggregated result")
+	} else {
+		return checkFees(msg.Fees.String())
 	}
-	if len(msg.DataSourceResults) == 0 || len(msg.TestCaseResults) == 0 {
-		return sdkerrors.Wrap(ErrMsgInvalid, "lengths of the data source and test case must be greater than zero")
-	}
-	return nil
 }
 
 // GetSignBytes encodes the message for signing
@@ -547,7 +515,7 @@ func (msg MsgAddReporter) Type() string { return "add_reporter" }
 
 // ValidateBasic runs stateless checks on the message
 func (msg MsgAddReporter) ValidateBasic() error {
-	if len(msg.Validator) == 0 || len(msg.Adder) == 0 || len(msg.Reporter) == 0 {
+	if msg.Validator.Empty() || msg.Adder.Empty() || msg.Reporter.Empty() {
 		return sdkerrors.Wrap(ErrReporterMsgInvalid, "The message attibutes cannot be empty")
 	}
 	return nil
@@ -590,7 +558,7 @@ func (msg MsgRemoveReporter) Type() string { return "remove_reporter" }
 
 // ValidateBasic runs stateless checks on the message
 func (msg MsgRemoveReporter) ValidateBasic() error {
-	if len(msg.Validator) == 0 || len(msg.Remover) == 0 || len(msg.Reporter) == 0 {
+	if msg.Validator.Empty() || msg.Remover.Empty() || msg.Reporter.Empty() {
 		return sdkerrors.Wrap(ErrReporterMsgInvalid, "The message attibutes cannot be empty")
 	}
 	return nil
@@ -672,4 +640,12 @@ func (msg MsgCreateStrategy) GetSignBytes() []byte {
 // GetSigners defines whose signature is required
 func (msg MsgCreateStrategy) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Creator}
+}
+
+func checkFees(fees string) error {
+	_, err := sdk.ParseCoins(fees)
+	if err != nil {
+		return sdkerrors.Wrap(ErrInvalidFeeType, err.Error())
+	}
+	return nil
 }

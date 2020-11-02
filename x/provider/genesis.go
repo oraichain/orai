@@ -2,7 +2,7 @@ package provider
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ducphamle2/dexai/x/provider/types"
+	"github.com/oraichain/orai/x/provider/types"
 )
 
 // InitGenesis initialize default parameters, can assign some coins in the chain here
@@ -19,8 +19,10 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 		keeper.CreateTestCase(ctx, record.Name, record)
 	}
 
+	// Init params for the provider module
 	keeper.SetParam(ctx, types.KeyOracleScriptRewardPercentage, data.Params.OracleScriptRewardPercentage)
 	keeper.SetParam(ctx, types.KeyExpirationCount, data.Params.ExpirationCount)
+	keeper.SetRngSeed(ctx, make([]byte, types.RngSeedSize))
 }
 
 // ExportGenesis writes the current store values

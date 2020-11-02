@@ -30,6 +30,8 @@ type BankKeeper interface {
 type BankKeeper interface {
 	SubtractCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, error)
 	SendCoins(ctx sdk.Context, fromAddr sdk.AccAddress, toAddr sdk.AccAddress, amt sdk.Coins) error
+	AddCoins(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coins) (sdk.Coins, error)
+	GetCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 }
 
 // SupplyKeeper defines the expected supply Keeper.

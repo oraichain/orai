@@ -24,7 +24,7 @@ import (
 	"github.com/tendermint/go-amino"
 	"github.com/tendermint/tendermint/libs/cli"
 
-	"github.com/ducphamle2/dexai/app"
+	"github.com/oraichain/orai/app"
 )
 
 func main() {

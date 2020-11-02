@@ -16,8 +16,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
-	"github.com/ducphamle2/dexai/x/provider"
-	"github.com/ducphamle2/dexai/x/provider/types"
+	"github.com/oraichain/orai/x/provider"
+	"github.com/oraichain/orai/x/provider/types"
 )
 
 // GenesisState represents chain state at the start of the chain. Any initial state (account balances) are stored here.

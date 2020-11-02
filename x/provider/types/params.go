@@ -10,7 +10,7 @@ import (
 const (
 	DefaultParamspace = ModuleName
 	// TODO: Define your default parameters
-	DefaultOracleScriptRewardPercentage = uint64(60)
+	DefaultOracleScriptRewardPercentage = uint64(70)
 	DefaultExpirationCount              = uint64(10)
 )
 

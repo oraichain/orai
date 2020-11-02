@@ -8,8 +8,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ducphamle2/dexai/x/provider/keeper"
-	"github.com/ducphamle2/dexai/x/provider/types"
+	"github.com/oraichain/orai/x/provider/keeper"
+	"github.com/oraichain/orai/x/provider/types"
 )
 
 // NewHandler creates an sdk.Handler for all the provider type messages
@@ -64,6 +64,8 @@ func handleMsgCreateOracleScript(ctx sdk.Context, k keeper.Keeper, msg types.Msg
 	// collect minimum fees required to run the oracle script
 	minimumFees, err := k.GetMinimumFees(ctx, aiDataSources, testCases)
 	if err != nil {
+		// erase because the script file is not properly added into the chain yet
+		k.EraseOracleScriptFile(msg.Name)
 		return nil, err
 	}
 	k.SetOracleScript(ctx, msg.Name, types.NewOracleScript(msg.Name, msg.Owner, msg.Description, minimumFees))
@@ -181,7 +183,7 @@ func handleMsgEditAIDataSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgEd
 }
 
 func handleMsgSetPriceRequest(ctx sdk.Context, k keeper.Keeper, msg types.MsgSetPriceRequest) (*sdk.Result, error) {
-	validators, err := k.RandomValidators(ctx, msg.MsgAIRequest.ValidatorCount)
+	validators, err := k.RandomValidators(ctx, msg.MsgAIRequest.ValidatorCount, []byte(msg.MsgAIRequest.RequestID))
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrCannotRandomValidators, err.Error())
 	}
@@ -190,7 +192,7 @@ func handleMsgSetPriceRequest(ctx sdk.Context, k keeper.Keeper, msg types.MsgSet
 	fees, _ := sdk.ParseCoins(msg.MsgAIRequest.Fees)
 	// Compute the fee allocated for oracle module to distribute to active validators.
 	rewardRatio := sdk.NewDecWithPrec(int64(k.GetParam(ctx, types.KeyOracleScriptRewardPercentage)), 2)
-	// We need to calculate the final 60% fee given by the user because the remaining 40% must be reserved for the proposer and validators.
+	// We need to calculate the final 70% fee given by the user because the remaining 30% must be reserved for the proposer and validators.
 	providedCoins, _ := sdk.NewDecCoinsFromCoins(fees...).MulDecTruncate(rewardRatio).TruncateDecimal()
 
 	//validatorFees, err := k.GetValidatorFees(ctx, providedCoins, validators)
@@ -237,51 +239,58 @@ func handleMsgSetPriceRequest(ctx sdk.Context, k keeper.Keeper, msg types.MsgSet
 		// Aggregate the required fees for an AI request
 		totalFees = totalFees.Add(aiDataSource.Fees...)
 	}
+	// valFees = 2/5 total dsource and test case fees (70% total in 100% of total fees split into 20% and 50% respectively)
+	valFees, _ := sdk.NewDecCoinsFromCoins(totalFees...).MulDec(sdk.NewDecWithPrec(int64(40), 2)).TruncateDecimal()
+	// 50% + 20% = 70% * validatorCount fees (since k validators will execute, the fees need to be propotional to the number of vals)
+	bothFees := sdk.NewDecCoinsFromCoins(totalFees.Add(valFees...)...)
+	finalFees, _ := bothFees.MulDec(sdk.NewDec(int64(msg.MsgAIRequest.ValidatorCount))).TruncateDecimal()
+	fmt.Println("both fees: ", bothFees.String())
+	fmt.Println("final fees needed: ", finalFees.String())
 
 	// If the total fee is larger than the fee provided by the user then we return error
-	if totalFees.IsAnyGT(providedCoins) {
+	if finalFees.IsAnyGT(providedCoins) {
 		return nil, sdkerrors.Wrap(types.ErrNeedMoreFees, "Fees given by the users are less than the total fees needed")
-	}
+	} else {
+		// set a new request with the aggregated result into blockchain
+		request := types.NewAIRequest(msg.MsgAIRequest.RequestID, msg.MsgAIRequest.OracleScriptName, msg.MsgAIRequest.Creator, validators, ctx.BlockHeight(), dataSourceObjs, testcaseObjs, fees, msg.MsgAIRequest.Input, msg.MsgAIRequest.ExpectedOutput)
 
-	// set a new request with the aggregated result into blockchain
-	request := types.NewAIRequest(msg.MsgAIRequest.RequestID, msg.MsgAIRequest.OracleScriptName, msg.MsgAIRequest.Creator, validators, ctx.BlockHeight(), dataSourceObjs, testcaseObjs, fees, msg.MsgAIRequest.Input, msg.MsgAIRequest.ExpectedOutput)
+		//fmt.Printf("request result: %s\n", outOracleScript.String())
 
-	//fmt.Printf("request result: %s\n", outOracleScript.String())
+		k.SetAIRequest(ctx, request.RequestID, request)
 
-	k.SetAIRequest(ctx, request.RequestID, request)
-
-	// TODO: Define your msg events
-	// Emit an event describing a data request and asked validators.
-	event := sdk.NewEvent(types.EventTypeSetPriceRequest)
-	event = event.AppendAttributes(
-		sdk.NewAttribute(types.AttributeRequestID, string(request.RequestID[:])),
-	)
-	for _, validator := range validators {
+		// TODO: Define your msg events
+		// Emit an event describing a data request and asked validators.
+		event := sdk.NewEvent(types.EventTypeSetPriceRequest)
 		event = event.AppendAttributes(
-			sdk.NewAttribute(types.AttributeRequestValidator, validator.String()),
+			sdk.NewAttribute(types.AttributeRequestID, string(request.RequestID[:])),
 		)
-	}
-	ctx.EventManager().EmitEvent(event)
+		for _, validator := range validators {
+			event = event.AppendAttributes(
+				sdk.NewAttribute(types.AttributeRequestValidator, validator.String()),
+			)
+		}
+		ctx.EventManager().EmitEvent(event)
 
-	// TODO: Define your msg events
-	// Emit an event describing a data request and asked validators.
-	event = sdk.NewEvent(types.EventTypeRequestWithData)
-	event = event.AppendAttributes(
-		sdk.NewAttribute(types.AttributeRequestID, string(request.RequestID[:])),
-		sdk.NewAttribute(types.AttributeOracleScriptName, request.OracleScriptName),
-		sdk.NewAttribute(types.AttributeRequestCreator, msg.MsgAIRequest.Creator.String()),
-		sdk.NewAttribute(types.AttributeRequestValidatorCount, string(msg.MsgAIRequest.ValidatorCount)),
-		sdk.NewAttribute(types.AttributeRequestInput, string(msg.MsgAIRequest.Input)),
-		sdk.NewAttribute(types.AttributeRequestExpectedOutput, string(msg.MsgAIRequest.ExpectedOutput)),
-	)
-	ctx.EventManager().EmitEvent(event)
-	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
+		// TODO: Define your msg events
+		// Emit an event describing a data request and asked validators.
+		event = sdk.NewEvent(types.EventTypeRequestWithData)
+		event = event.AppendAttributes(
+			sdk.NewAttribute(types.AttributeRequestID, string(request.RequestID[:])),
+			sdk.NewAttribute(types.AttributeOracleScriptName, request.OracleScriptName),
+			sdk.NewAttribute(types.AttributeRequestCreator, msg.MsgAIRequest.Creator.String()),
+			sdk.NewAttribute(types.AttributeRequestValidatorCount, string(msg.MsgAIRequest.ValidatorCount)),
+			sdk.NewAttribute(types.AttributeRequestInput, string(msg.MsgAIRequest.Input)),
+			sdk.NewAttribute(types.AttributeRequestExpectedOutput, string(msg.MsgAIRequest.ExpectedOutput)),
+		)
+		ctx.EventManager().EmitEvent(event)
+		return &sdk.Result{Events: ctx.EventManager().Events()}, nil
+	}
 }
 
 // handleMsgSetKYCRequest is a function message setting a new AI request
 func handleMsgSetKYCRequest(ctx sdk.Context, k keeper.Keeper, msg types.MsgSetKYCRequest) (*sdk.Result, error) {
 
-	validators, err := k.RandomValidators(ctx, msg.MsgAIRequest.ValidatorCount)
+	validators, err := k.RandomValidators(ctx, msg.MsgAIRequest.ValidatorCount, []byte(msg.MsgAIRequest.RequestID))
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrCannotRandomValidators, err.Error())
 	}
@@ -290,7 +299,7 @@ func handleMsgSetKYCRequest(ctx sdk.Context, k keeper.Keeper, msg types.MsgSetKY
 	fees, _ := sdk.ParseCoins(msg.MsgAIRequest.Fees)
 	// Compute the fee allocated for oracle module to distribute to active validators.
 	rewardRatio := sdk.NewDecWithPrec(int64(k.GetParam(ctx, types.KeyOracleScriptRewardPercentage)), 2)
-	// We need to calculate the final 60% fee given by the user because the remaining 40% must be reserved for the proposer and validators.
+	// We need to calculate the final 70% fee given by the user because the remaining 40% must be reserved for the proposer and validators.
 	providedCoins, _ := sdk.NewDecCoinsFromCoins(fees...).MulDecTruncate(rewardRatio).TruncateDecimal()
 
 	//validatorFees, err := k.GetValidatorFees(ctx, providedCoins, validators)

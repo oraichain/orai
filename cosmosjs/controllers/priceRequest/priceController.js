@@ -51,7 +51,8 @@ module.exports = {
                 "oracle_script_name": oScriptName,
                 "input": input,
                 "expected_output": expectedOutput,
-                "fees": fees
+                "fees": fees,
+                "validator_count": req.body.validator_count.toString()
               }, (isSuccess, response, error) => {
                 if (isSuccess) {
                   unsignedTx = response.data;

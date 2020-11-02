@@ -55,6 +55,11 @@ const (
 	// ScriptPath is the path that stores all the script files (oracle scripts, data sources, test cases)
 	ScriptPath = ".oraifiles/"
 
+	// RngSeedSize is the size of the random seed for validator sampling.
+	RngSeedSize = 64
+
+	// NumSeedRemoval is the number of bytes an old seed is removed to generate a new one
+	NumSeedRemoval = 1
 	// Denom is the denominator of the currency
 	Denom = "orai"
 )
@@ -86,6 +91,9 @@ var (
 
 	// StrategyKeyPrefix sets a prefix for a strategy key
 	StrategyKeyPrefix = "st"
+
+	// SeedKeyPrefix sets a prefix for the rng seed
+	SeedKeyPrefix = "sd"
 )
 
 // OracleScriptStoreKey returns the key to retrieve a specfic oScript from the store.
@@ -182,4 +190,14 @@ func RewardStoreKey(blockHeight int64) []byte {
 // StrategyStoreKey returns the key to retrieve a specfic strategy from the store.
 func StrategyStoreKey(stratID uint64, stratName string) []byte {
 	return []byte(StrategyKeyPrefix + strconv.FormatUint(stratID, 10) + stratName)
+}
+
+// SeedStoreKey returns the key to retrieve a specfic seed from the store.
+func SeedStoreKey() []byte {
+	return []byte(SeedKeyPrefix + "seed")
+}
+
+// RequeststoreKeyPrefixAll returns the prefix of request key (used to iterate all the requests of all requests
+func RequeststoreKeyPrefixAll() []byte {
+	return []byte(RequestKeyPrefix)
 }

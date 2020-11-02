@@ -12,8 +12,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/ducphamle2/dexai/packages/filecache"
-	"github.com/ducphamle2/dexai/x/provider/types"
+	"github.com/oraichain/orai/packages/filecache"
+	"github.com/oraichain/orai/x/provider/types"
 )
 
 // Keeper of the provider store
@@ -277,6 +277,11 @@ func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
 // AddOracleScriptFile adds the file to filecache,
 func (k Keeper) AddOracleScriptFile(file []byte, name string) {
 	k.fileCache.AddFile(file, types.OracleScriptStoreKeyString(name))
+}
+
+// EraseOracleScriptFile removes the file in the filecache,
+func (k Keeper) EraseOracleScriptFile(name string) {
+	k.fileCache.EraseFile(types.OracleScriptStoreKeyString(name))
 }
 
 // AddAIDataSourceFile adds the file to filecache,

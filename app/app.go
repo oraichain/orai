@@ -4,7 +4,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/ducphamle2/dexai/x/provider"
+	"github.com/oraichain/orai/x/provider"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
