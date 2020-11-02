@@ -171,31 +171,27 @@ func handlePriceRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 
 		fmt.Println("final result string: ", finalResultStr)
 		fmt.Println("final result after trimming: ", strings.TrimSuffix(finalResultStr, "-"))
+		msgReport := NewReport(req.AIRequest.RequestID, c.validator, dataSourceResults, testCaseResults, key.GetAddress(), sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(5000)))), []byte(finalResultStr))
 		if len(finalResultStr) == 0 {
-			finalResultStr = types.ResultFailure
+			msgReport.AggregatedResult = []byte(types.FailedResult)
+			// Create a new MsgCreateReport to the Oraichain
+		} else {
+			// "2" here is the expected output that the user wants to get
+			cmd := exec.Command("bash", oscriptPath, "aggregation", finalResultStr)
+			var res bytes.Buffer
+			cmd.Stdout = &res
+			err = cmd.Run()
+			if err != nil {
+				l.Error(":skull: failed to aggregate results: %s", err.Error())
+			}
+
+			// collect data source result from the script
+			ress := strings.TrimSuffix(res.String(), "\n")
+			fmt.Printf("final result from oScript: %s\n", ress)
+			msgReport.AggregatedResult = []byte(ress)
 		}
-
-		// report := k.GetAllReports(ctx)
-		// fmt.Printf("Report: %v\n", report)
-
-		// "2" here is the expected output that the user wants to get
-		cmd := exec.Command("bash", oscriptPath, "aggregation", strings.TrimSuffix(finalResultStr, "-"))
-		var res bytes.Buffer
-		cmd.Stdout = &res
-		err = cmd.Run()
-		if err != nil {
-			l.Error(":skull: failed to aggregate results: %s", err.Error())
-		}
-
-		// collect data source result from the script
-		ress := strings.TrimSuffix(res.String(), "\n")
-		fmt.Printf("final result from oScript: %s\n", ress)
-
-		msgReport := NewReport(req.AIRequest.RequestID, c.validator, dataSourceResults, testCaseResults, key.GetAddress(), sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(5000)))), []byte(ress))
-
 		// Create a new MsgCreateReport to the Oraichain
 		SubmitReport(c, l, key, msgReport)
-
 	}(l.With("reqid", req.AIRequest.RequestID, "oscriptname", req.AIRequest.OracleScriptName), req)
 }
 
