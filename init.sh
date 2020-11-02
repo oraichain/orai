@@ -38,7 +38,7 @@ oraicli keys add duc
 oraicli keys add hongeinh
 
 # Add both accounts, with coins to the genesis file
-oraid add-genesis-account $(oraicli keys show duc -a) 10000000000000orai
+oraid add-genesis-account $(oraicli keys show duc -a) 9000000000000000orai
 oraid add-genesis-account $(oraicli keys show hongeinh -a) 1000000000000orai
 
 # oraicli tx staking create-validator --amount 10000orai --pubkey oraivalconspub1addwnpepqvydmv22mkzc9rc92g43unew08cmj4q46dhk7vz0a9fj2xjsjn2lvqj0dfr --moniker ducphamle --chain-id Oraichain --commission-rate 0.10 --commission-max-rate 0.20 --commission-max-change-rate 0.01 --min-self-delegation 100 --gas auto --gas-adjustment 1.15 --gas-prices 0.025orai --from duc
@@ -48,7 +48,7 @@ oraid add-genesis-account $(oraicli keys show hongeinh -a) 1000000000000orai
 # The "nscli config" command saves configuration for the "nscli" command but not for "nsd" so we have to 
 # declare the keyring-backend with a flag here
 #nsd gentx --name jack <or your key_name> --keyring-backend test
-oraid gentx --amount 100000000orai --name duc --keyring-backend test --min-self-delegation 100
+oraid gentx --amount 900000000000orai --name duc --keyring-backend test --min-self-delegation 100
 
 # put the validators into the genesis file so the chain is aware of the validators
 oraid collect-gentxs
