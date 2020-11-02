@@ -153,8 +153,16 @@ func handlePriceRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 
 			fmt.Println("result from data sources: ", result)
 
+			dataSourceResult := types.NewDataSourceResult(dataSourceResultsTest[i].Name, []byte(result), types.ResultSuccess)
+
+			// By default, we consider returning null as failure. If any datasource does not follow this rule then it should not be used by any oracle scripts.
+			if len(result) == 0 {
+				// change status to fail so the datasource cannot be rewarded afterwards
+				dataSourceResult.Status = types.ResultFailure
+			}
+
 			// append an data source result into the list
-			dataSourceResults = append(dataSourceResults, types.NewDataSourceResult(dataSourceResultsTest[i].Name, []byte(result), types.ResultSuccess))
+			dataSourceResults = append(dataSourceResults, dataSourceResult)
 
 			// resultInt, _ := strconv.Atoi(result)
 			// finalResult = finalResult + resultInt
