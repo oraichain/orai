@@ -25,7 +25,7 @@ function getRequestId(payload, callback) {
 function getMinimumFees(payload, callback) {
   axios({
     method: "GET",
-    url: constants.ORAI_URL + paths.GET_MINIMUM_FEES + payload
+    url: constants.ORAI_URL + paths.GET_MINIMUM_FEES + payload.oScriptName + "?val_num=" + payload.valNum
   })
     .then((response) => {
       callback(true, response, null);

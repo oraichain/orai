@@ -61,8 +61,8 @@ func handleMsgCreateOracleScript(ctx sdk.Context, k keeper.Keeper, msg types.Msg
 		return nil, err
 	}
 
-	// collect minimum fees required to run the oracle script
-	minimumFees, err := k.GetMinimumFees(ctx, aiDataSources, testCases)
+	// collect minimum fees required to run the oracle script (for 1 validator)
+	minimumFees, err := k.GetMinimumFees(ctx, aiDataSources, testCases, 1)
 	if err != nil {
 		// erase because the script file is not properly added into the chain yet
 		k.EraseOracleScriptFile(msg.Name)
@@ -99,8 +99,8 @@ func handleMsgEditOracleScript(ctx sdk.Context, k keeper.Keeper, msg types.MsgEd
 		return nil, err
 	}
 
-	// collect minimum fees required to run the oracle script
-	minimumFees, err := k.GetMinimumFees(ctx, aiDataSources, testCases)
+	// collect minimum fees required to run the oracle script (for one validator)
+	minimumFees, err := k.GetMinimumFees(ctx, aiDataSources, testCases, 1)
 	if err != nil {
 		return nil, err
 	}

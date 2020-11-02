@@ -12,7 +12,11 @@ module.exports = {
     } else {
       const oScriptName = req.body.oscript_name
       // check minimum fees provided by the user
-      api.getMinimumFees(oScriptName, (isSuccess, response, error) => {
+      const payload = {
+        oScriptName: oScriptName,
+        valNum: req.body.validator_count
+      }
+      api.getMinimumFees(payload, (isSuccess, response, error) => {
         if (isSuccess) {
           // if the fees smaller than the minium required fees then we return error
           if (req.body.fees <= response.data.result.minimum_fees) {

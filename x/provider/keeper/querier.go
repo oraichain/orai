@@ -44,7 +44,7 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 		case types.QueryFullRequest:
 			return queryFullRequestByID(ctx, path[1:], keeper)
 		case types.QueryMinFees:
-			return queryMinFees(ctx, path[1:], keeper)
+			return queryMinFees(ctx, path[1:], keeper, req)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown provider query")
 		}
@@ -369,13 +369,21 @@ func queryTestCaseNames(ctx sdk.Context, keeper Keeper) ([]byte, error) {
 	return res, nil
 }
 
-func queryMinFees(ctx sdk.Context, path []string, k Keeper) ([]byte, error) {
+func queryMinFees(ctx sdk.Context, path []string, k Keeper, req abci.RequestQuery) ([]byte, error) {
 	if len(path) != 1 {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "error")
 	}
+
+	// number of validator
+	valNum := string(req.GetData()[:])
+	valNumInt, err := strconv.Atoi(valNum)
+	if err != nil {
+		return []byte{}, sdkerrors.Wrap(types.ErrPaginationInputInvalid, err.Error())
+	}
+
 	// id of the request
 	oScriptName := path[0]
-	_, err := k.GetOracleScript(ctx, oScriptName)
+	_, err = k.GetOracleScript(ctx, oScriptName)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrOracleScriptNotFound, err.Error())
 	}
@@ -389,7 +397,7 @@ func queryMinFees(ctx sdk.Context, path []string, k Keeper) ([]byte, error) {
 		return nil, err
 	}
 
-	minimumFees, err := k.GetMinimumFees(ctx, aiDataSources, testCases)
+	minimumFees, err := k.GetMinimumFees(ctx, aiDataSources, testCases, valNumInt)
 	if err != nil {
 		return nil, err
 	}
@@ -403,9 +411,8 @@ func queryMinFees(ctx sdk.Context, path []string, k Keeper) ([]byte, error) {
 }
 
 // GetMinimumFees collects minimum fees needed of an oracle script
-func (k Keeper) GetMinimumFees(ctx sdk.Context, dNames, tcNames []string) (sdk.Coins, error) {
+func (k Keeper) GetMinimumFees(ctx sdk.Context, dNames, tcNames []string, valNum int) (sdk.Coins, error) {
 	var totalFees sdk.Coins
-
 	// we have different test cases, so we need to loop through them
 	for i := 0; i < len(tcNames); i++ {
 		// loop to run the test case
@@ -428,7 +435,11 @@ func (k Keeper) GetMinimumFees(ctx sdk.Context, dNames, tcNames []string) (sdk.C
 		totalFees = totalFees.Add(aiDataSource.Fees...)
 	}
 	rewardRatio := sdk.NewDecWithPrec(int64(k.GetParam(ctx, types.KeyOracleScriptRewardPercentage)), 2)
-	minimumFees, _ := sdk.NewDecCoinsFromCoins(totalFees...).QuoDec(rewardRatio).TruncateDecimal()
-
+	//valFees = 2/5 total dsource and test case fees (70% total in 100% of total fees split into 20% and 50% respectively)
+	valFees, _ := sdk.NewDecCoinsFromCoins(totalFees...).MulDec(sdk.NewDecWithPrec(int64(40), 2)).TruncateDecimal()
+	//50% + 20% = 70% * validatorCount fees (since k validators will execute, the fees need to be propotional to the number of vals)
+	bothFees := sdk.NewDecCoinsFromCoins(totalFees.Add(valFees...)...)
+	finalFees, _ := bothFees.MulDec(sdk.NewDec(int64(valNum))).TruncateDecimal()
+	minimumFees, _ := sdk.NewDecCoinsFromCoins(finalFees...).QuoDec(rewardRatio).TruncateDecimal()
 	return minimumFees, nil
 }
