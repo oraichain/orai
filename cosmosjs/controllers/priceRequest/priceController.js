@@ -19,7 +19,7 @@ module.exports = {
       api.getMinimumFees(payload, (isSuccess, response, error) => {
         if (isSuccess) {
           // if the fees smaller than the minium required fees then we return error
-          if (req.body.fees <= response.data.result.minimum_fees) {
+          if (req.body.fees - response.data.result.minimum_fees <= 0) {
             return res.status(200).json({
               message: "The given fee is smaller / equal to the required fee or the oracle script does not exist. Provided fees should at least be higher",
               required_fee: response.data.result.minimum_fees + "orai"
