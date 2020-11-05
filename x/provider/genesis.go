@@ -16,13 +16,12 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 		keeper.SetAIDataSource(ctx, record.Name, record)
 	}
 	for _, record := range data.TestCases {
-		keeper.CreateTestCase(ctx, record.Name, record)
+		keeper.SetTestCase(ctx, record.Name, record)
 	}
 
 	// Init params for the provider module
 	keeper.SetParam(ctx, types.KeyOracleScriptRewardPercentage, data.Params.OracleScriptRewardPercentage)
 	keeper.SetParam(ctx, types.KeyExpirationCount, data.Params.ExpirationCount)
-	keeper.SetRngSeed(ctx, make([]byte, types.RngSeedSize))
 }
 
 // ExportGenesis writes the current store values

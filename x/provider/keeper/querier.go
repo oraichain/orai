@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"encoding/base64"
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -31,18 +30,18 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 			return queryOracleScriptNames(ctx, keeper)
 		case types.QueryDataSourceNames:
 			return queryDataSourceNames(ctx, keeper)
-		case types.QueryAIRequest:
-			return queryAIRequest(ctx, path[1:], keeper)
+		// case types.QueryAIRequest:
+		// 	return queryAIRequest(ctx, path[1:], keeper)
 		case types.QueryTestCase:
 			return queryTestCase(ctx, path[1:], keeper)
 		case types.QueryTestCases:
 			return queryTestCases(ctx, keeper, req)
-		case types.QueryAIRequestIDs:
-			return queryAIRequestIDs(ctx, keeper)
+		// case types.QueryAIRequestIDs:
+		// 	return queryAIRequestIDs(ctx, keeper)
 		case types.QueryTestCaseNames:
 			return queryTestCaseNames(ctx, keeper)
-		case types.QueryFullRequest:
-			return queryFullRequestByID(ctx, path[1:], keeper)
+		// case types.QueryFullRequest:
+		// 	return queryFullRequestByID(ctx, path[1:], keeper)
 		case types.QueryMinFees:
 			return queryMinFees(ctx, path[1:], keeper, req)
 		default:
@@ -60,14 +59,14 @@ func queryOracleScript(ctx sdk.Context, path []string, keeper Keeper) ([]byte, e
 	}
 
 	// get code of the oScript
-	code, err := keeper.fileCache.GetFile(types.OracleScriptStoreKeyString(oScript.Name))
+	code, err := keeper.fileCache.GetFile(types.OracleScriptStoreKeyString(oScript.GetName()))
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
 	}
 
 	executable := base64.StdEncoding.EncodeToString(code)
 
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResOracleScript(oScript.Name, oScript.Owner, executable, oScript.Description, oScript.MinimumFees))
+	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResOracleScript(oScript.GetName(), oScript.GetOwner(), executable, oScript.GetDescription(), oScript.GetMinimumFees()))
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -100,14 +99,14 @@ func queryOracleScripts(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) (
 
 	// get code of the each oScript
 	for _, oScript := range oScripts {
-		code, err := keeper.fileCache.GetFile(types.OracleScriptStoreKeyString(oScript.Name))
+		code, err := keeper.fileCache.GetFile(types.OracleScriptStoreKeyString(oScript.GetName()))
 		if err != nil {
 			return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
 		}
 		executable := base64.StdEncoding.EncodeToString(code)
 
 		// create a new queryResOracleScript
-		queryResOScripts = append(queryResOScripts, types.NewQueryResOracleScript(oScript.Name, oScript.Owner, executable, oScript.Description, oScript.MinimumFees))
+		queryResOScripts = append(queryResOScripts, types.NewQueryResOracleScript(oScript.GetName(), oScript.GetOwner(), executable, oScript.GetDescription(), oScript.GetMinimumFees()))
 	}
 
 	// return the query to the command
@@ -127,14 +126,14 @@ func queryDataSource(ctx sdk.Context, path []string, keeper Keeper) ([]byte, err
 	}
 
 	// get code of the data source
-	code, err := keeper.fileCache.GetFile(types.DataSourceStoreKeyString(aiDataSource.Name))
+	code, err := keeper.fileCache.GetFile(types.DataSourceStoreKeyString(aiDataSource.GetName()))
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
 	}
 
 	executable := base64.StdEncoding.EncodeToString(code)
 
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResAIDataSource(aiDataSource.Name, aiDataSource.Owner, executable, aiDataSource.Description))
+	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResAIDataSource(aiDataSource.GetName(), aiDataSource.GetOwner(), executable, aiDataSource.GetDescription()))
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -166,14 +165,14 @@ func queryDataSources(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]
 
 	// get code of the each dSource
 	for _, dSource := range dSources {
-		code, err := keeper.fileCache.GetFile(types.DataSourceStoreKeyString(dSource.Name))
+		code, err := keeper.fileCache.GetFile(types.DataSourceStoreKeyString(dSource.GetName()))
 		if err != nil {
 			return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
 		}
 		executable := base64.StdEncoding.EncodeToString(code)
 
 		// create a new queryResOracleScript
-		queryResAIDSources = append(queryResAIDSources, types.NewQueryResAIDataSource(dSource.Name, dSource.Owner, executable, dSource.Description))
+		queryResAIDSources = append(queryResAIDSources, types.NewQueryResAIDataSource(dSource.GetName(), dSource.GetOwner(), executable, dSource.GetDescription()))
 	}
 
 	// return the query to the command
@@ -221,69 +220,6 @@ func queryDataSourceNames(ctx sdk.Context, keeper Keeper) ([]byte, error) {
 	return res, nil
 }
 
-// queryAIRequest queries an AI request given its request ID
-func queryAIRequest(ctx sdk.Context, path []string, keeper Keeper) ([]byte, error) {
-	// tsao cho nay lai lay path[0] ?
-	request, err := keeper.GetAIRequest(ctx, path[0])
-	if err != nil {
-		return []byte{}, sdkerrors.Wrap(types.ErrRequestNotFound, err.Error())
-	}
-
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResAIRequest(request.RequestID, request.Creator, request.OracleScriptName, request.Validators, request.BlockHeight, request.AIDataSources, request.TestCases, request.Fees.String()))
-	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
-	}
-
-	return res, nil
-}
-
-func queryFullRequestByID(ctx sdk.Context, path []string, k Keeper) ([]byte, error) {
-	if len(path) != 1 {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "error")
-	}
-	// id of the request
-	id := path[0]
-	request, err := k.GetAIRequest(ctx, id)
-	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrRequestNotFound, err.Error())
-	}
-	// collect all the reports of a given request id
-	reports := k.GetReports(ctx, id)
-
-	// collect the result of a given request id
-
-	result, err := k.GetResult(ctx, id)
-	if err != nil {
-		// init a nil result showing that the result does not have a result yet
-		result = types.NewAIRequestResult(id, nil, types.RequestStatusPending)
-	}
-
-	res, err := codec.MarshalJSONIndent(k.cdc, types.NewQueryResFullRequest(request, reports, result))
-	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
-	}
-
-	return res, nil
-}
-
-// queryAIRequestIDs returns all the AI Request IDs in the store
-func queryAIRequestIDs(ctx sdk.Context, keeper Keeper) ([]byte, error) {
-	var requestIDs types.QueryResAIRequestIDs
-
-	iterator := keeper.GetAllAIRequestIDs(ctx)
-
-	for ; iterator.Valid(); iterator.Next() {
-		requestIDs = append(requestIDs, string(iterator.Key()))
-	}
-
-	res, err := codec.MarshalJSONIndent(keeper.cdc, requestIDs)
-	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
-	}
-
-	return res, nil
-}
-
 // queryTestCase queries an AI request test case
 func queryTestCase(ctx sdk.Context, path []string, keeper Keeper) ([]byte, error) {
 	// tsao cho nay lai lay path[0] ?
@@ -293,14 +229,14 @@ func queryTestCase(ctx sdk.Context, path []string, keeper Keeper) ([]byte, error
 	}
 
 	// get code of the test case
-	code, err := keeper.fileCache.GetFile(types.TestCaseStoreKeyString(testCase.Name))
+	code, err := keeper.fileCache.GetFile(types.TestCaseStoreKeyString(testCase.GetName()))
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
 	}
 
 	executable := base64.StdEncoding.EncodeToString(code)
 
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResTestCase(testCase.Name, testCase.Owner, executable, testCase.Description))
+	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResTestCase(testCase.GetName(), testCase.GetOwner(), executable, testCase.GetDescription()))
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -332,14 +268,14 @@ func queryTestCases(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]by
 
 	// get code of the each tCase
 	for _, tCase := range tCases {
-		code, err := keeper.fileCache.GetFile(types.TestCaseStoreKeyString(tCase.Name))
+		code, err := keeper.fileCache.GetFile(types.TestCaseStoreKeyString(tCase.GetName()))
 		if err != nil {
 			return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
 		}
 		executable := base64.StdEncoding.EncodeToString(code)
 
 		// create a new queryResOracleScript
-		queryResTestCases = append(queryResTestCases, types.NewQueryResTestCase(tCase.Name, tCase.Owner, executable, tCase.Description))
+		queryResTestCases = append(queryResTestCases, types.NewQueryResTestCase(tCase.GetDescription(), tCase.GetOwner(), executable, tCase.GetDescription()))
 	}
 
 	// return the query to the command
@@ -408,38 +344,4 @@ func queryMinFees(ctx sdk.Context, path []string, k Keeper, req abci.RequestQuer
 	}
 
 	return res, nil
-}
-
-// GetMinimumFees collects minimum fees needed of an oracle script
-func (k Keeper) GetMinimumFees(ctx sdk.Context, dNames, tcNames []string, valNum int) (sdk.Coins, error) {
-	var totalFees sdk.Coins
-	// we have different test cases, so we need to loop through them
-	for i := 0; i < len(tcNames); i++ {
-		// loop to run the test case
-		// collect all the test cases object to store in the ai request
-		testCase, err := k.GetTestCase(ctx, tcNames[i])
-		if err != nil {
-			return nil, sdkerrors.Wrap(types.ErrTestCaseNotFound, fmt.Sprintf("failed to get test case: %s", err.Error()))
-		}
-		// Aggregate the required fees for an AI request
-		totalFees = totalFees.Add(testCase.Fees...)
-	}
-
-	for j := 0; j < len(dNames); j++ {
-		// collect all the data source objects to store in the ai request
-		aiDataSource, err := k.GetAIDataSource(ctx, dNames[j])
-		if err != nil {
-			return nil, sdkerrors.Wrap(types.ErrDataSourceNotFound, fmt.Sprintf("failed to get data source: %s", err.Error()))
-		}
-		// Aggregate the required fees for an AI request
-		totalFees = totalFees.Add(aiDataSource.Fees...)
-	}
-	rewardRatio := sdk.NewDecWithPrec(int64(k.GetParam(ctx, types.KeyOracleScriptRewardPercentage)), 2)
-	//valFees = 2/5 total dsource and test case fees (70% total in 100% of total fees split into 20% and 50% respectively)
-	valFees, _ := sdk.NewDecCoinsFromCoins(totalFees...).MulDec(sdk.NewDecWithPrec(int64(40), 2)).TruncateDecimal()
-	//50% + 20% = 70% * validatorCount fees (since k validators will execute, the fees need to be propotional to the number of vals)
-	bothFees := sdk.NewDecCoinsFromCoins(totalFees.Add(valFees...)...)
-	finalFees, _ := bothFees.MulDec(sdk.NewDec(int64(valNum))).TruncateDecimal()
-	minimumFees, _ := sdk.NewDecCoinsFromCoins(finalFees...).QuoDec(rewardRatio).TruncateDecimal()
-	return minimumFees, nil
 }

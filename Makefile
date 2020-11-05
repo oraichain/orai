@@ -18,7 +18,7 @@ install: go.sum
 		@echo "--> Installing oraid & oraicli"
 		go install -mod=readonly $(BUILD_FLAGS) ./cmd/oraid
 		go install -mod=readonly $(BUILD_FLAGS) ./cmd/oraicli
-		go install -mod=readonly $(BUILD_FLAGS) ./cmd/websocket
+		#go install -mod=readonly $(BUILD_FLAGS) ./cmd/websocket
 
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"

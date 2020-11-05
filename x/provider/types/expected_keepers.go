@@ -57,3 +57,45 @@ type DistrKeeper interface {
 	SetFeePool(ctx sdk.Context, feePool distr.FeePool)
 	AllocateTokensToValidator(ctx sdk.Context, val staking.ValidatorI, tokens sdk.DecCoins)
 }
+
+// OracleScriptSet is an interface for all the related properties for interacting with the Oracle Script struct for Keeper
+type OracleScriptSet interface {
+	// GetOracleScript(ctx sdk.Context, name string) (exported.OracleScriptI, error)
+	// GetOracleScripts(ctx sdk.Context, page, limit uint) ([]exported.OracleScriptI, error)
+	// GetAllOracleScriptNames(ctx sdk.Context) sdk.Iterator
+	// GetPaginatedOracleScriptNames(ctx sdk.Context, page, limit uint) sdk.Iterator
+	// EditOracleScript(ctx sdk.Context, oldName string, newName string, oScript exported.OracleScriptI)
+	// SetOracleScript(ctx sdk.Context, name string, oScript exported.OracleScriptI)
+	// AddOracleScriptFile(file []byte, name string)
+	// EraseOracleScriptFile(name string)
+	// EditOracleScriptFile(file []byte, name string)
+	// GetOracleScriptFile(name string) []byte
+}
+
+// AIDataSourceSet is an interface for all the related properties for interacting with the Data Source struct for Keeper that are exported for other modules to use
+type AIDataSourceSet interface {
+	// GetAIDataSource(ctx sdk.Context, name string) (exported.AIDataSourceI, error)
+	// GetAIDataSources(ctx sdk.Context, page, limit uint) ([]exported.AIDataSourceI, error)
+	// GetAllAIDataSourceNames(ctx sdk.Context) sdk.Iterator
+	// GetPaginatedAIDataSourceNames(ctx sdk.Context, page, limit uint) sdk.Iterator
+	// EditAIDataSource(ctx sdk.Context, oldName string, newName string, oScript exported.AIDataSourceI)
+	// SetAIDataSource(ctx sdk.Context, name string, oScript exported.AIDataSourceI)
+	// AddAIDataSourceFile(file []byte, name string)
+	// EraseAIDataSourceFile(name string)
+	// EditAIDataSourceFile(file []byte, name string)
+	// GetAIDataSourceFile(name string) []byte
+}
+
+// TestCaseSet is an interface for all the related properties for interacting with the Test Case struct for Keeper that are exported for other modules to use
+type TestCaseSet interface {
+	// GetTestCase(ctx sdk.Context, name string) (exported.TestCaseI, error)
+	// GetTestCases(ctx sdk.Context, page, limit uint) ([]exported.TestCaseI, error)
+	// GetAllTestCaseNames(ctx sdk.Context) sdk.Iterator
+	// GetPaginatedTestCaseNames(ctx sdk.Context, page, limit uint) sdk.Iterator
+	// EditTestCase(ctx sdk.Context, oldName string, newName string, oScript exported.TestCaseI)
+	// SetTestCase(ctx sdk.Context, name string, oScript exported.TestCaseI)
+	// AddTestCaseFile(file []byte, name string)
+	// EraseTestCaseFile(name string)
+	// EditTestCaseFile(file []byte, name string)
+	// GetTestCaseFile(name string) []byte
+}

@@ -165,13 +165,13 @@ func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.Val
 // on every begin block
 func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) {
 	// 	TODO: fill out if your application requires beginblock, if not you can delete this function
-	k.ResolveRngSeed(ctx, req)
-	k.AllocateTokens(ctx, req.GetLastCommitInfo().Votes)
+	//k.ResolveRngSeed(ctx, req)
+	//k.AllocateTokens(ctx, req.GetLastCommitInfo().Votes)
 	//k.DirectAllocateTokens(ctx, req.GetLastCommitInfo().Votes)
 }
 
 // EndBlocker called every block, process inflation, update validator set.
 func EndBlocker(ctx sdk.Context, k Keeper) {
 	// 	TODO: fill out if your application requires endblock, if not you can delete this function
-	k.ProcessReward(ctx)
+	//k.ProcessReward(ctx)
 }

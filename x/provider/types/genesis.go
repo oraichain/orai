@@ -13,8 +13,19 @@ type GenesisState struct {
 	// TODO: Fill out what is needed by the module for genesis
 }
 
+// // NewGenesisState creates a new GenesisState object
+// func NewGenesisState(oScripts []OracleScript, aiDataSources []AIDataSource, aiRequests []AIRequest, testCases []TestCase, params Params) GenesisState {
+// 	return GenesisState{
+// 		// TODO: Fill out according to your genesis state
+// 		OracleScripts: oScripts,
+// 		AIDataSources: aiDataSources,
+// 		TestCases:     testCases,
+// 		Params:        params,
+// 	}
+// }
+
 // NewGenesisState creates a new GenesisState object
-func NewGenesisState(oScripts []OracleScript, aiDataSources []AIDataSource, aiRequests []AIRequest, testCases []TestCase, params Params) GenesisState {
+func NewGenesisState(oScripts []OracleScript, aiDataSources []AIDataSource, testCases []TestCase, params Params) GenesisState {
 	return GenesisState{
 		// TODO: Fill out according to your genesis state
 		OracleScripts: oScripts,
