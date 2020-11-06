@@ -290,11 +290,6 @@ func NewProviderApp(
 		app.cdc,
 		keys[provider.StoreKey],
 		app.subspaces[provider.ModuleName],
-		app.supplyKeeper,
-		app.bankKeeper,
-		&stakingKeeper,
-		app.distrKeeper,
-		auth.FeeCollectorName,
 		".oraifiles",
 	)
 

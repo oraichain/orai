@@ -1,0 +1,18 @@
+package rest
+
+import (
+	"github.com/gorilla/mux"
+
+	"github.com/cosmos/cosmos-sdk/client/context"
+)
+
+const (
+	storeName = "provider"
+	restName  = storeName
+)
+
+// RegisterRoutes registers provider-related REST handlers to a router
+func RegisterRoutes(cliCtx context.CLIContext, r *mux.Router) {
+	registerQueryRoutes(cliCtx, r)
+	registerTxRoutes(cliCtx, r)
+}

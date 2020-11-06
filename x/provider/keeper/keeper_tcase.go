@@ -53,6 +53,11 @@ func (k Keeper) SetTestCase(ctx sdk.Context, name string, testCase types.TestCas
 	store.Set(types.TestCaseStoreKey(name), bz)
 }
 
+// DefaultTestCase creates an empty Test Case struct
+func (k Keeper) DefaultTestCase() types.TestCase {
+	return types.TestCase{}
+}
+
 // EditTestCase allows users to edit a test case in the store
 func (k Keeper) EditTestCase(ctx sdk.Context, oldName string, newName string, testCase types.TestCase) {
 	key := types.TestCaseStoreKeyString(oldName)

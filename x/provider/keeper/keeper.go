@@ -27,34 +27,24 @@ var _ types.TestCaseSet = Keeper{}
 
 // Keeper of the provider store
 type Keeper struct {
-	storeKey         sdk.StoreKey
-	cdc              *codec.Codec
-	paramSpace       params.Subspace
-	supplyKeeper     types.SupplyKeeper
-	bankKeeper       types.BankKeeper
-	stakingKeeper    types.StakingKeeper
-	DistrKeeper      types.DistrKeeper
-	fileCache        filecache.Cache
-	feeCollectorName string
+	storeKey   sdk.StoreKey
+	cdc        *codec.Codec
+	paramSpace params.Subspace
+	fileCache  filecache.Cache
 }
 
 // NewKeeper creates a provider keeper
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, providerSubspace params.Subspace, supplyKeeper types.SupplyKeeper, bankKeeper types.BankKeeper, stakingKeeper types.StakingKeeper, distrKeeper types.DistrKeeper, feeCollectorName string, cacheDir string) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, providerSubspace params.Subspace, cacheDir string) Keeper {
 	if !providerSubspace.HasKeyTable() {
 		// register parameters of the provider module into the param space
 		providerSubspace = providerSubspace.WithKeyTable(types.ParamKeyTable())
 	}
 	fileCache := filecache.New(cacheDir)
 	return Keeper{
-		storeKey:         key,
-		cdc:              cdc,
-		paramSpace:       providerSubspace,
-		fileCache:        fileCache,
-		supplyKeeper:     supplyKeeper,
-		bankKeeper:       bankKeeper,
-		stakingKeeper:    stakingKeeper,
-		DistrKeeper:      distrKeeper,
-		feeCollectorName: feeCollectorName,
+		storeKey:   key,
+		cdc:        cdc,
+		paramSpace: providerSubspace,
+		fileCache:  fileCache,
 	}
 }
 

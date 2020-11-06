@@ -28,6 +28,11 @@ func (k Keeper) GetAIDataSource(ctx sdk.Context, name string) (types.AIDataSourc
 	return aiDataSource, nil
 }
 
+// DefaultAIDataSource creates an empty Data Source struct
+func (k Keeper) DefaultAIDataSource() types.AIDataSource {
+	return types.AIDataSource{}
+}
+
 // GetAIDataSources returns list of data sources
 func (k Keeper) GetAIDataSources(ctx sdk.Context, page, limit uint) ([]types.AIDataSource, error) {
 	var dSources []types.AIDataSource
