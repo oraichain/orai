@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	storeName = "ai_request"
+	storeName = "airequest"
 	restName  = storeName
 )
 

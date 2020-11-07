@@ -21,9 +21,14 @@ func (k Keeper) GetAIRequest(ctx sdk.Context, id string) (types.AIRequest, error
 // SetAIRequest allows users to set a oScript into the store
 func (k Keeper) SetAIRequest(ctx sdk.Context, id string, request types.AIRequest) {
 	store := ctx.KVStore(k.storeKey)
-
-	bz := k.cdc.MustMarshalBinaryBare(request)
+	fmt.Println("BEFORE STORY REQUEST SUCCESS v0")
+	bz, err := k.cdc.MarshalBinaryBare(request)
+	if err != nil {
+		fmt.Println("error: ", err)
+	}
+	fmt.Println("BEFORE STORY REQUEST SUCCESS")
 	store.Set(types.RequestStoreKey(id), bz)
+	fmt.Println("STORE KEY SUCCESS ??????????")
 }
 
 // GetAllAIRequestIDs get an iterator of all key-value pairs in the store

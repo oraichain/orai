@@ -102,6 +102,8 @@ func handleMsgSetPriceRequest(ctx sdk.Context, k keeper.Keeper, msg types.MsgSet
 		// set a new request with the aggregated result into blockchain
 		request := types.NewAIRequest(msg.MsgAIRequest.RequestID, msg.MsgAIRequest.OracleScriptName, msg.MsgAIRequest.Creator, validators, ctx.BlockHeight(), dataSourceObjs, testcaseObjs, fees, msg.MsgAIRequest.Input, msg.MsgAIRequest.ExpectedOutput)
 
+		fmt.Println("request: ", request)
+
 		//fmt.Printf("request result: %s\n", outOracleScript.String())
 
 		k.SetAIRequest(ctx, request.RequestID, request)

@@ -4,6 +4,7 @@
 .oraifiles/
 .images/
 .websocket/
+.vscode/
 cosmosjs/node_modules/
 
 signedTx.json
