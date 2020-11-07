@@ -1,10 +1,7 @@
 package keeper
 
 import (
-	"bytes"
 	"fmt"
-	"os/exec"
-	"strings"
 
 	"github.com/tendermint/tendermint/libs/log"
 
@@ -82,41 +79,6 @@ func (k Keeper) SetParam(ctx sdk.Context, key []byte, value uint64) {
 func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
 	k.paramSpace.GetParamSet(ctx, &params)
 	return params
-}
-
-// GetDNamesTcNames is a function that collects test case names and data source names from the oracle script
-func (k Keeper) GetDNamesTcNames(oscriptPath string) ([]string, []string, error) {
-	//use "data source" as an argument to collect the data source script name
-	cmd := exec.Command("bash", oscriptPath, "aiDataSource")
-	cmd.Stdin = strings.NewReader("some input")
-	var dataSourceName bytes.Buffer
-	cmd.Stdout = &dataSourceName
-	err := cmd.Run()
-	if err != nil {
-		return nil, nil, sdkerrors.Wrap(types.ErrFailedToOpenFile, err.Error())
-	}
-
-	// collect data source result from the script
-	result := strings.TrimSuffix(dataSourceName.String(), "\n")
-
-	aiDataSources := strings.Fields(result)
-
-	//use "test case" as an argument to collect the test case script name
-	cmd = exec.Command("bash", oscriptPath, "testcase")
-	cmd.Stdin = strings.NewReader("some input")
-	var testCaseName bytes.Buffer
-	cmd.Stdout = &testCaseName
-	err = cmd.Run()
-	if err != nil {
-		return nil, nil, sdkerrors.Wrap(types.ErrFailedToOpenFile, fmt.Sprintf("failed to collect test case name: %s", result))
-	}
-
-	// collect data source result from the script
-	result = strings.TrimSuffix(testCaseName.String(), "\n")
-
-	testCases := strings.Fields(result)
-
-	return aiDataSources, testCases, nil
 }
 
 // GetMinimumFees collects minimum fees needed of an oracle script

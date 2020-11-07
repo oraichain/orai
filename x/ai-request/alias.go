@@ -1,8 +1,8 @@
 package provider
 
 import (
+	"github.com/oraichain/orai/x/ai-request/keeper"
 	"github.com/oraichain/orai/x/ai-request/types"
-	"github.com/oraichain/orai/x/provider/keeper"
 )
 
 const (
@@ -17,27 +17,23 @@ const (
 )
 
 var (
-	NewKeeper                = keeper.NewKeeper
-	NewQuerier               = keeper.NewQuerier
-	NewMsgCreateOracleScript = types.NewMsgCreateOracleScript
-	NewMsgCreateAIDataSource = types.NewMsgCreateAIDataSource
-	NewMsgSetAIRequest       = types.NewMsgSetAIRequest
-	ModuleCdc                = types.ModuleCdc
-	RegisterCodec            = types.RegisterCodec
-	NewGenesisState          = types.NewGenesisState
-	RequestKeyPrefix         = types.RequestKeyPrefix
-	ResultKeyPrefix          = types.ResultKeyPrefix
-	ReportKeyPrefix          = types.ReportKeyPrefix
-	ReporterKeyPrefix        = types.ReporterKeyPrefix
-	RewardKeyPrefix          = types.RewardKeyPrefix
-	StrategyKeyPrefix        = types.StrategyKeyPrefix
+	NewKeeper          = keeper.NewKeeper
+	NewQuerier         = keeper.NewQuerier
+	NewMsgSetAIRequest = types.NewMsgSetAIRequest
+	ModuleCdc          = types.ModuleCdc
+	RegisterCodec      = types.RegisterCodec
+	NewGenesisState    = types.NewGenesisState
+	RequestKeyPrefix   = types.RequestKeyPrefix
+	ResultKeyPrefix    = types.ResultKeyPrefix
+	ReportKeyPrefix    = types.ReportKeyPrefix
+	ReporterKeyPrefix  = types.ReporterKeyPrefix
+	RewardKeyPrefix    = types.RewardKeyPrefix
+	StrategyKeyPrefix  = types.StrategyKeyPrefix
 )
 
 type (
-	Keeper                = keeper.Keeper
-	MsgCreateOracleScript = types.MsgCreateOracleScript
-	MsgCreateAIDataSource = types.MsgCreateAIDataSource
-	MsgSetAIRequest       = types.MsgSetAIRequest
-	AIRequest             = types.AIRequest
-	GenesisState          = types.GenesisState
+	Keeper          = keeper.Keeper
+	MsgSetAIRequest = types.MsgSetAIRequest
+	AIRequest       = types.AIRequest
+	GenesisState    = types.GenesisState
 )

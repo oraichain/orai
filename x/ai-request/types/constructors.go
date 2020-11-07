@@ -2,36 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/oraichain/orai/x/provider/exported"
-	"github.com/oraichain/orai/x/provider/types"
 )
-
-// NewAIRequest is the constructor of the ai request struct
-func NewAIRequest(
-	requestID string,
-	oscriptName string,
-	creator sdk.AccAddress,
-	validators []sdk.ValAddress,
-	blockHeight int64,
-	aiDataSources []types.AIDataSource,
-	testCases []types.TestCase,
-	fees sdk.Coins,
-	input string,
-	expectedOutput string,
-) AIRequest {
-	return AIRequest{
-		RequestID:        requestID,
-		OracleScriptName: oscriptName,
-		Creator:          creator,
-		Validators:       validators,
-		BlockHeight:      blockHeight,
-		AIDataSources:    aiDataSources,
-		TestCases:        testCases,
-		Fees:             fees,
-		Input:            input,
-		ExpectedOutput:   expectedOutput,
-	}
-}
 
 // NewReport is the constructor of the report struct
 func NewReport(
@@ -54,30 +25,6 @@ func NewReport(
 	}
 }
 
-// NewDataSourceResult is the constructor of the data source result struct
-func NewDataSourceResult(
-	name string,
-	result []byte,
-	status string,
-) DataSourceResult {
-	return DataSourceResult{
-		Name:   name,
-		Result: result,
-		Status: status,
-	}
-}
-
-// NewTestCaseResult is the constructor of the test case result struct
-func NewTestCaseResult(
-	name string,
-	dataSourceResults []DataSourceResult,
-) TestCaseResult {
-	return TestCaseResult{
-		Name:              name,
-		DataSourceResults: dataSourceResults,
-	}
-}
-
 // NewValidator is the constructor of the validator struct
 func NewValidator(
 	address sdk.ValAddress,
@@ -88,64 +35,6 @@ func NewValidator(
 		Address:     address,
 		VotingPower: votingPower,
 		Status:      status,
-	}
-}
-
-// NewReward is a constructor for the reward struct
-func NewReward(
-	validators []Validator,
-	dataSources []exported.AIDataSourceI,
-	testCases []exported.TestCaseI,
-	blockHeight int64,
-	totalVotingPower int64,
-	providerFees sdk.Coins,
-	validatorFees sdk.Coins,
-) Reward {
-	return Reward{
-		Validators:    validators,
-		DataSources:   dataSources,
-		TestCases:     testCases,
-		BlockHeight:   blockHeight,
-		TotalPower:    totalVotingPower,
-		ProviderFees:  providerFees,
-		ValidatorFees: validatorFees,
-	}
-}
-
-// DefaultReward is a default value init for the reward struct
-func DefaultReward(blockHeight int64) Reward {
-	return Reward{
-		Validators:    []Validator{},
-		DataSources:   make([]exported.AIDataSourceI, 0),
-		TestCases:     make([]exported.TestCaseI, 0),
-		BlockHeight:   blockHeight,
-		TotalPower:    int64(0),
-		ProviderFees:  sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(0)))),
-		ValidatorFees: sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(0)))),
-	}
-}
-
-// NewAIRequestResult is a constructor for the ai request result struct
-func NewAIRequestResult(
-	requestID string,
-	results ValResults,
-	status string,
-) AIRequestResult {
-	return AIRequestResult{
-		RequestID: requestID,
-		Results:   results,
-		Status:    status,
-	}
-}
-
-// NewValResult is a constructor for the validator result
-func NewValResult(
-	val sdk.ValAddress,
-	result []byte,
-) ValResult {
-	return ValResult{
-		Validator: val,
-		Result:    result,
 	}
 }
 

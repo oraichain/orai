@@ -13,6 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking/exported"
 	"github.com/oraichain/orai/packages/rng"
 	"github.com/oraichain/orai/x/ai-request/types"
+	provider "github.com/oraichain/orai/x/provider/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
@@ -31,7 +32,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo) {
 	// if there are fees from the requests, we remove them from the fee collector
 	if !requestFees.IsZero() {
 		// 100 - 70 = 30%
-		rewardRatio := sdk.NewDecWithPrec(int64(100)-int64(k.GetParam(ctx, types.KeyOracleScriptRewardPercentage)), 2)
+		rewardRatio := sdk.NewDecWithPrec(int64(100)-int64(k.GetParam(ctx, provider.KeyOracleScriptRewardPercentage)), 2)
 		rewardFeesDec := sdk.NewDecCoinsFromCoins(requestFees...)
 		rewardFees, _ := rewardFeesDec.MulDecTruncate(rewardRatio).TruncateDecimal()
 		// we remove the reward fees from the request fees to reward the proposer afterwards immediately
@@ -109,12 +110,12 @@ func (k Keeper) DirectAllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo)
 		// at this stage, the validator has run all the test cases and data sources to produce a valid report. This must be checked before => assume we have enough
 		for _, dSource := range request.AIDataSources {
 			// the creator will directly pays the data source provider
-			k.bankKeeper.SendCoins(ctx, request.Creator, dSource.Owner, dSource.Fees)
+			k.bankKeeper.SendCoins(ctx, request.Creator, dSource.GetOwner(), dSource.GetFees())
 		}
 
 		for _, testCase := range request.TestCases {
 			// the creator will directly pays the data source provider
-			k.bankKeeper.SendCoins(ctx, request.Creator, testCase.Owner, testCase.Fees)
+			k.bankKeeper.SendCoins(ctx, request.Creator, testCase.GetOwner(), testCase.GetFees())
 		}
 
 		// Allocate tokens directly to the validator that creates a report using the fees given in the report

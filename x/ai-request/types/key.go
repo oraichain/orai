@@ -8,7 +8,7 @@ import (
 
 const (
 	// ModuleName is the name of the module
-	ModuleName = "provider"
+	ModuleName = "airequest"
 
 	// StoreKey to be used when creating the KVStore
 	StoreKey = ModuleName
@@ -51,9 +51,6 @@ const (
 
 	// ResultSuccess is the success status of a result after the test case runs
 	ResultSuccess = "success"
-
-	// ScriptPath is the path that stores all the script files (oracle scripts, data sources, test cases)
-	ScriptPath = ".oraifiles/"
 
 	// RngSeedSize is the size of the random seed for validator sampling.
 	RngSeedSize = 64

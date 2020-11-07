@@ -1,7 +1,13 @@
 package keeper
 
 import (
+	"bytes"
+	"fmt"
+	"os/exec"
+	"strings"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/oraichain/orai/x/provider/types"
 )
 
@@ -9,10 +15,12 @@ import (
 func (k Keeper) GetOracleScript(ctx sdk.Context, name string) (types.OracleScript, error) {
 	store := ctx.KVStore(k.storeKey)
 	var oScript types.OracleScript
+	fmt.Println("before getting oracle script: ", oScript)
 	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get(types.OracleScriptStoreKey(name)), &oScript)
 	if err != nil {
 		return types.OracleScript{}, err
 	}
+	fmt.Println("After getting oracle script: ", oScript.Description)
 	return oScript, nil
 }
 
@@ -91,4 +99,41 @@ func (k Keeper) GetOracleScriptFile(name string) []byte {
 		return []byte{}
 	}
 	return code
+}
+
+// GetDNamesTcNames is a function that collects test case names and data source names from the oracle script
+func (k Keeper) GetDNamesTcNames(oscriptName string) ([]string, []string, error) {
+	// collect data source name from the oScript script
+	oscriptPath := types.ScriptPath + types.OracleScriptStoreKeyString(oscriptName)
+	//use "data source" as an argument to collect the data source script name
+	cmd := exec.Command("bash", oscriptPath, "aiDataSource")
+	cmd.Stdin = strings.NewReader("some input")
+	var dataSourceName bytes.Buffer
+	cmd.Stdout = &dataSourceName
+	err := cmd.Run()
+	if err != nil {
+		return nil, nil, sdkerrors.Wrap(types.ErrFailedToOpenFile, err.Error())
+	}
+
+	// collect data source result from the script
+	result := strings.TrimSuffix(dataSourceName.String(), "\n")
+
+	aiDataSources := strings.Fields(result)
+
+	//use "test case" as an argument to collect the test case script name
+	cmd = exec.Command("bash", oscriptPath, "testcase")
+	cmd.Stdin = strings.NewReader("some input")
+	var testCaseName bytes.Buffer
+	cmd.Stdout = &testCaseName
+	err = cmd.Run()
+	if err != nil {
+		return nil, nil, sdkerrors.Wrap(types.ErrFailedToOpenFile, fmt.Sprintf("failed to collect test case name: %s", result))
+	}
+
+	// collect data source result from the script
+	result = strings.TrimSuffix(testCaseName.String(), "\n")
+
+	testCases := strings.Fields(result)
+
+	return aiDataSources, testCases, nil
 }

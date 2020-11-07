@@ -7,6 +7,43 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
+// DataSourceResult stores the data source result
+type DataSourceResult struct {
+	Name   string `json:"data_source"`
+	Result []byte `json:"result"`
+	Status string `json:"result_status"`
+}
+
+// TestCaseResult stores the test case result
+type TestCaseResult struct {
+	Name              string             `json:"test_case"`
+	DataSourceResults []DataSourceResult `json:"data_source_result"`
+}
+
+// NewDataSourceResult is the constructor of the data source result struct
+func NewDataSourceResult(
+	name string,
+	result []byte,
+	status string,
+) DataSourceResult {
+	return DataSourceResult{
+		Name:   name,
+		Result: result,
+		Status: status,
+	}
+}
+
+// NewTestCaseResult is the constructor of the test case result struct
+func NewTestCaseResult(
+	name string,
+	dataSourceResults []DataSourceResult,
+) TestCaseResult {
+	return TestCaseResult{
+		Name:              name,
+		DataSourceResults: dataSourceResults,
+	}
+}
+
 // Validator mimics the original validator to store information of those that execute the oScript
 type Validator struct {
 	Address     sdk.ValAddress `json:"address"`

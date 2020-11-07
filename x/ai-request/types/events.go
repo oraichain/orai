@@ -8,6 +8,7 @@ const (
 	EventTypeRequestWithData = "ai_request_data"
 	EventTypeSetKYCRequest   = "set_kyc_request"
 	EventTypeSetPriceRequest = "set_price_request"
+	EventTypeSetReport       = "set_report"
 
 	// TODO: Create keys fo your events, the values will be derivided from the msg
 	// AttributeKeyAddress  		= "address"
@@ -17,12 +18,16 @@ const (
 
 	AttributeValueCategory = ModuleName
 	// Attribute for request
-	AttributeRequestID             = "request_id"
-	AttributeRequestValidator      = "request_validator"
-	AttributeRequestCreator        = "request_creator"
+	AttributeRequestID        = "request_id"
+	AttributeRequestValidator = "request_validator"
+	AttributeRequestCreator   = "request_creator"
+	// Attributes for oracle script
+	AttributeOracleScriptName      = "oscript_name"
 	AttributeRequestImageHash      = "request_image_hash"
 	AttributeRequestImageName      = "request_image_name"
 	AttributeRequestValidatorCount = "request_validator_count"
 	AttributeRequestInput          = "request_input"
 	AttributeRequestExpectedOutput = "expected_request_output"
+
+	AttributeReport = "report"
 )

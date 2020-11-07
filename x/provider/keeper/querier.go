@@ -323,12 +323,8 @@ func queryMinFees(ctx sdk.Context, path []string, k Keeper, req abci.RequestQuer
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrOracleScriptNotFound, err.Error())
 	}
-
-	// collect data source name from the oScript
-	oscriptPath := types.ScriptPath + types.OracleScriptStoreKeyString(oScriptName)
-
 	// get data source and test case names from the oracle script
-	aiDataSources, testCases, err := k.GetDNamesTcNames(oscriptPath)
+	aiDataSources, testCases, err := k.GetDNamesTcNames(oScriptName)
 	if err != nil {
 		return nil, err
 	}

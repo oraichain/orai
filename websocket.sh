@@ -15,10 +15,10 @@ websocket config validator $(oraicli keys show $1 -a --bech val --keyring-backen
 # setup broadcast-timeout to websocket config
 websocket config broadcast-timeout "30s"
 
-# setup rpc-poll-interval to yoda config
+# setup rpc-poll-interval to websocket config
 websocket config rpc-poll-interval "1s"
 
-# setup max-try to yoda config
+# setup max-try to websocket config
 websocket config max-try 5
 
 # config log type
@@ -45,7 +45,7 @@ sleep 6
 #wait for sending orai tokens transaction success
 
 # add reporter to oraichain
-echo "y" | oraicli tx provider add-reporters $(websocket keys list -a) --from $1 --fees 5000orai --keyring-backend test
+echo "y" | oraicli tx airequest add-reporters $(websocket keys list -a) --from $1 --fees 5000orai --keyring-backend test
 
 sleep 2
 

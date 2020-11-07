@@ -16,6 +16,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+	aiRequest "github.com/oraichain/orai/x/ai-request"
 	"github.com/oraichain/orai/x/provider"
 	"github.com/oraichain/orai/x/provider/types"
 )
@@ -50,18 +51,20 @@ func NewDefaultGenesisState() GenesisState {
 	slashingGenesis.Params.DowntimeJailDuration = 60 * 10 * time.Second       // 10 minutes
 	slashingGenesis.Params.SlashFractionDoubleSign = sdk.NewDecWithPrec(5, 2) // 5%
 	slashingGenesis.Params.SlashFractionDowntime = sdk.NewDecWithPrec(1, 4)   // 0.01%
+	// Add your modules here for the genesis states
 	return GenesisState{
-		genutil.ModuleName:  genutil.AppModuleBasic{}.DefaultGenesis(),
-		auth.ModuleName:     cdc.MustMarshalJSON(authGenesis),
-		bank.ModuleName:     bank.AppModuleBasic{}.DefaultGenesis(),
-		supply.ModuleName:   supply.AppModuleBasic{}.DefaultGenesis(),
-		staking.ModuleName:  cdc.MustMarshalJSON(stakingGenesis),
-		mint.ModuleName:     cdc.MustMarshalJSON(mintGenesis),
-		distr.ModuleName:    cdc.MustMarshalJSON(distrGenesis),
-		gov.ModuleName:      cdc.MustMarshalJSON(govGenesis),
-		crisis.ModuleName:   cdc.MustMarshalJSON(crisisGenesis),
-		slashing.ModuleName: cdc.MustMarshalJSON(slashingGenesis),
-		evidence.ModuleName: evidence.AppModuleBasic{}.DefaultGenesis(),
-		provider.ModuleName: provider.AppModuleBasic{}.DefaultGenesis(),
+		genutil.ModuleName:   genutil.AppModuleBasic{}.DefaultGenesis(),
+		auth.ModuleName:      cdc.MustMarshalJSON(authGenesis),
+		bank.ModuleName:      bank.AppModuleBasic{}.DefaultGenesis(),
+		supply.ModuleName:    supply.AppModuleBasic{}.DefaultGenesis(),
+		staking.ModuleName:   cdc.MustMarshalJSON(stakingGenesis),
+		mint.ModuleName:      cdc.MustMarshalJSON(mintGenesis),
+		distr.ModuleName:     cdc.MustMarshalJSON(distrGenesis),
+		gov.ModuleName:       cdc.MustMarshalJSON(govGenesis),
+		crisis.ModuleName:    cdc.MustMarshalJSON(crisisGenesis),
+		slashing.ModuleName:  cdc.MustMarshalJSON(slashingGenesis),
+		evidence.ModuleName:  evidence.AppModuleBasic{}.DefaultGenesis(),
+		provider.ModuleName:  provider.AppModuleBasic{}.DefaultGenesis(),
+		aiRequest.ModuleName: aiRequest.AppModuleBasic{}.DefaultGenesis(),
 	}
 }

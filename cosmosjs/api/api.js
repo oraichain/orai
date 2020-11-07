@@ -3,9 +3,9 @@ const constants = require('../utils/constants');
 const axios = require('axios');
 
 const paths = {
-  CREATE_UNSIGNED_TX: "/provider/aireq/pricereq",
+  CREATE_UNSIGNED_TX: "/airequest/aireq/pricereq",
   GET_REQUEST_ID: "/txs/",
-  GET_FULL_REQUEST: "/provider/fullreq/",
+  GET_FULL_REQUEST: "/airequest/fullreq/",
   GET_MINIMUM_FEES: "/provider/min_fees/"
 }
 

@@ -19,10 +19,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/oraichain/orai/x/provider/client/cli"
-	"github.com/oraichain/orai/x/provider/client/rest"
-	"github.com/oraichain/orai/x/provider/keeper"
-	"github.com/oraichain/orai/x/provider/types"
+	"github.com/oraichain/orai/x/ai-request/client/cli"
+	"github.com/oraichain/orai/x/ai-request/client/rest"
+	"github.com/oraichain/orai/x/ai-request/keeper"
+	"github.com/oraichain/orai/x/ai-request/types"
+	"github.com/oraichain/orai/x/provider"
 )
 
 // Type check to ensure the interface is properly implemented
@@ -82,15 +83,16 @@ type AppModule struct {
 	AppModuleBasic
 	keeper keeper.Keeper
 	// TODO: Add keepers that your application depends on
-	supplyKeeper  supply.Keeper
-	bankKeeper    bank.Keeper
-	stakingKeeper staking.Keeper
-	distrKeeper   distr.Keeper
-	params        params.Subspace
+	supplyKeeper   supply.Keeper
+	bankKeeper     bank.Keeper
+	stakingKeeper  staking.Keeper
+	distrKeeper    distr.Keeper
+	providerKeeper provider.Keeper
+	params         params.Subspace
 }
 
 // NewAppModule creates a new AppModule object
-func NewAppModule(k keeper.Keeper, s supply.Keeper, b bank.Keeper, staking staking.Keeper, distr distr.Keeper, params params.Subspace /*TODO: Add Keepers that your application depends on*/) AppModule {
+func NewAppModule(k keeper.Keeper, s supply.Keeper, b bank.Keeper, staking staking.Keeper, distr distr.Keeper, p provider.Keeper, params params.Subspace /*TODO: Add Keepers that your application depends on*/) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         k,
@@ -98,6 +100,7 @@ func NewAppModule(k keeper.Keeper, s supply.Keeper, b bank.Keeper, staking staki
 		bankKeeper:     b,
 		stakingKeeper:  staking,
 		distrKeeper:    distr,
+		providerKeeper: p,
 		params:         params,
 		// TODO: Add keepers that your application depends on
 	}

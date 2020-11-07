@@ -4,6 +4,7 @@ import (
 	"io"
 	"os"
 
+	aiRequest "github.com/oraichain/orai/x/ai-request"
 	"github.com/oraichain/orai/x/provider"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -62,6 +63,7 @@ var (
 		slashing.AppModuleBasic{},
 		//evidence.AppModuleBasic{},
 		provider.AppModuleBasic{},
+		aiRequest.AppModuleBasic{},
 		// TODO: Add your module(s) AppModuleBasic
 	)
 
@@ -126,7 +128,8 @@ type NewApp struct {
 	//crisisKeeper   crisis.Keeper      // halt the blockchain under some occasions
 	paramsKeeper params.Keeper // global available param store
 	//evidenceKeeper evidence.Keeper    // handling evidence of misbihaviour
-	providerKeeper provider.Keeper // our own provider which collects results from different AI models and aggregate them
+	providerKeeper  provider.Keeper  // our own provider which provides a marketplace for AI providers to provide their AI services
+	aiRequestKeeper aiRequest.Keeper // our own ai-request which collects results from different AI models and aggregate them
 	// TODO: Add your module(s)
 
 	// Module Manager
@@ -165,6 +168,7 @@ func NewProviderApp(
 		params.StoreKey,
 		//evidence.StoreKey,
 		provider.StoreKey,
+		aiRequest.StoreKey,
 	)
 
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
@@ -195,6 +199,8 @@ func NewProviderApp(
 	app.subspaces[mint.ModuleName] = app.paramsKeeper.Subspace(mint.DefaultParamspace)
 
 	app.subspaces[provider.ModuleName] = app.paramsKeeper.Subspace(provider.DefaultParamspace)
+
+	app.subspaces[aiRequest.ModuleName] = app.paramsKeeper.Subspace(aiRequest.DefaultParamspace)
 
 	//app.subspaces[evidence.ModuleName] = app.paramsKeeper.Subspace(evidence.DefaultParamspace)
 
@@ -293,6 +299,18 @@ func NewProviderApp(
 		".oraifiles",
 	)
 
+	app.aiRequestKeeper = aiRequest.NewKeeper(
+		app.cdc,
+		keys[aiRequest.StoreKey],
+		app.subspaces[aiRequest.ModuleName],
+		app.supplyKeeper,
+		app.bankKeeper,
+		&stakingKeeper,
+		app.distrKeeper,
+		app.providerKeeper,
+		auth.FeeCollectorName,
+	)
+
 	// // Register the proposal types.
 	// govRouter := gov.NewRouter()
 	// govRouter.
@@ -332,7 +350,9 @@ func NewProviderApp(
 
 		mint.NewAppModule(app.mintKeeper),
 
-		provider.NewAppModule(app.providerKeeper, app.supplyKeeper, app.bankKeeper, app.stakingKeeper, app.distrKeeper, app.subspaces[provider.ModuleName]),
+		provider.NewAppModule(app.providerKeeper, app.subspaces[provider.ModuleName]),
+
+		aiRequest.NewAppModule(app.aiRequestKeeper, app.supplyKeeper, app.bankKeeper, app.stakingKeeper, app.distrKeeper, app.providerKeeper, app.subspaces[aiRequest.ModuleName]),
 
 		//gov.NewAppModule(app.govKeeper, app.accountKeeper, app.supplyKeeper),
 
@@ -344,8 +364,8 @@ func NewProviderApp(
 	// there is nothing left over in the validator fee pool, so as to keep the
 	// CanWithdrawInvariant invariant.
 
-	app.mm.SetOrderBeginBlockers(provider.ModuleName, distr.ModuleName, slashing.ModuleName, staking.ModuleName)
-	app.mm.SetOrderEndBlockers(staking.ModuleName, provider.ModuleName)
+	app.mm.SetOrderBeginBlockers(aiRequest.ModuleName, distr.ModuleName, slashing.ModuleName, staking.ModuleName)
+	app.mm.SetOrderEndBlockers(staking.ModuleName, aiRequest.ModuleName)
 
 	// Sets the order of Genesis - Order matters, genutil is to always come last
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -358,7 +378,7 @@ func NewProviderApp(
 
 	app.mm.SetOrderInitGenesis(
 		auth.ModuleName, distr.ModuleName, staking.ModuleName, bank.ModuleName, supply.ModuleName,
-		slashing.ModuleName, mint.ModuleName, provider.ModuleName,
+		slashing.ModuleName, mint.ModuleName, provider.ModuleName, aiRequest.ModuleName,
 		genutil.ModuleName,
 	)
 

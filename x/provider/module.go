@@ -3,12 +3,7 @@ package provider
 import (
 	"encoding/json"
 
-	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/cosmos/cosmos-sdk/x/staking"
-
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/supply"
 
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
@@ -82,22 +77,14 @@ type AppModule struct {
 	AppModuleBasic
 	keeper keeper.Keeper
 	// TODO: Add keepers that your application depends on
-	supplyKeeper  supply.Keeper
-	bankKeeper    bank.Keeper
-	stakingKeeper staking.Keeper
-	distrKeeper   distr.Keeper
-	params        params.Subspace
+	params params.Subspace
 }
 
 // NewAppModule creates a new AppModule object
-func NewAppModule(k keeper.Keeper, s supply.Keeper, b bank.Keeper, staking staking.Keeper, distr distr.Keeper, params params.Subspace /*TODO: Add Keepers that your application depends on*/) AppModule {
+func NewAppModule(k keeper.Keeper, params params.Subspace /*TODO: Add Keepers that your application depends on*/) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         k,
-		supplyKeeper:   s,
-		bankKeeper:     b,
-		stakingKeeper:  staking,
-		distrKeeper:    distr,
 		params:         params,
 		// TODO: Add keepers that your application depends on
 	}

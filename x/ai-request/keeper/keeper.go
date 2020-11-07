@@ -8,7 +8,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/oraichain/orai/packages/filecache"
 	"github.com/oraichain/orai/x/ai-request/types"
 )
 
@@ -22,21 +21,19 @@ type Keeper struct {
 	stakingKeeper    types.StakingKeeper
 	distrKeeper      types.DistrKeeper
 	ProviderKeeper   types.ProviderKeeper
-	fileCache        filecache.Cache
 	feeCollectorName string
 }
 
 // NewKeeper creates a provider keeper
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, providerSubspace params.Subspace, supplyKeeper types.SupplyKeeper, bankKeeper types.BankKeeper, stakingKeeper types.StakingKeeper, distrKeeper types.DistrKeeper, providerKeeper types.ProviderKeeper, feeCollectorName string, cacheDir string) Keeper {
-	if !providerSubspace.HasKeyTable() {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, aiRequestSubspace params.Subspace, supplyKeeper types.SupplyKeeper, bankKeeper types.BankKeeper, stakingKeeper types.StakingKeeper, distrKeeper types.DistrKeeper, providerKeeper types.ProviderKeeper, feeCollectorName string) Keeper {
+	if !aiRequestSubspace.HasKeyTable() {
 		// register parameters of the provider module into the param space
-		providerSubspace = providerSubspace.WithKeyTable(types.ParamKeyTable())
+		aiRequestSubspace = aiRequestSubspace.WithKeyTable(types.ParamKeyTable())
 	}
 	return Keeper{
 		storeKey:         key,
 		cdc:              cdc,
-		paramSpace:       providerSubspace,
-		fileCache:        filecache.New(cacheDir),
+		paramSpace:       aiRequestSubspace,
 		supplyKeeper:     supplyKeeper,
 		bankKeeper:       bankKeeper,
 		stakingKeeper:    stakingKeeper,

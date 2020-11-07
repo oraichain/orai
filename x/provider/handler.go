@@ -39,10 +39,11 @@ func handleMsgCreateOracleScript(ctx sdk.Context, k keeper.Keeper, msg types.Msg
 		return nil, sdkerrors.Wrap(types.ErrOracleScriptNameExists, "Name already exists")
 	}
 	k.AddOracleScriptFile(msg.Code, msg.Name)
-	oscriptPath := types.ScriptPath + types.OracleScriptStoreKeyString(msg.Name)
 	// Get Data source and test case names from an oracle script
-	aiDataSources, testCases, err := k.GetDNamesTcNames(oscriptPath)
+	aiDataSources, testCases, err := k.GetDNamesTcNames(msg.Name)
 	if err != nil {
+		// erase because the script file is not properly added into the chain yet
+		k.EraseOracleScriptFile(msg.Name)
 		return nil, err
 	}
 
@@ -78,8 +79,7 @@ func handleMsgEditOracleScript(ctx sdk.Context, k keeper.Keeper, msg types.MsgEd
 	}
 
 	// Get Data source and test case names from an oracle script
-	oscriptPath := types.ScriptPath + types.OracleScriptStoreKeyString(msg.NewName)
-	aiDataSources, testCases, err := k.GetDNamesTcNames(oscriptPath)
+	aiDataSources, testCases, err := k.GetDNamesTcNames(msg.NewName)
 	if err != nil {
 		return nil, err
 	}

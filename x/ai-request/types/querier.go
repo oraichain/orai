@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/oraichain/orai/x/provider/types"
+	provider "github.com/oraichain/orai/x/provider/exported"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -21,18 +21,18 @@ const (
 
 // QueryResAIRequest resolves a query for an AI request
 type QueryResAIRequest struct {
-	RequestID        string               `json:"request_id"`
-	Creator          sdk.AccAddress       `json:"request_creator"`
-	OracleScriptName string               `json:"oscript_name"`
-	Validators       []sdk.ValAddress     `json:"validator_addrs"`
-	BlockHeight      int64                `json:"block_height"`
-	AIDataSources    []types.AIDataSource `json:"data_sources"`
-	TestCases        []types.TestCase     `json:"test_cases"`
-	Fees             string               `json:"transaction_fee"`
+	RequestID        string                   `json:"request_id"`
+	Creator          sdk.AccAddress           `json:"request_creator"`
+	OracleScriptName string                   `json:"oscript_name"`
+	Validators       []sdk.ValAddress         `json:"validator_addrs"`
+	BlockHeight      int64                    `json:"block_height"`
+	AIDataSources    []provider.AIDataSourceI `json:"data_sources"`
+	TestCases        []provider.TestCaseI     `json:"test_cases"`
+	Fees             string                   `json:"transaction_fee"`
 }
 
 // NewQueryResAIRequest is the constructor for the query ai request
-func NewQueryResAIRequest(reqID string, creator sdk.AccAddress, oscriptName string, vals []sdk.ValAddress, blockHeight int64, aiDataSources []types.AIDataSource, testCases []types.TestCase, fees string) QueryResAIRequest {
+func NewQueryResAIRequest(reqID string, creator sdk.AccAddress, oscriptName string, vals []sdk.ValAddress, blockHeight int64, aiDataSources []provider.AIDataSourceI, testCases []provider.TestCaseI, fees string) QueryResAIRequest {
 	return QueryResAIRequest{
 		RequestID:        reqID,
 		Creator:          creator,

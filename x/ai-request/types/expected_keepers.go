@@ -66,6 +66,7 @@ type ProviderKeeper interface {
 	GetAIDataSourceI(ctx sdk.Context, name string) (exported.AIDataSourceI, error)
 	DefaultTestCaseI() exported.TestCaseI
 	GetTestCaseI(ctx sdk.Context, name string) (exported.TestCaseI, error)
+	GetDNamesTcNames(oscriptPath string) ([]string, []string, error)
 }
 
 type AIRequestSet interface {

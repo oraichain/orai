@@ -27,15 +27,26 @@ type ValResult struct {
 // ValResults is the list of results struct
 type ValResults []ValResult
 
-// DataSourceResult stores the data source result
-type DataSourceResult struct {
-	Name   string `json:"data_source"`
-	Result []byte `json:"result"`
-	Status string `json:"result_status"`
+// NewAIRequestResult is a constructor for the ai request result struct
+func NewAIRequestResult(
+	requestID string,
+	results ValResults,
+	status string,
+) AIRequestResult {
+	return AIRequestResult{
+		RequestID: requestID,
+		Results:   results,
+		Status:    status,
+	}
 }
 
-// TestCaseResult stores the test case result
-type TestCaseResult struct {
-	Name              string             `json:"test_case"`
-	DataSourceResults []DataSourceResult `json:"data_source_result"`
+// NewValResult is a constructor for the validator result
+func NewValResult(
+	val sdk.ValAddress,
+	result []byte,
+) ValResult {
+	return ValResult{
+		Validator: val,
+		Result:    result,
+	}
 }

@@ -19,3 +19,37 @@ type Reward struct {
 	ProviderFees  sdk.Coins                `json:"provider_fees"`
 	ValidatorFees sdk.Coins                `json:"validator_fees"`
 }
+
+// NewReward is a constructor for the reward struct
+func NewReward(
+	validators []Validator,
+	dataSources []provider.AIDataSourceI,
+	testCases []provider.TestCaseI,
+	blockHeight int64,
+	totalVotingPower int64,
+	providerFees sdk.Coins,
+	validatorFees sdk.Coins,
+) Reward {
+	return Reward{
+		Validators:    validators,
+		DataSources:   dataSources,
+		TestCases:     testCases,
+		BlockHeight:   blockHeight,
+		TotalPower:    totalVotingPower,
+		ProviderFees:  providerFees,
+		ValidatorFees: validatorFees,
+	}
+}
+
+// DefaultReward is a default value init for the reward struct
+func DefaultReward(blockHeight int64) Reward {
+	return Reward{
+		Validators:    []Validator{},
+		DataSources:   make([]provider.AIDataSourceI, 0),
+		TestCases:     make([]provider.TestCaseI, 0),
+		BlockHeight:   blockHeight,
+		TotalPower:    int64(0),
+		ProviderFees:  sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(0)))),
+		ValidatorFees: sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(0)))),
+	}
+}

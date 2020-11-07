@@ -98,7 +98,7 @@ func InitCmd(ctx *server.Context, cdc *codec.Codec, customAppState map[string]js
 			config := ctx.Config
 			config.SetRoot(viper.GetString(cli.HomeFlag))
 			// adjust config.toml file here using config param
-			config.Consensus.TimeoutCommit = 5000 * time.Millisecond
+			config.Consensus.TimeoutCommit = 1500 * time.Millisecond
 			if err := genFilePVIfNotExists(cdc, config.PrivValidatorKeyFile(), config.PrivValidatorStateFile()); err != nil {
 				return err
 			}

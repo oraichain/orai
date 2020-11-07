@@ -21,7 +21,6 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 
 	// Init params for the provider module
 	keeper.SetParam(ctx, types.KeyOracleScriptRewardPercentage, data.Params.OracleScriptRewardPercentage)
-	keeper.SetParam(ctx, types.KeyExpirationCount, data.Params.ExpirationCount)
 }
 
 // ExportGenesis writes the current store values
