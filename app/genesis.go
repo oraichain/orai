@@ -16,9 +16,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
-	aiRequest "github.com/oraichain/orai/x/ai-request"
+	aiRequest "github.com/oraichain/orai/x/airequest"
 	"github.com/oraichain/orai/x/provider"
 	"github.com/oraichain/orai/x/provider/types"
+	webSocket "github.com/oraichain/orai/x/websocket"
 )
 
 // GenesisState represents chain state at the start of the chain. Any initial state (account balances) are stored here.
@@ -66,5 +67,6 @@ func NewDefaultGenesisState() GenesisState {
 		evidence.ModuleName:  evidence.AppModuleBasic{}.DefaultGenesis(),
 		provider.ModuleName:  provider.AppModuleBasic{}.DefaultGenesis(),
 		aiRequest.ModuleName: aiRequest.AppModuleBasic{}.DefaultGenesis(),
+		webSocket.ModuleName: webSocket.AppModuleBasic{}.DefaultGenesis(),
 	}
 }

@@ -12,7 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 
 	"github.com/oraichain/orai/app"
-	"github.com/oraichain/orai/x/ai-request/types"
+	"github.com/oraichain/orai/x/airequest/types"
 )
 
 var (

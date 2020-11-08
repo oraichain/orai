@@ -2,7 +2,7 @@ package websocket
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/oraichain/orai/x/ai-request/types"
+	"github.com/oraichain/orai/x/airequest/types"
 )
 
 type KYCRequest struct {

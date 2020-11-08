@@ -4,8 +4,9 @@ import (
 	"io"
 	"os"
 
-	aiRequest "github.com/oraichain/orai/x/ai-request"
+	aiRequest "github.com/oraichain/orai/x/airequest"
 	"github.com/oraichain/orai/x/provider"
+	webSocket "github.com/oraichain/orai/x/websocket"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
@@ -129,8 +130,9 @@ type NewApp struct {
 	paramsKeeper params.Keeper // global available param store
 	//evidenceKeeper evidence.Keeper    // handling evidence of misbihaviour
 	providerKeeper  provider.Keeper  // our own provider which provides a marketplace for AI providers to provide their AI services
-	aiRequestKeeper aiRequest.Keeper // our own ai-request which collects results from different AI models and aggregate them
+	aiRequestKeeper aiRequest.Keeper // our own airequest which collects results from different AI models and aggregate them
 	// TODO: Add your module(s)
+	webSocketKeeper webSocket.Keeper
 
 	// Module Manager
 	mm *module.Manager
@@ -169,6 +171,7 @@ func NewProviderApp(
 		//evidence.StoreKey,
 		provider.StoreKey,
 		aiRequest.StoreKey,
+		webSocket.StoreKey,
 	)
 
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
@@ -201,6 +204,8 @@ func NewProviderApp(
 	app.subspaces[provider.ModuleName] = app.paramsKeeper.Subspace(provider.DefaultParamspace)
 
 	app.subspaces[aiRequest.ModuleName] = app.paramsKeeper.Subspace(aiRequest.DefaultParamspace)
+
+	app.subspaces[webSocket.ModuleName] = app.paramsKeeper.Subspace(webSocket.DefaultParamspace)
 
 	//app.subspaces[evidence.ModuleName] = app.paramsKeeper.Subspace(evidence.DefaultParamspace)
 
@@ -308,6 +313,7 @@ func NewProviderApp(
 		&stakingKeeper,
 		app.distrKeeper,
 		app.providerKeeper,
+		app.webSocketKeeper,
 		auth.FeeCollectorName,
 	)
 
@@ -352,7 +358,7 @@ func NewProviderApp(
 
 		provider.NewAppModule(app.providerKeeper, app.subspaces[provider.ModuleName]),
 
-		aiRequest.NewAppModule(app.aiRequestKeeper, app.supplyKeeper, app.bankKeeper, app.stakingKeeper, app.distrKeeper, app.providerKeeper, app.subspaces[aiRequest.ModuleName]),
+		aiRequest.NewAppModule(app.aiRequestKeeper, app.supplyKeeper, app.bankKeeper, app.stakingKeeper, app.distrKeeper, app.providerKeeper, app.webSocketKeeper, app.subspaces[aiRequest.ModuleName]),
 
 		//gov.NewAppModule(app.govKeeper, app.accountKeeper, app.supplyKeeper),
 
