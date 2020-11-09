@@ -42,3 +42,9 @@ type ValidatorI interface {
 	GetVotingPower() int64
 	GetStatus() string
 }
+
+// ValResultI is the generic ValidatorResult interface that is used for other modules
+type ValResultI interface {
+	GetValidator() sdk.ValAddress
+	GetResult() []byte
+}

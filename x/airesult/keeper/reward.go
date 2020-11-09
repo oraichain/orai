@@ -2,7 +2,7 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/oraichain/orai/x/airequest/types"
+	"github.com/oraichain/orai/x/airesult/types"
 )
 
 // SetReward saves the reward to the storage without performing validation.

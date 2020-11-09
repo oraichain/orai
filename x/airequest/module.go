@@ -3,12 +3,8 @@ package airequest
 import (
 	"encoding/json"
 
-	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/staking"
-
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/supply"
 
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
@@ -24,7 +20,6 @@ import (
 	"github.com/oraichain/orai/x/airequest/keeper"
 	"github.com/oraichain/orai/x/airequest/types"
 	"github.com/oraichain/orai/x/provider"
-	webSocket "github.com/oraichain/orai/x/websocket"
 )
 
 // Type check to ensure the interface is properly implemented
@@ -84,27 +79,19 @@ type AppModule struct {
 	AppModuleBasic
 	keeper keeper.Keeper
 	// TODO: Add keepers that your application depends on
-	supplyKeeper    supply.Keeper
-	bankKeeper      bank.Keeper
-	stakingKeeper   staking.Keeper
-	distrKeeper     distr.Keeper
-	providerKeeper  provider.Keeper
-	webSocketKeeper webSocket.Keeper
-	params          params.Subspace
+	stakingKeeper  staking.Keeper
+	providerKeeper provider.Keeper
+	params         params.Subspace
 }
 
 // NewAppModule creates a new AppModule object
-func NewAppModule(k keeper.Keeper, s supply.Keeper, b bank.Keeper, staking staking.Keeper, distr distr.Keeper, p provider.Keeper, ws webSocket.Keeper, params params.Subspace /*TODO: Add Keepers that your application depends on*/) AppModule {
+func NewAppModule(k keeper.Keeper, staking staking.Keeper, p provider.Keeper, params params.Subspace /*TODO: Add Keepers that your application depends on*/) AppModule {
 	return AppModule{
-		AppModuleBasic:  AppModuleBasic{},
-		keeper:          k,
-		supplyKeeper:    s,
-		bankKeeper:      b,
-		stakingKeeper:   staking,
-		distrKeeper:     distr,
-		providerKeeper:  p,
-		webSocketKeeper: ws,
-		params:          params,
+		AppModuleBasic: AppModuleBasic{},
+		keeper:         k,
+		stakingKeeper:  staking,
+		providerKeeper: p,
+		params:         params,
 		// TODO: Add keepers that your application depends on
 	}
 }
@@ -172,12 +159,12 @@ func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.Val
 func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) {
 	// 	TODO: fill out if your application requires beginblock, if not you can delete this function
 	k.ResolveRngSeed(ctx, req)
-	k.AllocateTokens(ctx, req.GetLastCommitInfo().Votes)
+	//k.AllocateTokens(ctx, req.GetLastCommitInfo().Votes)
 	//k.DirectAllocateTokens(ctx, req.GetLastCommitInfo().Votes)
 }
 
 // EndBlocker called every block, process inflation, update validator set.
 func EndBlocker(ctx sdk.Context, k Keeper) {
 	// 	TODO: fill out if your application requires endblock, if not you can delete this function
-	k.ProcessReward(ctx)
+	//k.ProcessReward(ctx)
 }

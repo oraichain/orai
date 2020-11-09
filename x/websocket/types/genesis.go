@@ -38,7 +38,7 @@ func ValidateGenesis(data GenesisState) error {
 			return fmt.Errorf("invalid Report: Value: %s. Error: Missing RequestID", record.RequestID)
 		}
 		if record.BlockHeight <= int64(0) {
-			return fmt.Errorf("invalid Report: BlockHeight: %s. Error: Invalid block height", record.BlockHeight)
+			return fmt.Errorf("invalid Report: BlockHeight: %d. Error: Invalid block height", record.BlockHeight)
 		}
 		if record.Reporter.isEmpty() {
 			return fmt.Errorf("invalid AIRequests: Reporter: %s. Error: Missing Reporter information", record.Reporter)

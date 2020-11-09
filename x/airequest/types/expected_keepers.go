@@ -6,6 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/params"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/exported"
 	supply "github.com/cosmos/cosmos-sdk/x/supply/exported"
+	"github.com/oraichain/orai/x/airequest/exported"
 	provider "github.com/oraichain/orai/x/provider/exported"
 	webSocket "github.com/oraichain/orai/x/websocket/exported"
 )
@@ -78,6 +79,7 @@ type WebSocketKeeper interface {
 }
 
 type AIRequestSet interface {
+	GetAIRequest(ctx sdk.Context, id string) (exported.AIRequestI, error)
 }
 
 type RewardSet interface {

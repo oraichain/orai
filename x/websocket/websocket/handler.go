@@ -8,8 +8,10 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/oraichain/orai/x/airequest/types"
+	aiRequest "github.com/oraichain/orai/x/airequest/types"
 	provider "github.com/oraichain/orai/x/provider/types"
+	"github.com/oraichain/orai/x/websocket/exported"
+	"github.com/oraichain/orai/x/websocket/types"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
@@ -36,9 +38,9 @@ func handleTransaction(c *Context, l *Logger, tx tmtypes.TxResult) {
 
 		l.Info(":star: message type: %s", messageType)
 
-		if messageType == (types.MsgSetKYCRequest{}).Type() {
+		if messageType == (aiRequest.MsgSetKYCRequest{}).Type() {
 			//go handleKYCRequestLog(c, l, log)
-		} else if messageType == (types.MsgSetPriceRequest{}).Type() {
+		} else if messageType == (aiRequest.MsgSetPriceRequest{}).Type() {
 			go handlePriceRequestLog(c, l, log)
 		} else {
 			l.Debug(":ghost: Skipping non-{request/packet} type: %s", messageType)
@@ -94,9 +96,9 @@ func handlePriceRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 
 		var finalResultStr string
 		// create data source results to store in the report
-		var dataSourceResultsTest []types.DataSourceResult
-		var dataSourceResults []types.DataSourceResult
-		var testCaseResults []types.TestCaseResult
+		var dataSourceResultsTest []exported.DataSourceResultI
+		var dataSourceResults []exported.DataSourceResultI
+		var testCaseResults []exported.TestCaseResultI
 
 		// we have different test cases, so we need to loop through them
 		for i := range testCases {
@@ -104,6 +106,7 @@ func handlePriceRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 			for j := range aiDataSources {
 				// Aggregate the required fees for an AI request
 				// run the test case script
+				fmt.Println("test case path: ", getTCasePath(testCases[i])+provider.DataSourceStoreKeyString(aiDataSources[j]))
 				cmdTestCase := exec.Command("bash", getTCasePath(testCases[i]), provider.DataSourceStoreKeyString(aiDataSources[j]), req.AIRequest.Input, req.AIRequest.ExpectedOutput)
 				var outTestCase bytes.Buffer
 				cmdTestCase.Stdout = &outTestCase
@@ -114,6 +117,8 @@ func handlePriceRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 
 				// collect test case result from the script
 				result := strings.TrimSuffix(outTestCase.String(), "\n")
+
+				fmt.Println("result after running test case: ", result)
 
 				dataSourceResult := types.NewDataSourceResult(aiDataSources[j], []byte(result), types.ResultSuccess)
 
@@ -137,8 +142,8 @@ func handlePriceRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 			// run the data source script
 			var outTestCase bytes.Buffer
 			var dataSourceResult types.DataSourceResult
-			if dataSourceResultsTest[i].Status == types.ResultSuccess {
-				cmdTestCase := exec.Command("bash", getDSourcePath(dataSourceResultsTest[i].Name))
+			if dataSourceResultsTest[i].GetStatus() == types.ResultSuccess {
+				cmdTestCase := exec.Command("bash", getDSourcePath(dataSourceResultsTest[i].GetName()))
 				cmdTestCase.Stdout = &outTestCase
 				err = cmdTestCase.Run()
 				if err != nil {
@@ -148,7 +153,7 @@ func handlePriceRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 				result := strings.TrimSuffix(outTestCase.String(), "\n")
 				fmt.Println("result from data sources: ", result)
 				// By default, we consider returning null as failure. If any datasource does not follow this rule then it should not be used by any oracle scripts.
-				dataSourceResult = types.NewDataSourceResult(dataSourceResultsTest[i].Name, []byte(result), types.ResultSuccess)
+				dataSourceResult = types.NewDataSourceResult(dataSourceResultsTest[i].GetName(), []byte(result), types.ResultSuccess)
 				if len(result) == 0 {
 					// change status to fail so the datasource cannot be rewarded afterwards
 					dataSourceResult.Status = types.ResultFailure
@@ -156,7 +161,7 @@ func handlePriceRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 					finalResultStr = finalResultStr + result + "-"
 				}
 			} else {
-				dataSourceResult = types.NewDataSourceResult(dataSourceResultsTest[i].Name, []byte(dataSourceResultsTest[i].Result), types.ResultFailure)
+				dataSourceResult = types.NewDataSourceResult(dataSourceResultsTest[i].GetName(), []byte(dataSourceResultsTest[i].GetResult()), types.ResultFailure)
 			}
 			// append an data source result into the list
 			dataSourceResults = append(dataSourceResults, dataSourceResult)

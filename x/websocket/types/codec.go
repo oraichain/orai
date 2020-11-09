@@ -18,11 +18,13 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterInterface((*exported.DataSourceResultI)(nil), nil) // has to be pointer of interface
 	cdc.RegisterInterface((*exported.TestCaseResultI)(nil), nil)   // has to be pointer of interface
 	cdc.RegisterInterface((*exported.ValidatorI)(nil), nil)        // has to be pointer of interface
+	cdc.RegisterInterface((*exported.ValResultI)(nil), nil)        // has to be pointer of interface
 	cdc.RegisterConcrete(&Report{}, "websocket/Report", nil)
 	cdc.RegisterConcrete(&Reporter{}, "websocket/Reporter", nil)
 	cdc.RegisterConcrete(&DataSourceResult{}, "websocket/DataSourceResult", nil)
 	cdc.RegisterConcrete(&TestCaseResult{}, "websocket/TestCaseResult", nil)
 	cdc.RegisterConcrete(&Validator{}, "websocket/Validator", nil)
+	cdc.RegisterConcrete(&ValResult{}, "websocket/ValResult", nil)
 }
 
 // ModuleCdc defines the module codec

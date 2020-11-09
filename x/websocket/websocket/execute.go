@@ -12,7 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 
 	"github.com/oraichain/orai/app"
-	"github.com/oraichain/orai/x/airequest/types"
+	"github.com/oraichain/orai/x/websocket/types"
 )
 
 var (
@@ -21,11 +21,6 @@ var (
 
 // SubmitReport creates a new MsgCreateReport and submits it to the Oraichain to create a new report
 func SubmitReport(c *Context, l *Logger, key keys.Info, msgReport Report) {
-	msg := types.NewMsgCreateReport(msgReport.RequestID, msgReport.Validator, msgReport.DataSourceResults, msgReport.TestCaseResults, msgReport.Reporter, msgReport.Fees, msgReport.AggregatedResult)
-	if err := msg.ValidateBasic(); err != nil {
-		l.Error(":exploding_head: Failed to validate basic with error: %s", err.Error())
-		return
-	}
 	cliCtx := sdkCtx.CLIContext{Client: c.client, TrustNode: true, Codec: cdc}
 	txHash := ""
 	for try := uint64(1); try <= c.maxTry; try++ {
@@ -36,7 +31,12 @@ func SubmitReport(c *Context, l *Logger, key keys.Info, msgReport Report) {
 			time.Sleep(c.rpcPollInterval)
 			continue
 		}
-
+		reporter := types.NewReporter(key.GetAddress(), key.GetName(), msgReport.Validator)
+		msg := types.NewMsgCreateReport(msgReport.RequestID, msgReport.DataSourceResults, msgReport.TestCaseResults, reporter, msgReport.Fees, msgReport.AggregatedResult)
+		if err := msg.ValidateBasic(); err != nil {
+			l.Error(":exploding_head: Failed to validate basic with error: %s", err.Error())
+			return
+		}
 		txBldr := auth.NewTxBuilder(
 			auth.DefaultTxEncoder(cdc), acc.GetAccountNumber(), acc.GetSequence(),
 			200000, 1, false, cfg.ChainID, fmt.Sprintf("websocket"), sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(5000)))), c.gasPrices,

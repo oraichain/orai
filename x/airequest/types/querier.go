@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	provider "github.com/oraichain/orai/x/provider/exported"
-	websocket "github.com/oraichain/orai/x/websocket/exported"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -16,7 +15,6 @@ const (
 	// Query<Action>    = "<action>"
 	QueryAIRequest    = "aireq"
 	QueryAIRequestIDs = "aireqs"
-	QueryFullRequest  = "fullreq"
 	QueryMinFees      = "min_fees"
 )
 
@@ -63,20 +61,4 @@ type QueryResAIRequestIDs []string
 // implement fmt.Stringer
 func (e QueryResAIRequestIDs) String() string {
 	return strings.Join(e[:], "\n")
-}
-
-// QueryResFullRequest Queries a complete request with reports
-type QueryResFullRequest struct {
-	AIRequest AIRequest           `json:"ai_request"`
-	Reports   []websocket.ReportI `json:"reports"`
-	Result    AIRequestResult     `json:"ai_result"`
-}
-
-// NewQueryResFullRequest is the constructor for the query full request
-func NewQueryResFullRequest(aiReq AIRequest, reps []websocket.ReportI, result AIRequestResult) QueryResFullRequest {
-	return QueryResFullRequest{
-		AIRequest: aiReq,
-		Reports:   reps,
-		Result:    result,
-	}
 }

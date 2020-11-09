@@ -5,7 +5,7 @@ const axios = require('axios');
 const paths = {
   CREATE_UNSIGNED_TX: "/airequest/aireq/pricereq",
   GET_REQUEST_ID: "/txs/",
-  GET_FULL_REQUEST: "/airequest/fullreq/",
+  GET_FULL_REQUEST: "/airesult/fullreq/",
   GET_MINIMUM_FEES: "/provider/min_fees/"
 }
 

@@ -24,7 +24,7 @@ var (
 	ErrNotEnoughValidators      = sdkerrors.Register(ModuleName, 15, "Not enough validators to execute the request")
 	ErrCannotRandomValidators   = sdkerrors.Register(ModuleName, 16, "Cannot random a list of validators")
 	ErrCannotFindValidator      = sdkerrors.Register(ModuleName, 17, "Cannot find the correct validator")
-	ErrValidatorAlreadyReported = sdkerrors.Register(ModuleName, 18, "The validator is already exported")
+	ErrValidatorAlreadyReported = sdkerrors.Register(ModuleName, 18, "The validator is already reported")
 	ErrTestCaseNotFound         = sdkerrors.Register(ModuleName, 19, "The test case is not found")
 	ErrInvalidFeeType           = sdkerrors.Register(ModuleName, 20, "The transaction fee is invalid")
 	ErrTestCaseNameExists       = sdkerrors.Register(ModuleName, 21, "The test case name already exists")

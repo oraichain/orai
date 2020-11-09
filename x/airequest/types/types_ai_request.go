@@ -64,3 +64,53 @@ func NewAIRequest(
 		ExpectedOutput:   expectedOutput,
 	}
 }
+
+// GetRequestID is getter method for AIRequest struct
+func (ai AIRequest) GetRequestID() string {
+	return ai.RequestID
+}
+
+// GetOScriptName is getter method for AIRequest struct
+func (ai AIRequest) GetOScriptName() string {
+	return ai.OracleScriptName
+}
+
+// GetCreator is getter method for AIRequest struct
+func (ai AIRequest) GetCreator() sdk.AccAddress {
+	return ai.Creator
+}
+
+// GetValidators is getter method for AIRequest struct
+func (ai AIRequest) GetValidators() []sdk.ValAddress {
+	return ai.Validators
+}
+
+// GetBlockHeight is getter method for AIRequest struct
+func (ai AIRequest) GetBlockHeight() int64 {
+	return ai.BlockHeight
+}
+
+// GetAIDataSources is getter method for AIRequest struct
+func (ai AIRequest) GetAIDataSources() []provider.AIDataSourceI {
+	return ai.AIDataSources
+}
+
+// GetTestCases is getter method for AIRequest struct
+func (ai AIRequest) GetTestCases() []provider.TestCaseI {
+	return ai.TestCases
+}
+
+// GetFees is getter method for AIRequest struct
+func (ai AIRequest) GetFees() sdk.Coins {
+	return ai.Fees
+}
+
+// GetInput is getter method for AIRequest struct
+func (ai AIRequest) GetInput() string {
+	return ai.Input
+}
+
+// GetExpectedOutput is getter method for AIRequest struct
+func (ai AIRequest) GetExpectedOutput() string {
+	return ai.ExpectedOutput
+}

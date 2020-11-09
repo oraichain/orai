@@ -2,7 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/oraichain/orai/x/airequest/exported"
+	"github.com/oraichain/orai/x/airesult/exported"
 	provider "github.com/oraichain/orai/x/provider/exported"
 	websocket "github.com/oraichain/orai/x/websocket/exported"
 )

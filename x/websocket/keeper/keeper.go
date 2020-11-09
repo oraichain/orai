@@ -25,6 +25,9 @@ var _ types.TestCaseResultSet = Keeper{}
 // Implements ValidatorSet interface
 var _ types.ValidatorSet = Keeper{}
 
+// Implements ValidatorSet interface
+var _ types.ValResultSet = Keeper{}
+
 // Keeper of the provider store
 type Keeper struct {
 	storeKey      sdk.StoreKey

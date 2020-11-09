@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/cosmos/cosmos-sdk/x/params"
+	"github.com/cosmos/cosmos-sdk/x/staking"
 
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
@@ -77,14 +78,16 @@ type AppModule struct {
 	AppModuleBasic
 	keeper keeper.Keeper
 	// TODO: Add keepers that your application depends on
-	params params.Subspace
+	stakingKeeper staking.Keeper
+	params        params.Subspace
 }
 
 // NewAppModule creates a new AppModule object
-func NewAppModule(k keeper.Keeper, params params.Subspace /*TODO: Add Keepers that your application depends on*/) AppModule {
+func NewAppModule(k keeper.Keeper, s staking.Keeper, params params.Subspace /*TODO: Add Keepers that your application depends on*/) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         k,
+		stakingKeeper:  s,
 		params:         params,
 		// TODO: Add keepers that your application depends on
 	}

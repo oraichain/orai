@@ -15,6 +15,15 @@ type Reporter struct {
 	Validator sdk.ValAddress `json:"reporter_validator"`
 }
 
+// NewReporter is the constructor of the Reporter struct
+func NewReporter(addr sdk.AccAddress, name string, valAddr sdk.ValAddress) Reporter {
+	return Reporter{
+		Address:   addr,
+		Name:      name,
+		Validator: valAddr,
+	}
+}
+
 func (r Reporter) isEmpty() bool {
 	return false
 }

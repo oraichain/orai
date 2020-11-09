@@ -45,7 +45,7 @@ sleep 6
 #wait for sending orai tokens transaction success
 
 # add reporter to oraichain
-echo "y" | oraicli tx airequest add-reporters $(websocket keys list -a) --from $1 --fees 5000orai --keyring-backend test
+echo "y" | oraicli tx websocket add-reporters $(websocket keys list -a) --from $1 --fees 5000orai --keyring-backend test
 
 sleep 2
 

@@ -7,7 +7,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 )
@@ -25,82 +24,9 @@ func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 
 	providerQueryCmd.AddCommand(
 		flags.GetCommands(
-			// TODO: Add query Cmds
-			GetCmdQueryAIRequest(queryRoute, cdc),
-			GetCmdAIRequestIDs(queryRoute, cdc),
-			GetCmdQueryFullRequest(queryRoute, cdc),
+		// TODO: Add query Cmds
 		)...,
 	)
 
 	return providerQueryCmd
-}
-
-// TODO: Add Query Commands
-
-// GetCmdQueryAIRequest queries information about an AI request
-func GetCmdQueryAIRequest(queryRoute string, cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
-		Use:   "aireq [id]",
-		Short: "query an ai request using its request ID",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			id := []byte(args[0])
-
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/aireq/%s", queryRoute, id), nil)
-			if err != nil {
-				fmt.Printf("could not query request - %s \n", args[0])
-				return nil
-			}
-
-			var out types.QueryResAIRequest
-			cdc.MustUnmarshalJSON(res, &out)
-			return cliCtx.PrintOutput(out)
-		},
-	}
-}
-
-// GetCmdQueryFullRequest queries full information about an AI request
-func GetCmdQueryFullRequest(queryRoute string, cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
-		Use:   "fullreq [id]",
-		Short: "query a full ai request using its request ID",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			id := []byte(args[0])
-
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/fullreq/%s", queryRoute, id), nil)
-			if err != nil {
-				fmt.Printf("could not query request - %s \n", args[0])
-				return nil
-			}
-
-			var out types.QueryResFullRequest
-			cdc.MustUnmarshalJSON(res, &out)
-			return cliCtx.PrintOutput(out)
-		},
-	}
-}
-
-// GetCmdAIRequestIDs queries a list of all request IDs
-func GetCmdAIRequestIDs(queryRoute string, cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
-		Use:   "aireqs",
-		Short: "query all AI request IDs",
-		// Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/aireqs", queryRoute), nil)
-			if err != nil {
-				fmt.Printf("could not get request IDs\n")
-				return nil
-			}
-
-			var out types.QueryResAIRequestIDs
-			cdc.MustUnmarshalJSON(res, &out)
-			return cliCtx.PrintOutput(out)
-		},
-	}
 }

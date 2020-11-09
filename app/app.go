@@ -5,6 +5,7 @@ import (
 	"os"
 
 	aiRequest "github.com/oraichain/orai/x/airequest"
+	aiResult "github.com/oraichain/orai/x/airesult"
 	"github.com/oraichain/orai/x/provider"
 	webSocket "github.com/oraichain/orai/x/websocket"
 
@@ -65,6 +66,8 @@ var (
 		//evidence.AppModuleBasic{},
 		provider.AppModuleBasic{},
 		aiRequest.AppModuleBasic{},
+		webSocket.AppModuleBasic{},
+		aiResult.AppModuleBasic{},
 		// TODO: Add your module(s) AppModuleBasic
 	)
 
@@ -131,6 +134,7 @@ type NewApp struct {
 	//evidenceKeeper evidence.Keeper    // handling evidence of misbihaviour
 	providerKeeper  provider.Keeper  // our own provider which provides a marketplace for AI providers to provide their AI services
 	aiRequestKeeper aiRequest.Keeper // our own airequest which collects results from different AI models and aggregate them
+	aiResultKeeper  aiResult.Keeper
 	// TODO: Add your module(s)
 	webSocketKeeper webSocket.Keeper
 
@@ -172,6 +176,7 @@ func NewProviderApp(
 		provider.StoreKey,
 		aiRequest.StoreKey,
 		webSocket.StoreKey,
+		aiResult.StoreKey,
 	)
 
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
@@ -206,6 +211,8 @@ func NewProviderApp(
 	app.subspaces[aiRequest.ModuleName] = app.paramsKeeper.Subspace(aiRequest.DefaultParamspace)
 
 	app.subspaces[webSocket.ModuleName] = app.paramsKeeper.Subspace(webSocket.DefaultParamspace)
+
+	app.subspaces[aiResult.ModuleName] = app.paramsKeeper.Subspace(aiResult.DefaultParamspace)
 
 	//app.subspaces[evidence.ModuleName] = app.paramsKeeper.Subspace(evidence.DefaultParamspace)
 
@@ -308,12 +315,27 @@ func NewProviderApp(
 		app.cdc,
 		keys[aiRequest.StoreKey],
 		app.subspaces[aiRequest.ModuleName],
+		&stakingKeeper,
+		app.providerKeeper,
+	)
+
+	app.webSocketKeeper = webSocket.NewKeeper(
+		app.cdc,
+		keys[webSocket.StoreKey],
+		&stakingKeeper,
+	)
+
+	app.aiResultKeeper = aiResult.NewKeeper(
+		app.cdc,
+		keys[aiRequest.StoreKey],
+		app.subspaces[aiRequest.ModuleName],
 		app.supplyKeeper,
 		app.bankKeeper,
 		&stakingKeeper,
 		app.distrKeeper,
 		app.providerKeeper,
 		app.webSocketKeeper,
+		app.aiRequestKeeper,
 		auth.FeeCollectorName,
 	)
 
@@ -358,7 +380,11 @@ func NewProviderApp(
 
 		provider.NewAppModule(app.providerKeeper, app.subspaces[provider.ModuleName]),
 
-		aiRequest.NewAppModule(app.aiRequestKeeper, app.supplyKeeper, app.bankKeeper, app.stakingKeeper, app.distrKeeper, app.providerKeeper, app.webSocketKeeper, app.subspaces[aiRequest.ModuleName]),
+		aiRequest.NewAppModule(app.aiRequestKeeper, app.stakingKeeper, app.providerKeeper, app.subspaces[aiRequest.ModuleName]),
+
+		webSocket.NewAppModule(app.webSocketKeeper, app.stakingKeeper, app.subspaces[webSocket.ModuleName]),
+
+		aiResult.NewAppModule(app.aiResultKeeper, app.supplyKeeper, app.bankKeeper, app.stakingKeeper, app.distrKeeper, app.providerKeeper, app.webSocketKeeper, app.aiRequestKeeper, app.subspaces[aiResult.ModuleName]),
 
 		//gov.NewAppModule(app.govKeeper, app.accountKeeper, app.supplyKeeper),
 
@@ -370,8 +396,8 @@ func NewProviderApp(
 	// there is nothing left over in the validator fee pool, so as to keep the
 	// CanWithdrawInvariant invariant.
 
-	app.mm.SetOrderBeginBlockers(aiRequest.ModuleName, distr.ModuleName, slashing.ModuleName, staking.ModuleName)
-	app.mm.SetOrderEndBlockers(staking.ModuleName, aiRequest.ModuleName)
+	app.mm.SetOrderBeginBlockers(aiRequest.ModuleName, aiResult.ModuleName, distr.ModuleName, slashing.ModuleName, staking.ModuleName)
+	app.mm.SetOrderEndBlockers(staking.ModuleName, aiResult.ModuleName)
 
 	// Sets the order of Genesis - Order matters, genutil is to always come last
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -384,7 +410,7 @@ func NewProviderApp(
 
 	app.mm.SetOrderInitGenesis(
 		auth.ModuleName, distr.ModuleName, staking.ModuleName, bank.ModuleName, supply.ModuleName,
-		slashing.ModuleName, mint.ModuleName, provider.ModuleName, aiRequest.ModuleName,
+		slashing.ModuleName, mint.ModuleName, provider.ModuleName, aiRequest.ModuleName, webSocket.ModuleName, aiResult.ModuleName,
 		genutil.ModuleName,
 	)
 

@@ -17,6 +17,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	aiRequest "github.com/oraichain/orai/x/airequest"
+	aiResult "github.com/oraichain/orai/x/airesult"
 	"github.com/oraichain/orai/x/provider"
 	"github.com/oraichain/orai/x/provider/types"
 	webSocket "github.com/oraichain/orai/x/websocket"
@@ -68,5 +69,6 @@ func NewDefaultGenesisState() GenesisState {
 		provider.ModuleName:  provider.AppModuleBasic{}.DefaultGenesis(),
 		aiRequest.ModuleName: aiRequest.AppModuleBasic{}.DefaultGenesis(),
 		webSocket.ModuleName: webSocket.AppModuleBasic{}.DefaultGenesis(),
+		aiResult.ModuleName:  aiResult.AppModuleBasic{}.DefaultGenesis(),
 	}
 }

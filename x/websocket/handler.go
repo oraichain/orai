@@ -33,6 +33,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 
 // this handler will be triggered when the websocket create a MsgCreateReport
 func handleMsgAddReport(ctx sdk.Context, k Keeper, msg types.MsgCreateReport) (*sdk.Result, error) {
+	fmt.Println("GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGg")
 	// validator := types.NewValidator(msg.Reporter.Validator, k.GetValidator(ctx, msg.Reporter.Validator).GetConsensusPower(), "active")
 	report := types.NewReport(msg.RequestID, msg.DataSourceResults, msg.TestCaseResults, ctx.BlockHeight(), msg.Fees, msg.AggregatedResult, msg.Reporter)
 	err := k.AddReport(ctx, msg.RequestID, report)

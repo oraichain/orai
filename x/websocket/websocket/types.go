@@ -2,7 +2,7 @@ package websocket
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/oraichain/orai/x/airequest/types"
+	"github.com/oraichain/orai/x/websocket/exported"
 )
 
 type KYCRequest struct {
@@ -66,19 +66,19 @@ type Report struct {
 	RequestID string         `json:"request_id"`
 	Validator sdk.ValAddress `json:"validator"`
 	// DataSourceResults are the actual results, not from the test cases
-	DataSourceResults []types.DataSourceResult `json:"data_source_results"`
-	TestCaseResults   []types.TestCaseResult   `json:"test_case_results"`
-	Reporter          sdk.AccAddress           `json:"reporter"`
-	Fees              sdk.Coins                `json:"report_fee"`
-	AggregatedResult  []byte                   `json:"aggregated_result"`
+	DataSourceResults []exported.DataSourceResultI `json:"data_source_results"`
+	TestCaseResults   []exported.TestCaseResultI   `json:"test_case_results"`
+	Reporter          sdk.AccAddress               `json:"reporter"`
+	Fees              sdk.Coins                    `json:"report_fee"`
+	AggregatedResult  []byte                       `json:"aggregated_result"`
 }
 
 // NewReport is a constructor function for MsgCreateReport
 func NewReport(
 	requestID string,
 	validator sdk.ValAddress,
-	dataSourceResults []types.DataSourceResult,
-	testCaseResults []types.TestCaseResult,
+	dataSourceResults []exported.DataSourceResultI,
+	testCaseResults []exported.TestCaseResultI,
 	reporter sdk.AccAddress,
 	fees sdk.Coins,
 	aggregatedResult []byte,

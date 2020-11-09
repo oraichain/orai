@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	storeName = "airequest"
+	storeName = "websocket"
 	restName  = storeName
 )
 

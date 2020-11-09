@@ -11,37 +11,30 @@ import (
 	"github.com/oraichain/orai/x/airequest/types"
 )
 
+// Implements OracleScriptSet interface
+var _ types.AIRequestSet = Keeper{}
+
 // Keeper of the provider store
 type Keeper struct {
-	storeKey         sdk.StoreKey
-	cdc              *codec.Codec
-	paramSpace       params.Subspace
-	supplyKeeper     types.SupplyKeeper
-	bankKeeper       types.BankKeeper
-	stakingKeeper    types.StakingKeeper
-	distrKeeper      types.DistrKeeper
-	ProviderKeeper   types.ProviderKeeper
-	webSocketKeeper  types.WebSocketKeeper
-	feeCollectorName string
+	storeKey       sdk.StoreKey
+	cdc            *codec.Codec
+	paramSpace     params.Subspace
+	stakingKeeper  types.StakingKeeper
+	ProviderKeeper types.ProviderKeeper
 }
 
 // NewKeeper creates a provider keeper
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, aiRequestSubspace params.Subspace, supplyKeeper types.SupplyKeeper, bankKeeper types.BankKeeper, stakingKeeper types.StakingKeeper, distrKeeper types.DistrKeeper, providerKeeper types.ProviderKeeper, socketKeeper types.WebSocketKeeper, feeCollectorName string) Keeper {
+func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, aiRequestSubspace params.Subspace, stakingKeeper types.StakingKeeper, providerKeeper types.ProviderKeeper) Keeper {
 	if !aiRequestSubspace.HasKeyTable() {
 		// register parameters of the provider module into the param space
 		aiRequestSubspace = aiRequestSubspace.WithKeyTable(types.ParamKeyTable())
 	}
 	return Keeper{
-		storeKey:         key,
-		cdc:              cdc,
-		paramSpace:       aiRequestSubspace,
-		supplyKeeper:     supplyKeeper,
-		bankKeeper:       bankKeeper,
-		stakingKeeper:    stakingKeeper,
-		distrKeeper:      distrKeeper,
-		ProviderKeeper:   providerKeeper,
-		webSocketKeeper:  socketKeeper,
-		feeCollectorName: feeCollectorName,
+		storeKey:       key,
+		cdc:            cdc,
+		paramSpace:     aiRequestSubspace,
+		stakingKeeper:  stakingKeeper,
+		ProviderKeeper: providerKeeper,
 	}
 }
 

@@ -1,35 +1,42 @@
 package keeper
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/oraichain/orai/x/airequest/types"
-	"github.com/oraichain/orai/x/websocket/exported"
+	aiRequest "github.com/oraichain/orai/x/airequest/exported"
+	"github.com/oraichain/orai/x/airesult/types"
+	webSocket "github.com/oraichain/orai/x/websocket/exported"
+	webSocketType "github.com/oraichain/orai/x/websocket/types"
 )
 
 // ResolveResult aggregates the results from the reports before storing it into the blockchain
-func (k Keeper) ResolveResult(ctx sdk.Context, req types.AIRequest, rep exported.ReportI) {
+func (k Keeper) ResolveResult(ctx sdk.Context, req aiRequest.AIRequestI, rep webSocket.ReportI) {
 	// hard code the result first if the request does not have a result
-	if !k.HasResult(ctx, req.RequestID) {
+	if !k.HasResult(ctx, req.GetRequestID()) {
 		// if the the request only needs a validator to return a result from the report then it's finished
-		var resultList types.ValResults
-		resultList = append(resultList, types.NewValResult(rep.GetValidator(), rep.GetAggregatedResult()))
-		if len(req.Validators) == 1 {
-			k.SetResult(ctx, req.RequestID, types.NewAIRequestResult(req.RequestID, resultList, types.RequestStatusFinished))
+		fmt.Println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaa0")
+		resultList := make([]webSocket.ValResultI, 0)
+		resultList = append(resultList, webSocketType.NewValResult(rep.GetValidator(), rep.GetAggregatedResult()))
+		fmt.Println("report: ", rep)
+		fmt.Println("req validator length: ", len(req.GetValidators()))
+		if len(req.GetValidators()) == 1 {
+			k.SetResult(ctx, req.GetRequestID(), types.NewAIRequestResult(req.GetRequestID(), resultList, types.RequestStatusFinished))
 		} else {
 			// assume that we have already checked the number of validators required for a request
-			k.SetResult(ctx, req.RequestID, types.NewAIRequestResult(req.RequestID, resultList, types.RequestStatusPending))
+			k.SetResult(ctx, req.GetRequestID(), types.NewAIRequestResult(req.GetRequestID(), resultList, types.RequestStatusPending))
 		}
 	} else {
 		// if there are more than one validators then we add more results
-		if len(req.Validators) > 1 {
+		if len(req.GetValidators()) > 1 {
 			// if already has result then we add more results
-			result, _ := k.GetResult(ctx, req.RequestID)
-			result.Results = append(result.Results, types.NewValResult(rep.GetValidator(), rep.GetAggregatedResult()))
+			result, _ := k.GetResult(ctx, req.GetRequestID())
+			result.Results = append(result.Results, webSocketType.NewValResult(rep.GetValidator(), rep.GetAggregatedResult()))
 			// check if there are enough results from the validators or not
-			if len(req.Validators) == len(result.Results) {
+			if len(req.GetValidators()) == len(result.Results) {
 				result.Status = types.RequestStatusFinished
 			}
-			k.SetResult(ctx, req.RequestID, result)
+			k.SetResult(ctx, req.GetRequestID(), result)
 		}
 	}
 }
