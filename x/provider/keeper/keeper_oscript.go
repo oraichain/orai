@@ -15,12 +15,10 @@ import (
 func (k Keeper) GetOracleScript(ctx sdk.Context, name string) (types.OracleScript, error) {
 	store := ctx.KVStore(k.storeKey)
 	var oScript types.OracleScript
-	fmt.Println("before getting oracle script: ", oScript)
 	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get(types.OracleScriptStoreKey(name)), &oScript)
 	if err != nil {
 		return types.OracleScript{}, err
 	}
-	fmt.Println("After getting oracle script: ", oScript.Description)
 	return oScript, nil
 }
 

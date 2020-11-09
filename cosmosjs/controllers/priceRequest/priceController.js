@@ -76,6 +76,7 @@ module.exports = {
                   orai.broadcast(signedTx).then(response => {
                     // wait about 5 seconds to query the tx hash. Count check if interval 5 times still cannot get response then stop
                     console.log("response: ", response)
+                    // TODO: at this time, need to verify if the txhash is a success or not. Normally, if success => no "code" field, if fail then have "code" field when querying the transaction hash
                     let txHash = response.txhash
                     let count = 0
                     let counter = 0

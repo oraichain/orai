@@ -98,7 +98,7 @@ func InitCmd(ctx *server.Context, cdc *codec.Codec, customAppState map[string]js
 			config := ctx.Config
 			config.SetRoot(viper.GetString(cli.HomeFlag))
 			// adjust config.toml file here using config param
-			config.Consensus.TimeoutCommit = 1500 * time.Millisecond
+			config.Consensus.TimeoutCommit = 5000 * time.Millisecond
 			if err := genFilePVIfNotExists(cdc, config.PrivValidatorKeyFile(), config.PrivValidatorStateFile()); err != nil {
 				return err
 			}
@@ -149,6 +149,6 @@ func InitCmd(ctx *server.Context, cdc *codec.Codec, customAppState map[string]js
 	cmd.Flags().String(cli.HomeFlag, defaultNodeHome, "node's home directory")
 	cmd.Flags().BoolP(flagOverwrite, "o", false, "overwrite the genesis.json file")
 	cmd.Flags().String(flags.FlagChainID, "", "genesis file chain-id, if left blank will be randomly created")
-	cmd.Flags().Int(flagTimeoutCommit, 1500, "timeout commit of the node in ms")
+	cmd.Flags().Int(flagTimeoutCommit, 5000, "timeout commit of the node in ms")
 	return cmd
 }

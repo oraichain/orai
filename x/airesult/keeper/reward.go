@@ -35,7 +35,7 @@ func (k Keeper) ProcessReward(ctx sdk.Context) {
 
 	// Collect all the reports in the current block to get all the information for the reward
 	for _, report := range k.webSocketKeeper.GetReportsBlockHeight(ctx, blockHeight) {
-		k.ResolveRequestsFromReports(ctx, report, &reward, ctx.BlockHeight())
+		k.ResolveRequestsFromReports(ctx, report, &reward, blockHeight)
 	}
 	// check if the reward is empty or not
 	if len(reward.Validators) > 0 {

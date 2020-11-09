@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	aiRequest "github.com/oraichain/orai/x/airequest/exported"
 	"github.com/oraichain/orai/x/airesult/types"
@@ -15,11 +13,8 @@ func (k Keeper) ResolveResult(ctx sdk.Context, req aiRequest.AIRequestI, rep web
 	// hard code the result first if the request does not have a result
 	if !k.HasResult(ctx, req.GetRequestID()) {
 		// if the the request only needs a validator to return a result from the report then it's finished
-		fmt.Println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaa0")
 		resultList := make([]webSocket.ValResultI, 0)
 		resultList = append(resultList, webSocketType.NewValResult(rep.GetValidator(), rep.GetAggregatedResult()))
-		fmt.Println("report: ", rep)
-		fmt.Println("req validator length: ", len(req.GetValidators()))
 		if len(req.GetValidators()) == 1 {
 			k.SetResult(ctx, req.GetRequestID(), types.NewAIRequestResult(req.GetRequestID(), resultList, types.RequestStatusFinished))
 		} else {
