@@ -8,7 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/oraichain/orai/x/airequest/types"
+	"github.com/oraichain/orai/x/airesult/types"
 )
 
 // GetTxCmd returns the transaction commands for this module

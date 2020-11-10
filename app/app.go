@@ -327,8 +327,8 @@ func NewProviderApp(
 
 	app.aiResultKeeper = aiResult.NewKeeper(
 		app.cdc,
-		keys[aiRequest.StoreKey],
-		app.subspaces[aiRequest.ModuleName],
+		keys[aiResult.StoreKey],
+		app.subspaces[aiResult.ModuleName],
 		app.supplyKeeper,
 		app.bankKeeper,
 		&stakingKeeper,
