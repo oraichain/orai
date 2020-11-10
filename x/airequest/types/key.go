@@ -8,7 +8,7 @@ import (
 
 const (
 	// ModuleName is the name of the module
-	ModuleName = "airesult"
+	ModuleName = "airequest"
 
 	// StoreKey to be used when creating the KVStore
 	StoreKey = ModuleName
