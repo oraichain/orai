@@ -12,7 +12,6 @@ import (
 
 // HasReport checks if the report of this ID triple exists in the storage.
 func (k Keeper) HasReport(ctx sdk.Context, id string, val sdk.ValAddress) bool {
-	fmt.Println("report store key: ", types.ReportStoreKey(id, string(val[:])))
 	return ctx.KVStore(k.storeKey).Has(types.ReportStoreKey(id, string(val[:])))
 }
 
@@ -107,11 +106,6 @@ func (k Keeper) ValidateReport(ctx sdk.Context, rep exported.ReportI, req aiRequ
 	// Check if the validator is in the requested list of validators
 	if !containsVal(req.GetValidators(), rep.GetValidator()) {
 		return sdkerrors.Wrap(types.ErrCannotFindValidator, fmt.Sprintln("failed to find the requested validator"))
-	}
-	// Check if the validator has reported or not
-	// TODO: HAS BUG HERE. SAME REQUEST ID FOR ALL CASES ????????????????
-	if k.HasReport(ctx, req.GetRequestID(), rep.GetValidator()) {
-		return sdkerrors.Wrap(types.ErrValidatorAlreadyReported, fmt.Sprintf("Validator already reported"))
 	}
 	// if len(rep.RawReports) != len(req.RawRequests) {
 	// 	return types.ErrInvalidReportSize

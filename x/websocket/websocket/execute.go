@@ -23,6 +23,12 @@ var (
 func SubmitReport(c *Context, l *Logger, key keys.Info, msgReport Report) {
 	cliCtx := sdkCtx.CLIContext{Client: c.client, TrustNode: true, Codec: cdc}
 	txHash := ""
+	reporter := types.NewReporter(key.GetAddress(), key.GetName(), msgReport.Validator)
+	msg := types.NewMsgCreateReport(msgReport.RequestID, msgReport.DataSourceResults, msgReport.TestCaseResults, reporter, msgReport.Fees, msgReport.AggregatedResult)
+	if err := msg.ValidateBasic(); err != nil {
+		l.Error(":exploding_head: Failed to validate basic with error: %s", err.Error())
+		return
+	}
 	for try := uint64(1); try <= c.maxTry; try++ {
 		l.Info(":e-mail: Try to broadcast report transaction(%d/%d)", try, c.maxTry)
 		acc, err := auth.NewAccountRetriever(cliCtx).GetAccount(key.GetAddress())
@@ -30,12 +36,6 @@ func SubmitReport(c *Context, l *Logger, key keys.Info, msgReport Report) {
 			l.Info(":warning: Failed to retreive account with error: %s", err.Error())
 			time.Sleep(c.rpcPollInterval)
 			continue
-		}
-		reporter := types.NewReporter(key.GetAddress(), key.GetName(), msgReport.Validator)
-		msg := types.NewMsgCreateReport(msgReport.RequestID, msgReport.DataSourceResults, msgReport.TestCaseResults, reporter, msgReport.Fees, msgReport.AggregatedResult)
-		if err := msg.ValidateBasic(); err != nil {
-			l.Error(":exploding_head: Failed to validate basic with error: %s", err.Error())
-			return
 		}
 		txBldr := auth.NewTxBuilder(
 			auth.DefaultTxEncoder(cdc), acc.GetAccountNumber(), acc.GetSequence(),

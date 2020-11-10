@@ -58,8 +58,6 @@ func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep webSocket.Report
 
 	req, _ := k.aiRequestKeeper.GetAIRequest(ctx, rep.GetRequestID())
 	validation := k.validateBasic(ctx, req, rep, blockHeight)
-
-	fmt.Println("AAAAAAAAAABBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBCCCCCCCCCCCCCCCCCCCCC")
 	// if the report cannot pass the validation basic then we skip the rest
 	if !validation {
 		return
@@ -89,9 +87,6 @@ func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep webSocket.Report
 	validator := webSocketType.NewValidator(valAddress, k.stakingKeeper.Validator(ctx, valAddress).GetConsensusPower(), "active")
 	reward.Validators = append(reward.Validators, validator)
 	reward.TotalPower += validator.GetVotingPower()
-
-	fmt.Println("AAAAAAAAAABBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
-
 	// Aggregate the result and store it into the blockchain
 	k.ResolveResult(ctx, req, rep)
 }
