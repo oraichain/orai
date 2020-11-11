@@ -3,7 +3,7 @@ package cli
 import (
 	"fmt"
 
-	"github.com/oraichain/orai/x/airequest/types"
+	"github.com/oraichain/orai/x/websocket/types"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
