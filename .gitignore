@@ -6,6 +6,7 @@
 .websocket/
 .vscode/
 cosmosjs/node_modules/
+images/
 
 signedTx.json
 unsignedTx.json

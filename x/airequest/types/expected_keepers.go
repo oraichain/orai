@@ -69,6 +69,7 @@ type ProviderKeeper interface {
 	DefaultTestCaseI() provider.TestCaseI
 	GetTestCaseI(ctx sdk.Context, name string) (provider.TestCaseI, error)
 	GetDNamesTcNames(oscriptPath string) ([]string, []string, error)
+	GetOScriptPath(oScriptName string) string
 }
 
 // WebSocketKeeper defines the expected websocket keeper

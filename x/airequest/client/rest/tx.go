@@ -49,6 +49,7 @@ type setKYCRequestReq struct {
 	Simulate         bool         `json:"simulate"`
 	Input            string       `json:"input"`
 	ExpectedOutput   string       `json:"expected_output"`
+	ValidatorCount   int          `json:"validator_count"`
 }
 
 type setIPFSImage struct {
@@ -116,6 +117,13 @@ func setAIRequestHandlerFn(cliCtx context.CLIContext, w http.ResponseWriter, r *
 		}
 	}
 
+	// convert from form-data string to correct data type of baseReq
+	valCount, err := strconv.Atoi(r.FormValue("validator_count"))
+	if len(r.FormValue("validator_count")) != 0 && err != nil {
+		rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request for validator count")
+		return setKYCRequestReq{}
+	}
+
 	// This may be redundant, but it does not affect much so leave this for now.
 	req := setKYCRequestReq{
 		OracleScriptName: r.FormValue("oracle_script_name"),
@@ -131,6 +139,7 @@ func setAIRequestHandlerFn(cliCtx context.CLIContext, w http.ResponseWriter, r *
 		Simulate:         simulate,
 		Input:            r.FormValue("input"),
 		ExpectedOutput:   r.FormValue("expected_output"),
+		ValidatorCount:   valCount,
 	}
 
 	return req
@@ -231,7 +240,7 @@ func setKYCRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// create the message
-		msg := types.NewMsgSetKYCRequest(result.Hash, handler.Filename, types.NewMsgSetAIRequest(ksuid.New().String(), req.OracleScriptName, addr, req.Fees.String(), 1, req.Input, req.ExpectedOutput))
+		msg := types.NewMsgSetKYCRequest(result.Hash, handler.Filename, types.NewMsgSetAIRequest(ksuid.New().String(), req.OracleScriptName, addr, req.Fees.String(), req.ValidatorCount, req.Input, req.ExpectedOutput))
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "GHYK")

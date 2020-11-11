@@ -16,7 +16,8 @@ type ParamSubspace interface {
 
 // OracleScriptSet is an interface for all the related properties for interacting with the Oracle Script struct for Keeper
 type OracleScriptSet interface {
-	GetDNamesTcNames(oscriptName string) ([]string, []string, error)
+	GetDNamesTcNames(oScriptName string) ([]string, []string, error)
+	GetOScriptPath(oScriptName string) string
 	// GetOracleScript(ctx sdk.Context, name string) (exported.OracleScriptI, error)
 	// GetOracleScripts(ctx sdk.Context, page, limit uint) ([]exported.OracleScriptI, error)
 	// GetAllOracleScriptNames(ctx sdk.Context) sdk.Iterator

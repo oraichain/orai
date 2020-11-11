@@ -100,9 +100,9 @@ func (k Keeper) GetOracleScriptFile(name string) []byte {
 }
 
 // GetDNamesTcNames is a function that collects test case names and data source names from the oracle script
-func (k Keeper) GetDNamesTcNames(oscriptName string) ([]string, []string, error) {
+func (k Keeper) GetDNamesTcNames(oScriptName string) ([]string, []string, error) {
 	// collect data source name from the oScript script
-	oscriptPath := types.ScriptPath + types.OracleScriptStoreKeyString(oscriptName)
+	oscriptPath := types.ScriptPath + types.OracleScriptStoreKeyString(oScriptName)
 	//use "data source" as an argument to collect the data source script name
 	cmd := exec.Command("bash", oscriptPath, "aiDataSource")
 	cmd.Stdin = strings.NewReader("some input")
@@ -134,4 +134,10 @@ func (k Keeper) GetDNamesTcNames(oscriptName string) ([]string, []string, error)
 	testCases := strings.Fields(result)
 
 	return aiDataSources, testCases, nil
+}
+
+// GetOScriptPath is the path for the complete oracle script file location
+func (k Keeper) GetOScriptPath(oScriptName string) string {
+	// collect data source name from the oScript script
+	return types.ScriptPath + types.OracleScriptStoreKeyString(oScriptName)
 }

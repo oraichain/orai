@@ -1,6 +1,8 @@
 package types
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -32,8 +34,10 @@ func (msg MsgSetKYCRequest) ValidateBasic() error {
 	// if msg.Owner.Empty() {
 	// 	return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	// }
+	fmt.Println("messgae: ", msg)
 	err := msg.MsgAIRequest.ValidateBasic()
 	if err != nil {
+		fmt.Println("ERROR IN VALIDATING MSG AI REQUEST", err)
 		return err
 	}
 	if len(msg.ImageHash) == 0 || len(msg.ImageName) == 0 {

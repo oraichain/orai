@@ -3,7 +3,8 @@ const constants = require('../utils/constants');
 const axios = require('axios');
 
 const paths = {
-  CREATE_UNSIGNED_TX: "/airequest/aireq/pricereq",
+  PRICE_REQ: "/airequest/aireq/pricereq",
+  KYC_REQ: "/airequest/aireq/kycreq",
   GET_REQUEST_ID: "/txs/",
   GET_FULL_REQUEST: "/airesult/fullreq/",
   GET_MINIMUM_FEES: "/provider/min_fees/"
@@ -48,10 +49,25 @@ function getFullRequest(payload, callback) {
     });
 }
 
-function createUnsignedTx(payload, callback) {
+function createFormUnsignedTx(payload, path, callback) {
   axios({
     method: "POST",
-    url: constants.ORAI_URL + paths.CREATE_UNSIGNED_TX,
+    url: constants.ORAI_URL + path,
+    data: payload,
+    headers: payload.getHeaders()
+  })
+    .then((response) => {
+      callback(true, response, null);
+    })
+    .catch((error) => {
+      callback(false, null, error);
+    });
+}
+
+function createUnsignedTx(payload, path, callback) {
+  axios({
+    method: "POST",
+    url: constants.ORAI_URL + path,
     data: payload,
   })
     .then((response) => {
@@ -66,7 +82,9 @@ const api = {
   createUnsignedTx,
   getRequestId,
   getFullRequest,
-  getMinimumFees
+  getMinimumFees,
+  paths,
+  createFormUnsignedTx
 }
 
 module.exports = api;

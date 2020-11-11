@@ -2,14 +2,16 @@ const { validationResult } = require("express-validator/check");
 const cosmosjs = require("@cosmostation/cosmosjs");
 const request = require('request');
 const constants = require('../../utils/constants')
-const api = require('../../api/api')
+const api = require('../../api/api');
+const formData = require("./formData");
 
 module.exports = {
-  getPrice: (req, res) => {
+  getClassification: (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(422).json({ errors: errors.array() });
     } else {
+      console.log("request file: ", req.file)
       const oScriptName = req.body.oscript_name
       // check minimum fees provided by the user
       const payload = {
@@ -35,11 +37,11 @@ module.exports = {
             const accAddress = constants.ACC_ADDRESS
 
             // input encoded in base64 for the oracle script
-            const input = req.body.price
+            const input = req.body.input
 
             // expected output from the user for the test case
             //const expectedOutput = "NTAwMA=="
-            const expectedOutput = req.body.expected_price
+            const expectedOutput = req.body.expected_output
 
             // fees paid for the transaction
             const fees = req.body.fees + constants.DENOM
@@ -47,18 +49,19 @@ module.exports = {
             // collect orai account to get acc sequence and number
             orai.getAccounts(accAddress).then(acc => {
               // create an unsigned tx
-              api.createUnsignedTx({
-                "base_req": {
-                  "from": accAddress,
-                  "chain_id": constants.CHAIN_ID
-                },
+              var form = formData.generateKycData({
+                "from": accAddress,
+                "chain_id": constants.CHAIN_ID,
                 "oracle_script_name": oScriptName,
                 "input": input,
                 "expected_output": expectedOutput,
                 "fees": fees,
+                "img_name": req.file.originalname,
                 "validator_count": req.body.validator_count.toString()
-              }, api.paths.PRICE_REQ, (isSuccess, response, error) => {
+              })
+              api.createFormUnsignedTx(form, api.paths.KYC_REQ, (isSuccess, response, error) => {
                 if (isSuccess) {
+                  console.log("unsigned tx: ", response.data)
                   unsignedTx = response.data;
 
                   // create a new stdSignMsg for signing
@@ -174,7 +177,7 @@ module.exports = {
                   });
                 } else {
                   return res.status(400).json({
-                    message: "There is an error while creating an unsigned tx",
+                    message: "There is an error while creating an unsigned tx: ",
                     error: error,
                   })
                 }
