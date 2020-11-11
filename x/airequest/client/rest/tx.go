@@ -157,6 +157,8 @@ func setKYCRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 		defer file.Close()
 
+		fmt.Println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
+
 		// Create a temp file in local storage for IPFS http request
 		tempFile, err := ioutil.TempFile("./", "upload-*.png")
 		if err != nil {
@@ -168,6 +170,8 @@ func setKYCRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			fmt.Println(err)
 		}
 		tempFile.Write(fileBytes)
+
+		fmt.Println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
 		// Prepare to send the image onto IPFS
 		b, writer, err := filehandling.CreateMultipartFormData("image", tempFile.Name())

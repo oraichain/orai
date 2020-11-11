@@ -56,7 +56,7 @@ module.exports = {
                 "input": input,
                 "expected_output": expectedOutput,
                 "fees": fees,
-                "img_name": req.file.originalname,
+                "img_path": req.file.path,
                 "validator_count": req.body.validator_count.toString()
               })
               api.createFormUnsignedTx(form, api.paths.KYC_REQ, (isSuccess, response, error) => {

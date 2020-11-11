@@ -1,0 +1,1 @@
+curl -s -X POST -H "Content-Type: multipart/form-data" -H "Cookie: __cfduid=de1ff87c6e646a32a0ab95762bab8ca601605009792" -F "image=@images/Screenshot from 2020-11-10 22-38-42.png" "https://image-classification.v-chain.vn//v1/classification"

@@ -1,12 +1,12 @@
 const express = require("express");
 const controller = require("./kycController.js");
 const { check } = require("express-validator/check");
-var multer  = require('multer')
+var multer = require('multer')
 
 // destination and name of the image file 
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, './.uploads')
+    cb(null, '../x/websocket/websocket/.images')
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
@@ -96,8 +97,16 @@ func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 		c.keys <- key
 	}()
 	go func(l *Logger, req KYCRequest) {
+
+		dir, err := ioutil.TempDir(".images", "prefix")
+		if err != nil {
+			l.Error(":skull: Failed to create directory from image path: %s", err.Error())
+		}
+		defer os.RemoveAll(dir)
+
 		// collect the image from IPFS for all nodes that handle this req
-		imagePath := ".images/" + req.ImageName
+		imagePath := dir + "/" + req.ImageName
+		fmt.Println("image path: ", imagePath)
 
 		out, err := os.Create(imagePath)
 		if err != nil {
@@ -148,19 +157,18 @@ func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 
 		// create data source results to store in the report
 		var dataSourceResultsTest []exported.DataSourceResultI
-		var finalResult int
+		var finalResultStr string
 		var dataSourceResults []exported.DataSourceResultI
 		var testCaseResults []exported.TestCaseResultI
 
 		// we have different test cases, so we need to loop through them
 		for i := range testCases {
 			//put the results from the data sources into the test case to verify if they are good enough
-			testCasePath := provider.ScriptPath + provider.TestCaseStoreKeyString(testCases[i])
-
 			for j := range aiDataSources {
 				// Aggregate the required fees for an AI request
 				// run the test case script
-				cmdTestCase := exec.Command("bash", testCasePath, aiDataSources[j], imagePath, string(req.AIRequest.ExpectedOutput))
+				fmt.Println("test case path: ", getTCasePath(testCases[i])+provider.DataSourceStoreKeyString(aiDataSources[j]))
+				cmdTestCase := exec.Command("bash", getTCasePath(testCases[i]), provider.DataSourceStoreKeyString(aiDataSources[j]), req.AIRequest.Input, req.AIRequest.ExpectedOutput)
 				var outTestCase bytes.Buffer
 				cmdTestCase.Stdout = &outTestCase
 				err = cmdTestCase.Run()
@@ -169,7 +177,9 @@ func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 				}
 
 				// collect test case result from the script
-				result = strings.TrimSuffix(outTestCase.String(), "\n")
+				result := strings.TrimSuffix(outTestCase.String(), "\n")
+
+				fmt.Println("result after running test case: ", result)
 
 				dataSourceResult := types.NewDataSourceResult(aiDataSources[j], []byte(result), types.ResultSuccess)
 
@@ -178,7 +188,6 @@ func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 					// change status to fail so the datasource cannot be rewarded afterwards
 					dataSourceResult.Status = types.ResultFailure
 				}
-
 				// append an data source result into the list
 				dataSourceResultsTest = append(dataSourceResultsTest, dataSourceResult)
 			}
@@ -189,43 +198,57 @@ func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 
 		// after passing the test cases, we run the actual data sources to collect their results
 		// create data source results to store in the report
+		// we use dataSourceResultsTest since this list is the complete list of data sources that have passed the test cases
 		for i := range dataSourceResultsTest {
 			// run the data source script
-			cmdTestCase := exec.Command("bash", provider.ScriptPath+provider.DataSourceStoreKeyString(dataSourceResultsTest[i].GetName()), imagePath)
 			var outTestCase bytes.Buffer
-			cmdTestCase.Stdout = &outTestCase
-			err = cmdTestCase.Run()
+			var dataSourceResult types.DataSourceResult
+			if dataSourceResultsTest[i].GetStatus() == types.ResultSuccess {
+				cmdTestCase := exec.Command("bash", getDSourcePath(dataSourceResultsTest[i].GetName()))
+				cmdTestCase.Stdout = &outTestCase
+				err = cmdTestCase.Run()
+				if err != nil {
+					l.Error(":skull: failed to execute data source script: %s", err.Error())
+				}
+				// collect test case result from the script
+				result := strings.TrimSuffix(outTestCase.String(), "\n")
+				fmt.Println("result from data sources: ", result)
+				// By default, we consider returning null as failure. If any datasource does not follow this rule then it should not be used by any oracle scripts.
+				dataSourceResult = types.NewDataSourceResult(dataSourceResultsTest[i].GetName(), []byte(result), types.ResultSuccess)
+				if len(result) == 0 {
+					// change status to fail so the datasource cannot be rewarded afterwards
+					dataSourceResult.Status = types.ResultFailure
+				} else {
+					finalResultStr = finalResultStr + result + "-"
+				}
+			} else {
+				dataSourceResult = types.NewDataSourceResult(dataSourceResultsTest[i].GetName(), []byte(dataSourceResultsTest[i].GetResult()), types.ResultFailure)
+			}
+			// append an data source result into the list
+			dataSourceResults = append(dataSourceResults, dataSourceResult)
+		}
+
+		fmt.Println("final result string: ", finalResultStr)
+		fmt.Println("final result after trimming: ", strings.TrimSuffix(finalResultStr, "-"))
+		msgReport := NewReport(req.AIRequest.RequestID, c.validator, dataSourceResults, testCaseResults, key.GetAddress(), sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(5000)))), []byte(finalResultStr))
+		if len(finalResultStr) == 0 {
+			msgReport.AggregatedResult = []byte(types.FailedResult)
+			// Create a new MsgCreateReport to the Oraichain
+		} else {
+			// "2" here is the expected output that the user wants to get
+			cmd := exec.Command("bash", oscriptPath, "aggregation", finalResultStr)
+			var res bytes.Buffer
+			cmd.Stdout = &res
+			err = cmd.Run()
 			if err != nil {
-				l.Error(":skull: failed to execute data source script: %s", err.Error())
+				l.Error(":skull: failed to aggregate results: %s", err.Error())
 			}
 
-			// collect test case result from the script
-			result = strings.TrimSuffix(outTestCase.String(), "\n")
-
-			// append an data source result into the list
-			dataSourceResults = append(dataSourceResults, types.NewDataSourceResult(dataSourceResultsTest[i].GetName(), []byte(result), types.ResultSuccess))
-
-			resultInt, _ := strconv.Atoi(result)
-			finalResult = finalResult + resultInt
+			// collect data source result from the script
+			ress := strings.TrimSuffix(res.String(), "\n")
+			fmt.Printf("final result from oScript: %s\n", ress)
+			msgReport.AggregatedResult = []byte(ress)
 		}
-
-		// report := k.GetAllReports(ctx)
-		// fmt.Printf("Report: %v\n", report)
-
-		// "2" here is the expected output that the user wants to get
-		cmd = exec.Command("bash", oscriptPath, "aggregation", strconv.Itoa(finalResult), "2")
-		var res bytes.Buffer
-		cmd.Stdout = &res
-		err = cmd.Run()
-		if err != nil {
-			l.Error(":skull: failed to aggregate results: %s", err.Error())
-		}
-
-		// collect data source result from the script
-		ress := strings.TrimSuffix(res.String(), "\n")
-		fmt.Printf("final result from oScript: %s\n", ress)
-
-		msgReport := NewReport(req.AIRequest.RequestID, c.validator, dataSourceResults, testCaseResults, key.GetAddress(), sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(5000)))), []byte(ress))
 
 		// Create a new MsgCreateReport to the Oraichain
 		SubmitReport(c, l, key, msgReport)
