@@ -7,6 +7,7 @@
 .vscode/
 cosmosjs/node_modules/
 images/
+cosmosjs/.uploads/
 
 signedTx.json
 unsignedTx.json
