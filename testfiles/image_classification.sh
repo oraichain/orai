@@ -1,5 +1,8 @@
 #!/bin/bash
-res=$(curl --location --request POST "https://image-classification.v-chain.vn/v1/short-classification" --form "image=@$1" --form "model=resnet18")
+
+input=$(echo "$1" |base64 --decode)
+
+res=$(curl --location --request POST "https://image-classification.v-chain.vn/v1/short-classification" --form "image=@$input" --form "model=resnet18")
 
 code=$(jq '.code' <<< "$res")
 data=$(jq '.data' <<< "$res")

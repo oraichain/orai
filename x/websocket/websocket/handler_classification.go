@@ -168,7 +168,7 @@ func handleClassificationRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLo
 				// Aggregate the required fees for an AI request
 				// run the test case script
 				fmt.Println("test case path: ", getTCasePath(testCases[i])+provider.DataSourceStoreKeyString(aiDataSources[j]))
-				cmdTestCase := exec.Command("bash", getTCasePath(testCases[i]), provider.DataSourceStoreKeyString(aiDataSources[j]), req.AIRequest.Input, req.AIRequest.ExpectedOutput)
+				cmdTestCase := exec.Command("bash", getTCasePath(testCases[i]), provider.DataSourceStoreKeyString(aiDataSources[j]), imagePath, req.AIRequest.ExpectedOutput, req.AIRequest.Input)
 				var outTestCase bytes.Buffer
 				cmdTestCase.Stdout = &outTestCase
 				err = cmdTestCase.Run()
@@ -204,7 +204,7 @@ func handleClassificationRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLo
 			var outTestCase bytes.Buffer
 			var dataSourceResult types.DataSourceResult
 			if dataSourceResultsTest[i].GetStatus() == types.ResultSuccess {
-				cmdTestCase := exec.Command("bash", getDSourcePath(dataSourceResultsTest[i].GetName()))
+				cmdTestCase := exec.Command("bash", getDSourcePath(dataSourceResultsTest[i].GetName()), imagePath, req.AIRequest.Input)
 				cmdTestCase.Stdout = &outTestCase
 				err = cmdTestCase.Run()
 				if err != nil {
