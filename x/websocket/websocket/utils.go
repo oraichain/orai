@@ -17,4 +17,6 @@ func getTCasePath(name string) string {
 const (
 	// ScriptPath is the path that stores all the script files (oracle scripts, data sources, test cases)
 	ScriptPath = "../../../.oraifiles/"
+	// Delimiter is the delimiter for separating results
+	delimiter = "-"
 )

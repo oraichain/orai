@@ -17,10 +17,10 @@ import (
 	"github.com/oraichain/orai/x/websocket/types"
 )
 
-// GetEventKYCRequest returns the event kyc request in the given log.
-func GetEventKYCRequest(log sdk.ABCIMessageLog) (KYCRequest, error) {
+// GetEventClassificationRequest returns the event classification request in the given log.
+func GetEventClassificationRequest(log sdk.ABCIMessageLog) (ClassificationRequest, error) {
 	requestID, err := GetEventValue(log, types.EventTypeRequestWithData, types.AttributeRequestID)
-	req := KYCRequest{}
+	req := ClassificationRequest{}
 	if err != nil {
 		return req, err
 	}
@@ -58,19 +58,19 @@ func GetEventKYCRequest(log sdk.ABCIMessageLog) (KYCRequest, error) {
 
 	valCount, _ := strconv.ParseInt(valCountStr, 10, 64)
 
-	req = NewKYCRequest(imageHash, imageName, NewAIRequest(requestID, oscriptName, creator, valCount, inputStr, expectedOutputStr))
+	req = NewClassificationRequest(imageHash, imageName, NewAIRequest(requestID, oscriptName, creator, valCount, inputStr, expectedOutputStr))
 
-	fmt.Println("kyc request: ", req)
+	fmt.Println("classification request: ", req)
 
 	return req, nil
 }
 
-func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
+func handleClassificationRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 
 	l.Info(":delivery_truck: Processing incoming request event before checking validators")
 
 	// Skip if not related to this validator
-	validators := GetEventValues(log, types.EventTypeSetKYCRequest, types.AttributeRequestValidator)
+	validators := GetEventValues(log, types.EventTypeSetClassificationRequest, types.AttributeRequestValidator)
 	hasMe := false
 	for _, validator := range validators {
 		l.Info(":delivery_truck: validator: %s", validator)
@@ -87,7 +87,7 @@ func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 
 	l.Info(":delivery_truck: Processing incoming request event")
 
-	req, err := GetEventKYCRequest(log)
+	req, err := GetEventClassificationRequest(log)
 	if err != nil {
 		l.Error(":skull: Failed to parse raw requests with error: %s", err.Error())
 	}
@@ -96,7 +96,7 @@ func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 	defer func() {
 		c.keys <- key
 	}()
-	go func(l *Logger, req KYCRequest) {
+	go func(l *Logger, req ClassificationRequest) {
 
 		dir, err := ioutil.TempDir("./", ".images")
 		if err != nil {

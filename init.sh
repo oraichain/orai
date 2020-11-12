@@ -85,6 +85,8 @@ oraid start --minimum-gas-prices 0.025orai
 
 # curl -XPOST -s http://localhost:1317/provider/oscript --data-binary '{"base_req":{"from":"'$(oraicli keys show duc -a)'","chain_id":"Oraichain"},"name":"testing","code":"./testfiles/oscript.sh"}' > unsignedTx.json
 
+curl -s -X POST -H "Content-Type: multipart/form-data" -F "image=@images/photo_2020-11-12_11-38-52.jpg" -F "oracle_script_name=oscript_classification" -F "fees=45000orai" -F "from=$(oraicli keys show duc -a)" -F "chain_id=Oraichain" -F "input=''" -F "expected_output=5000" -F "validator_count=1" "http://localhost:1317/airequest/aireq/kycreq" > unsignedTx.json
+
 # curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show duc -a)"
 
 # oraicli tx sign unsignedTx.json --from duc --offline --chain-id Oraichain --sequence 4 --account-number 0 > signedTx.json
@@ -106,8 +108,6 @@ oraid start --minimum-gas-prices 0.025orai
 # curl -o image.png -X POST "http://164.90.180.95:5001/api/v0/cat?arg=QmXipiMWjkm9ggFHbAVsLyixSGKHRRKhSTbtYWqDVDwZrf"
 
 # curl -XPOST -s http://165.232.118.44:1317/provider/aireq/pricereq --data-binary '{"base_req":{"from":"'$(oraicli keys show ducbean -a)'","chain_id":"Oraichain"},"oracle_script_name":"oscript_price","input":"","expected_output":"NTAwMA==","fees":"35000orai"}' > unsignedTx.json
-
-curl -s -X POST -H "Content-Type: multipart/form-data" -F "image=@images/Screenshot from 2020-11-10 22-38-42.png" -F "oracle_script_name=oscript_eth" -F "fees=45000orai" -F "from=$(oraicli keys show duc -a)" -F "chain_id=Oraichain" -F "input=''" -F "expected_output=5000" -F "validator_count=1" "http://localhost:1317/airequest/aireq/kycreq" > unsignedTx.json
 
 # curl -s "http://165.232.118.44:1317/auth/accounts/$(oraicli keys show ducbean -a)"
 

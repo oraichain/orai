@@ -42,6 +42,8 @@ func handleTransaction(c *Context, l *Logger, tx tmtypes.TxResult) {
 			go handleKYCRequestLog(c, l, log)
 		} else if messageType == (aiRequest.MsgSetPriceRequest{}).Type() {
 			go handlePriceRequestLog(c, l, log)
+		} else if messageType == (aiRequest.MsgSetClassificationRequest{}).Type() {
+			go handleClassificationRequestLog(c, l, log)
 		} else {
 			l.Debug(":ghost: Skipping non-{request/packet} type: %s", messageType)
 		} /*else if messageType == (ibc.MsgPacket{}).Type() {
@@ -158,7 +160,7 @@ func handlePriceRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 					// change status to fail so the datasource cannot be rewarded afterwards
 					dataSourceResult.Status = types.ResultFailure
 				} else {
-					finalResultStr = finalResultStr + result + "-"
+					finalResultStr = finalResultStr + result + delimiter
 				}
 			} else {
 				dataSourceResult = types.NewDataSourceResult(dataSourceResultsTest[i].GetName(), []byte(dataSourceResultsTest[i].GetResult()), types.ResultFailure)
@@ -298,7 +300,7 @@ func GetEventPriceRequest(log sdk.ABCIMessageLog) (PriceRequest, error) {
 
 	req = NewPriceRequest(NewAIRequest(requestID, oscriptName, creator, valCount, inputStr, expectedOutputStr))
 
-	fmt.Println("kyc request: ", req)
+	fmt.Println("price request: ", req)
 
 	return req, nil
 }

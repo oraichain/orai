@@ -23,6 +23,24 @@ func NewKYCRequest(
 	}
 }
 
+type ClassificationRequest struct {
+	ImageHash string    `json:"image_hash"`
+	ImageName string    `json:"image_name"`
+	AIRequest AIRequest `json:"ai_request"`
+}
+
+func NewClassificationRequest(
+	imageHash string,
+	imageName string,
+	aiRequest AIRequest,
+) ClassificationRequest {
+	return ClassificationRequest{
+		ImageHash: imageHash,
+		ImageName: imageName,
+		AIRequest: aiRequest,
+	}
+}
+
 type PriceRequest struct {
 	AIRequest AIRequest `json:"ai_request"`
 }
