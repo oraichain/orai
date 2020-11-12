@@ -1,12 +1,12 @@
 const express = require("express");
-const controller = require("./kycController.js");
+const controller = require("./classificationController.js");
 const { check } = require("express-validator/check");
-var multer = require('multer')
+const multer = require('multer')
 
 // destination and name of the image file 
-var storage = multer.diskStorage({
+const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, '../x/websocket/websocket/.images')
+    cb(null, '../images')
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
@@ -17,7 +17,7 @@ const upload = multer({ storage: storage })
 
 const router = express.Router();
 
-router.post("/kyc_price", upload.single('face_img'), [
+router.post("/img_classification", upload.single('image'), [
   check("oscript_name").isLength({ min: 3, max: 99 }),
   check("input").isBase64(),
   check("expected_output").isBase64(),

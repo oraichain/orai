@@ -8,7 +8,9 @@ module.exports = {
   FINISHED_STATUS: "finished",
   INTERVAL: 5,
   MESSAGE_TYPE: {
-    SET_PRICE_REQUEST: "airequest/SetPriceRequest"
+    SET_PRICE_REQUEST: "airequest/SetPriceRequest",
+    SET_KYC_REQUEST: "airequest/SetKYCRequest",
+    SET_CLASSIFICATION_REQUEST: "airequest/SetClassificationRequest"
   },
   DENOM: "orai"
 }

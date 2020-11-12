@@ -49,7 +49,7 @@ module.exports = {
             // collect orai account to get acc sequence and number
             orai.getAccounts(accAddress).then(acc => {
               // create an unsigned tx
-              var form = formData.generateKycData({
+              var form = formData.generateClassificationData({
                 "from": accAddress,
                 "chain_id": constants.CHAIN_ID,
                 "oracle_script_name": oScriptName,
@@ -95,7 +95,7 @@ module.exports = {
                           // loop through the list of msgs to collect request ids
                           for (let i = 0; i < msgs.length; i++) {
                             // since there can be more than one msg with different types, we need to do a msg type check. We only handle SET PRICE REQUEST type
-                            if (msgs[i].type === constants.MESSAGE_TYPE.SET_PRICE_REQUEST) {
+                            if (msgs[i].type === constants.MESSAGE_TYPE.SET_KYC_REQUEST) {
                               let resp = {
                                 requestId: [],
                                 validatorAddrs: [],
