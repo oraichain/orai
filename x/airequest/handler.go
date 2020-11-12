@@ -279,6 +279,8 @@ func handleMsgSetClassificationRequest(ctx sdk.Context, k keeper.Keeper, msg typ
 	// We need to calculate the final 70% fee given by the user because the remaining 40% must be reserved for the proposer and validators.
 	providedCoins, _ := sdk.NewDecCoinsFromCoins(fees...).MulDecTruncate(rewardRatio).TruncateDecimal()
 
+	fmt.Println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+
 	//validatorFees, err := k.GetValidatorFees(ctx, providedCoins, validators)
 
 	// collect data source name from the oScript script
@@ -313,6 +315,8 @@ func handleMsgSetClassificationRequest(ctx sdk.Context, k keeper.Keeper, msg typ
 	result = strings.TrimSuffix(testCaseName.String(), "\n")
 
 	testCases := strings.Fields(result)
+
+	fmt.Println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBBBBBBB")
 
 	//var finalResult int
 
