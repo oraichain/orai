@@ -1,5 +1,5 @@
 #!/bin/bash
-res=$(curl --location --request POST 'https://image-classification.v-chain.vn/v1/short-classification' --form 'image=@images/photo_2020-11-12_11-38-52.jpg' --form 'model=resnet18')
+res=$(curl --location --request POST "https://image-classification.v-chain.vn/v1/short-classification" --form "image=@$1" --form "model=resnet18")
 
 code=$(jq '.code' <<< "$res")
 data=$(jq '.data' <<< "$res")
