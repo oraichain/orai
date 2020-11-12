@@ -6,15 +6,11 @@ import (
 	// "bytes"
 	// "net/http"
 
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/gorilla/mux"
-	"github.com/oraichain/orai/packages/filehandling"
 	"github.com/oraichain/orai/x/airequest/types"
 	"github.com/segmentio/ksuid"
 
@@ -170,6 +166,9 @@ func setAIRequestHandlerFn(cliCtx context.CLIContext, w http.ResponseWriter, r *
 func setKYCRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
+		imageHash := r.FormValue("image_hash")
+		imageName := r.FormValue("image_name")
+
 		// // collect image file from user
 		// file, handler, err := r.FormFile("image")
 		// if err != nil {
@@ -267,7 +266,7 @@ func setKYCRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 
 		// create the message
 		// msg := types.NewMsgSetKYCRequest(result.Hash, handler.Filename, types.NewMsgSetAIRequest(ksuid.New().String(), req.OracleScriptName, addr, req.Fees.String(), req.ValidatorCount, req.Input, req.ExpectedOutput))
-		msg := types.NewMsgSetKYCRequest("a", "b", types.NewMsgSetAIRequest(ksuid.New().String(), req.OracleScriptName, addr, req.Fees.String(), req.ValidatorCount, req.Input, req.ExpectedOutput))
+		msg := types.NewMsgSetKYCRequest(imageHash, imageName, types.NewMsgSetAIRequest(ksuid.New().String(), req.OracleScriptName, addr, req.Fees.String(), req.ValidatorCount, req.Input, req.ExpectedOutput))
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "GHYK")
@@ -316,73 +315,76 @@ func setPriceRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 func setClassificationRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		// collect image file from user
-		file, handler, err := r.FormFile("image")
-		if err != nil {
-			fmt.Println("Error Retrieving the File")
-			fmt.Println(err)
-			return
-		}
-		defer file.Close()
+		// // collect image file from user
+		// file, handler, err := r.FormFile("image")
+		// if err != nil {
+		// 	fmt.Println("Error Retrieving the File")
+		// 	fmt.Println(err)
+		// 	return
+		// }
+		// defer file.Close()
 
-		fmt.Println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
+		// fmt.Println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB")
 
-		// Create a temp file in local storage for IPFS http request
-		tempFile, err := ioutil.TempFile("./", "upload-*.png")
-		if err != nil {
-			fmt.Println(err)
-		}
-		defer tempFile.Close()
-		fileBytes, err := ioutil.ReadAll(file)
-		if err != nil {
-			fmt.Println(err)
-		}
-		tempFile.Write(fileBytes)
+		// // Create a temp file in local storage for IPFS http request
+		// tempFile, err := ioutil.TempFile("./", "upload-*.png")
+		// if err != nil {
+		// 	fmt.Println(err)
+		// }
+		// defer tempFile.Close()
+		// fileBytes, err := ioutil.ReadAll(file)
+		// if err != nil {
+		// 	fmt.Println(err)
+		// }
+		// tempFile.Write(fileBytes)
 
-		fmt.Println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+		// fmt.Println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 
-		// Prepare to send the image onto IPFS
-		b, writer, err := filehandling.CreateMultipartFormData("image", tempFile.Name())
+		// // Prepare to send the image onto IPFS
+		// b, writer, err := filehandling.CreateMultipartFormData("image", tempFile.Name())
 
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to create multiform data image")
-			return
-		}
+		// if err != nil {
+		// 	rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to create multiform data image")
+		// 	return
+		// }
 
-		httpReq, err := http.NewRequest("POST", types.IPFSUrl+types.IPFSAdd, &b)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to create new request for sending image to IPFS")
-			return
-		}
-		// Don't forget to set the content type, this will contain the boundary.
-		httpReq.Header.Set("Content-Type", writer.FormDataContentType())
+		// httpReq, err := http.NewRequest("POST", types.IPFSUrl+types.IPFSAdd, &b)
+		// if err != nil {
+		// 	rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to create new request for sending image to IPFS")
+		// 	return
+		// }
+		// // Don't forget to set the content type, this will contain the boundary.
+		// httpReq.Header.Set("Content-Type", writer.FormDataContentType())
 
-		client := &http.Client{}
-		resp, err := client.Do(httpReq)
+		// client := &http.Client{}
+		// resp, err := client.Do(httpReq)
 
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to execute request for sending image to IPFS")
-			return
-		}
+		// if err != nil {
+		// 	rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to execute request for sending image to IPFS")
+		// 	return
+		// }
 
-		defer resp.Body.Close()
+		// defer resp.Body.Close()
 
-		result := setIPFSImage{}
+		// result := setIPFSImage{}
 
-		// Collect the result in json form. Remember that we need to create a corresponding struct to do this
-		json.NewDecoder(resp.Body).Decode(&result)
+		// // Collect the result in json form. Remember that we need to create a corresponding struct to do this
+		// json.NewDecoder(resp.Body).Decode(&result)
 
-		// After collecting the hash image, we need to clear the image file stored temporary
-		err = os.Remove(tempFile.Name())
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("Failed to remove the temporary image file: %s", err.Error()))
-			return
-		}
+		// // After collecting the hash image, we need to clear the image file stored temporary
+		// err = os.Remove(tempFile.Name())
+		// if err != nil {
+		// 	rest.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("Failed to remove the temporary image file: %s", err.Error()))
+		// 	return
+		// }
 
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("Failed to push image onto IPFS: %s", err.Error()))
-			return
-		}
+		// if err != nil {
+		// 	rest.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("Failed to push image onto IPFS: %s", err.Error()))
+		// 	return
+		// }
+
+		imageHash := r.FormValue("image_hash")
+		imageName := r.FormValue("image_name")
 
 		req := setAIRequestHandlerFn(cliCtx, w, r)
 
@@ -412,7 +414,7 @@ func setClassificationRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFu
 		}
 
 		// create the message
-		msg := types.NewMsgSetClassificationRequest(result.Hash, handler.Filename, types.NewMsgSetAIRequest(ksuid.New().String(), req.OracleScriptName, addr, req.Fees.String(), req.ValidatorCount, req.Input, req.ExpectedOutput))
+		msg := types.NewMsgSetClassificationRequest(imageHash, imageName, types.NewMsgSetAIRequest(ksuid.New().String(), req.OracleScriptName, addr, req.Fees.String(), req.ValidatorCount, req.Input, req.ExpectedOutput))
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "GHYK")

@@ -50,6 +50,24 @@ function getFullRequest(payload, callback) {
     });
 }
 
+function addIPFS(payload, callback) {
+  var config = {
+    method: 'post',
+    url: 'http://164.90.180.95:5001/api/v0/add',
+    headers: { 
+        ...payload.getHeaders()
+    },
+    data : payload
+  };
+  axios(config)
+    .then((response) => {
+      callback(true, response, null);
+    })
+    .catch((error) => {
+      callback(false, null, error);
+    });
+}
+
 function createFormUnsignedTx(payload, path, callback) {
   axios({
     method: "POST",
@@ -85,7 +103,8 @@ const api = {
   getFullRequest,
   getMinimumFees,
   paths,
-  createFormUnsignedTx
+  createFormUnsignedTx,
+  addIPFS
 }
 
 module.exports = api;

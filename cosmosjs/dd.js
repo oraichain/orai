@@ -2,20 +2,12 @@ var axios = require('axios');
 var FormData = require('form-data');
 var fs = require('fs');
 var data = new FormData();
-data.append('image', fs.createReadStream('/home/duc/Pictures/photo_2020-11-12_11-38-52.jpg'));
-data.append('oracle_script_name', 'oscript_classification');
-data.append('fees', '45000orai');
-data.append('from', 'orai18xc2v6uw7ph5q337awxmq43k5394gssvlx9q8e');
-data.append('chain_id', 'Oraichain');
-data.append('input', '\'\'');
-data.append('expected_output', 'Samoyed');
-data.append('validator_count', '1');
+data.append('file', fs.createReadStream('../images/photo_2020-11-12_11-38-52.jpg'));
 
 var config = {
   method: 'post',
-  url: 'http://localhost:1317/airequest/aireq/kycreq',
+  url: 'http://164.90.180.95:5001/api/v0/add',
   headers: { 
-    'Content-Type': 'multipart/form-data', 
     ...data.getHeaders()
   },
   data : data
