@@ -7,14 +7,14 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// MsgSetClassificationRequest defines message for a KYC request
+// MsgSetClassificationRequest defines message for a classification request
 type MsgSetClassificationRequest struct {
 	ImageHash    string          `json:"image_hash"`
 	ImageName    string          `json:"image_name"`
 	MsgAIRequest MsgSetAIRequest `json:"msg_set_ai_request"`
 }
 
-// NewMsgSetClassificationRequest is a constructor function for MsgSetKYCRequest
+// NewMsgSetClassificationRequest is a constructor function for MsgSetClassificationRequest
 func NewMsgSetClassificationRequest(imageHash string, imageName string, msgSetAIRequest MsgSetAIRequest) MsgSetClassificationRequest {
 	return MsgSetClassificationRequest{
 		ImageHash:    imageHash,

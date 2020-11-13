@@ -101,7 +101,7 @@ func handleMsgSetPriceRequest(ctx sdk.Context, k keeper.Keeper, msg types.MsgSet
 		sdk.NewAttribute(types.AttributeRequestID, string(request.RequestID[:])),
 		sdk.NewAttribute(types.AttributeOracleScriptName, request.OracleScriptName),
 		sdk.NewAttribute(types.AttributeRequestCreator, msg.MsgAIRequest.Creator.String()),
-		sdk.NewAttribute(types.AttributeRequestValidatorCount, string(msg.MsgAIRequest.ValidatorCount)),
+		sdk.NewAttribute(types.AttributeRequestValidatorCount, fmt.Sprint(msg.MsgAIRequest.ValidatorCount)),
 		sdk.NewAttribute(types.AttributeRequestInput, string(msg.MsgAIRequest.Input)),
 		sdk.NewAttribute(types.AttributeRequestExpectedOutput, string(msg.MsgAIRequest.ExpectedOutput)),
 	)

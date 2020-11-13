@@ -141,7 +141,7 @@ func handleMsgSetOCRRequest(ctx sdk.Context, k keeper.Keeper, msg types.MsgSetOC
 		sdk.NewAttribute(types.AttributeRequestCreator, msg.MsgAIRequest.Creator.String()),
 		sdk.NewAttribute(types.AttributeRequestImageHash, msg.ImageHash),
 		sdk.NewAttribute(types.AttributeRequestImageName, msg.ImageName),
-		sdk.NewAttribute(types.AttributeRequestValidatorCount, string(msg.MsgAIRequest.ValidatorCount)),
+		sdk.NewAttribute(types.AttributeRequestValidatorCount, fmt.Sprint(msg.MsgAIRequest.ValidatorCount)),
 		sdk.NewAttribute(types.AttributeRequestInput, msg.MsgAIRequest.Input),
 		sdk.NewAttribute(types.AttributeRequestExpectedOutput, msg.MsgAIRequest.ExpectedOutput),
 	)
