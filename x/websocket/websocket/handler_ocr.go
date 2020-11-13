@@ -17,10 +17,10 @@ import (
 	"github.com/oraichain/orai/x/websocket/types"
 )
 
-// GetEventClassificationRequest returns the event classification request in the given log.
-func GetEventClassificationRequest(log sdk.ABCIMessageLog) (ClassificationRequest, error) {
+// GetEventOCRRequest returns the event ocr request in the given log.
+func GetEventOCRRequest(log sdk.ABCIMessageLog) (OCRRequest, error) {
 	requestID, err := GetEventValue(log, types.EventTypeRequestWithData, types.AttributeRequestID)
-	req := ClassificationRequest{}
+	req := OCRRequest{}
 	if err != nil {
 		return req, err
 	}
@@ -58,19 +58,19 @@ func GetEventClassificationRequest(log sdk.ABCIMessageLog) (ClassificationReques
 
 	valCount, _ := strconv.ParseInt(valCountStr, 10, 64)
 
-	req = NewClassificationRequest(imageHash, imageName, NewAIRequest(requestID, oscriptName, creator, valCount, inputStr, expectedOutputStr))
+	req = NewOCRRequest(imageHash, imageName, NewAIRequest(requestID, oscriptName, creator, valCount, inputStr, expectedOutputStr))
 
 	fmt.Println("classification request: ", req)
 
 	return req, nil
 }
 
-func handleClassificationRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
+func handleOCRRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 
 	l.Info(":delivery_truck: Processing incoming request event before checking validators")
 
 	// Skip if not related to this validator
-	validators := GetEventValues(log, types.EventTypeSetClassificationRequest, types.AttributeRequestValidator)
+	validators := GetEventValues(log, types.EventTypeSetOCRRequest, types.AttributeRequestValidator)
 	hasMe := false
 	for _, validator := range validators {
 		l.Info(":delivery_truck: validator: %s", validator)
@@ -188,7 +188,6 @@ func handleClassificationRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLo
 					// change status to fail so the datasource cannot be rewarded afterwards
 					dataSourceResult.Status = types.ResultFailure
 					dataSourceResult.Result = []byte(types.FailedResponseTc)
-
 				}
 				// append an data source result into the list
 				dataSourceResultsTest = append(dataSourceResultsTest, dataSourceResult)
@@ -221,7 +220,6 @@ func handleClassificationRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLo
 					// change status to fail so the datasource cannot be rewarded afterwards
 					dataSourceResult.Status = types.ResultFailure
 					dataSourceResult.Result = []byte(types.FailedResponseDs)
-
 				} else {
 					finalResultStr = finalResultStr + result + delimiter
 				}

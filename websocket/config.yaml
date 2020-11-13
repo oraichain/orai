@@ -1,9 +1,0 @@
-address: false
-broadcast-timeout: 30s
-chain-id: Oraichain
-gas-prices: ""
-log-level: debug
-max-try: "5"
-node: tcp://localhost:26657
-rpc-poll-interval: 1s
-validator: oraivaloper140hpxq3eu3cvczqfk8nt8933xdcjcr3c2497mp

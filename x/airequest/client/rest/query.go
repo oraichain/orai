@@ -22,11 +22,6 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
 		fmt.Sprintf("/%s/aireqs", storeName),
 		queryAIRequestIDsHandlerFn(cliCtx),
 	).Methods("GET")
-
-	r.HandleFunc(
-		fmt.Sprintf("/%s/fullreq/{%s}", storeName, restName),
-		queryFullAIRequestHandlerFn(cliCtx),
-	).Methods("GET")
 }
 
 func queryAIRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
@@ -35,21 +30,6 @@ func queryAIRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		id := vars[restName]
 
 		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/aireq/%s", storeName, id), nil)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
-			return
-		}
-
-		rest.PostProcessResponse(w, cliCtx, res)
-	}
-}
-
-func queryFullAIRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		id := vars[restName]
-
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/fullreq/%s", storeName, id), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return

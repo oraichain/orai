@@ -31,6 +31,15 @@ const (
 	// FailedResult represents a data source that cannot pass the test case
 	FailedResult = "null"
 
+	// FailedResponseOs represents an oracle script cannot collect or aggregate the data source results
+	FailedResponseOs = "The oracle script could not collect or aggregate the data source results"
+
+	// FailedResponseTc represents the failed response from the data source
+	FailedResponseTc = "This data source did not pass the test case given the user expected output"
+
+	// FailedResponseDs represents the failed response from the data source
+	FailedResponseDs = "This data source passed the test case but failed when actually running"
+
 	// ResultFailure is the fail status of a result after the test case runs
 	ResultFailure = "fail"
 

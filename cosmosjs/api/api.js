@@ -6,6 +6,7 @@ const paths = {
   PRICE_REQ: "/airequest/aireq/pricereq",
   KYC_REQ: "/airequest/aireq/kycreq",
   CLASSIFICATION_REQ: "/airequest/aireq/clreq",
+  OCR_REQ: "/airequest/aireq/ocrreq",
   GET_REQUEST_ID: "/txs/",
   GET_FULL_REQUEST: "/airesult/fullreq/",
   GET_MINIMUM_FEES: "/provider/min_fees/"

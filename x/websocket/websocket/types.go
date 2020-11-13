@@ -41,6 +41,24 @@ func NewClassificationRequest(
 	}
 }
 
+type OCRRequest struct {
+	ImageHash string    `json:"image_hash"`
+	ImageName string    `json:"image_name"`
+	AIRequest AIRequest `json:"ai_request"`
+}
+
+func NewOCRRequest(
+	imageHash string,
+	imageName string,
+	aiRequest AIRequest,
+) OCRRequest {
+	return OCRRequest{
+		ImageHash: imageHash,
+		ImageName: imageName,
+		AIRequest: aiRequest,
+	}
+}
+
 type PriceRequest struct {
 	AIRequest AIRequest `json:"ai_request"`
 }

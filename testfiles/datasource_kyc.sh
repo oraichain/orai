@@ -5,12 +5,13 @@ status=$(jq '.status' <<< "$res")
 user_id=$(jq '.data.user_id' <<< "$res")
 
 echo $status
-echo $user_id
-correct_status="success"
+status_trim= echo "$status" | tr -d '"'
+status_correct="success"
+echo $status_correct
+echo $status_trim
 
 # check status code of the request
-if [[ "$status" = "$correct_status" ]];
-  then
+if [[ "$status_trim" = "$status_correct" ]]; then
     echo "$user_id" | tr -d '"' # return result of the image classification and remove double quotes
 else
     echo null

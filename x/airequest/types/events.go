@@ -8,6 +8,7 @@ const (
 	EventTypeRequestWithData          = "ai_request_data"
 	EventTypeSetKYCRequest            = "set_kyc_request"
 	EventTypeSetClassificationRequest = "set_classification_request"
+	EventTypeSetOCRRequest            = "set_ocr_request"
 	EventTypeSetPriceRequest          = "set_price_request"
 	EventTypeSetReport                = "set_report"
 

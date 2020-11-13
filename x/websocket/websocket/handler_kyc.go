@@ -187,6 +187,7 @@ func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 				if result == types.FailedResult || len(result) == 0 {
 					// change status to fail so the datasource cannot be rewarded afterwards
 					dataSourceResult.Status = types.ResultFailure
+					dataSourceResult.Result = []byte(types.FailedResponseTc)
 				}
 				// append an data source result into the list
 				dataSourceResultsTest = append(dataSourceResultsTest, dataSourceResult)
@@ -215,9 +216,10 @@ func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 				fmt.Println("result from data sources: ", result)
 				// By default, we consider returning null as failure. If any datasource does not follow this rule then it should not be used by any oracle scripts.
 				dataSourceResult = types.NewDataSourceResult(dataSourceResultsTest[i].GetName(), []byte(result), types.ResultSuccess)
-				if len(result) == 0 {
+				if result == types.FailedResult || len(result) == 0 {
 					// change status to fail so the datasource cannot be rewarded afterwards
 					dataSourceResult.Status = types.ResultFailure
+					dataSourceResult.Result = []byte(types.FailedResponseDs)
 				} else {
 					finalResultStr = finalResultStr + result + delimiter
 				}
@@ -233,7 +235,7 @@ func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 		fmt.Println("final result after trimming: ", finalResultStr)
 		msgReport := NewReport(req.AIRequest.RequestID, c.validator, dataSourceResults, testCaseResults, key.GetAddress(), sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(5000)))), []byte(finalResultStr))
 		if len(finalResultStr) == 0 {
-			msgReport.AggregatedResult = []byte(types.FailedResult)
+			msgReport.AggregatedResult = []byte(types.FailedResponseOs)
 			// Create a new MsgCreateReport to the Oraichain
 		} else {
 			// "2" here is the expected output that the user wants to get

@@ -10,7 +10,8 @@ module.exports = {
   MESSAGE_TYPE: {
     SET_PRICE_REQUEST: "airequest/SetPriceRequest",
     SET_KYC_REQUEST: "airequest/SetKYCRequest",
-    SET_CLASSIFICATION_REQUEST: "airequest/SetClassificationRequest"
+    SET_CLASSIFICATION_REQUEST: "airequest/SetClassificationRequest",
+    SET_OCR_REQUEST: "airequest/SetOCRRequest"
   },
   DENOM: "orai"
 }
