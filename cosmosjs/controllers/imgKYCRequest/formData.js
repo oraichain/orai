@@ -2,7 +2,7 @@ const FormData = require('form-data');
 const fs = require('fs');
 
 module.exports = {
-    generateClassificationData: (data) => {
+    generateKYCData: (data) => {
         const form = new FormData();
         form.append("oracle_script_name", data.oracle_script_name)
         form.append("from", data.from)

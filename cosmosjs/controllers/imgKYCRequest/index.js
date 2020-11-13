@@ -1,5 +1,5 @@
 const express = require("express");
-const controller = require("./classificationController.js");
+const controller = require("./kycController.js");
 const { check } = require("express-validator/check");
 const multer = require('multer');
 const fs = require('fs');
@@ -21,12 +21,12 @@ const upload = multer({ storage: storage })
 
 const router = express.Router();
 
-router.post("/img_classification", upload.single('image'), [
+router.post("/img_kyc", upload.single('image'), [
   check("oscript_name").isLength({ min: 3, max: 99 }),
   check("input").isBase64(),
   check("expected_output").isBase64(),
   check("fees").isNumeric(),
   check("validator_count").isNumeric().isInt({ min: 1 })
-], controller.getClassification);
+], controller.getKYC);
 
 module.exports = router;
