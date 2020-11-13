@@ -276,6 +276,8 @@ func handleMsgSetClassificationRequest(ctx sdk.Context, k keeper.Keeper, msg typ
 	fees, _ := sdk.ParseCoins(msg.MsgAIRequest.Fees)
 	// Compute the fee allocated for oracle module to distribute to active validators.
 	rewardRatio := sdk.NewDecWithPrec(int64(k.GetParam(ctx, types.KeyOracleScriptRewardPercentage)), 2)
+	fmt.Println("reward ratio: ", rewardRatio)
+	fmt.Println("script reward: ", types.KeyOracleScriptRewardPercentage)
 	// We need to calculate the final 70% fee given by the user because the remaining 40% must be reserved for the proposer and validators.
 	providedCoins, _ := sdk.NewDecCoinsFromCoins(fees...).MulDecTruncate(rewardRatio).TruncateDecimal()
 
