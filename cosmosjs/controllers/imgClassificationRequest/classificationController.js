@@ -8,7 +8,7 @@ const formData = require("./formData");
 module.exports = {
   getClassification: (req, res) => {
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
+    if (!errors.isEmpty() || req.file === undefined) {
       return res.status(422).json({ errors: errors.array() });
     } else {
       console.log("request file: ", req.file)
