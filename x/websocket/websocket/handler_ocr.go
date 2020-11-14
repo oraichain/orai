@@ -222,9 +222,7 @@ func handleOCRRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 					dataSourceResult.Status = types.ResultFailure
 					dataSourceResult.Result = []byte(types.FailedResponseDs)
 				} else {
-					if dataSourceCount == 0 {
-						finalResultStr = result
-					}
+					finalResultStr = result
 					dataSourceCount++
 				}
 			} else {
