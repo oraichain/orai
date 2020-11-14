@@ -4,7 +4,7 @@
 route() {
   if [[ $1 = "aiDataSource" ]]
   then 
-    echo "image_classification_resnet18 image_classification_inception image_classification_vgg11_bn" # return names of the data sources
+    echo "image_classification_resnet18 image_classification_resnet18 image_classification_vgg11_bn" # return names of the data sources
   elif [[ $1 = "testcase" ]] # return names of the test cases
   then
     echo "testcase_classification"

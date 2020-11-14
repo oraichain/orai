@@ -39,11 +39,11 @@ func (kyc setClassificationRequestReq) getHash() string {
 }
 
 // setClassificationRequestReqFn is the function that collects all the necessary info of image classification and return a new object out of it
-func setClassificationRequestReqFn(cliCtx context.CLIContext, w http.ResponseWriter, r *http.Request) setKYCRequestReq {
+func setClassificationRequestReqFn(cliCtx context.CLIContext, w http.ResponseWriter, r *http.Request) setClassificationRequestReq {
 	req := setAIRequestHandlerFn(cliCtx, w, r)
 	imageHash := r.FormValue("image_hash")
 	imageName := r.FormValue("image_name")
-	return newSetKYCRequestReq(req, imageHash, imageName)
+	return newSetClassificationRequestReq(req, imageName, imageHash)
 }
 
 func setClassificationRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
