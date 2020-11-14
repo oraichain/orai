@@ -250,7 +250,7 @@ func handleOCRRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 			// collect data source result from the script
 			ress := strings.TrimSuffix(res.String(), "\n")
 			fmt.Printf("final result from oScript: %s\n", ress)
-			msgReport.AggregatedResult = []byte(ress)
+			msgReport.AggregatedResult = []byte("collected the following result from" + fmt.Sprint(dataSourceCount) + "data sources that passed the test case: " + finalResultStr)
 		}
 
 		// Create a new MsgCreateReport to the Oraichain
