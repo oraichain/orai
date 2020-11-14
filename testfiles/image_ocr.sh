@@ -10,7 +10,7 @@ data=$(jq '.data' <<< "$res")
 # check status code of the request
 if [[ $code = 200 ]]
   then 
-    echo "$data" | tr -d '"' # return result of the image classification and remove double quotes
+    echo $data | sed 's/\\n/ /g'
 else
     echo null
 fi
