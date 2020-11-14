@@ -10,7 +10,7 @@ route() {
     echo "testcase_ocr"
   elif [[ $1 = "aggregation" ]] # $2 is true output, $3 is expected output
   then
-    echo "collected the following result from" $3 "data sources that passed the test case": $2
+    echo "collected the following result from" $2 "data sources that passed the test case": $3
     #echo $2
   else
     echo 0

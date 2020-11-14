@@ -223,7 +223,7 @@ func handleOCRRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 					dataSourceResult.Result = []byte(types.FailedResponseDs)
 				} else {
 					if dataSourceCount == 0 {
-						finalResultStr += result
+						finalResultStr = result
 					}
 					dataSourceCount++
 				}
@@ -239,7 +239,7 @@ func handleOCRRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 			// Create a new MsgCreateReport to the Oraichain
 		} else {
 			// "2" here is the expected output that the user wants to get
-			cmd := exec.Command("bash", oscriptPath, "aggregation", finalResultStr, fmt.Sprint(dataSourceCount))
+			cmd := exec.Command("bash", oscriptPath, "aggregation", fmt.Sprint(dataSourceCount), finalResultStr)
 			var res bytes.Buffer
 			cmd.Stdout = &res
 			err = cmd.Run()
