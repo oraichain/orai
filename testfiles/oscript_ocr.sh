@@ -10,17 +10,7 @@ route() {
     echo "testcase_ocr"
   elif [[ $1 = "aggregation" ]] # $2 is true output, $3 is expected output
   then
-    # collect input string with a delimiter of each data source value separated with a '-' delimiter
-    IFS='-' read -ra array <<< "$2"
-    echo $IFS
-    aggregation_result=0
-    size=0
-    result=""
-    # here is the algorithm for each oracle script. This should be different based on the oscript
-    for i in "${array[@]}"; do
-      let "size+=1"
-    done
-    echo "collected the following result from" $size "data sources that passed the test case": ${array[0]}
+    echo "collected the following result from" $3 "data sources that passed the test case": $2
     #echo $2
   else
     echo 0
