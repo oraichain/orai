@@ -14,7 +14,7 @@ if [[ $code = 200 ]]
     # trim last \f character
     trim=$(echo $trim_quotes | rev | cut -c3- | rev)
     # repace all \n string with actual \n
-    echo $trim | sed 's/\\n/\n/g'
+    echo $trim | sed 's/\\n/ /g'
 else
     echo null
 fi
