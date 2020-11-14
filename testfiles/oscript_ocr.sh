@@ -7,7 +7,7 @@ route() {
     echo "image_ocr image_ocr image_ocr image_ocr" # return names of the data sources
   elif [[ $1 = "testcase" ]] # return names of the test cases
   then
-    echo "testcase_classification"
+    echo "testcase_ocr"
   elif [[ $1 = "aggregation" ]] # $2 is true output, $3 is expected output
   then
     echo $2
