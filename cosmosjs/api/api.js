@@ -3,9 +3,12 @@ const constants = require('../utils/constants');
 const axios = require('axios');
 
 const paths = {
-  CREATE_UNSIGNED_TX: "/provider/aireq/pricereq",
+  PRICE_REQ: "/airequest/aireq/pricereq",
+  KYC_REQ: "/airequest/aireq/kycreq",
+  CLASSIFICATION_REQ: "/airequest/aireq/clreq",
+  OCR_REQ: "/airequest/aireq/ocrreq",
   GET_REQUEST_ID: "/txs/",
-  GET_FULL_REQUEST: "/provider/fullreq/",
+  GET_FULL_REQUEST: "/airesult/fullreq/",
   GET_MINIMUM_FEES: "/provider/min_fees/"
 }
 
@@ -25,7 +28,7 @@ function getRequestId(payload, callback) {
 function getMinimumFees(payload, callback) {
   axios({
     method: "GET",
-    url: constants.ORAI_URL + paths.GET_MINIMUM_FEES + payload
+    url: constants.ORAI_URL + paths.GET_MINIMUM_FEES + payload.oScriptName + "?val_num=" + payload.valNum
   })
     .then((response) => {
       callback(true, response, null);
@@ -48,10 +51,43 @@ function getFullRequest(payload, callback) {
     });
 }
 
-function createUnsignedTx(payload, callback) {
+function addIPFS(payload, callback) {
+  var config = {
+    method: 'post',
+    url: 'http://164.90.180.95:5001/api/v0/add',
+    headers: { 
+        ...payload.getHeaders()
+    },
+    data : payload
+  };
+  axios(config)
+    .then((response) => {
+      callback(true, response, null);
+    })
+    .catch((error) => {
+      callback(false, null, error);
+    });
+}
+
+function createFormUnsignedTx(payload, path, callback) {
   axios({
     method: "POST",
-    url: constants.ORAI_URL + paths.CREATE_UNSIGNED_TX,
+    url: constants.ORAI_URL + path,
+    data: payload,
+    headers: payload.getHeaders()
+  })
+    .then((response) => {
+      callback(true, response, null);
+    })
+    .catch((error) => {
+      callback(false, null, error);
+    });
+}
+
+function createUnsignedTx(payload, path, callback) {
+  axios({
+    method: "POST",
+    url: constants.ORAI_URL + path,
     data: payload,
   })
     .then((response) => {
@@ -66,7 +102,10 @@ const api = {
   createUnsignedTx,
   getRequestId,
   getFullRequest,
-  getMinimumFees
+  getMinimumFees,
+  paths,
+  createFormUnsignedTx,
+  addIPFS
 }
 
 module.exports = api;

@@ -12,10 +12,14 @@ module.exports = {
     } else {
       const oScriptName = req.body.oscript_name
       // check minimum fees provided by the user
-      api.getMinimumFees(oScriptName, (isSuccess, response, error) => {
+      const payload = {
+        oScriptName: oScriptName,
+        valNum: req.body.validator_count
+      }
+      api.getMinimumFees(payload, (isSuccess, response, error) => {
         if (isSuccess) {
           // if the fees smaller than the minium required fees then we return error
-          if (req.body.fees <= response.data.result.minimum_fees) {
+          if (req.body.fees - response.data.result.minimum_fees <= 0) {
             return res.status(200).json({
               message: "The given fee is smaller / equal to the required fee or the oracle script does not exist. Provided fees should at least be higher",
               required_fee: response.data.result.minimum_fees + "orai"
@@ -51,8 +55,9 @@ module.exports = {
                 "oracle_script_name": oScriptName,
                 "input": input,
                 "expected_output": expectedOutput,
-                "fees": fees
-              }, (isSuccess, response, error) => {
+                "fees": fees,
+                "validator_count": req.body.validator_count.toString()
+              }, api.paths.PRICE_REQ, (isSuccess, response, error) => {
                 if (isSuccess) {
                   unsignedTx = response.data;
 
@@ -71,6 +76,7 @@ module.exports = {
                   orai.broadcast(signedTx).then(response => {
                     // wait about 5 seconds to query the tx hash. Count check if interval 5 times still cannot get response then stop
                     console.log("response: ", response)
+                    // TODO: at this time, need to verify if the txhash is a success or not. Normally, if success => no "code" field, if fail then have "code" field when querying the transaction hash
                     let txHash = response.txhash
                     let count = 0
                     let counter = 0

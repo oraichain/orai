@@ -6,9 +6,12 @@ module.exports = {
   // address of the account that uses to sign the transaction
   ACC_ADDRESS: process.env.ACC_ADDRESS,
   FINISHED_STATUS: "finished",
-  INTERVAL: 5,
+  INTERVAL: 10,
   MESSAGE_TYPE: {
-    SET_PRICE_REQUEST: "provider/SetPriceRequest"
+    SET_PRICE_REQUEST: "airequest/SetPriceRequest",
+    SET_KYC_REQUEST: "airequest/SetKYCRequest",
+    SET_CLASSIFICATION_REQUEST: "airequest/SetClassificationRequest",
+    SET_OCR_REQUEST: "airequest/SetOCRRequest"
   },
   DENOM: "orai"
 }

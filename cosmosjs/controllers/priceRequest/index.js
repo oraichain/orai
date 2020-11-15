@@ -9,7 +9,8 @@ router.post("/req_price", [
   check("oscript_name").isLength({ min: 3, max: 99 }),
   check("price").isBase64(),
   check("expected_price").isBase64(),
-  check("fees").isNumeric()
+  check("fees").isNumeric(),
+  check("validator_count").isNumeric().isInt({ min: 1 })
 ], controller.getPrice);
 
 module.exports = router;

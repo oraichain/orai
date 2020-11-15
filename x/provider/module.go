@@ -3,12 +3,7 @@ package provider
 import (
 	"encoding/json"
 
-	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/cosmos/cosmos-sdk/x/staking"
-
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/supply"
 
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
@@ -19,10 +14,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/ducphamle2/dexai/x/provider/client/cli"
-	"github.com/ducphamle2/dexai/x/provider/client/rest"
-	"github.com/ducphamle2/dexai/x/provider/keeper"
-	"github.com/ducphamle2/dexai/x/provider/types"
+	"github.com/oraichain/orai/x/provider/client/cli"
+	"github.com/oraichain/orai/x/provider/client/rest"
+	"github.com/oraichain/orai/x/provider/keeper"
+	"github.com/oraichain/orai/x/provider/types"
 )
 
 // Type check to ensure the interface is properly implemented
@@ -82,22 +77,14 @@ type AppModule struct {
 	AppModuleBasic
 	keeper keeper.Keeper
 	// TODO: Add keepers that your application depends on
-	supplyKeeper  supply.Keeper
-	bankKeeper    bank.Keeper
-	stakingKeeper staking.Keeper
-	distrKeeper   distr.Keeper
-	params        params.Subspace
+	params params.Subspace
 }
 
 // NewAppModule creates a new AppModule object
-func NewAppModule(k keeper.Keeper, s supply.Keeper, b bank.Keeper, staking staking.Keeper, distr distr.Keeper, params params.Subspace /*TODO: Add Keepers that your application depends on*/) AppModule {
+func NewAppModule(k keeper.Keeper, params params.Subspace /*TODO: Add Keepers that your application depends on*/) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         k,
-		supplyKeeper:   s,
-		bankKeeper:     b,
-		stakingKeeper:  staking,
-		distrKeeper:    distr,
 		params:         params,
 		// TODO: Add keepers that your application depends on
 	}
@@ -165,13 +152,13 @@ func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.Val
 // on every begin block
 func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) {
 	// 	TODO: fill out if your application requires beginblock, if not you can delete this function
+	//k.ResolveRngSeed(ctx, req)
 	//k.AllocateTokens(ctx, req.GetLastCommitInfo().Votes)
-	k.DirectAllocateTokens(ctx, req.GetLastCommitInfo().Votes)
+	//k.DirectAllocateTokens(ctx, req.GetLastCommitInfo().Votes)
 }
 
 // EndBlocker called every block, process inflation, update validator set.
 func EndBlocker(ctx sdk.Context, k Keeper) {
 	// 	TODO: fill out if your application requires endblock, if not you can delete this function
-
-	k.ProcessReward(ctx)
+	//k.ProcessReward(ctx)
 }

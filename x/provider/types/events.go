@@ -10,12 +10,9 @@ const (
 	// Event type for data source
 	EventTypeSetDataSource  = "set_datasource"
 	EventTypeEditDataSource = "edit_datasource"
-	// Event type for set ai request
-	EventTypeRequestWithData = "ai_request_data"
-	EventTypeSetKYCRequest   = "set_kyc_request"
-	EventTypeSetPriceRequest = "set_price_request"
 	// Event type for test case
 	EventTypeCreateTestCase = "set_test_case"
+	EventTypeEditTestCase   = "set_edit_case"
 
 	// TODO: Create keys fo your events, the values will be derivided from the msg
 	// AttributeKeyAddress  		= "address"
@@ -28,15 +25,6 @@ const (
 	AttributeOracleScriptName = "oscript_name"
 	// Attribute for data source
 	AttributeDataSourceName = "datasource_name"
-	// Attribute for request
-	AttributeRequestID             = "request_id"
-	AttributeRequestValidator      = "request_validator"
-	AttributeRequestCreator        = "request_creator"
-	AttributeRequestImageHash      = "request_image_hash"
-	AttributeRequestImageName      = "request_image_name"
-	AttributeRequestValidatorCount = "request_validator_count"
-	AttributeRequestInput          = "request_input"
-	AttributeRequestExpectedOutput = "expected_request_output"
 
 	// Attribute for test case
 	AttributeTestCaseName = "test_case_name"
