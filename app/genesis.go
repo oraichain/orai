@@ -44,7 +44,7 @@ func NewDefaultGenesisState() GenesisState {
 	stakingGenesis.Params.HistoricalEntries = 1000
 	distrGenesis.Params.BaseProposerReward = sdk.NewDecWithPrec(10, 2)  // 5%
 	distrGenesis.Params.BonusProposerReward = sdk.NewDecWithPrec(10, 2) // 12%
-	mintGenesis.Params.BlocksPerYear = 10519200                         // target 3-second block time
+	mintGenesis.Params.BlocksPerYear = 6311200                          // target 5-second block time
 	mintGenesis.Params.MintDenom = denom
 	govGenesis.DepositParams.MinDeposit = sdk.NewCoins(sdk.NewCoin(denom, sdk.TokensFromConsensusPower(10)))
 	crisisGenesis.ConstantFee = sdk.NewCoin(denom, sdk.TokensFromConsensusPower(10))
