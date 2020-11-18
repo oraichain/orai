@@ -43,7 +43,7 @@ func setOCRRequestReqFn(cliCtx context.CLIContext, w http.ResponseWriter, r *htt
 	req := setAIRequestHandlerFn(cliCtx, w, r)
 	imageHash := r.FormValue("image_hash")
 	imageName := r.FormValue("image_name")
-	return newSetORCRequestReq(req, imageHash, imageName)
+	return newSetORCRequestReq(req, imageName, imageHash)
 }
 
 func setOCRRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {

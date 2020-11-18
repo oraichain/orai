@@ -33,7 +33,6 @@ func handleTransaction(c *Context, l *Logger, tx tmtypes.TxResult) {
 		}
 
 		l.Info(":star: message type: %s", messageType)
-		l.Info(":star: message from event: %s", (aiRequest.MsgSetOCRRequest{}).Type())
 
 		if messageType == (aiRequest.MsgSetKYCRequest{}).Type() {
 			go handleKYCRequestLog(c, l, log)

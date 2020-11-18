@@ -200,6 +200,7 @@ func handleOCRRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 		// after passing the test cases, we run the actual data sources to collect their results
 		// create data source results to store in the report
 		// we use dataSourceResultsTest since this list is the complete list of data sources that have passed the test cases
+		dataSourceCount := 0
 		for i := range dataSourceResultsTest {
 			// run the data source script
 			var outTestCase bytes.Buffer
@@ -221,7 +222,8 @@ func handleOCRRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 					dataSourceResult.Status = types.ResultFailure
 					dataSourceResult.Result = []byte(types.FailedResponseDs)
 				} else {
-					finalResultStr = finalResultStr + result + delimiter
+					finalResultStr = result
+					dataSourceCount++
 				}
 			} else {
 				dataSourceResult = types.NewDataSourceResult(dataSourceResultsTest[i].GetName(), []byte(dataSourceResultsTest[i].GetResult()), types.ResultFailure)
@@ -229,17 +231,13 @@ func handleOCRRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 			// append an data source result into the list
 			dataSourceResults = append(dataSourceResults, dataSourceResult)
 		}
-
-		fmt.Println("final result string: ", finalResultStr)
-		finalResultStr = strings.TrimSuffix(finalResultStr, "-")
-		fmt.Println("final result after trimming: ", finalResultStr)
 		msgReport := NewReport(req.AIRequest.RequestID, c.validator, dataSourceResults, testCaseResults, key.GetAddress(), sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(5000)))), []byte(finalResultStr))
 		if len(finalResultStr) == 0 {
 			msgReport.AggregatedResult = []byte(types.FailedResponseOs)
 			// Create a new MsgCreateReport to the Oraichain
 		} else {
 			// "2" here is the expected output that the user wants to get
-			cmd := exec.Command("bash", oscriptPath, "aggregation", finalResultStr)
+			cmd := exec.Command("bash", oscriptPath, "aggregation", fmt.Sprint(dataSourceCount), finalResultStr)
 			var res bytes.Buffer
 			cmd.Stdout = &res
 			err = cmd.Run()
@@ -250,7 +248,7 @@ func handleOCRRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 			// collect data source result from the script
 			ress := strings.TrimSuffix(res.String(), "\n")
 			fmt.Printf("final result from oScript: %s\n", ress)
-			msgReport.AggregatedResult = []byte(ress)
+			msgReport.AggregatedResult = []byte("collected the following result from" + fmt.Sprint(dataSourceCount) + "data sources that passed the test case: " + finalResultStr)
 		}
 
 		// Create a new MsgCreateReport to the Oraichain

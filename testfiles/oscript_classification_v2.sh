@@ -4,14 +4,13 @@
 route() {
   if [[ $1 = "aiDataSource" ]]
   then 
-    echo "image_ocr image_ocr image_ocr image_ocr" # return names of the data sources
+    echo "image_classification_resnet18 image_classification_resnet18 image_classification_vgg11_bn" # return names of the data sources
   elif [[ $1 = "testcase" ]] # return names of the test cases
   then
-    echo "testcase_ocr"
+    echo "testcase_classification"
   elif [[ $1 = "aggregation" ]] # $2 is true output, $3 is expected output
   then
-    echo "collected the following result from" $2 "data sources that passed the test case": $3
-    #echo $2
+    echo $2
   else
     echo 0
   fi

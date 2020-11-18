@@ -43,7 +43,7 @@ func setKYCRequestReqFn(cliCtx context.CLIContext, w http.ResponseWriter, r *htt
 	req := setAIRequestHandlerFn(cliCtx, w, r)
 	imageHash := r.FormValue("image_hash")
 	imageName := r.FormValue("image_name")
-	return newSetKYCRequestReq(req, imageHash, imageName)
+	return newSetKYCRequestReq(req, imageName, imageHash)
 }
 
 func setKYCRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
