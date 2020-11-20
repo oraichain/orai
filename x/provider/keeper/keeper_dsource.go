@@ -59,7 +59,7 @@ func (k Keeper) SetAIDataSource(ctx sdk.Context, name string, aiDataSource types
 }
 
 // EditAIDataSource allows users to edit a data source in the store
-func (k Keeper) EditAIDataSource(ctx sdk.Context, oldName string, newName string, aiDataSource types.AIDataSource) {
+func (k Keeper) EditAIDataSource(ctx sdk.Context, oldName, newName string, code []byte, aiDataSource types.AIDataSource) {
 	key := types.DataSourceStoreKeyString(oldName)
 	// if the user does not want to reuse the old name
 	if oldName != newName {
@@ -68,8 +68,12 @@ func (k Keeper) EditAIDataSource(ctx sdk.Context, oldName string, newName string
 		store.Delete(byteKey)
 		// delete the old file because it not pointed by any oScript
 		k.fileCache.EraseFile(key)
+		// add new file
+		k.AddAIDataSourceFile(code, newName)
+	} else {
+		// edit the file instead since old name = new name
+		k.EditAIDataSourceFile(code, oldName)
 	}
-
 	k.SetAIDataSource(ctx, newName, aiDataSource)
 }
 

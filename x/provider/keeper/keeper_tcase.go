@@ -59,7 +59,7 @@ func (k Keeper) DefaultTestCase() types.TestCase {
 }
 
 // EditTestCase allows users to edit a test case in the store
-func (k Keeper) EditTestCase(ctx sdk.Context, oldName string, newName string, testCase types.TestCase) {
+func (k Keeper) EditTestCase(ctx sdk.Context, oldName, newName string, code []byte, testCase types.TestCase) {
 	key := types.TestCaseStoreKeyString(oldName)
 	// if the user does not want to reuse the old name
 	if oldName != newName {
@@ -68,8 +68,11 @@ func (k Keeper) EditTestCase(ctx sdk.Context, oldName string, newName string, te
 		store.Delete(byteKey)
 		// delete the old file because it not pointed by any oScript
 		k.fileCache.EraseFile(key)
+		k.AddTestCaseFile(code, newName)
+	} else {
+		// edit the file instead since old name = new name
+		k.EditTestCaseFile(code, oldName)
 	}
-
 	k.SetTestCase(ctx, newName, testCase)
 }
 

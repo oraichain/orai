@@ -92,12 +92,7 @@ func handleMsgEditOracleScript(ctx sdk.Context, k keeper.Keeper, msg types.MsgEd
 
 	oScript = types.NewOracleScript(msg.NewName, msg.Owner, msg.Description, minimumFees)
 
-	k.EditOracleScript(ctx, msg.OldName, msg.NewName, oScript)
-	if msg.OldName != msg.NewName {
-		k.AddOracleScriptFile(msg.Code, msg.NewName)
-	} else {
-		k.EditOracleScriptFile(msg.Code, msg.NewName)
-	}
+	k.EditOracleScript(ctx, msg.OldName, msg.NewName, msg.Code, oScript)
 
 	// TODO: Define your msg events
 	ctx.EventManager().EmitEvent(
@@ -149,12 +144,7 @@ func handleMsgEditAIDataSource(ctx sdk.Context, k keeper.Keeper, msg types.MsgEd
 	fees, _ := sdk.ParseCoins(msg.Fees)
 	aiDataSource = types.NewAIDataSource(msg.NewName, msg.Owner, fees, msg.Description)
 
-	k.EditAIDataSource(ctx, msg.OldName, msg.NewName, aiDataSource)
-	if msg.OldName != msg.NewName {
-		k.AddAIDataSourceFile(msg.Code, msg.NewName)
-	} else {
-		k.EditAIDataSourceFile(msg.Code, msg.NewName)
-	}
+	k.EditAIDataSource(ctx, msg.OldName, msg.NewName, msg.Code, aiDataSource)
 
 	// TODO: Define your msg events
 	ctx.EventManager().EmitEvent(
@@ -206,12 +196,7 @@ func handleMsgEditTestCase(ctx sdk.Context, k keeper.Keeper, msg types.MsgEditTe
 	fees, _ := sdk.ParseCoins(msg.Fees)
 	testCase = types.NewTestCase(msg.NewName, msg.Owner, fees, msg.Description)
 
-	k.EditTestCase(ctx, msg.OldName, msg.NewName, testCase)
-	if msg.OldName != msg.NewName {
-		k.AddTestCaseFile(msg.Code, msg.NewName)
-	} else {
-		k.EditTestCaseFile(msg.Code, msg.NewName)
-	}
+	k.EditTestCase(ctx, msg.OldName, msg.NewName, msg.Code, testCase)
 
 	// TODO: Define your msg events
 	ctx.EventManager().EmitEvent(

@@ -60,7 +60,7 @@ func (k Keeper) GetPaginatedOracleScriptNames(ctx sdk.Context, page, limit uint)
 }
 
 // EditOracleScript allows users to edit a oScript in the store
-func (k Keeper) EditOracleScript(ctx sdk.Context, oldName string, newName string, oScript types.OracleScript) {
+func (k Keeper) EditOracleScript(ctx sdk.Context, oldName, newName string, code []byte, oScript types.OracleScript) {
 
 	key := types.OracleScriptStoreKeyString(oldName)
 	// if the user does not want to reuse the old name
@@ -70,8 +70,10 @@ func (k Keeper) EditOracleScript(ctx sdk.Context, oldName string, newName string
 		store.Delete(byteKey)
 		// delete the old file because it not pointed by any oScript
 		k.fileCache.EraseFile(key)
+		k.AddOracleScriptFile(code, newName)
+	} else {
+		k.EditOracleScriptFile(code, oldName)
 	}
-
 	k.SetOracleScript(ctx, newName, oScript)
 }
 
