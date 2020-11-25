@@ -29,45 +29,14 @@ func handleMsgSetPriceRequest(ctx sdk.Context, k keeper.Keeper, msg types.MsgSet
 		return nil, err
 	}
 
-	//var finalResult int
-
 	testcaseObjs := make([]provider.TestCaseI, 0)
 
 	dataSourceObjs := make([]provider.AIDataSourceI, 0)
 
-	//var testCaseResults []types.TestCaseResult
-
-	var totalFees sdk.Coins
-
-	// we have different test cases, so we need to loop through them
-	for i := 0; i < len(testCases); i++ {
-		// loop to run the test case
-		// collect all the test cases object to store in the ai request
-		testCase, err := k.ProviderKeeper.GetTestCaseI(ctx, testCases[i])
-		if err != nil {
-			return nil, sdkerrors.Wrap(types.ErrTestCaseNotFound, fmt.Sprintf("failed to get test case: %s", err.Error()))
-		}
-		testcaseObjs = append(testcaseObjs, testCase)
-		// Aggregate the required fees for an AI request
-		totalFees = totalFees.Add(testCase.GetFees()...)
+	finalFees, err := k.ProviderKeeper.GetMinimumFees(ctx, aiDataSources, testCases, len(validators))
+	if err != nil {
+		return nil, sdkerrors.Wrap(err, "Error getting minimum fees from oracle script")
 	}
-
-	for j := 0; j < len(aiDataSources); j++ {
-		// collect all the data source objects to store in the ai request
-		aiDataSource, err := k.ProviderKeeper.GetAIDataSourceI(ctx, aiDataSources[j])
-		if err != nil {
-			return nil, sdkerrors.Wrap(types.ErrDataSourceNotFound, fmt.Sprintf("failed to get data source: %s", err.Error()))
-		}
-		dataSourceObjs = append(dataSourceObjs, aiDataSource)
-		// Aggregate the required fees for an AI request
-		totalFees = totalFees.Add(aiDataSource.GetFees()...)
-	}
-	// valFees = 2/5 total dsource and test case fees (70% total in 100% of total fees split into 20% and 50% respectively)
-	valFees, _ := sdk.NewDecCoinsFromCoins(totalFees...).MulDec(sdk.NewDecWithPrec(int64(40), 2)).TruncateDecimal()
-	// 50% + 20% = 70% * validatorCount fees (since k validators will execute, the fees need to be propotional to the number of vals)
-	bothFees := sdk.NewDecCoinsFromCoins(totalFees.Add(valFees...)...)
-	finalFees, _ := bothFees.MulDec(sdk.NewDec(int64(msg.MsgAIRequest.ValidatorCount))).TruncateDecimal()
-	fmt.Println("both fees: ", bothFees.String())
 	fmt.Println("final fees needed: ", finalFees.String())
 
 	// If the total fee is larger than the fee provided by the user then we return error

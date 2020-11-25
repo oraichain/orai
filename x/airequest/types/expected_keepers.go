@@ -70,6 +70,7 @@ type ProviderKeeper interface {
 	GetTestCaseI(ctx sdk.Context, name string) (provider.TestCaseI, error)
 	GetDNamesTcNames(oscriptPath string) ([]string, []string, error)
 	GetOScriptPath(oScriptName string) string
+	GetMinimumFees(ctx sdk.Context, dNames, tcNames []string, valNum int) (sdk.Coins, error)
 }
 
 // WebSocketKeeper defines the expected websocket keeper
