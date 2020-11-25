@@ -19,12 +19,16 @@ type OracleScript struct {
 	Owner       sdk.AccAddress `json:"owner"`
 	Description string         `json:"description"`
 	MinimumFees sdk.Coins      `json:"minimum_fees"`
+	DSources    []string       `json:"data_sources"`
+	TCases      []string       `json:"test_cases"`
 }
 
 // implement fmt.Stringer
 func (os OracleScript) String() string {
+	dsListNames := strings.Join(os.DSources[:], "\n")
+	tcListNames := strings.Join(os.TCases[:], "\n")
 	return strings.TrimSpace(fmt.Sprintf(`Name: %s
-Owner: %s Description: %s Minimum Fees: %s`, os.Name, os.Owner, os.Description, os.MinimumFees))
+Owner: %s Description: %s Minimum Fees: %s Data Sources: %s Test Cases: %s`, os.Name, os.Owner, os.Description, os.MinimumFees, dsListNames, tcListNames))
 }
 
 // NewOracleScript is the constructor of the oScript struct
@@ -33,12 +37,16 @@ func NewOracleScript(
 	owner sdk.AccAddress,
 	des string,
 	minimumFees sdk.Coins,
+	dSources []string,
+	tCases []string,
 ) OracleScript {
 	return OracleScript{
 		Name:        name,
 		Owner:       owner,
 		Description: des,
 		MinimumFees: minimumFees,
+		DSources:    dSources,
+		TCases:      tCases,
 	}
 }
 
@@ -96,4 +104,32 @@ func (os OracleScript) SetMinimumFees(minFees sdk.Coins) error {
 // GetMinimumFees is the getter function for getting the OracleScript's fees
 func (os OracleScript) GetMinimumFees() sdk.Coins {
 	return os.MinimumFees
+}
+
+// SetDSources is the setter function for updating the OracleScript's data sources
+func (os OracleScript) SetDSources(dSources []string) error {
+	if len(dSources) == 0 {
+		return errors.New("The data source list is empty")
+	}
+	os.DSources = dSources
+	return nil
+}
+
+// GetDSources is the getter function for getting the OracleScript's data sources
+func (os OracleScript) GetDSources() []string {
+	return os.DSources
+}
+
+// SetTCases is the setter function for updating the OracleScript's test cases
+func (os OracleScript) SetTCases(tCases []string) error {
+	if len(tCases) == 0 {
+		return errors.New("The test case list is empty")
+	}
+	os.TCases = tCases
+	return nil
+}
+
+// GetTCases is the getter function for getting the OracleScript's test cases
+func (os OracleScript) GetTCases() []string {
+	return os.TCases
 }

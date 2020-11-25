@@ -66,7 +66,7 @@ func queryOracleScript(ctx sdk.Context, path []string, keeper Keeper) ([]byte, e
 
 	executable := base64.StdEncoding.EncodeToString(code)
 
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResOracleScript(oScript.GetName(), oScript.GetOwner(), executable, oScript.GetDescription(), oScript.GetMinimumFees()))
+	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResOracleScript(oScript.GetName(), oScript.GetOwner(), executable, oScript.GetDescription(), oScript.GetMinimumFees(), oScript.DSources, oScript.TCases))
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -106,7 +106,7 @@ func queryOracleScripts(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) (
 		executable := base64.StdEncoding.EncodeToString(code)
 
 		// create a new queryResOracleScript
-		queryResOScripts = append(queryResOScripts, types.NewQueryResOracleScript(oScript.GetName(), oScript.GetOwner(), executable, oScript.GetDescription(), oScript.GetMinimumFees()))
+		queryResOScripts = append(queryResOScripts, types.NewQueryResOracleScript(oScript.GetName(), oScript.GetOwner(), executable, oScript.GetDescription(), oScript.GetMinimumFees(), oScript.DSources, oScript.TCases))
 	}
 
 	// return the query to the command
@@ -324,7 +324,7 @@ func queryMinFees(ctx sdk.Context, path []string, k Keeper, req abci.RequestQuer
 		return nil, sdkerrors.Wrapf(types.ErrOracleScriptNotFound, err.Error())
 	}
 	// get data source and test case names from the oracle script
-	aiDataSources, testCases, err := k.GetDNamesTcNames(oScriptName)
+	aiDataSources, testCases, err := k.GetDNamesTcNames(ctx, oScriptName)
 	if err != nil {
 		return nil, err
 	}

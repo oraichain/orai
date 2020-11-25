@@ -21,6 +21,10 @@ type OracleScriptI interface {
 	ProviderI
 	SetMinimumFees(fees sdk.Coins) error
 	GetMinimumFees() sdk.Coins
+	SetDSources(dSources []string) error
+	GetDSources() []string
+	SetTCases(tCases []string) error
+	GetTCases() []string
 }
 
 // AIDataSourceI expected data source functions

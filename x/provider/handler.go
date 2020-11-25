@@ -40,7 +40,7 @@ func handleMsgCreateOracleScript(ctx sdk.Context, k keeper.Keeper, msg types.Msg
 	}
 	k.AddOracleScriptFile(msg.Code, msg.Name)
 	// Get Data source and test case names from an oracle script
-	aiDataSources, testCases, err := k.GetDNamesTcNames(msg.Name)
+	aiDataSources, testCases, err := k.GetDSourceTCasesScripts(msg.Name)
 	if err != nil {
 		// erase because the script file is not properly added into the chain yet
 		k.EraseOracleScriptFile(msg.Name)
@@ -54,7 +54,7 @@ func handleMsgCreateOracleScript(ctx sdk.Context, k keeper.Keeper, msg types.Msg
 		k.EraseOracleScriptFile(msg.Name)
 		return nil, err
 	}
-	k.SetOracleScript(ctx, msg.Name, types.NewOracleScript(msg.Name, msg.Owner, msg.Description, minimumFees))
+	k.SetOracleScript(ctx, msg.Name, types.NewOracleScript(msg.Name, msg.Owner, msg.Description, minimumFees, aiDataSources, testCases))
 	// TODO: Define your msg events
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
@@ -79,7 +79,7 @@ func handleMsgEditOracleScript(ctx sdk.Context, k keeper.Keeper, msg types.MsgEd
 	}
 
 	// Get Data source and test case names from an oracle script
-	aiDataSources, testCases, err := k.GetDNamesTcNames(msg.NewName)
+	aiDataSources, testCases, err := k.GetDSourceTCasesScripts(msg.NewName)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +90,7 @@ func handleMsgEditOracleScript(ctx sdk.Context, k keeper.Keeper, msg types.MsgEd
 		return nil, err
 	}
 
-	oScript = types.NewOracleScript(msg.NewName, msg.Owner, msg.Description, minimumFees)
+	oScript = types.NewOracleScript(msg.NewName, msg.Owner, msg.Description, minimumFees, aiDataSources, testCases)
 
 	k.EditOracleScript(ctx, msg.OldName, msg.NewName, msg.Code, oScript)
 

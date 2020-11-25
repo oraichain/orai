@@ -24,23 +24,27 @@ type QueryResOracleScript struct {
 	Code        string         `json:"code"`
 	Description string         `json:"description"`
 	MinimumFees sdk.Coins      `json:"minimum_fees"`
+	DSources    []string       `json:"data_sources"`
+	TCases      []string       `json:"test_cases"`
 }
 
 // NewQueryResOracleScript is the constructor for the query oracle script request
-func NewQueryResOracleScript(name string, owner sdk.AccAddress, code string, des string, minFees sdk.Coins) QueryResOracleScript {
+func NewQueryResOracleScript(name string, owner sdk.AccAddress, code string, des string, minFees sdk.Coins, ds []string, tc []string) QueryResOracleScript {
 	return QueryResOracleScript{
 		Name:        name,
 		Owner:       owner,
 		Code:        code,
 		Description: des,
 		MinimumFees: minFees,
+		DSources:    ds,
+		TCases:      tc,
 	}
 }
 
 func (qrs QueryResOracleScript) String() string {
 	return strings.TrimSpace(fmt.Sprintf(`Name: %s
 Owner: %s
-Code: %s Description: %s Minimum Fees: %s`, qrs.Name, string(qrs.Owner[:]), qrs.Code, qrs.Description, qrs.MinimumFees.String()))
+Code: %s Description: %s Minimum Fees: %s Data Sources: %s Test Cases: %s`, qrs.Name, string(qrs.Owner[:]), qrs.Code, qrs.Description, qrs.MinimumFees.String(), qrs.DSources, qrs.TCases))
 }
 
 // QueryResOracleScriptNames Queries Result Payload for a names query

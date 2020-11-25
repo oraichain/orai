@@ -26,13 +26,12 @@ func handleMsgSetClassificationRequest(ctx sdk.Context, k keeper.Keeper, msg typ
 	providedCoins, _ := sdk.NewDecCoinsFromCoins(fees...).MulDecTruncate(rewardRatio).TruncateDecimal()
 
 	// get data source and test case names from the oracle script
-	aiDataSources, testCases, err := k.ProviderKeeper.GetDNamesTcNames(msg.MsgAIRequest.OracleScriptName)
+	aiDataSources, testCases, err := k.ProviderKeeper.GetDNamesTcNames(ctx, msg.MsgAIRequest.OracleScriptName)
 	if err != nil {
 		return nil, err
 	}
 
 	var testcaseObjs []provider.TestCaseI
-
 	var dataSourceObjs []provider.AIDataSourceI
 
 	finalFees, err := k.ProviderKeeper.GetMinimumFees(ctx, aiDataSources, testCases, len(validators))

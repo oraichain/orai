@@ -66,9 +66,10 @@ type DistrKeeper interface {
 type ProviderKeeper interface {
 	DefaultAIDataSourceI() provider.AIDataSourceI
 	GetAIDataSourceI(ctx sdk.Context, name string) (provider.AIDataSourceI, error)
+	GetOracleScriptI(ctx sdk.Context, name string) (provider.OracleScriptI, error)
 	DefaultTestCaseI() provider.TestCaseI
 	GetTestCaseI(ctx sdk.Context, name string) (provider.TestCaseI, error)
-	GetDNamesTcNames(oscriptPath string) ([]string, []string, error)
+	GetDNamesTcNames(ctx sdk.Context, oScript string) ([]string, []string, error)
 	GetOScriptPath(oScriptName string) string
 	GetMinimumFees(ctx sdk.Context, dNames, tcNames []string, valNum int) (sdk.Coins, error)
 }

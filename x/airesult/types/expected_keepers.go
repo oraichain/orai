@@ -68,7 +68,7 @@ type ProviderKeeper interface {
 	GetAIDataSourceI(ctx sdk.Context, name string) (provider.AIDataSourceI, error)
 	DefaultTestCaseI() provider.TestCaseI
 	GetTestCaseI(ctx sdk.Context, name string) (provider.TestCaseI, error)
-	GetDNamesTcNames(oscriptPath string) ([]string, []string, error)
+	GetDNamesTcNames(ctx sdk.Context, oScript string) ([]string, []string, error)
 }
 
 // WebSocketKeeper defines the expected websocket keeper
