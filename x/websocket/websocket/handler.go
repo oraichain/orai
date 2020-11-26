@@ -54,13 +54,14 @@ func handleTransaction(c *Context, l *Logger, tx tmtypes.TxResult) {
 	}
 }
 
+// getPaths collect data sources and test cases information from the ai request event
 func getPaths(log sdk.ABCIMessageLog) ([]string, []string, error) {
-	aiDataSourcesStr, err := GetEventValue(log, aiRequest.EventTypeRequestWithData, aiRequest.AttributeRequestCreator)
+	aiDataSourcesStr, err := GetEventValue(log, aiRequest.EventTypeRequestWithData, aiRequest.AttributeRequestDSources)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	testCasesStr, err := GetEventValue(log, aiRequest.EventTypeRequestWithData, aiRequest.AttributeRequestValidatorCount)
+	testCasesStr, err := GetEventValue(log, aiRequest.EventTypeRequestWithData, aiRequest.AttributeRequestTCases)
 	if err != nil {
 		return nil, nil, err
 	}
