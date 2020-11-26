@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	aiRequest "github.com/oraichain/orai/x/airequest/types"
 	provider "github.com/oraichain/orai/x/provider/types"
 	"github.com/oraichain/orai/x/websocket/exported"
 	"github.com/oraichain/orai/x/websocket/types"
@@ -19,35 +20,36 @@ import (
 
 // GetEventKYCRequest returns the event kyc request in the given log.
 func GetEventKYCRequest(log sdk.ABCIMessageLog) (KYCRequest, error) {
-	requestID, err := GetEventValue(log, types.EventTypeRequestWithData, types.AttributeRequestID)
+	ev := aiRequest.EventTypeRequestWithData
+	requestID, err := GetEventValue(log, ev, aiRequest.AttributeRequestID)
 	req := KYCRequest{}
 	if err != nil {
 		return req, err
 	}
-	oscriptName, err := GetEventValue(log, types.EventTypeRequestWithData, types.AttributeOracleScriptName)
+	oscriptName, err := GetEventValue(log, ev, aiRequest.AttributeOracleScriptName)
 	if err != nil {
 		return req, err
 	}
-	creatorStr, err := GetEventValue(log, types.EventTypeRequestWithData, types.AttributeRequestCreator)
+	creatorStr, err := GetEventValue(log, ev, aiRequest.AttributeRequestCreator)
 	if err != nil {
 		return req, err
 	}
-	imageHash, err := GetEventValue(log, types.EventTypeRequestWithData, types.AttributeRequestImageHash)
+	imageHash, err := GetEventValue(log, ev, aiRequest.AttributeRequestImageHash)
 	if err != nil {
 		return req, err
 	}
-	imageName, err := GetEventValue(log, types.EventTypeRequestWithData, types.AttributeRequestImageName)
+	imageName, err := GetEventValue(log, ev, aiRequest.AttributeRequestImageName)
 	if err != nil {
 		return req, err
 	}
-	valCountStr, err := GetEventValue(log, types.EventTypeRequestWithData, types.AttributeRequestValidatorCount)
+	valCountStr, err := GetEventValue(log, ev, aiRequest.AttributeRequestValidatorCount)
 	if err != nil {
 		return req, err
 	}
 
-	inputStr, err := GetEventValue(log, types.EventTypeRequestWithData, types.AttributeRequestInput)
+	inputStr, err := GetEventValue(log, ev, aiRequest.AttributeRequestInput)
 
-	expectedOutputStr, err := GetEventValue(log, types.EventTypeRequestWithData, types.AttributeRequestExpectedOutput)
+	expectedOutputStr, err := GetEventValue(log, ev, aiRequest.AttributeRequestExpectedOutput)
 
 	fmt.Println("expected output str: ", expectedOutputStr)
 
@@ -70,7 +72,7 @@ func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 	l.Info(":delivery_truck: Processing incoming request event before checking validators")
 
 	// Skip if not related to this validator
-	validators := GetEventValues(log, types.EventTypeSetKYCRequest, types.AttributeRequestValidator)
+	validators := GetEventValues(log, aiRequest.EventTypeSetKYCRequest, aiRequest.AttributeRequestValidator)
 	hasMe := false
 	for _, validator := range validators {
 		l.Info(":delivery_truck: validator: %s", validator)
@@ -113,7 +115,7 @@ func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 			l.Error(":skull: Failed to create output from image path: %s", err.Error())
 		}
 		defer out.Close()
-		resp, err := http.Post(types.IPFSUrl+types.IPFSCat+"?arg="+req.ImageHash, "application/json", nil)
+		resp, err := http.Post(aiRequest.IPFSUrl+aiRequest.IPFSCat+"?arg="+req.ImageHash, "application/json", nil)
 		if err != nil {
 			l.Error(":skull: Failed to receive response from IPFS: %s", err.Error())
 		}
@@ -125,35 +127,12 @@ func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 		}
 
 		// collect data source name from the oScript script
-		oscriptPath := provider.ScriptPath + provider.OracleScriptStoreKeyString(req.AIRequest.OracleScriptName)
-
-		//use "data source" as an argument to collect the data source script name
-		cmd := exec.Command("bash", oscriptPath, "aiDataSource")
-		var dataSourceName bytes.Buffer
-		cmd.Stdout = &dataSourceName
-		err = cmd.Run()
+		oscriptPath := getOScriptPath(req.AIRequest.OracleScriptName)
+		// collect ai data sources and test cases from the ai request event.
+		aiDataSources, testCases, err := getPaths(log)
 		if err != nil {
-			l.Error(":skull: failed to collect data source name: %s", err.Error())
+			l.Error(":skull: Failed to parse ai data sources and test cases with error: %s", err.Error())
 		}
-
-		// collect data source result from the script
-		result := strings.TrimSuffix(dataSourceName.String(), "\n")
-
-		aiDataSources := strings.Fields(result)
-
-		//use "test case" as an argument to collect the test case script name
-		cmd = exec.Command("bash", oscriptPath, "testcase")
-		var testCaseName bytes.Buffer
-		cmd.Stdout = &testCaseName
-		err = cmd.Run()
-		if err != nil {
-			l.Error(":skull: failed to collect test case name: %s", err.Error())
-		}
-
-		// collect data source result from the script
-		result = strings.TrimSuffix(testCaseName.String(), "\n")
-
-		testCases := strings.Fields(result)
 
 		// create data source results to store in the report
 		var dataSourceResultsTest []exported.DataSourceResultI

@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	aiRequest "github.com/oraichain/orai/x/airequest/types"
 	provider "github.com/oraichain/orai/x/provider/types"
 	"github.com/oraichain/orai/x/websocket/exported"
 	"github.com/oraichain/orai/x/websocket/types"
@@ -15,29 +16,30 @@ import (
 
 // GetEventPriceRequest returns the event price request in the given log.
 func GetEventPriceRequest(log sdk.ABCIMessageLog) (PriceRequest, error) {
-	requestID, err := GetEventValue(log, types.EventTypeRequestWithData, types.AttributeRequestID)
+	ev := aiRequest.EventTypeRequestWithData
+	requestID, err := GetEventValue(log, ev, aiRequest.AttributeRequestID)
 
 	req := PriceRequest{}
 	if err != nil {
 		return req, err
 	}
-	oscriptName, err := GetEventValue(log, types.EventTypeRequestWithData, types.AttributeOracleScriptName)
+	oscriptName, err := GetEventValue(log, ev, aiRequest.AttributeOracleScriptName)
 	if err != nil {
 		return req, err
 	}
-	creatorStr, err := GetEventValue(log, types.EventTypeRequestWithData, types.AttributeRequestCreator)
-	if err != nil {
-		return req, err
-	}
-
-	valCountStr, err := GetEventValue(log, types.EventTypeRequestWithData, types.AttributeRequestValidatorCount)
+	creatorStr, err := GetEventValue(log, ev, aiRequest.AttributeRequestCreator)
 	if err != nil {
 		return req, err
 	}
 
-	inputStr, err := GetEventValue(log, types.EventTypeRequestWithData, types.AttributeRequestInput)
+	valCountStr, err := GetEventValue(log, ev, aiRequest.AttributeRequestValidatorCount)
+	if err != nil {
+		return req, err
+	}
 
-	expectedOutputStr, err := GetEventValue(log, types.EventTypeRequestWithData, types.AttributeRequestExpectedOutput)
+	inputStr, err := GetEventValue(log, ev, aiRequest.AttributeRequestInput)
+
+	expectedOutputStr, err := GetEventValue(log, ev, aiRequest.AttributeRequestExpectedOutput)
 
 	fmt.Println("expected output str: ", expectedOutputStr)
 
@@ -59,7 +61,7 @@ func handlePriceRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 	l.Info(":delivery_truck: Processing incoming request event before checking validators")
 
 	// Skip if not related to this validator
-	validators := GetEventValues(log, types.EventTypeSetPriceRequest, types.AttributeRequestValidator)
+	validators := GetEventValues(log, aiRequest.EventTypeSetPriceRequest, aiRequest.AttributeRequestValidator)
 	hasMe := false
 	for _, validator := range validators {
 		l.Info(":delivery_truck: validator: %s", validator)
@@ -89,9 +91,11 @@ func handlePriceRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 		// collect data source name from the oScript script
 		oscriptPath := getOScriptPath(req.AIRequest.OracleScriptName)
 
-		paths := getPaths(l, oscriptPath)
-		aiDataSources := paths[0]
-		testCases := paths[1]
+		// collect ai data sources and test cases from the ai request event.
+		aiDataSources, testCases, err := getPaths(log)
+		if err != nil {
+			l.Error(":skull: Failed to parse ai data sources and test cases with error: %s", err.Error())
+		}
 
 		var finalResultStr string
 		// create data source results to store in the report

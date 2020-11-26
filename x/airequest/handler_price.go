@@ -2,6 +2,7 @@ package airequest
 
 import (
 	"fmt"
+	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -73,6 +74,8 @@ func handleMsgSetPriceRequest(ctx sdk.Context, k keeper.Keeper, msg types.MsgSet
 		sdk.NewAttribute(types.AttributeRequestValidatorCount, fmt.Sprint(msg.MsgAIRequest.ValidatorCount)),
 		sdk.NewAttribute(types.AttributeRequestInput, string(msg.MsgAIRequest.Input)),
 		sdk.NewAttribute(types.AttributeRequestExpectedOutput, string(msg.MsgAIRequest.ExpectedOutput)),
+		sdk.NewAttribute(types.AttributeRequestDSources, strings.Join(aiDataSources, "-")),
+		sdk.NewAttribute(types.AttributeRequestTCases, strings.Join(testCases, "-")),
 	)
 	ctx.EventManager().EmitEvent(event)
 	return &sdk.Result{Events: ctx.EventManager().Events()}, nil

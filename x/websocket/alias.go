@@ -10,9 +10,6 @@ const (
 	RouterKey         = types.RouterKey
 	StoreKey          = types.StoreKey
 	QuerierRoute      = types.QuerierRoute
-	IPFSUrl           = types.IPFSUrl
-	IPFSAdd           = types.IPFSAdd
-	IPFSCat           = types.IPFSCat
 	DefaultParamspace = types.DefaultParamspace
 )
 

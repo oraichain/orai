@@ -4,8 +4,6 @@ package types
 const (
 	// TODO: Create your event types
 	// EventType<Action>    		= "action"
-	// Event type for set ai request
-	EventTypeSetReport = "set_report"
 
 	// TODO: Create keys fo your events, the values will be derivided from the msg
 	// AttributeKeyAddress  		= "address"
@@ -14,6 +12,4 @@ const (
 	// AttributeValueDoubleSign = "double_sign"
 
 	AttributeValueCategory = ModuleName
-
-	AttributeReport = "report"
 )

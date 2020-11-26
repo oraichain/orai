@@ -1,9 +1,7 @@
 package websocket
 
 import (
-	"bytes"
 	"fmt"
-	"os/exec"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -56,40 +54,17 @@ func handleTransaction(c *Context, l *Logger, tx tmtypes.TxResult) {
 	}
 }
 
-func getPaths(l *Logger, oscriptPath string) [][]string {
-	//use "data source" as an argument to collect the data source script name
-	cmd := exec.Command("bash", oscriptPath, "aiDataSource")
-	var dataSourceName bytes.Buffer
-	cmd.Stdout = &dataSourceName
-	err := cmd.Run()
+func getPaths(log sdk.ABCIMessageLog) ([]string, []string, error) {
+	aiDataSourcesStr, err := GetEventValue(log, aiRequest.EventTypeRequestWithData, aiRequest.AttributeRequestCreator)
 	if err != nil {
-		l.Error(":skull: failed to collect data source name: %s", err.Error())
+		return nil, nil, err
 	}
 
-	// collect data source result from the script
-	result := strings.TrimSuffix(dataSourceName.String(), "\n")
-
-	aiDataSources := strings.Fields(result)
-
-	//use "test case" as an argument to collect the test case script name
-	cmd = exec.Command("bash", oscriptPath, "testcase")
-	var testCaseName bytes.Buffer
-	cmd.Stdout = &testCaseName
-	err = cmd.Run()
+	testCasesStr, err := GetEventValue(log, aiRequest.EventTypeRequestWithData, aiRequest.AttributeRequestValidatorCount)
 	if err != nil {
-		l.Error(":skull: failed to collect test case name: %s", err.Error())
+		return nil, nil, err
 	}
-
-	// collect data source result from the script
-	result = strings.TrimSuffix(testCaseName.String(), "\n")
-
-	testCases := strings.Fields(result)
-
-	var listPaths [][]string
-	listPaths = append(listPaths, aiDataSources)
-	listPaths = append(listPaths, testCases)
-
-	return listPaths
+	return strings.Split(aiDataSourcesStr, "-"), strings.Split(testCasesStr, "-"), nil
 }
 
 // GetEventValues returns the list of all values in the given log with the given type and key.

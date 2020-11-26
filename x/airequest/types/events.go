@@ -10,7 +10,6 @@ const (
 	EventTypeSetClassificationRequest = "set_classification_request"
 	EventTypeSetOCRRequest            = "set_ocr_request"
 	EventTypeSetPriceRequest          = "set_price_request"
-	EventTypeSetReport                = "set_report"
 
 	// TODO: Create keys fo your events, the values will be derivided from the msg
 	// AttributeKeyAddress  		= "address"
@@ -30,6 +29,6 @@ const (
 	AttributeRequestValidatorCount = "request_validator_count"
 	AttributeRequestInput          = "request_input"
 	AttributeRequestExpectedOutput = "expected_request_output"
-
-	AttributeReport = "report"
+	AttributeRequestDSources       = "data_sources"
+	AttributeRequestTCases         = "test_cases"
 )

@@ -19,15 +19,6 @@ const (
 	// QuerierRoute to be used for querierer msgs
 	QuerierRoute = ModuleName
 
-	// IPFSUrl is he default URL of ipfs gateway to store user images
-	IPFSUrl = "http://164.90.180.95:5001/api/v0"
-
-	//IPFSAdd is the path for adding a file onto IPFS
-	IPFSAdd = "/add"
-
-	//IPFSCat is the path for retrieving a file from IPFS into the system
-	IPFSCat = "/cat"
-
 	// DefaultQueryPage sets the default page query value
 	DefaultQueryPage = "1"
 
