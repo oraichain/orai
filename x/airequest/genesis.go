@@ -16,6 +16,11 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	k.SetRngSeed(ctx, make([]byte, types.RngSeedSize))
 }
 
+// DefaultGenesisState returns the default airequest genesis state.
+func DefaultGenesisState() GenesisState {
+	return types.DefaultGenesisState()
+}
+
 // ExportGenesis writes the current store values
 // to a genesis file, which can be imported again
 // with InitGenesis

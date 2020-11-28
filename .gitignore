@@ -5,6 +5,7 @@
 .images/
 .websocket/
 .vscode/
+.oraisimd/
 cosmosjs/node_modules/
 images/
 cosmosjs/.uploads/
