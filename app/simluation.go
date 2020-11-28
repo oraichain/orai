@@ -173,14 +173,6 @@ func (tApp TestApp) InitializeFromGenesisStates(genesisStates ...GenesisState) T
 		}
 	}
 
-	// // Add genesis transactions to create 3 validators during chain genesis.
-	// genutilGenesis := genutil.NewGenesisStateFromStdTx([]authtypes.StdTx{
-	// 	createValidatorTx(FirstVal, "validator1", DefaultCoins[0]),
-	// 	createValidatorTx(SecondVal, "validator2", DefaultCoins[0]),
-	// 	createValidatorTx(ThirdVal, "validator3", DefaultCoins[0]),
-	// })
-	// genesisState[genutil.ModuleName] = tApp.Codec().MustMarshalJSON(genutilGenesis)
-
 	// create default genesis state for our modules
 	providerGenesis := provider.DefaultGenesisState()
 	aiRequestGenesis := aiRequest.DefaultGenesisState()
@@ -285,6 +277,7 @@ func GenerateGenesisAccs() ([]Account, []Account) {
 	return list, valList
 }
 
+// createValidatorTx is the genutil transaction to create genesis validator on the system
 func createValidatorTx(acc Account, moniker string, selfDelegation sdk.Coin) authtypes.StdTx {
 	msg := staking.NewMsgCreateValidator(
 		acc.ValAddress, acc.PubKey, selfDelegation,
@@ -292,6 +285,8 @@ func createValidatorTx(acc Account, moniker string, selfDelegation sdk.Coin) aut
 		staking.NewCommissionRates(sdk.MustNewDecFromStr("0.125"), sdk.MustNewDecFromStr("0.3"), sdk.MustNewDecFromStr("0.01")),
 		sdk.NewInt(1),
 	)
+
+	// create a transaction to sign
 	txMsg := authtypes.StdSignMsg{
 		ChainID:       ChainID,
 		AccountNumber: 0,
@@ -300,6 +295,7 @@ func createValidatorTx(acc Account, moniker string, selfDelegation sdk.Coin) aut
 		Msgs:          []sdk.Msg{msg},
 		Memo:          "",
 	}
+	// sign the message
 	sigBytes, err := acc.PrivKey.Sign(txMsg.Bytes())
 	if err != nil {
 		panic(err)
