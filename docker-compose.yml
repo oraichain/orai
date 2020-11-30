@@ -1,0 +1,8 @@
+version: '3.3'
+services:
+  orai:
+    image: orai/orai
+    working_dir: /workspace
+    tty: true
+    volumes:
+      - ./:/workspace

@@ -15,3 +15,6 @@ test.json
 go.sum
 cosmosjs/package-lock.json
 cosmosjs/.env
+
+tmp
+.DS_Store

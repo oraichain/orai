@@ -2,15 +2,15 @@
 # moniker is the name of your node
 #nsd init <moniker> --chain-id namechain
 
-sudo rm -rf .oraid/
+rm -rf .oraid/
 
-sudo rm -rf .oraicli/
+rm -rf .oraicli/
 
-sudo rm -rf .oraifiles/
+rm -rf .oraifiles/
 
 # rm -rf .images/
 
-sudo rm -rf .websocket/
+rm -rf .websocket/
 
 rm go.sum
 

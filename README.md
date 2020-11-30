@@ -7,3 +7,14 @@
 <br/>
 
 ## Monolithic repository of everything Oraichain
+
+## Starterkit
+
+```bash
+docker-compose up -d
+docker-compose exec orai bash
+
+# start after init
+make watch-oraid
+
+```

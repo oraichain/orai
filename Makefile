@@ -1,6 +1,6 @@
 PACKAGES=$(shell go list ./... | grep -v '/simulation')
 
-VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
+VERSION := $(shell echo $(shell git describe --tags --always) | sed 's/^v//')
 COMMIT := $(shell git log -1 --format='%H')
 
 # TODO: Update the ldflags with the app, client & server names
@@ -19,6 +19,12 @@ install: go.sum
 		go install -mod=readonly $(BUILD_FLAGS) ./cmd/oraid
 		go install -mod=readonly $(BUILD_FLAGS) ./cmd/oraicli
 		go install -mod=readonly $(BUILD_FLAGS) ./cmd/websocket
+
+watch-oraid:
+		air -c oraid.toml		
+
+build-oraid: 
+		go build -o ./tmp/oraid -mod=readonly $(BUILD_FLAGS) ./cmd/oraid	
 
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"
