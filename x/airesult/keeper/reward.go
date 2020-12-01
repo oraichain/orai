@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/oraichain/orai/x/airesult/types"
 )
@@ -39,6 +41,7 @@ func (k Keeper) ProcessReward(ctx sdk.Context) {
 	}
 	// check if the reward is empty or not
 	if len(reward.Validators) > 0 {
+		fmt.Println("block for reward: ", blockHeight)
 		k.SetReward(ctx, blockHeight, reward)
 	}
 }

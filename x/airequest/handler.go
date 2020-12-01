@@ -7,6 +7,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/oraichain/orai/x/airequest/keeper"
 	"github.com/oraichain/orai/x/airequest/types"
+	provider "github.com/oraichain/orai/x/provider/exported"
 )
 
 // NewHandler creates an sdk.Handler for all the airequest type messages
@@ -27,4 +28,26 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 		}
 	}
+}
+
+func getDSourcesTCases(ctx sdk.Context, k Keeper, dSources, tCases []string) (dSourceObjs []provider.AIDataSourceI, tCaseObjs []provider.TestCaseI, errors error) {
+
+	// collect data source objects
+	for _, dSource := range dSources {
+		dSourceObj, err := k.ProviderKeeper.GetAIDataSourceI(ctx, dSource)
+		if err != nil {
+			return nil, nil, err
+		}
+		dSourceObjs = append(dSourceObjs, dSourceObj)
+	}
+
+	// collect test case objects
+	for _, tCase := range tCases {
+		tCaseObj, err := k.ProviderKeeper.GetTestCaseI(ctx, tCase)
+		if err != nil {
+			return nil, nil, err
+		}
+		tCaseObjs = append(tCaseObjs, tCaseObj)
+	}
+	return dSourceObjs, tCaseObjs, nil
 }

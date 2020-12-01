@@ -8,7 +8,6 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/oraichain/orai/x/airequest/keeper"
 	"github.com/oraichain/orai/x/airequest/types"
-	provider "github.com/oraichain/orai/x/provider/exported"
 )
 
 func handleMsgSetPriceRequest(ctx sdk.Context, k keeper.Keeper, msg types.MsgSetPriceRequest) (*sdk.Result, error) {
@@ -30,9 +29,15 @@ func handleMsgSetPriceRequest(ctx sdk.Context, k keeper.Keeper, msg types.MsgSet
 		return nil, err
 	}
 
-	testcaseObjs := make([]provider.TestCaseI, 0)
+	fmt.Println("ai data sources: ", aiDataSources)
 
-	dataSourceObjs := make([]provider.AIDataSourceI, 0)
+	// collect data source and test case objects to store into the request
+	dataSourceObjs, testcaseObjs, err := getDSourcesTCases(ctx, k, aiDataSources, testCases)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println("data source obj: ", dataSourceObjs)
 
 	finalFees, err := k.ProviderKeeper.GetMinimumFees(ctx, aiDataSources, testCases, len(validators))
 	if err != nil {
@@ -48,6 +53,8 @@ func handleMsgSetPriceRequest(ctx sdk.Context, k keeper.Keeper, msg types.MsgSet
 	request := types.NewAIRequest(msg.MsgAIRequest.RequestID, msg.MsgAIRequest.OracleScriptName, msg.MsgAIRequest.Creator, validators, ctx.BlockHeight(), dataSourceObjs, testcaseObjs, fees, msg.MsgAIRequest.Input, msg.MsgAIRequest.ExpectedOutput)
 
 	//fmt.Printf("request result: %s\n", outOracleScript.String())
+
+	fmt.Println("request information: ", request)
 
 	k.SetAIRequest(ctx, request.RequestID, request)
 

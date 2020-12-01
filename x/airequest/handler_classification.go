@@ -8,7 +8,6 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/oraichain/orai/x/airequest/keeper"
 	"github.com/oraichain/orai/x/airequest/types"
-	provider "github.com/oraichain/orai/x/provider/exported"
 )
 
 // handleMsgSetClassificationRequest is a function message setting a new image classification request
@@ -32,8 +31,11 @@ func handleMsgSetClassificationRequest(ctx sdk.Context, k keeper.Keeper, msg typ
 		return nil, err
 	}
 
-	var testcaseObjs []provider.TestCaseI
-	var dataSourceObjs []provider.AIDataSourceI
+	// collect data source and test case objects to store into the request
+	dataSourceObjs, testcaseObjs, err := getDSourcesTCases(ctx, k, aiDataSources, testCases)
+	if err != nil {
+		return nil, err
+	}
 
 	finalFees, err := k.ProviderKeeper.GetMinimumFees(ctx, aiDataSources, testCases, len(validators))
 	if err != nil {

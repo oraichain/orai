@@ -1,8 +1,8 @@
 package types
 
 import (
-	airequest "github.com/oraichain/orai/x/airequest/exported"
-	websocket "github.com/oraichain/orai/x/websocket/exported"
+	aiRequest "github.com/oraichain/orai/x/airequest/exported"
+	webSocket "github.com/oraichain/orai/x/websocket/exported"
 )
 
 // Query aiDataSources supported by the provider querier. Eg: custom provider query oScript
@@ -15,13 +15,13 @@ const (
 
 // QueryResFullRequest Queries a complete request with reports
 type QueryResFullRequest struct {
-	AIRequest airequest.AIRequestI `json:"ai_request"`
-	Reports   []websocket.ReportI  `json:"reports"`
+	AIRequest aiRequest.AIRequestI `json:"ai_request"`
+	Reports   []webSocket.ReportI  `json:"reports"`
 	Result    AIRequestResult      `json:"ai_result"`
 }
 
 // NewQueryResFullRequest is the constructor for the query full request
-func NewQueryResFullRequest(aiReq airequest.AIRequestI, reps []websocket.ReportI, result AIRequestResult) QueryResFullRequest {
+func NewQueryResFullRequest(aiReq aiRequest.AIRequestI, reps []webSocket.ReportI, result AIRequestResult) QueryResFullRequest {
 	return QueryResFullRequest{
 		AIRequest: aiReq,
 		Reports:   reps,

@@ -40,4 +40,5 @@ var (
 	ErrValidatorsHaveNoVotes    = sdkerrors.Register(ModuleName, 31, "Total voting power of all validators is zero")
 	ErrFailedToModulo           = sdkerrors.Register(ModuleName, 32, "Tbere is an error while sampling the validators from modulo")
 	ErrCannotGetMinimumFees     = sdkerrors.Register(ModuleName, 33, "Cannot retrieve minimum fees")
+	ErrBlockHeightInvalid       = sdkerrors.Register(ModuleName, 34, "The block height is invalid")
 )

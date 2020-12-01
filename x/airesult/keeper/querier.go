@@ -15,6 +15,8 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 		switch path[0] {
 		case types.QueryFullRequest:
 			return queryFullRequestByID(ctx, path[1:], keeper)
+		case types.QueryReward:
+			return queryReward(ctx, path[1:], keeper)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown provider query")
 		}
