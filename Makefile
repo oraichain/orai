@@ -21,7 +21,13 @@ install: go.sum
 		go install -mod=readonly $(BUILD_FLAGS) ./cmd/websocket
 
 watch-oraid:
-		air -c oraid.toml		
+		air -c oraid.toml
+
+watch-oraicli:
+		air -c oraicli.toml
+
+watch-websocket:
+		air -c websocket.toml		
 
 build-oraid: 
 		go build -o ./tmp/oraid -mod=readonly $(BUILD_FLAGS) ./cmd/oraid	
