@@ -11,7 +11,7 @@ cmd = "make build-oraicli"
 # Binary file yields from `cmd`.
 bin = "tmp/oraicli"
 # Customize binary.
-full_bin = "./tmp/oraicli start"
+full_bin = "./tmp/oraicli"
 # This log file places in your tmp_dir.
 log = "air_errors.log"
 # Watch these filename extensions.

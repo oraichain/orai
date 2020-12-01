@@ -4,5 +4,7 @@ services:
     image: orai/orai
     working_dir: /workspace
     tty: true
+    ports:
+      - 1317:1317
     volumes:
       - ./:/workspace

@@ -11,7 +11,7 @@ cmd = "make build-websocket"
 # Binary file yields from `cmd`.
 bin = "tmp/websocket"
 # Customize binary.
-full_bin = "./tmp/websocket start"
+full_bin = "./tmp/websocket"
 # This log file places in your tmp_dir.
 log = "air_errors.log"
 # Watch these filename extensions.
