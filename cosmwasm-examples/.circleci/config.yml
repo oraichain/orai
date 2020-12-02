@@ -1,0 +1,219 @@
+version: 2
+workflows:
+  version: 2
+  test:
+    jobs:
+      - erc20
+      - escrow
+      - nameservice
+      - mask
+
+jobs:
+  erc20:
+    docker:
+      - image: rust:1.44.1
+    working_directory: ~/project/erc20
+    steps:
+      - checkout:
+          path: ~/project
+      - run:
+          name: Version information
+          command: rustc --version; cargo --version; rustup --version
+      - restore_cache:
+          keys:
+            - cargocache-erc20-rust:1.44.1-{{ checksum "Cargo.lock" }}
+      - run:
+          name: Add wasm32 target
+          command: rustup target add wasm32-unknown-unknown
+      - run:
+          name: Add components to Rust toolchain
+          command: rustup component add rustfmt clippy
+      - run:
+          name: Unit Tests
+          env: RUST_BACKTRACE=1
+          command: cargo unit-test --locked
+      - run:
+          name: Build Wasm
+          command: cargo wasm --locked
+      - run:
+          name: Integration Tests
+          command: cargo integration-test --locked  -- --test-threads=2
+      - run:
+          name: Check formatting
+          command: cargo fmt -- --check
+      - run:
+          name: Lint
+          command: cargo clippy -- -D warnings
+      - run:
+          name: Build and run schema generator
+          command: cargo schema --locked
+      - run:
+          name: Ensure checked-in schemas are up-to-date
+          command: |
+            CHANGES_IN_REPO=$(git status --porcelain)
+            if [[ -n "$CHANGES_IN_REPO" ]]; then
+              echo "Repository is dirty. Showing 'git status' and 'git --no-pager diff' for debugging now:"
+              git status && git --no-pager diff
+              exit 1
+            fi
+      - save_cache:
+          paths:
+            - /usr/local/cargo/registry
+            - target
+          key: cargocache-erc20-rust:1.44.1-{{ checksum "Cargo.lock" }}
+  escrow:
+    docker:
+      - image: rust:1.44.1
+    working_directory: ~/project/escrow
+    steps:
+      - checkout:
+          path: ~/project
+      - run:
+          name: Version information
+          command: rustc --version; cargo --version; rustup --version
+      - restore_cache:
+          keys:
+            - cargocache-escrow-rust:1.44.1-{{ checksum "Cargo.lock" }}
+      - run:
+          name: Add wasm32 target
+          command: rustup target add wasm32-unknown-unknown
+      - run:
+          name: Add components to Rust toolchain
+          command: rustup component add rustfmt clippy
+      - run:
+          name: Unit Tests
+          env: RUST_BACKTRACE=1
+          command: cargo unit-test --locked
+      - run:
+          name: Build Wasm
+          command: cargo wasm --locked
+      - run:
+          name: Integration Tests
+          command: cargo integration-test --locked -- --test-threads=2
+      - run:
+          name: Check formatting
+          command: cargo fmt -- --check
+      - run:
+          name: Lint
+          command: cargo clippy -- -D warnings
+      - run:
+          name: Build and run schema generator
+          command: cargo schema --locked
+      - run:
+          name: Ensure checked-in schemas are up-to-date
+          command: |
+            CHANGES_IN_REPO=$(git status --porcelain)
+            if [[ -n "$CHANGES_IN_REPO" ]]; then
+              echo "Repository is dirty. Showing 'git status' and 'git --no-pager diff' for debugging now:"
+              git status && git --no-pager diff
+              exit 1
+            fi
+      - save_cache:
+          paths:
+            - /usr/local/cargo/registry
+            - target
+          key: cargocache-escrow-rust:1.44.1-{{ checksum "Cargo.lock" }}
+  nameservice:
+    docker:
+      - image: rust:1.44.1
+    working_directory: ~/project/nameservice
+    steps:
+      - checkout:
+          path: ~/project
+      - run:
+          name: Version information
+          command: rustc --version; cargo --version; rustup --version
+      - restore_cache:
+          keys:
+            - cargocache-nameservice-rust:1.44.1-{{ checksum "Cargo.lock" }}
+      - run:
+          name: Add wasm32 target
+          command: rustup target add wasm32-unknown-unknown
+      - run:
+          name: Add components to Rust toolchain
+          command: rustup component add rustfmt clippy
+      - run:
+          name: Unit Tests
+          env: RUST_BACKTRACE=1
+          command: cargo unit-test --locked
+      - run:
+          name: Build Wasm
+          command: cargo wasm --locked
+      - run:
+          name: Integration Tests
+          command: cargo integration-test --locked -- --test-threads=2
+      - run:
+          name: Check formatting
+          command: cargo fmt -- --check
+      - run:
+          name: Lint
+          command: cargo clippy -- -D warnings
+      - run:
+          name: Build and run schema generator
+          command: cargo schema --locked
+      - run:
+          name: Ensure checked-in schemas are up-to-date
+          command: |
+            CHANGES_IN_REPO=$(git status --porcelain)
+            if [[ -n "$CHANGES_IN_REPO" ]]; then
+              echo "Repository is dirty. Showing 'git status' and 'git --no-pager diff' for debugging now:"
+              git status && git --no-pager diff
+              exit 1
+            fi
+      - save_cache:
+          paths:
+            - /usr/local/cargo/registry
+            - target
+          key: cargocache-nameservice-rust:1.44.1-{{ checksum "Cargo.lock" }}
+  mask:
+    docker:
+      - image: rust:1.44.1
+    working_directory: ~/project/mask
+    steps:
+      - checkout:
+          path: ~/project
+      - run:
+          name: Version information
+          command: rustc --version; cargo --version; rustup --version
+      - restore_cache:
+          keys:
+            - cargocache-mask-rust:1.44.1-{{ checksum "Cargo.lock" }}
+      - run:
+          name: Add wasm32 target
+          command: rustup target add wasm32-unknown-unknown
+      - run:
+          name: Add components to Rust toolchain
+          command: rustup component add rustfmt clippy
+      - run:
+          name: Unit Tests
+          env: RUST_BACKTRACE=1
+          command: cargo unit-test --locked
+      - run:
+          name: Build Wasm
+          command: cargo wasm --locked
+      - run:
+          name: Integration Tests
+          command: cargo integration-test --locked  -- --test-threads=2
+      - run:
+          name: Check formatting
+          command: cargo fmt -- --check
+      - run:
+          name: Lint
+          command: cargo clippy -- -D warnings
+      - run:
+          name: Build and run schema generator
+          command: cargo schema --locked
+      - run:
+          name: Ensure checked-in schemas are up-to-date
+          command: |
+            CHANGES_IN_REPO=$(git status --porcelain)
+            if [[ -n "$CHANGES_IN_REPO" ]]; then
+              echo "Repository is dirty. Showing 'git status' and 'git --no-pager diff' for debugging now:"
+              git status && git --no-pager diff
+              exit 1
+            fi
+      - save_cache:
+          paths:
+            - /usr/local/cargo/registry
+            - target
+          key: cargocache-mask-rust:1.44.1-{{ checksum "Cargo.lock" }}

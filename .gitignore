@@ -18,3 +18,6 @@ cosmosjs/.env
 
 tmp
 .DS_Store
+registry_cache
+*.wasm
+wasmd/
