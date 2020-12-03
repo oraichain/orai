@@ -42,7 +42,7 @@ printBoldColor(){
 printHelp () {
 
   echo $BOLD "Usage: "  
-  echo "  $SCRIPT_NAME -h|--help (print this message)"  
+  echo "  $SCRIPT_NAME -h|--help (Show help)"  
   echo $NORMAL
 
   if [[ ! -z $2 ]]; then
