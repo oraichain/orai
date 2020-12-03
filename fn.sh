@@ -156,7 +156,12 @@ oraidFn(){
     oraid start
 }
 
-websocketFn(){    
+websocketInitFn(){
+    local reporter="${USER}_reporter"
+    ./websocket.sh $USER $reporter
+}
+
+websocketRunFn(){
     websocket run
 }
 
@@ -168,10 +173,44 @@ restServerFn(){
     oraicli rest-server --chain-id Oraichain --laddr tcp://0.0.0.0:1317  --trust-node
 }
 
+unsignedFn(){
+  local id=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.address" -r)
+  local unsigned=$(curl --location --request POST 'http://localhost:1317/airequest/aireq/pricereq' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "base_req":{
+        "from":"'$id'",
+        "chain_id":"Oraichain"
+    },
+    "oracle_script_name":"oscript_eth",
+    "input":"",
+    "expected_output":"NTAwMA==",
+    "fees":"60000orai",
+    "validator_count": "1"
+}' > tmp/unsignedTx.json)
+}
+
 signFn(){     
     # $1 is account number
     local sequence=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.sequence" -r)
-    oraicli tx sign tmp/unsignedTx.json --from $USER --offline --chain-id Oraichain --sequence $sequence --account-number $1 > tmp/signedTx.json
+    local acc_num=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.account_number" -r)
+    oraicli tx sign tmp/unsignedTx.json --from $USER --offline --chain-id Oraichain --sequence $sequence --account-number $acc_num > tmp/signedTx.json
+}
+
+initScriptFn(){
+  oraicli tx provider set-datasource coingecko_eth ./testfiles/coingecko_eth.sh "A data source that fetches the ETH price from Coingecko API" --from $USER --fees 5000orai
+
+  sleep 5
+
+  oraicli tx provider set-datasource crypto_compare_eth ./testfiles/crypto_compare_eth.sh "A data source that collects ETH price from crypto compare" --from $USER --fees 5000orai
+
+  sleep 5
+
+  oraicli tx provider set-testcase testcase_price ./testfiles/testcase_price.sh "A sample test case that uses the expected output of users provided to verify the bitcoin price from the datasource" --from $USER --fees 5000orai
+
+  sleep 5
+
+  oraicli tx provider set-oscript oscript_eth ./testfiles/oscript_eth.sh "An oracle script that fetches and aggregates ETH price from different sources" --from $USER --fees 5000orai
 }
 
 USER=$(getArgument "user" duc)
@@ -184,8 +223,17 @@ case "${METHOD}" in
   oraid)
     oraidFn
   ;;
-  websocket)
-    websocketFn
+  websocketInit)
+    websocketInitFn
+  ;;
+  websocketRun)
+    websocketRunFn
+  ;;
+  unsign)
+    unsignedFn
+  ;;
+  initScript)
+    initScriptFn
   ;;
   sign)
     signFn 3

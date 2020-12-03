@@ -6,6 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	aiRequestType "github.com/oraichain/orai/x/airequest/types"
 	"github.com/oraichain/orai/x/airesult/types"
 )
 
@@ -23,7 +24,7 @@ func queryReward(ctx sdk.Context, path []string, k Keeper) ([]byte, error) {
 	// get reward
 	reward, err := k.GetReward(ctx, int64(blockHeightInt))
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrRequestNotFound, err.Error())
+		return nil, sdkerrors.Wrapf(aiRequestType.ErrRequestNotFound, err.Error())
 	}
 
 	res, err := codec.MarshalJSONIndent(k.cdc, types.NewQueryResReward(reward))

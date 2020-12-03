@@ -11,7 +11,6 @@ func RegisterCodec(cdc *codec.Codec) {
 	cdc.RegisterConcrete(MsgCreateReport{}, "websocket/AddReport", nil)
 	cdc.RegisterConcrete(MsgAddReporter{}, "websocket/AddReporter", nil)
 	cdc.RegisterConcrete(MsgRemoveReporter{}, "websocket/RemoveReporter", nil)
-	cdc.RegisterConcrete(MsgCreateStrategy{}, "websocket/CreateStrategy", nil)
 	// When exporting interfaces for other modules to use, we need to register those interfaces as well as concrete structs so that the message can be encoded properly according to the Codec module
 	cdc.RegisterInterface((*exported.ReportI)(nil), nil) // has to be pointer of interface
 	cdc.RegisterInterface((*exported.ReporterI)(nil), nil)

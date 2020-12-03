@@ -3,7 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/oraichain/orai/x/airequest/types"
+	"github.com/oraichain/orai/x/websocket/types"
 )
 
 // IsReporter returns true iff the address is an authorized reporter for the given validator.

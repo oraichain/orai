@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"bytes"
+	"encoding/base64"
 	"fmt"
 	"os/exec"
 	"strconv"
@@ -90,6 +91,9 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 	go func(l *Logger, req AIRequest) {
 		// collect data source name from the oScript script
 		oscriptPath := getOScriptPath(req.OracleScriptName)
+		// encode the input and output back to base64 type to forward to the test case
+		input := base64.StdEncoding.EncodeToString([]byte(req.Input))
+		expectedOutput := base64.StdEncoding.EncodeToString([]byte(req.ExpectedOutput))
 
 		// collect ai data sources and test cases from the ai request event.
 		aiDataSources, testCases, err := getPaths(log)
@@ -110,7 +114,7 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 				// Aggregate the required fees for an AI request
 				// run the test case script
 				fmt.Println("test case path: ", getTCasePath(testCases[i])+provider.DataSourceStoreKeyString(aiDataSources[j]))
-				cmdTestCase := exec.Command("python", getTCasePath(testCases[i]), provider.DataSourceStoreKeyString(aiDataSources[j]), req.Input, req.ExpectedOutput)
+				cmdTestCase := exec.Command("bash", getTCasePath(testCases[i]), provider.DataSourceStoreKeyString(aiDataSources[j]), input, expectedOutput)
 				var outTestCase bytes.Buffer
 				cmdTestCase.Stdout = &outTestCase
 				err = cmdTestCase.Run()
@@ -147,7 +151,7 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 			var outTestCase bytes.Buffer
 			var dataSourceResult types.DataSourceResult
 			if dataSourceResultsTest[i].GetStatus() == types.ResultSuccess {
-				cmdTestCase := exec.Command("python", getDSourcePath(dataSourceResultsTest[i].GetName()))
+				cmdTestCase := exec.Command("bash", getDSourcePath(dataSourceResultsTest[i].GetName()))
 				cmdTestCase.Stdout = &outTestCase
 				err = cmdTestCase.Run()
 				if err != nil {
@@ -180,7 +184,7 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 			// Create a new MsgCreateReport to the Oraichain
 		} else {
 			// "2" here is the expected output that the user wants to get
-			cmd := exec.Command("python", oscriptPath, "aggregation", finalResultStr)
+			cmd := exec.Command("bash", oscriptPath, "aggregation", finalResultStr)
 			var res bytes.Buffer
 			cmd.Stdout = &res
 			err = cmd.Run()

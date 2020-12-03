@@ -225,7 +225,7 @@ func queryTestCase(ctx sdk.Context, path []string, keeper Keeper) ([]byte, error
 	// tsao cho nay lai lay path[0] ?
 	testCase, err := keeper.GetTestCase(ctx, path[0])
 	if err != nil {
-		return []byte{}, sdkerrors.Wrap(types.ErrRequestNotFound, err.Error())
+		return []byte{}, sdkerrors.Wrap(types.ErrTestCaseNotFound, err.Error())
 	}
 
 	// get code of the test case

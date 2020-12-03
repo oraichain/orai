@@ -3,4 +3,4 @@ WORKDIR /workspace
 COPY . /workspace
 RUN init.sh
 
-RUN apt update -y && apt install jq -y
+RUN apt update -y && apt install jq -y && apt-get install bc -y

@@ -124,7 +124,7 @@ curl -s -X POST -H "Content-Type: multipart/form-data" -F "image=@images/sample.
 
 # oraicli tx provider set-datasource crypto_compare_eth ./testfiles/crypto_compare_eth.sh "A data source that collects ETH price from crypto compare" --from duc --fees 5000orai
 
-# oraicli tx provider set-testcase testcase_price ./testfiles/testcase_price.sh "A sample test case that uses the expected output of users provided to verify the bitcoin price from the datasource" --from duc --fees 5000orai
+# oraicli tx provider edit-testcase testcase_price testcase_price ./testfiles/testcase_price.sh "A sample test case that uses the expected output of users provided to verify the bitcoin price from the datasource" --from duc --fees 5000orai
 
 # oraicli tx provider set-oscript oscript_eth ./testfiles/oscript_eth.sh "An oracle script that fetches and aggregates ETH price from different sources" --from duc --fees 5000orai
 

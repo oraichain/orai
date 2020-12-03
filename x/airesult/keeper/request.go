@@ -65,7 +65,7 @@ func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep webSocket.Report
 
 	// collect data source owners that have their data sources executed to reward
 	for _, dataSourceResult := range rep.GetDataSourceResults() {
-		if dataSourceResult.GetStatus() == types.ResultSuccess {
+		if dataSourceResult.GetStatus() == webSocketType.ResultSuccess {
 			dataSource, _ := k.ProviderKeeper.GetAIDataSourceI(ctx, dataSourceResult.GetName())
 			reward.DataSources = append(reward.DataSources, dataSource)
 			reward.ProviderFees = reward.ProviderFees.Add(dataSource.GetFees()...)

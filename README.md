@@ -16,8 +16,14 @@ docker-compose exec orai bash
 
 # using fn to run on multiple terminal
 fn oraid # start node
-fn websocket # start websocket
+fn websocketInit # start websocket
 fn restServer # start rest server
+
+# steps to broadcast a price request
+fn initScript <account-name> # initiate a complete price script
+fn unsign <account-name>
+fn sign <account-name>
+fn broadcast
 
 # start after init for development
 make watch-oraid

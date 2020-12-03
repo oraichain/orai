@@ -46,9 +46,9 @@ func (msg MsgCreateReport) ValidateBasic() error {
 	if msg.Reporter.Address.Empty() || len(msg.Reporter.Name) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Reporter.String())
 	} else if len(msg.RequestID) == 0 || msg.Reporter.Validator.Empty() {
-		return sdkerrors.Wrap(ErrMsgInvalid, "Request ID / validator address cannot be empty")
+		return sdkerrors.Wrap(ErrMsgReportInvalid, "Request ID / validator address cannot be empty")
 	} else if len(msg.DataSourceResults) == 0 || len(msg.TestCaseResults) == 0 || len(msg.AggregatedResult) == 0 {
-		return sdkerrors.Wrap(ErrMsgInvalid, "lengths of the data source and test case must be greater than zero, and there must be an aggregated result")
+		return sdkerrors.Wrap(ErrMsgReportInvalid, "lengths of the data source and test case must be greater than zero, and there must be an aggregated result")
 	} else {
 		_, err := sdk.ParseCoins(msg.Fees.String())
 		if err != nil {

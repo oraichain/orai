@@ -9,6 +9,7 @@ import (
 	"github.com/oraichain/orai/x/airequest/keeper"
 	"github.com/oraichain/orai/x/airequest/types"
 	provider "github.com/oraichain/orai/x/provider/exported"
+	providerType "github.com/oraichain/orai/x/provider/types"
 )
 
 // NewHandler creates an sdk.Handler for all the airequest type messages
@@ -58,7 +59,7 @@ func handleMsgSetAIRequest(ctx sdk.Context, k keeper.Keeper, msg types.MsgSetAIR
 
 	// If the total fee is larger than the fee provided by the user then we return error
 	if finalFees.IsAnyGT(providedCoins) {
-		return nil, sdkerrors.Wrap(types.ErrNeedMoreFees, "Fees given by the users are less than the total fees needed")
+		return nil, sdkerrors.Wrap(providerType.ErrNeedMoreFees, "Fees given by the users are less than the total fees needed")
 	}
 	// set a new request with the aggregated result into blockchain
 	request := types.NewAIRequest(msg.RequestID, msg.OracleScriptName, msg.Creator, validators, ctx.BlockHeight(), dataSourceObjs, testcaseObjs, fees, msg.Input, msg.ExpectedOutput)
