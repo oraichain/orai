@@ -67,17 +67,15 @@ oraid start --minimum-gas-prices 0.025orai
 
 # oraicli tx provider set-testcase test ./testfiles/testcase.sh "" --from duc --fees 5000orai
 
-# oraicli query provider enames
-
 # oraicli query provider onames
 
-# oraicli tx provider set-datasource test1 'curl -s -X GET "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd" -H "accept: application/json" | jq -r ".[\"bitcoin\"].usd"' --from duc
+## oraicli tx provider set-datasource test1 'curl -s -X GET "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd" -H "accept: application/json" | jq -r ".[\"bitcoin\"].usd"' --from duc
 
-# oraicli tx provider set-aireq test --from duc
+## oraicli tx provider set-aireq test --from duc
 
-# oraicli query provider aireqs
+## oraicli query provider aireqs
 
-# oraicli query provider aireq 1gRw15C6LF2I85NStROMA1Ggmkh (remember to remove prefix key of the request or name of oscript / data source to query)
+## oraicli query provider aireq 1gRw15C6LF2I85NStROMA1Ggmkh (remember to remove prefix key of the request or name of oscript / data source to query)
 
 ###################################### REST requests
 
@@ -85,7 +83,7 @@ oraid start --minimum-gas-prices 0.025orai
 
 # curl -XPOST -s http://localhost:1317/provider/oscript --data-binary '{"base_req":{"from":"'$(oraicli keys show duc -a)'","chain_id":"Oraichain"},"name":"testing","code":"./testfiles/oscript.sh"}' > unsignedTx.json
 
-curl -s -X POST -H "Content-Type: multipart/form-data" -F "image=@images/photo_2020-11-12_11-38-52.jpg" -F "oracle_script_name=oscript_classification" -F "fees=45000orai" -F "from=$(oraicli keys show duc -a)" -F "chain_id=Oraichain" -F "input=''" -F "expected_output=5000" -F "validator_count=1" "http://localhost:1317/airequest/aireq/kycreq" > unsignedTx.json
+curl -s -X POST -H "Content-Type: multipart/form-data" -F "image=@images/sample.png" -F "oracle_script_name=oscript_classification" -F "fees=45000orai" -F "from=$(oraicli keys show duc -a)" -F "chain_id=Oraichain" -F "input=''" -F "expected_output=5000" -F "validator_count=1" "http://localhost:1317/airequest/aireq/kycreq" > unsignedTx.json
 
 # curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show duc -a)"
 
@@ -107,24 +105,28 @@ curl -s -X POST -H "Content-Type: multipart/form-data" -F "image=@images/photo_2
 
 # curl -o image.png -X POST "http://164.90.180.95:5001/api/v0/cat?arg=QmXipiMWjkm9ggFHbAVsLyixSGKHRRKhSTbtYWqDVDwZrf"
 
-# curl -XPOST -s http://165.232.118.44:1317/provider/aireq/pricereq --data-binary '{"base_req":{"from":"'$(oraicli keys show ducbean -a)'","chain_id":"Oraichain"},"oracle_script_name":"oscript_price","input":"","expected_output":"NTAwMA==","fees":"35000orai"}' > unsignedTx.json
+# curl -XPOST -s http://165.232.118.44:1317/provider/aireq/pricereq --data-binary '{"base_req":{"from":"'$(oraicli keys show duc -a)'","chain_id":"Oraichain"},"oracle_script_name":"oscript_price","input":"","expected_output":"NTAwMA==","fees":"35000orai"}' > unsignedTx.json
 
-# curl -s "http://165.232.118.44:1317/auth/accounts/$(oraicli keys show ducbean -a)"
+# curl -s "http://165.232.118.44:1317/auth/accounts/$(oraicli keys show duc -a)"
 
-# oraicli tx sign unsignedTx.json --from ducbean --offline --chain-id Oraichain --sequence 14 --account-number 3 > signedTx.json
+# oraicli tx sign unsignedTx.json --from duc --offline --chain-id Oraichain --sequence 14 --account-number 3 > signedTx.json
 
 # oraicli tx send orai15tmx7qke90puyx2y63jkr8fl4fcjw06hm7alam orai10merxsp7n7wn5k0h5ux5e3acsz8rpg80679zky 10000000000orai --from orai15tmx7qke90puyx2y63jkr8fl4fcjw06hm7alam --fees 5000orai
 
-# oraicli tx provider edit-datasource datasource coingecko_btc ./testfiles/coingecko_btc.sh "A data source that fetches the BTC price from Coingecko API" --from ducbean --fees 5000orai
+# oraicli tx provider edit-datasource datasource coingecko_btc ./testfiles/coingecko_btc.sh "A data source that fetches the BTC price from Coingecko API" --from duc --fees 5000orai
 
-# oraicli tx provider set-oscript oscript_eth ./testfiles/oscript_eth.sh "An oracle script that fetches and aggregates ETH price from different sources" --from duc --fees 5000orai
+
 
 # oraicli tx provider set-datasource coindesk_btc ./testfiles/coindesk_btc.sh "A data source that collects BTC price from coindesk" --from duc --fees 5000orai
 
+## preparation
 # oraicli tx provider set-datasource coingecko_eth ./testfiles/coingecko_eth.sh "A data source that fetches the ETH price from Coingecko API" --from duc --fees 5000orai
 
 # oraicli tx provider set-datasource crypto_compare_eth ./testfiles/crypto_compare_eth.sh "A data source that collects ETH price from crypto compare" --from duc --fees 5000orai
 
 # oraicli tx provider set-testcase testcase_price ./testfiles/testcase_price.sh "A sample test case that uses the expected output of users provided to verify the bitcoin price from the datasource" --from duc --fees 5000orai
 
+# oraicli tx provider set-oscript oscript_eth ./testfiles/oscript_eth.sh "An oracle script that fetches and aggregates ETH price from different sources" --from duc --fees 5000orai
+
 # curl -XPOST -s http://localhost:8000/api/txs/req_price -H "Content-Type: application/json" --data '{"oscript_name": "oscript_btc","price": "MA==","expected_price": "MA==","fees": "35000"}'
+

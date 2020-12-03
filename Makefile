@@ -32,6 +32,12 @@ watch-websocket:
 build-oraid: 
 		go build -o ./tmp/oraid -mod=readonly $(BUILD_FLAGS) ./cmd/oraid	
 
+build-oraicli: 
+		go build -o ./tmp/oraicli -mod=readonly $(BUILD_FLAGS) ./cmd/oraicli	
+
+build-websocket: 
+		go build -o ./tmp/websocket -mod=readonly $(BUILD_FLAGS) ./cmd/websocket					
+
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"
 		GO111MODULE=on go mod verify

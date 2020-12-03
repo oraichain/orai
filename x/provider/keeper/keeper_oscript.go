@@ -3,7 +3,10 @@ package keeper
 import (
 	"bytes"
 	"fmt"
+	"log"
+	"os"
 	"os/exec"
+	"path"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -102,15 +105,20 @@ func (k Keeper) GetOracleScriptFile(name string) []byte {
 // GetDNamesTcNames is a function that collects test case names and data source names from the oracle script
 func (k Keeper) GetDNamesTcNames(oScriptName string) ([]string, []string, error) {
 	// collect data source name from the oScript script
-	oscriptPath := types.ScriptPath + types.OracleScriptStoreKeyString(oScriptName)
+	currentDir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	// get absolute path from working dir
+	oscriptPath := path.Join(currentDir, types.ScriptPath, types.OracleScriptStoreKeyString(oScriptName))
 	//use "data source" as an argument to collect the data source script name
 	cmd := exec.Command("bash", oscriptPath, "aiDataSource")
 	cmd.Stdin = strings.NewReader("some input")
 	var dataSourceName bytes.Buffer
 	cmd.Stdout = &dataSourceName
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
-		return nil, nil, sdkerrors.Wrap(types.ErrFailedToOpenFile, err.Error())
+		return nil, nil, sdkerrors.Wrap(types.ErrFailedToOpenFile, fmt.Sprintf("oscriptPath: %s, error: %s", oscriptPath, err.Error()))
 	}
 
 	// collect data source result from the script
