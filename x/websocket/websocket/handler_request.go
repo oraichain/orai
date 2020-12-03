@@ -3,10 +3,6 @@ package websocket
 import (
 	"bytes"
 	"fmt"
-	"io"
-	"io/ioutil"
-	"net/http"
-	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -18,11 +14,12 @@ import (
 	"github.com/oraichain/orai/x/websocket/types"
 )
 
-// GetEventKYCRequest returns the event kyc request in the given log.
-func GetEventKYCRequest(log sdk.ABCIMessageLog) (KYCRequest, error) {
+// GetEventAIRequest returns the event AI request in the given log.
+func GetEventAIRequest(log sdk.ABCIMessageLog) (AIRequest, error) {
 	ev := aiRequest.EventTypeRequestWithData
 	requestID, err := GetEventValue(log, ev, aiRequest.AttributeRequestID)
-	req := KYCRequest{}
+
+	req := AIRequest{}
 	if err != nil {
 		return req, err
 	}
@@ -34,14 +31,7 @@ func GetEventKYCRequest(log sdk.ABCIMessageLog) (KYCRequest, error) {
 	if err != nil {
 		return req, err
 	}
-	imageHash, err := GetEventValue(log, ev, aiRequest.AttributeRequestImageHash)
-	if err != nil {
-		return req, err
-	}
-	imageName, err := GetEventValue(log, ev, aiRequest.AttributeRequestImageName)
-	if err != nil {
-		return req, err
-	}
+
 	valCountStr, err := GetEventValue(log, ev, aiRequest.AttributeRequestValidatorCount)
 	if err != nil {
 		return req, err
@@ -60,19 +50,18 @@ func GetEventKYCRequest(log sdk.ABCIMessageLog) (KYCRequest, error) {
 
 	valCount, _ := strconv.ParseInt(valCountStr, 10, 64)
 
-	req = NewKYCRequest(imageHash, imageName, NewAIRequest(requestID, oscriptName, creator, valCount, inputStr, expectedOutputStr))
+	req = NewAIRequest(requestID, oscriptName, creator, valCount, inputStr, expectedOutputStr)
 
-	fmt.Println("kyc request: ", req)
+	fmt.Println("AI request: ", req)
 
 	return req, nil
 }
 
-func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
-
+func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 	l.Info(":delivery_truck: Processing incoming request event before checking validators")
 
 	// Skip if not related to this validator
-	validators := GetEventValues(log, aiRequest.EventTypeSetKYCRequest, aiRequest.AttributeRequestValidator)
+	validators := GetEventValues(log, aiRequest.EventTypeSetPriceRequest, aiRequest.AttributeRequestValidator)
 	hasMe := false
 	for _, validator := range validators {
 		l.Info(":delivery_truck: validator: %s", validator)
@@ -89,7 +78,7 @@ func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 
 	l.Info(":delivery_truck: Processing incoming request event")
 
-	req, err := GetEventKYCRequest(log)
+	req, err := GetEventAIRequest(log)
 	if err != nil {
 		l.Error(":skull: Failed to parse raw requests with error: %s", err.Error())
 	}
@@ -98,45 +87,19 @@ func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 	defer func() {
 		c.keys <- key
 	}()
-	go func(l *Logger, req KYCRequest) {
-
-		dir, err := ioutil.TempDir("./", ".images")
-		if err != nil {
-			l.Error(":skull: Failed to create directory from image path: %s", err.Error())
-		}
-		defer os.RemoveAll(dir)
-
-		// collect the image from IPFS for all nodes that handle this req
-		imagePath := dir + "/" + req.ImageName
-		fmt.Println("image path: ", imagePath)
-
-		out, err := os.Create(imagePath)
-		if err != nil {
-			l.Error(":skull: Failed to create output from image path: %s", err.Error())
-		}
-		defer out.Close()
-		resp, err := http.Post(aiRequest.IPFSUrl+aiRequest.IPFSCat+"?arg="+req.ImageHash, "application/json", nil)
-		if err != nil {
-			l.Error(":skull: Failed to receive response from IPFS: %s", err.Error())
-		}
-		defer resp.Body.Close()
-		_, err = io.Copy(out, resp.Body)
-
-		if err != nil {
-			l.Error(":skull: Failed to create a new image from IPFS: %s", err.Error())
-		}
-
+	go func(l *Logger, req AIRequest) {
 		// collect data source name from the oScript script
-		oscriptPath := getOScriptPath(req.AIRequest.OracleScriptName)
+		oscriptPath := getOScriptPath(req.OracleScriptName)
+
 		// collect ai data sources and test cases from the ai request event.
 		aiDataSources, testCases, err := getPaths(log)
 		if err != nil {
 			l.Error(":skull: Failed to parse ai data sources and test cases with error: %s", err.Error())
 		}
 
+		var finalResultStr string
 		// create data source results to store in the report
 		var dataSourceResultsTest []exported.DataSourceResultI
-		var finalResultStr string
 		var dataSourceResults []exported.DataSourceResultI
 		var testCaseResults []exported.TestCaseResultI
 
@@ -147,7 +110,7 @@ func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 				// Aggregate the required fees for an AI request
 				// run the test case script
 				fmt.Println("test case path: ", getTCasePath(testCases[i])+provider.DataSourceStoreKeyString(aiDataSources[j]))
-				cmdTestCase := exec.Command("bash", getTCasePath(testCases[i]), provider.DataSourceStoreKeyString(aiDataSources[j]), req.AIRequest.Input, req.AIRequest.ExpectedOutput)
+				cmdTestCase := exec.Command("python", getTCasePath(testCases[i]), provider.DataSourceStoreKeyString(aiDataSources[j]), req.Input, req.ExpectedOutput)
 				var outTestCase bytes.Buffer
 				cmdTestCase.Stdout = &outTestCase
 				err = cmdTestCase.Run()
@@ -184,7 +147,7 @@ func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 			var outTestCase bytes.Buffer
 			var dataSourceResult types.DataSourceResult
 			if dataSourceResultsTest[i].GetStatus() == types.ResultSuccess {
-				cmdTestCase := exec.Command("bash", getDSourcePath(dataSourceResultsTest[i].GetName()))
+				cmdTestCase := exec.Command("python", getDSourcePath(dataSourceResultsTest[i].GetName()))
 				cmdTestCase.Stdout = &outTestCase
 				err = cmdTestCase.Run()
 				if err != nil {
@@ -210,15 +173,14 @@ func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 		}
 
 		fmt.Println("final result string: ", finalResultStr)
-		finalResultStr = strings.TrimSuffix(finalResultStr, "-")
-		fmt.Println("final result after trimming: ", finalResultStr)
-		msgReport := NewReport(req.AIRequest.RequestID, c.validator, dataSourceResults, testCaseResults, key.GetAddress(), sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(5000)))), []byte(finalResultStr))
+		fmt.Println("final result after trimming: ", strings.TrimSuffix(finalResultStr, "-"))
+		msgReport := NewReport(req.RequestID, c.validator, dataSourceResults, testCaseResults, key.GetAddress(), sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(5000)))), []byte(finalResultStr))
 		if len(finalResultStr) == 0 {
 			msgReport.AggregatedResult = []byte(types.FailedResponseOs)
 			// Create a new MsgCreateReport to the Oraichain
 		} else {
 			// "2" here is the expected output that the user wants to get
-			cmd := exec.Command("bash", oscriptPath, "aggregation", finalResultStr)
+			cmd := exec.Command("python", oscriptPath, "aggregation", finalResultStr)
 			var res bytes.Buffer
 			cmd.Stdout = &res
 			err = cmd.Run()
@@ -231,9 +193,7 @@ func handleKYCRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 			fmt.Printf("final result from oScript: %s\n", ress)
 			msgReport.AggregatedResult = []byte(ress)
 		}
-
 		// Create a new MsgCreateReport to the Oraichain
 		SubmitReport(c, l, key, msgReport)
-
-	}(l.With("reqid", req.AIRequest.RequestID, "oscriptname", req.AIRequest.OracleScriptName), req)
+	}(l.With("reqid", req.RequestID, "oscriptname", req.OracleScriptName), req)
 }

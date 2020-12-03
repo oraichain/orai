@@ -32,14 +32,8 @@ func handleTransaction(c *Context, l *Logger, tx tmtypes.TxResult) {
 
 		l.Info(":star: message type: %s", messageType)
 
-		if messageType == (aiRequest.MsgSetKYCRequest{}).Type() {
-			go handleKYCRequestLog(c, l, log)
-		} else if messageType == (aiRequest.MsgSetPriceRequest{}).Type() {
-			go handlePriceRequestLog(c, l, log)
-		} else if messageType == (aiRequest.MsgSetClassificationRequest{}).Type() {
-			go handleClassificationRequestLog(c, l, log)
-		} else if messageType == (aiRequest.MsgSetOCRRequest{}).Type() {
-			go handleOCRRequestLog(c, l, log)
+		if messageType == (aiRequest.MsgSetAIRequest{}).Type() {
+			go handleAIRequestLog(c, l, log)
 		} else {
 			l.Debug(":ghost: Skipping non-{request/packet} type: %s", messageType)
 		} /*else if messageType == (ibc.MsgPacket{}).Type() {

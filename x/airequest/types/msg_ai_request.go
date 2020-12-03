@@ -63,12 +63,12 @@ type MsgSetAIRequest struct {
 	Creator          sdk.AccAddress `json:"creator"`
 	ValidatorCount   int            `json:"validator_count"`
 	Fees             string         `json:"transaction_fee"`
-	Input            string         `json:"request_input"`
-	ExpectedOutput   string         `json:"expected_output"`
+	Input            []byte         `json:"request_input"`
+	ExpectedOutput   []byte         `json:"expected_output"`
 }
 
 // NewMsgSetAIRequest is a constructor function for NewMsgSetAIRequest
-func NewMsgSetAIRequest(requestID string, oscriptName string, creator sdk.AccAddress, fees string, valCount int, input string, expectedOutput string) MsgSetAIRequest {
+func NewMsgSetAIRequest(requestID string, oscriptName string, creator sdk.AccAddress, fees string, valCount int, input []byte, expectedOutput []byte) MsgSetAIRequest {
 	return MsgSetAIRequest{
 		RequestID:        requestID,
 		OracleScriptName: oscriptName,

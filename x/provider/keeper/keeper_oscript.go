@@ -106,7 +106,7 @@ func (k Keeper) GetDSourceTCasesScripts(oScript string) ([]string, []string, err
 	// collect data source name from the oScript script
 	oscriptPath := types.ScriptPath + types.OracleScriptStoreKeyString(oScript)
 	//use "data source" as an argument to collect the data source script name
-	cmd := exec.Command("bash", oscriptPath, "aiDataSource")
+	cmd := exec.Command("python", oscriptPath, "aiDataSource")
 	cmd.Stdin = strings.NewReader("some input")
 	var dataSourceName bytes.Buffer
 	cmd.Stdout = &dataSourceName
@@ -121,7 +121,7 @@ func (k Keeper) GetDSourceTCasesScripts(oScript string) ([]string, []string, err
 	aiDataSources := strings.Fields(result)
 
 	//use "test case" as an argument to collect the test case script name
-	cmd = exec.Command("bash", oscriptPath, "testcase")
+	cmd = exec.Command("python", oscriptPath, "testcase")
 	cmd.Stdin = strings.NewReader("some input")
 	var testCaseName bytes.Buffer
 	cmd.Stdout = &testCaseName
