@@ -1,0 +1,35 @@
+version: '3.3'
+services:
+  # rust:
+  #   image: rust:alpine
+  #   tty: true
+  #   working_dir: /cosmwasm-examples
+  #   volumes:
+  #     - ./cosmwasm-examples:/cosmwasm-examples
+  #     - ./registry_cache:/usr/local/cargo/registry
+  #   # apk add libc-dev, rustup default stable, rustup target add wasm32-unknown-unknown --toolchain stable
+  #   # RUSTFLAGS='-C link-arg=-s' cargo wasm
+
+  # wasmd:
+  #   image: cosmwasm/wasmd
+  #   tty: true
+  #   working_dir: /wasmd
+  #   volumes:
+  #     - ./wasmd:/wasmd
+  #     - ./cosmwasm-examples:/cosmwasm-examples
+  #   # /opt/setup_wasmd.sh, /opt/run_wasmd.sh
+  #   command: tail -f /dev/null
+  #   ports:
+  #     - 26657:26657
+  #   environment:
+  #     - HOME=/wasmd
+
+  orai:
+    image: orai/orai
+    working_dir: /workspace
+    tty: true
+    ports:
+      - 1317:1317
+    volumes:
+      - ./:/workspace
+      - ./fn.sh:/usr/local/bin/fn
