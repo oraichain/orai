@@ -41,8 +41,7 @@ printBoldColor(){
 # Print the usage message
 printHelp () {
 
-  echo $BOLD "Usage: "
-  echo "  $SCRIPT_NAME [-m|--method=] hello|sign"
+  echo $BOLD "Usage: "  
   echo "  $SCRIPT_NAME -h|--help (print this message)"  
   echo $NORMAL
 
