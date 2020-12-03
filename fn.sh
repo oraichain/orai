@@ -18,6 +18,26 @@ NORMAL=$(tput sgr0)
 BASE_DIR=$PWD
 SCRIPT_NAME=`basename "$0"`
 
+# verify the result of the end-to-end test
+verifyResult() {  
+  if [ $1 -ne 0 ] ; then
+    echo "!!!!!!!!!!!!!!! "$2" !!!!!!!!!!!!!!!!"
+    echo "========= ERROR !!! FAILED to execute End-2-End Scenario ==========="
+    echo
+      exit 1
+  fi
+}
+
+printCommand(){
+  echo -e ""
+  printBoldColor $BROWN "Command:"
+  printBoldColor $BLUE "\t$1"  
+}
+
+printBoldColor(){
+  echo -e "$1${BOLD}$2${NC}${NORMAL}"
+}
+
 # Print the usage message
 printHelp () {
 
