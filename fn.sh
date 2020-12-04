@@ -236,7 +236,7 @@ case "${METHOD}" in
     initScriptFn
   ;;
   sign)
-    signFn 3
+    signFn
   ;;
   broadcast)
     broadcastFn

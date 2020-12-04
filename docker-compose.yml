@@ -24,6 +24,14 @@ services:
   #   environment:
   #     - HOME=/wasmd
 
+  golang:
+    image: orai/godev
+    working_dir: /workspace
+    tty: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./dockersdk/:/workspace
+
   orai:
     image: orai/orai
     working_dir: /workspace
