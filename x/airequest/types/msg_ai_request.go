@@ -3,7 +3,6 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	providerType "github.com/oraichain/orai/x/provider/types"
 )
 
 // MsgSetAIRequest defines message for an AI request
@@ -42,11 +41,11 @@ func (msg MsgSetAIRequest) ValidateBasic() error {
 	// 	return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	// }
 	if len(msg.OracleScriptName) == 0 || msg.ValidatorCount <= 0 {
-		return sdkerrors.Wrap(providerType.ErrNameIsEmpty, "Name or / and validator count cannot be empty")
+		return sdkerrors.Wrap(ErrRequestInvalid, "Name or / and validator count cannot be empty")
 	}
 	_, err := sdk.ParseCoins(msg.Fees)
 	if err != nil {
-		return sdkerrors.Wrap(providerType.ErrInvalidFeeType, err.Error())
+		return sdkerrors.Wrap(ErrRequestFeesInvalid, err.Error())
 	}
 	return nil
 }

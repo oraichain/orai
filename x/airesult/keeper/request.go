@@ -7,7 +7,6 @@ import (
 	aiRequest "github.com/oraichain/orai/x/airequest/exported"
 	"github.com/oraichain/orai/x/airesult/types"
 	webSocket "github.com/oraichain/orai/x/websocket/exported"
-	webSocketType "github.com/oraichain/orai/x/websocket/types"
 )
 
 // GetRequestsBlockHeight returns all requests for the given block height, or nil if there is none.
@@ -65,7 +64,7 @@ func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep webSocket.Report
 
 	// collect data source owners that have their data sources executed to reward
 	for _, dataSourceResult := range rep.GetDataSourceResults() {
-		if dataSourceResult.GetStatus() == webSocketType.ResultSuccess {
+		if dataSourceResult.GetStatus() == k.webSocketKeeper.GetKeyResultSuccess() {
 			dataSource, _ := k.ProviderKeeper.GetAIDataSourceI(ctx, dataSourceResult.GetName())
 			reward.DataSources = append(reward.DataSources, dataSource)
 			reward.ProviderFees = reward.ProviderFees.Add(dataSource.GetFees()...)
@@ -84,7 +83,7 @@ func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep webSocket.Report
 	reward.ValidatorFees = reward.ValidatorFees.Add(valFees...)
 	// store information into the reward struct to reward these entities in the next begin block
 	valAddress := rep.GetValidator()
-	validator := webSocketType.NewValidator(valAddress, k.stakingKeeper.Validator(ctx, valAddress).GetConsensusPower(), "active")
+	validator := k.webSocketKeeper.NewValidator(valAddress, k.stakingKeeper.Validator(ctx, valAddress).GetConsensusPower(), "active")
 	reward.Validators = append(reward.Validators, validator)
 	reward.TotalPower += validator.GetVotingPower()
 	// Aggregate the result and store it into the blockchain

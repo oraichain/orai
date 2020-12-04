@@ -165,12 +165,24 @@ websocketRunFn(){
     websocket run
 }
 
-broadcastFn(){
-    oraicli tx broadcast tmp/signedTx.json
-}
-
 restServerFn(){
     oraicli rest-server --chain-id Oraichain --laddr tcp://0.0.0.0:1317  --trust-node
+}
+
+initScriptFn(){
+  oraicli tx provider set-datasource coingecko_eth ./testfiles/coingecko_eth.sh "A data source that fetches the ETH price from Coingecko API" --from $USER --fees 5000orai
+
+  sleep 5
+
+  oraicli tx provider set-datasource crypto_compare_eth ./testfiles/crypto_compare_eth.sh "A data source that collects ETH price from crypto compare" --from $USER --fees 5000orai
+
+  sleep 5
+
+  oraicli tx provider set-testcase testcase_price ./testfiles/testcase_price.sh "A sample test case that uses the expected output of users provided to verify the bitcoin price from the datasource" --from $USER --fees 5000orai
+
+  sleep 5
+
+  oraicli tx provider set-oscript oscript_eth ./testfiles/oscript_eth.sh "An oracle script that fetches and aggregates ETH price from different sources" --from $USER --fees 5000orai
 }
 
 unsignedFn(){
@@ -197,20 +209,8 @@ signFn(){
     oraicli tx sign tmp/unsignedTx.json --from $USER --offline --chain-id Oraichain --sequence $sequence --account-number $acc_num > tmp/signedTx.json
 }
 
-initScriptFn(){
-  oraicli tx provider set-datasource coingecko_eth ./testfiles/coingecko_eth.sh "A data source that fetches the ETH price from Coingecko API" --from $USER --fees 5000orai
-
-  sleep 5
-
-  oraicli tx provider set-datasource crypto_compare_eth ./testfiles/crypto_compare_eth.sh "A data source that collects ETH price from crypto compare" --from $USER --fees 5000orai
-
-  sleep 5
-
-  oraicli tx provider set-testcase testcase_price ./testfiles/testcase_price.sh "A sample test case that uses the expected output of users provided to verify the bitcoin price from the datasource" --from $USER --fees 5000orai
-
-  sleep 5
-
-  oraicli tx provider set-oscript oscript_eth ./testfiles/oscript_eth.sh "An oracle script that fetches and aggregates ETH price from different sources" --from $USER --fees 5000orai
+broadcastFn(){
+    oraicli tx broadcast tmp/signedTx.json
 }
 
 USER=$(getArgument "user" duc)
