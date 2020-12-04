@@ -35,7 +35,7 @@ func execCmdRun(id string, param string) {
 	resp, err := cli.ContainerExecCreate(ctx, id, types.ExecConfig{
 		AttachStdout: true,
 		AttachStderr: true,
-		Cmd:          []string{"echo", param},
+		Cmd:          []string{"python", "-c", param},
 	})
 	if err != nil {
 		panic(err)

@@ -16,6 +16,10 @@ func init() {
 	rootCmd.AddCommand(createCmd)
 }
 
+const (
+	imageName = "python:3.7-alpine"
+)
+
 var createCmd = &cobra.Command{
 	Use:   "create",
 	Short: "create a docker container",
@@ -33,14 +37,14 @@ func createCmdRun(containerName string) {
 		panic(err)
 	}
 
-	reader, err := cli.ImagePull(ctx, "docker.io/library/alpine", types.ImagePullOptions{})
+	reader, err := cli.ImagePull(ctx, imageName, types.ImagePullOptions{})
 	if err != nil {
 		panic(err)
 	}
 	io.Copy(os.Stdout, reader)
 
 	resp, err := cli.ContainerCreate(ctx, &container.Config{
-		Image: "alpine",
+		Image: imageName,
 		Tty:   true,
 	}, nil, nil, nil, containerName)
 	if err != nil {
