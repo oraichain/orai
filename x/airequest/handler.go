@@ -9,7 +9,6 @@ import (
 	"github.com/oraichain/orai/x/airequest/keeper"
 	"github.com/oraichain/orai/x/airequest/types"
 	provider "github.com/oraichain/orai/x/provider/exported"
-	providerType "github.com/oraichain/orai/x/provider/types"
 )
 
 // NewHandler creates an sdk.Handler for all the airequest type messages
@@ -35,7 +34,7 @@ func handleMsgSetAIRequest(ctx sdk.Context, k keeper.Keeper, msg types.MsgSetAIR
 	// we can safely parse fees to coins since we have validated it in the Msg already
 	fees, _ := sdk.ParseCoins(msg.Fees)
 	// Compute the fee allocated for oracle module to distribute to active validators.
-	rewardRatio := sdk.NewDecWithPrec(int64(k.GetParam(ctx, types.KeyOracleScriptRewardPercentage)), 2)
+	rewardRatio := sdk.NewDecWithPrec(k.ProviderKeeper.GetKeyOracleScriptRewardPercentage(ctx), 2)
 	// We need to calculate the final 70% fee given by the user because the remaining 30% must be reserved for the proposer and validators.
 	providedCoins, _ := sdk.NewDecCoinsFromCoins(fees...).MulDecTruncate(rewardRatio).TruncateDecimal()
 
@@ -59,7 +58,7 @@ func handleMsgSetAIRequest(ctx sdk.Context, k keeper.Keeper, msg types.MsgSetAIR
 
 	// If the total fee is larger than the fee provided by the user then we return error
 	if finalFees.IsAnyGT(providedCoins) {
-		return nil, sdkerrors.Wrap(providerType.ErrNeedMoreFees, "Fees given by the users are less than the total fees needed")
+		return nil, sdkerrors.Wrap(types.ErrNeedMoreFees, "Fees given by the users are less than the total fees needed")
 	}
 	// set a new request with the aggregated result into blockchain
 	request := types.NewAIRequest(msg.RequestID, msg.OracleScriptName, msg.Creator, validators, ctx.BlockHeight(), dataSourceObjs, testcaseObjs, fees, msg.Input, msg.ExpectedOutput)

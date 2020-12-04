@@ -5,7 +5,6 @@ import (
 	aiRequest "github.com/oraichain/orai/x/airequest/exported"
 	"github.com/oraichain/orai/x/airesult/types"
 	webSocket "github.com/oraichain/orai/x/websocket/exported"
-	webSocketType "github.com/oraichain/orai/x/websocket/types"
 )
 
 // ResolveResult aggregates the results from the reports before storing it into the blockchain
@@ -14,7 +13,7 @@ func (k Keeper) ResolveResult(ctx sdk.Context, req aiRequest.AIRequestI, rep web
 	if !k.HasResult(ctx, req.GetRequestID()) {
 		// if the the request only needs a validator to return a result from the report then it's finished
 		resultList := make([]webSocket.ValResultI, 0)
-		resultList = append(resultList, webSocketType.NewValResult(rep.GetValidator(), rep.GetAggregatedResult()))
+		resultList = append(resultList, k.webSocketKeeper.NewValResult(rep.GetValidator(), rep.GetAggregatedResult()))
 		if len(req.GetValidators()) == 1 {
 			k.SetResult(ctx, req.GetRequestID(), types.NewAIRequestResult(req.GetRequestID(), resultList, types.RequestStatusFinished))
 		} else {
@@ -26,7 +25,7 @@ func (k Keeper) ResolveResult(ctx sdk.Context, req aiRequest.AIRequestI, rep web
 		if len(req.GetValidators()) > 1 {
 			// if already has result then we add more results
 			result, _ := k.GetResult(ctx, req.GetRequestID())
-			result.Results = append(result.Results, webSocketType.NewValResult(rep.GetValidator(), rep.GetAggregatedResult()))
+			result.Results = append(result.Results, k.webSocketKeeper.NewValResult(rep.GetValidator(), rep.GetAggregatedResult()))
 			// check if there are enough results from the validators or not
 			if len(req.GetValidators()) == len(result.Results) {
 				result.Status = types.RequestStatusFinished

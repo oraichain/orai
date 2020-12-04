@@ -78,18 +78,12 @@ type WebSocketKeeper interface {
 	GetReportsBlockHeight(ctx sdk.Context, blockHeight int64) (reports []webSocket.ReportI)
 	ValidateReport(ctx sdk.Context, rep webSocket.ReportI, req aiRequest.AIRequestI) error
 	DefaultValResultI() webSocket.ValResultI
+	GetKeyResultSuccess() string
+	NewValidator(address sdk.ValAddress, votingPower int64, status string) webSocket.ValidatorI
+	NewValResult(val sdk.ValAddress, result []byte) webSocket.ValResultI
 }
 
 // AIRequestKeeper defines the expected airequest keeper
 type AIRequestKeeper interface {
 	GetAIRequest(ctx sdk.Context, id string) (aiRequest.AIRequestI, error)
-}
-
-type RewardSet interface {
-}
-
-type ValResultSet interface {
-}
-
-type AIRequestResultSet interface {
 }

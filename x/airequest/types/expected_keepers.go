@@ -6,7 +6,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/params"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/exported"
 	supply "github.com/cosmos/cosmos-sdk/x/supply/exported"
-	"github.com/oraichain/orai/x/airequest/exported"
 	provider "github.com/oraichain/orai/x/provider/exported"
 	webSocket "github.com/oraichain/orai/x/websocket/exported"
 )
@@ -72,6 +71,7 @@ type ProviderKeeper interface {
 	GetDNamesTcNames(ctx sdk.Context, oScript string) ([]string, []string, error)
 	GetOScriptPath(oScriptName string) string
 	GetMinimumFees(ctx sdk.Context, dNames, tcNames []string, valNum int) (sdk.Coins, error)
+	GetKeyOracleScriptRewardPercentage(ctx sdk.Context) int64
 }
 
 // WebSocketKeeper defines the expected websocket keeper
@@ -79,17 +79,4 @@ type WebSocketKeeper interface {
 	GetReports(ctx sdk.Context, rid string) (reports []webSocket.ReportI)
 	HasReport(ctx sdk.Context, id string, val sdk.ValAddress) bool
 	GetReportsBlockHeight(ctx sdk.Context, blockHeight int64) (reports []webSocket.ReportI)
-}
-
-type AIRequestSet interface {
-	GetAIRequest(ctx sdk.Context, id string) (exported.AIRequestI, error)
-}
-
-type RewardSet interface {
-}
-
-type ValResultSet interface {
-}
-
-type AIRequestResultSet interface {
 }

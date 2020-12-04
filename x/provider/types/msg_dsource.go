@@ -42,7 +42,7 @@ func (msg MsgCreateAIDataSource) ValidateBasic() error {
 	// 	return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	// }
 	if len(msg.Name) == 0 || len(msg.Code) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "Name and/or Code cannot be empty")
+		return sdkerrors.Wrap(ErrEmpty, "Name and/or Code cannot be empty")
 	}
 	return checkFees(msg.Fees)
 }

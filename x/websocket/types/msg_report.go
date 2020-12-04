@@ -52,7 +52,7 @@ func (msg MsgCreateReport) ValidateBasic() error {
 	} else {
 		_, err := sdk.ParseCoins(msg.Fees.String())
 		if err != nil {
-			return sdkerrors.Wrap(ErrInvalidFeeType, err.Error())
+			return sdkerrors.Wrap(ErrReportFeeTypeInvalid, err.Error())
 		}
 		return nil
 	}
