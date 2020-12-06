@@ -88,7 +88,7 @@ func setAIRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
 			return
 		}
-		fmt.Println("read req after parsing: ", req)
+		//fmt.Println("read req after parsing: ", req)
 		// Collect fees & gas prices in Coins type. Bug: cannot set fee through json using REST API => This is the workaround
 		fees, _ := sdk.ParseCoins(req.Fees)
 		gas, _ := sdk.ParseCoins(req.GasPrices)
@@ -122,8 +122,15 @@ func ReadRESTReq(w http.ResponseWriter, r *http.Request, req *SetAIRequestReq) b
 
 	err := msgp.Decode(r.Body, req)
 	if err != nil {
-		fmt.Println("BBBBBBBBBBBBBBBBBBBBBBBB: ", err)
 		rest.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("failed to decode JSON payload: %s", err))
+		return false
+	}
+
+	reqSize := msgp.GuessSize(req)
+
+	// validate the request size
+	if reqSize > types.MaximumRequestBytesThreshold {
+		rest.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("the size of the request exceeds the amount allowed."))
 		return false
 	}
 

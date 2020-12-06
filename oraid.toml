@@ -7,7 +7,7 @@ tmp_dir = "tmp"
 
 [build]
 # Just plain old shell command. You could use `make` as well.
-cmd = "make build-oraid"
+cmd = "make build"
 # Binary file yields from `cmd`.
 bin = "tmp/oraid"
 # Customize binary.
