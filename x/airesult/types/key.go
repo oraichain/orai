@@ -34,11 +34,6 @@ const (
 	// RequestStatusExpired is the status expired of the request
 	RequestStatusExpired = "expired"
 
-	// RngSeedSize is the size of the random seed for validator sampling.
-	RngSeedSize = 64
-
-	// NumSeedRemoval is the number of bytes an old seed is removed to generate a new one
-	NumSeedRemoval = 1
 	// Denom is the denominator of the currency
 	Denom = "orai"
 )
