@@ -69,6 +69,7 @@ type ProviderKeeper interface {
 	DefaultTestCaseI() provider.TestCaseI
 	GetTestCaseI(ctx sdk.Context, name string) (provider.TestCaseI, error)
 	GetDNamesTcNames(ctx sdk.Context, oScript string) ([]string, []string, error)
+	GetKeyOracleScriptRewardPercentage(ctx sdk.Context) int64
 }
 
 // WebSocketKeeper defines the expected websocket keeper
