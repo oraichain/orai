@@ -62,7 +62,7 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 	l.Info(":delivery_truck: Processing incoming request event before checking validators")
 
 	// Skip if not related to this validator
-	validators := GetEventValues(log, aiRequest.EventTypeSetPriceRequest, aiRequest.AttributeRequestValidator)
+	validators := GetEventValues(log, aiRequest.EventTypeSetAIRequest, aiRequest.AttributeRequestValidator)
 	hasMe := false
 	for _, validator := range validators {
 		l.Info(":delivery_truck: validator: %s", validator)
