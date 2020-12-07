@@ -24,8 +24,8 @@ type AIRequest struct {
 	AIDataSources    []provider.AIDataSourceI `json:"data_sources"`
 	TestCases        []provider.TestCaseI     `json:"testcases"`
 	Fees             sdk.Coins                `json:"transaction_fee"`
-	Input            string                   `json:"request_input"`
-	ExpectedOutput   string                   `json:"expected_output"`
+	Input            []byte                   `json:"request_input"`
+	ExpectedOutput   []byte                   `json:"expected_output"`
 	//Time         string `json:"time"`
 }
 
@@ -48,8 +48,8 @@ func NewAIRequest(
 	aiDataSources []provider.AIDataSourceI,
 	testCases []provider.TestCaseI,
 	fees sdk.Coins,
-	input string,
-	expectedOutput string,
+	input []byte,
+	expectedOutput []byte,
 ) AIRequest {
 	return AIRequest{
 		RequestID:        requestID,
@@ -106,11 +106,11 @@ func (ai AIRequest) GetFees() sdk.Coins {
 }
 
 // GetInput is getter method for AIRequest struct
-func (ai AIRequest) GetInput() string {
+func (ai AIRequest) GetInput() []byte {
 	return ai.Input
 }
 
 // GetExpectedOutput is getter method for AIRequest struct
-func (ai AIRequest) GetExpectedOutput() string {
+func (ai AIRequest) GetExpectedOutput() []byte {
 	return ai.ExpectedOutput
 }

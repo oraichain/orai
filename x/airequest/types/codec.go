@@ -8,10 +8,7 @@ import (
 // RegisterCodec registers concrete types on codec
 func RegisterCodec(cdc *codec.Codec) {
 	// TODO: Register the modules msgs
-	cdc.RegisterConcrete(MsgSetKYCRequest{}, "airequest/SetKYCRequest", nil)
-	cdc.RegisterConcrete(MsgSetClassificationRequest{}, "airequest/SetClassificationRequest", nil)
-	cdc.RegisterConcrete(MsgSetOCRRequest{}, "airequest/SetOCRRequest", nil)
-	cdc.RegisterConcrete(MsgSetPriceRequest{}, "airequest/SetPriceRequest", nil)
+	cdc.RegisterConcrete(MsgSetAIRequest{}, "airequest/SetAIRequest", nil)
 	cdc.RegisterInterface((*exported.AIRequestI)(nil), nil) // has to be pointer of interface
 	cdc.RegisterConcrete(&AIRequest{}, "airequest/AIRequest", nil)
 }

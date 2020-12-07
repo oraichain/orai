@@ -3,7 +3,10 @@ package keeper
 import (
 	"bytes"
 	"fmt"
+	"log"
+	"os"
 	"os/exec"
+	"path"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -104,15 +107,20 @@ func (k Keeper) GetOracleScriptFile(name string) []byte {
 // GetDSourceTCasesScripts is a function that collects test cases and data sources from the oracle script file
 func (k Keeper) GetDSourceTCasesScripts(oScript string) ([]string, []string, error) {
 	// collect data source name from the oScript script
-	oscriptPath := types.ScriptPath + types.OracleScriptStoreKeyString(oScript)
+	currentDir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	// get absolute path from working dir
+	oscriptPath := path.Join(currentDir, types.ScriptPath, types.OracleScriptStoreKeyString(oScript))
 	//use "data source" as an argument to collect the data source script name
 	cmd := exec.Command("bash", oscriptPath, "aiDataSource")
 	cmd.Stdin = strings.NewReader("some input")
 	var dataSourceName bytes.Buffer
 	cmd.Stdout = &dataSourceName
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
-		return nil, nil, sdkerrors.Wrap(types.ErrFailedToOpenFile, err.Error())
+		return nil, nil, sdkerrors.Wrap(types.ErrFailedToOpenFile, fmt.Sprintf("oscriptPath: %s, error: %s", oscriptPath, err.Error()))
 	}
 
 	// collect data source result from the script
@@ -154,4 +162,10 @@ func (k Keeper) GetDNamesTcNames(ctx sdk.Context, oScript string) ([]string, []s
 	aiDataSources := oracleScript.GetDSources()
 	testCases := oracleScript.GetTCases()
 	return aiDataSources, testCases, nil
+}
+
+// GetKeyOracleScriptRewardPercentage returns the oracle script reward percentage from the provider module
+func (k Keeper) GetKeyOracleScriptRewardPercentage(ctx sdk.Context) int64 {
+	percentage := k.GetParam(ctx, types.KeyOracleScriptRewardPercentage)
+	return int64(percentage)
 }

@@ -27,6 +27,7 @@ func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		flags.GetCommands(
 			// TODO: Add query Cmds
 			GetCmdQueryFullRequest(queryRoute, cdc),
+			GetCmdReward(queryRoute, cdc),
 		)...,
 	)
 
@@ -52,6 +53,29 @@ func GetCmdQueryFullRequest(queryRoute string, cdc *codec.Codec) *cobra.Command 
 			}
 
 			var out types.QueryResFullRequest
+			cdc.MustUnmarshalJSON(res, &out)
+			return cliCtx.PrintOutput(out)
+		},
+	}
+}
+
+// GetCmdReward queries full information about a reward at a specific block height
+func GetCmdReward(queryRoute string, cdc *codec.Codec) *cobra.Command {
+	return &cobra.Command{
+		Use:   "reward [block-height]",
+		Short: "query a reward information given a block height",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			blockHeight := []byte(args[0])
+
+			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/reward/%s", queryRoute, blockHeight), nil)
+			if err != nil {
+				fmt.Printf("could not query request - %s \n", args[0])
+				return nil
+			}
+
+			var out types.QueryResReward
 			cdc.MustUnmarshalJSON(res, &out)
 			return cliCtx.PrintOutput(out)
 		},

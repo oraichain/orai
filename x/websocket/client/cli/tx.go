@@ -3,7 +3,6 @@ package cli
 import (
 	"bufio"
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -35,7 +34,7 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 		//GetCmdSetAIRequest(cdc),
 		GetCmdAddReporters(cdc),
 		GetCmdRemoveReporter(cdc),
-		GetCmdCreateStrategy(cdc),
+		// GetCmdCreateStrategy(cdc),
 	)...)
 
 	return providerTxCmd
@@ -182,59 +181,59 @@ $ %s tx provider remove-reporter band1p40yh3zkmhcv0ecqp3mcazy83sa57rgjp07dun --f
 	return cmd
 }
 
-// GetCmdCreateStrategy is the CLI command for creating a new strategy transaction
-func GetCmdCreateStrategy(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
-		Use:   "set-strat [id] [name] [performance-fee] [performance-max] [withdrawal-fee] [withdrawal-max] [gov-addr] [strategist-addr] [flow] ...",
-		Short: "Set a new strategy into the store",
-		Args:  cobra.MinimumNArgs(9),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+// // GetCmdCreateStrategy is the CLI command for creating a new strategy transaction
+// func GetCmdCreateStrategy(cdc *codec.Codec) *cobra.Command {
+// 	return &cobra.Command{
+// 		Use:   "set-strat [id] [name] [performance-fee] [performance-max] [withdrawal-fee] [withdrawal-max] [gov-addr] [strategist-addr] [flow] ...",
+// 		Short: "Set a new strategy into the store",
+// 		Args:  cobra.MinimumNArgs(9),
+// 		RunE: func(cmd *cobra.Command, args []string) error {
+// 			inBuf := bufio.NewReader(cmd.InOrStdin())
+// 			cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
+// 			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(utils.GetTxEncoder(cdc))
 
-			var flow []string
+// 			var flow []string
 
-			for i := 8; i < len(args); i++ {
-				flow = append(flow, args[i])
-			}
+// 			for i := 8; i < len(args); i++ {
+// 				flow = append(flow, args[i])
+// 			}
 
-			// convert some int values from string to uint64
-			id, err := strconv.Atoi(args[0])
-			if err != nil {
-				return err
-			}
+// 			// convert some int values from string to uint64
+// 			id, err := strconv.Atoi(args[0])
+// 			if err != nil {
+// 				return err
+// 			}
 
-			perFee, err := strconv.Atoi(args[2])
-			if err != nil {
-				return err
-			}
+// 			perFee, err := strconv.Atoi(args[2])
+// 			if err != nil {
+// 				return err
+// 			}
 
-			perMax, err := strconv.Atoi(args[3])
-			if err != nil {
-				return err
-			}
+// 			perMax, err := strconv.Atoi(args[3])
+// 			if err != nil {
+// 				return err
+// 			}
 
-			wdrawFee, err := strconv.Atoi(args[4])
-			if err != nil {
-				return err
-			}
+// 			wdrawFee, err := strconv.Atoi(args[4])
+// 			if err != nil {
+// 				return err
+// 			}
 
-			wdrawMax, err := strconv.Atoi(args[5])
-			if err != nil {
-				return err
-			}
+// 			wdrawMax, err := strconv.Atoi(args[5])
+// 			if err != nil {
+// 				return err
+// 			}
 
-			// create a new MsgStrategy
-			msg := types.NewMsgCreateStrategy(uint64(id), args[1], flow, uint64(perFee), uint64(perMax), uint64(wdrawFee), uint64(wdrawMax), args[6], args[7], cliCtx.GetFromAddress())
+// 			// create a new MsgStrategy
+// 			msg := types.NewMsgCreateStrategy(uint64(id), args[1], flow, uint64(perFee), uint64(perMax), uint64(wdrawFee), uint64(wdrawMax), args[6], args[7], cliCtx.GetFromAddress())
 
-			err = msg.ValidateBasic()
-			if err != nil {
-				return err
-			}
+// 			err = msg.ValidateBasic()
+// 			if err != nil {
+// 				return err
+// 			}
 
-			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
-		},
-	}
-}
+// 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+// 		},
+// 	}
+// }

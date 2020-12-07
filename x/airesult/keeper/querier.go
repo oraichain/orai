@@ -6,6 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	aiRequestType "github.com/oraichain/orai/x/airequest/types"
 	"github.com/oraichain/orai/x/airesult/types"
 )
 
@@ -15,6 +16,8 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 		switch path[0] {
 		case types.QueryFullRequest:
 			return queryFullRequestByID(ctx, path[1:], keeper)
+		case types.QueryReward:
+			return queryReward(ctx, path[1:], keeper)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown provider query")
 		}
@@ -29,7 +32,7 @@ func queryFullRequestByID(ctx sdk.Context, path []string, k Keeper) ([]byte, err
 	id := path[0]
 	request, err := k.aiRequestKeeper.GetAIRequest(ctx, id)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.ErrRequestNotFound, err.Error())
+		return nil, sdkerrors.Wrapf(aiRequestType.ErrRequestNotFound, err.Error())
 	}
 	// collect all the reports of a given request id
 	reports := k.webSocketKeeper.GetReports(ctx, id)

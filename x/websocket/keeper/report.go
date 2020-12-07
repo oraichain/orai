@@ -105,7 +105,7 @@ func (k Keeper) GetAllReports(ctx sdk.Context) (reports []types.Report) {
 func (k Keeper) ValidateReport(ctx sdk.Context, rep exported.ReportI, req aiRequest.AIRequestI) error {
 	// Check if the validator is in the requested list of validators
 	if !containsVal(req.GetValidators(), rep.GetValidator()) {
-		return sdkerrors.Wrap(types.ErrCannotFindValidator, fmt.Sprintln("failed to find the requested validator"))
+		return sdkerrors.Wrap(types.ErrValidatorNotFound, fmt.Sprintln("failed to find the requested validator"))
 	}
 	// if len(rep.RawReports) != len(req.RawRequests) {
 	// 	return types.ErrInvalidReportSize

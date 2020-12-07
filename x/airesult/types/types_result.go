@@ -27,3 +27,18 @@ func NewAIRequestResult(
 		Status:    status,
 	}
 }
+
+// GetRequestID getter
+func (result AIRequestResult) GetRequestID() string {
+	return result.RequestID
+}
+
+// GetValResults getter
+func (result AIRequestResult) GetValResults() []webSocket.ValResultI {
+	return result.Results
+}
+
+// GetStatus getter
+func (result AIRequestResult) GetStatus() string {
+	return result.Status
+}

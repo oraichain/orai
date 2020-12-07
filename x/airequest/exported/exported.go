@@ -15,6 +15,6 @@ type AIRequestI interface {
 	GetAIDataSources() []provider.AIDataSourceI
 	GetTestCases() []provider.TestCaseI
 	GetFees() sdk.Coins
-	GetInput() string
-	GetExpectedOutput() string
+	GetInput() []byte
+	GetExpectedOutput() []byte
 }
