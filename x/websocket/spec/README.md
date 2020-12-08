@@ -1,17 +1,24 @@
-# provider module specification
+<!--
+order: 0
+title: WebSocket Overview
+parent:
+  title: "websocket"
+-->
+
+# `websocket`
 
 ## Abstract
 
-<!-- TODO: Create a abstract definition of what this module does, what functionality does it enable and how it can be used. -->
+This paper specifies the WebSocket module of Oraichain.
+
+After an AI Request is created, validators will execute the request before reporting back to Oraichain. The process of storing validator results and reports are handled by this module.
 
 ## Contents
 
-// TODO: Create the below files if they are needed.
-1. **[Concepts](01_concepts.md)**
-2. **[State](02_state.md)**
-3. **[Messages](03_messages.md)**
-4. **[Begin-Block](04_begin_block.md)**
-5. **[End-Block](06_end_bloc.md)**
-6. **[05_hooks](06_hooks.md)**
-7. **[Events](07_events.md)**
-8. **[Parameters](08_params.md)**
+1. **[State](01_state.md)**
+2. **[Messages](03_messages.md)**
+    - [MsgCreateReport](03_messages.md#MsgCreateReport)
+    - [MsgCreateReporter](03_messages.md#MsgAddReporter)
+    - [MsgRemoveReporter](03_messages.md#MsgRemoveReporter)
+3. **[Events](07_events.md)**
+4. **[Parameters](08_params.md)**
