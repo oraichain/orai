@@ -1,6 +1,8 @@
 # Initialize configuration files and genesis file
 # moniker is the name of your node
 #nsd init <moniker> --chain-id namechain
+CHAIN_ID=${1:-Oraichain}
+USER=${2:-duc}
 
 rm -rf .oraid/
 
@@ -18,10 +20,10 @@ go get ./...
 
 make install
 
-oraid init dws --chain-id Oraichain
+oraid init dws --chain-id $CHAIN_ID
 
 # Configure your CLI to eliminate need to declare them as flags
-oraicli config chain-id Oraichain
+oraicli config chain-id $CHAIN_ID
 oraicli config output json
 oraicli config indent true
 oraicli config trust-node true
@@ -32,14 +34,14 @@ oraicli config keyring-backend test
 # Copy the `Address` output here and save it for later use
 # [optional] add "--ledger" at the end to use a Ledger Nano S
 # Note: In order for a new full node to join the network, after creating a local 
-oraicli keys add duc
+oraicli keys add $USER
 
 # Copy the `Address` output here and save it for later use
-oraicli keys add hongeinh
+# oraicli keys add hongeinh
 
 # Add both accounts, with coins to the genesis file
-oraid add-genesis-account $(oraicli keys show duc -a) 9000000000000000orai
-oraid add-genesis-account $(oraicli keys show hongeinh -a) 1000000000000orai
+oraid add-genesis-account $(oraicli keys show $USER -a) 9000000000000000orai
+# oraid add-genesis-account $(oraicli keys show hongeinh -a) 1000000000000orai
 
 # oraicli tx staking create-validator --amount 10000orai --pubkey oraivalconspub1addwnpepqvydmv22mkzc9rc92g43unew08cmj4q46dhk7vz0a9fj2xjsjn2lvqj0dfr --moniker ducphamle --chain-id Oraichain --commission-rate 0.10 --commission-max-rate 0.20 --commission-max-change-rate 0.01 --min-self-delegation 100 --gas auto --gas-adjustment 1.15 --gas-prices 0.025orai --from duc
 
@@ -48,7 +50,7 @@ oraid add-genesis-account $(oraicli keys show hongeinh -a) 1000000000000orai
 # The "nscli config" command saves configuration for the "nscli" command but not for "nsd" so we have to 
 # declare the keyring-backend with a flag here
 #nsd gentx --name jack <or your key_name> --keyring-backend test
-oraid gentx --amount 900000000000orai --name duc --keyring-backend test --min-self-delegation 100
+oraid gentx --amount 900000000000orai --name $USER --keyring-backend test --min-self-delegation 100
 
 # put the validators into the genesis file so the chain is aware of the validators
 oraid collect-gentxs
@@ -83,7 +85,7 @@ oraid start --minimum-gas-prices 0.025orai
 
 # curl -XPOST -s http://localhost:1317/provider/oscript --data-binary '{"base_req":{"from":"'$(oraicli keys show duc -a)'","chain_id":"Oraichain"},"name":"testing","code":"./testfiles/oscript.sh"}' > unsignedTx.json
 
-curl -s -X POST -H "Content-Type: multipart/form-data" -F "image=@images/sample.png" -F "oracle_script_name=oscript_classification" -F "fees=45000orai" -F "from=$(oraicli keys show duc -a)" -F "chain_id=Oraichain" -F "input=''" -F "expected_output=5000" -F "validator_count=1" "http://localhost:1317/airequest/aireq/kycreq" > unsignedTx.json
+# curl -s -X POST -H "Content-Type: multipart/form-data" -F "image=@images/sample.png" -F "oracle_script_name=oscript_classification" -F "fees=45000orai" -F "from=$(oraicli keys show duc -a)" -F "chain_id=Oraichain" -F "input=''" -F "expected_output=5000" -F "validator_count=1" "http://localhost:1317/airequest/aireq/kycreq" > unsignedTx.json
 
 # curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show duc -a)"
 
