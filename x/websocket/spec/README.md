@@ -16,9 +16,7 @@ After an AI Request is created, validators will execute the request before repor
 ## Contents
 
 1. **[State](01_state.md)**
-2. **[Messages](03_messages.md)**
-    - [MsgCreateReport](03_messages.md#MsgCreateReport)
-    - [MsgCreateReporter](03_messages.md#MsgAddReporter)
-    - [MsgRemoveReporter](03_messages.md#MsgRemoveReporter)
-3. **[Events](07_events.md)**
-4. **[Parameters](08_params.md)**
+2. **[Messages](02_messages.md)**
+    - [MsgCreateReport](02_messages.md#MsgCreateReport)
+    - [MsgCreateReporter](02_messages.md#MsgAddReporter)
+    - [MsgRemoveReporter](02_messages.md#MsgRemoveReporter)

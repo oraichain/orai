@@ -18,12 +18,12 @@ The holders can choose an AI service through the Oracle Script, and they will re
 ## Contents
 
 1. **[State](01_state.md)**
-2. **[Messages](03_messages.md)**
-    - [MsgCreateOracleScript](03_messages.md#msgcreateoraclescript)
-    - [MsgEditOracleScript](03_messages.md#msgeditoraclescript)
-    - [MsgCreateAIDataSource](03_messages.md#msgcreateaidatasource)
-    - [MsgEditAIDataSource](03_messages.md#msgeditaidatasource)
-    - [MsgCreateTestCase](03_messages.md#msgcreatetestcase)
-    - [MsgEditTestCase](03_messages.md#msgedittestcase)
-3. **[Events](07_events.md)**
-4. **[Parameters](08_params.md)**
+2. **[Messages](02_messages.md)**
+    - [MsgCreateOracleScript](02_messages.md#msgcreateoraclescript)
+    - [MsgEditOracleScript](02_messages.md#msgeditoraclescript)
+    - [MsgCreateAIDataSource](02_messages.md#msgcreateaidatasource)
+    - [MsgEditAIDataSource](02_messages.md#msgeditaidatasource)
+    - [MsgCreateTestCase](02_messages.md#msgcreatetestcase)
+    - [MsgEditTestCase](02_messages.md#msgedittestcase)
+3. **[Events](03_events.md)**
+4. **[Parameters](04_params.md)**
