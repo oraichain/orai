@@ -7,7 +7,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	provider "github.com/oraichain/orai/x/provider/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
@@ -26,7 +25,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo) {
 	// if there are fees from the requests, we remove them from the fee collector
 	if !requestFees.IsZero() {
 		// 100 - 70 = 30%
-		rewardRatio := sdk.NewDecWithPrec(int64(100)-int64(k.GetParam(ctx, provider.KeyOracleScriptRewardPercentage)), 2)
+		rewardRatio := sdk.NewDecWithPrec(int64(100)-int64(k.ProviderKeeper.GetKeyOracleScriptRewardPercentage(ctx)), 2)
 		rewardFeesDec := sdk.NewDecCoinsFromCoins(requestFees...)
 		rewardFees, _ := rewardFeesDec.MulDecTruncate(rewardRatio).TruncateDecimal()
 		// we remove the reward fees from the request fees to reward the proposer afterwards immediately

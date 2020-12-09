@@ -53,7 +53,6 @@ func (k Keeper) ResolveExpiredRequest(ctx sdk.Context, reqID string) {
 
 // ResolveRequestsFromReports handles the reports received in a block to group all the validators, data source owners and test case owners
 func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep webSocket.ReportI, reward *types.Reward, blockHeight int64) {
-	// fmt.Println("Param of the provider module: ", k.GetParam(ctx, types.KeyOracleScriptRewardPercentage))
 
 	req, _ := k.aiRequestKeeper.GetAIRequest(ctx, rep.GetRequestID())
 	validation := k.validateBasic(ctx, req, rep, blockHeight)

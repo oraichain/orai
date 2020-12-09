@@ -187,7 +187,7 @@ initScriptFn(){
 
 unsignedFn(){
   local id=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.address" -r)
-  local unsigned=$(curl --location --request POST 'http://localhost:1317/airequest/aireq/pricereq' \
+  local unsigned=$(curl --location --request POST 'http://localhost:1317/airequest/aireq/testreq' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "base_req":{
