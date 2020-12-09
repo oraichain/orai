@@ -202,6 +202,22 @@ unsignedFn(){
 }' > tmp/unsignedTx.json)
 }
 
+unsignedSetDsFn(){
+  local id=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.address" -r)
+  local unsigned=$(curl --location --request POST 'http://localhost:1317/provider/datasource' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "base_req":{
+        "from":"'$id'",
+        "chain_id":"Oraichain"
+    },
+    "name":"coingecko_eth",
+    "code_path":"/workspace/testfiles/coingecko_eth.py",
+    "description":"NTAwMA==",
+    "fees":"60000orai"
+}' > tmp/unsignedTx.json)
+}
+
 signFn(){     
     # $1 is account number
     local sequence=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.sequence" -r)
@@ -231,6 +247,9 @@ case "${METHOD}" in
   ;;
   unsign)
     unsignedFn
+  ;;
+  unsignedSetDsFn)
+    unsignedDsFn
   ;;
   initScript)
     initScriptFn
