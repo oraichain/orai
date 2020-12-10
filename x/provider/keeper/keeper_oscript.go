@@ -1,16 +1,7 @@
 package keeper
 
 import (
-	"bytes"
-	"fmt"
-	"log"
-	"os"
-	"os/exec"
-	"path"
-	"strings"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/oraichain/orai/x/provider/types"
 )
 
@@ -102,48 +93,6 @@ func (k Keeper) GetOracleScriptFile(name string) []byte {
 		return []byte{}
 	}
 	return code
-}
-
-// GetDSourceTCasesScripts is a function that collects test cases and data sources from the oracle script file
-func (k Keeper) GetDSourceTCasesScripts(oScript string) ([]string, []string, error) {
-	// collect data source name from the oScript script
-	currentDir, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
-	// get absolute path from working dir
-	oscriptPath := path.Join(currentDir, types.ScriptPath, types.OracleScriptStoreKeyString(oScript))
-	//use "data source" as an argument to collect the data source script name
-	cmd := exec.Command("bash", oscriptPath, "aiDataSource")
-	cmd.Stdin = strings.NewReader("some input")
-	var dataSourceName bytes.Buffer
-	cmd.Stdout = &dataSourceName
-	err = cmd.Run()
-	if err != nil {
-		return nil, nil, sdkerrors.Wrap(types.ErrFailedToOpenFile, fmt.Sprintf("oscriptPath: %s, error: %s", oscriptPath, err.Error()))
-	}
-
-	// collect data source result from the script
-	result := strings.TrimSuffix(dataSourceName.String(), "\n")
-
-	aiDataSources := strings.Fields(result)
-
-	//use "test case" as an argument to collect the test case script name
-	cmd = exec.Command("bash", oscriptPath, "testcase")
-	cmd.Stdin = strings.NewReader("some input")
-	var testCaseName bytes.Buffer
-	cmd.Stdout = &testCaseName
-	err = cmd.Run()
-	if err != nil {
-		return nil, nil, sdkerrors.Wrap(types.ErrFailedToOpenFile, fmt.Sprintf("failed to collect test case name: %s", result))
-	}
-
-	// collect data source result from the script
-	result = strings.TrimSuffix(testCaseName.String(), "\n")
-
-	testCases := strings.Fields(result)
-
-	return aiDataSources, testCases, nil
 }
 
 // GetOScriptPath is the path for the complete oracle script file location

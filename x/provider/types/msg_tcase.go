@@ -91,7 +91,7 @@ func (msg MsgEditTestCase) ValidateBasic() error {
 	// 	return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	// }
 	if len(msg.OldName) == 0 || len(msg.Code) == 0 || len(msg.NewName) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "Name and/or Code cannot be empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Name and/or Code cannot be empty")
 	}
 	return checkFees(msg.Fees)
 }

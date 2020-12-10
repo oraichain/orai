@@ -38,23 +38,14 @@ func handleMsgCreateOracleScript(ctx sdk.Context, k keeper.Keeper, msg types.Msg
 	if k.IsNamePresent(ctx, types.OracleScriptStoreKeyString(msg.Name)) {
 		return nil, sdkerrors.Wrap(types.ErrOracleScriptNameExists, "Name already exists")
 	}
-	k.AddOracleScriptFile(msg.Code, msg.Name)
-	// Get Data source and test case names from an oracle script
-	aiDataSources, testCases, err := k.GetDSourceTCasesScripts(msg.Name)
-	if err != nil {
-		// erase because the script file is not properly added into the chain yet
-		k.EraseOracleScriptFile(msg.Name)
-		return nil, err
-	}
 
 	// collect minimum fees required to run the oracle script (for 1 validator)
-	minimumFees, err := k.GetMinimumFees(ctx, aiDataSources, testCases, 1)
+	minimumFees, err := k.GetMinimumFees(ctx, msg.DataSources, msg.TestCases, 1)
 	if err != nil {
-		// erase because the script file is not properly added into the chain yet
-		k.EraseOracleScriptFile(msg.Name)
 		return nil, err
 	}
-	k.SetOracleScript(ctx, msg.Name, types.NewOracleScript(msg.Name, msg.Owner, msg.Description, minimumFees, aiDataSources, testCases))
+	k.SetOracleScript(ctx, msg.Name, types.NewOracleScript(msg.Name, msg.Owner, msg.Description, minimumFees, msg.DataSources, msg.TestCases))
+	k.AddOracleScriptFile(msg.Code, msg.Name)
 	// TODO: Define your msg events
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
@@ -78,19 +69,13 @@ func handleMsgEditOracleScript(ctx sdk.Context, k keeper.Keeper, msg types.MsgEd
 		return nil, sdkerrors.Wrap(types.ErrEditorNotAuthorized, "Only owner can edit the oScript")
 	}
 
-	// Get Data source and test case names from an oracle script
-	aiDataSources, testCases, err := k.GetDSourceTCasesScripts(msg.NewName)
-	if err != nil {
-		return nil, err
-	}
-
 	// collect minimum fees required to run the oracle script (for one validator)
-	minimumFees, err := k.GetMinimumFees(ctx, aiDataSources, testCases, 1)
+	minimumFees, err := k.GetMinimumFees(ctx, msg.DataSources, msg.TestCases, 1)
 	if err != nil {
 		return nil, err
 	}
 
-	oScript = types.NewOracleScript(msg.NewName, msg.Owner, msg.Description, minimumFees, aiDataSources, testCases)
+	oScript = types.NewOracleScript(msg.NewName, msg.Owner, msg.Description, minimumFees, msg.DataSources, msg.TestCases)
 
 	k.EditOracleScript(ctx, msg.OldName, msg.NewName, msg.Code, oScript)
 

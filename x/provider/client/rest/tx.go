@@ -26,6 +26,8 @@ type createOracleScriptReq struct {
 	Name        string       `json:"name"`
 	CodePath    string       `json:"code_path"`
 	Description string       `json:"description"`
+	DataSources []string     `json:"data_sources"`
+	TestCases   []string     `json:"test_cases"`
 }
 
 type editOracleScriptReq struct {
@@ -34,6 +36,8 @@ type editOracleScriptReq struct {
 	NewName     string       `json:"new_name"`
 	CodePath    string       `json:"code_path"`
 	Description string       `json:"description"`
+	DataSources []string     `json:"data_sources"`
+	TestCases   []string     `json:"test_cases"`
 }
 
 type createDataSourceReq struct {
@@ -131,7 +135,7 @@ func setOracleScriptHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// create the message
-		msg := types.NewMsgCreateOracleScript(req.Name, execBytes, addr, req.Description)
+		msg := types.NewMsgCreateOracleScript(req.Name, execBytes, addr, req.Description, req.DataSources, req.TestCases)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -172,7 +176,7 @@ func editOracleScriptHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// create the message
-		msg := types.NewMsgEditOracleScript(req.OldName, req.NewName, execBytes, addr, req.Description)
+		msg := types.NewMsgEditOracleScript(req.OldName, req.NewName, execBytes, addr, req.Description, req.DataSources, req.TestCases)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())

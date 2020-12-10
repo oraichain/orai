@@ -18,6 +18,11 @@ import (
 	"github.com/oraichain/orai/x/provider/types"
 )
 
+const (
+	flagDataSources = "ds"
+	flagTestCases   = "tc"
+)
+
 // GetTxCmd returns the transaction commands for this module
 func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 	providerTxCmd := &cobra.Command{
@@ -72,10 +77,10 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 
 // GetCmdSetOracleScript is the CLI command for sending a SetOracleScript transaction
 func GetCmdSetOracleScript(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
-		Use:   "set-oscript [name] [code-path] [description]",
+	cmd := &cobra.Command{
+		Use:   "set-oscript [name] [code-path] [description] (--ds [datasource list]) (--tc [testcase list])",
 		Short: "Set a new oscript into the system",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.MinimumNArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -87,7 +92,17 @@ func GetCmdSetOracleScript(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgCreateOracleScript(args[0], execBytes, cliCtx.FromAddress, args[2])
+			dSources, err := cmd.Flags().GetStringArray(flagDataSources)
+			if err != nil {
+				return err
+			}
+
+			tCases, err := cmd.Flags().GetStringArray(flagTestCases)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgCreateOracleScript(args[0], execBytes, cliCtx.FromAddress, args[2], dSources, tCases)
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -96,11 +111,16 @@ func GetCmdSetOracleScript(cdc *codec.Codec) *cobra.Command {
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
+
+	cmd.Flags().StringArray(flagDataSources, make([]string, 0), "identifiers of the data sources")
+	cmd.Flags().StringArray(flagTestCases, make([]string, 0), "identifiers of the test cases")
+
+	return cmd
 }
 
 // GetCmdEditOracleScript is the CLI command for sending a MsgEditOracleScript transaction
 func GetCmdEditOracleScript(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "edit-oscript [old-name] [new-name] [code-path] [description]",
 		Short: "Edit an existing oscript in the system",
 		Args:  cobra.ExactArgs(4),
@@ -115,7 +135,17 @@ func GetCmdEditOracleScript(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgEditOracleScript(args[0], args[1], execBytes, cliCtx.FromAddress, args[3])
+			dSources, err := cmd.Flags().GetStringArray(flagDataSources)
+			if err != nil {
+				return err
+			}
+
+			tCases, err := cmd.Flags().GetStringArray(flagTestCases)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgEditOracleScript(args[0], args[1], execBytes, cliCtx.FromAddress, args[3], dSources, tCases)
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err
@@ -124,6 +154,11 @@ func GetCmdEditOracleScript(cdc *codec.Codec) *cobra.Command {
 			return utils.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
 		},
 	}
+
+	cmd.Flags().StringArray(flagDataSources, make([]string, 0), "identifiers of the data sources")
+	cmd.Flags().StringArray(flagTestCases, make([]string, 0), "identifiers of the test cases")
+
+	return cmd
 }
 
 // GetCmdCreateAIDataSource is the CLI command for sending a SetAIDataSource transaction
