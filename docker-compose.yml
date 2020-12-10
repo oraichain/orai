@@ -34,10 +34,18 @@ services:
 
   orai:
     image: orai/orai
+    build:
+      context: .
     working_dir: /workspace
     tty: true
     ports:
       - 1317:1317
+      - 40000:40000
+    security_opt:
+      - "seccomp:unconfined"
+    cap_add:
+      - SYS_PTRACE
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - ./:/workspace
       - ./fn.sh:/usr/local/bin/fn
