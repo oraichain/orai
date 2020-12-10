@@ -232,9 +232,16 @@ signFn(){
     local sequence=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.sequence" -r)
     local acc_num=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.account_number" -r)
     oraicli tx sign tmp/unsignedTx.json --from $USER --offline --chain-id $CHAIN_ID --sequence $sequence --account-number $acc_num > tmp/signedTx.json
+
+    oraicli tx broadcast tmp/signedTx.json
 }
 
 broadcastFn(){
+  # $1 is account number
+    local sequence=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.sequence" -r)
+    local acc_num=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.account_number" -r)
+    oraicli tx sign tmp/unsignedTx.json --from $USER --offline --chain-id $CHAIN_ID --sequence $sequence --account-number $acc_num > tmp/signedTx.json
+
     oraicli tx broadcast tmp/signedTx.json
 }
 
@@ -271,8 +278,8 @@ case "${METHOD}" in
   unsign)
     unsignedFn
   ;;
-  unsignedSetDsFn)
-    unsignedDsFn
+  unsignedSetDs)
+    unsignedSetDsFn
   ;;
   initScript)
     initScriptFn
