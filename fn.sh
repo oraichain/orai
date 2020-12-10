@@ -158,7 +158,7 @@ oraidFn(){
 
 websocketInitFn(){
     local reporter="${USER}_reporter"
-    ./websocket.sh $USER $reporter
+    ./websocket-init.sh $USER $reporter
 }
 
 websocketRunFn(){
@@ -170,19 +170,19 @@ restServerFn(){
 }
 
 initScriptFn(){
-  oraicli tx provider set-datasource coingecko_eth ./testfiles/coingecko_eth.sh "A data source that fetches the ETH price from Coingecko API" --from $USER --fees 5000orai
+  oraicli tx provider set-datasource coingecko_eth ./testfiles/coingecko_eth.py "A data source that fetches the ETH price from Coingecko API" --from $USER --fees 5000orai
 
   sleep 5
 
-  oraicli tx provider set-datasource crypto_compare_eth ./testfiles/crypto_compare_eth.sh "A data source that collects ETH price from crypto compare" --from $USER --fees 5000orai
+  oraicli tx provider set-datasource crypto_compare_eth ./testfiles/crypto_compare_eth.py "A data source that collects ETH price from crypto compare" --from $USER --fees 5000orai
 
   sleep 5
 
-  oraicli tx provider set-testcase testcase_price ./testfiles/testcase_price.sh "A sample test case that uses the expected output of users provided to verify the bitcoin price from the datasource" --from $USER --fees 5000orai
+  oraicli tx provider set-testcase testcase_price ./testfiles/testcase_price.py "A sample test case that uses the expected output of users provided to verify the bitcoin price from the datasource" --from $USER --fees 5000orai
 
   sleep 5
 
-  oraicli tx provider set-oscript oscript_eth ./testfiles/oscript_eth.sh "An oracle script that fetches and aggregates ETH price from different sources" --from $USER --fees 5000orai
+  oraicli tx provider set-oscript oscript_eth ./testfiles/oscript_eth.py "An oracle script that fetches and aggregates ETH price from different sources" --from $USER --fees 5000orai
 }
 
 unsignedFn(){

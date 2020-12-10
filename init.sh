@@ -55,7 +55,7 @@ oraid collect-gentxs
 
 oraid validate-genesis
 
-oraid start --minimum-gas-prices 0.025orai
+# oraid start --minimum-gas-prices 0.025orai
 
 #oraid start
 
@@ -83,7 +83,7 @@ oraid start --minimum-gas-prices 0.025orai
 
 # curl -XPOST -s http://localhost:1317/provider/oscript --data-binary '{"base_req":{"from":"'$(oraicli keys show duc -a)'","chain_id":"Oraichain"},"name":"testing","code":"./testfiles/oscript.sh"}' > unsignedTx.json
 
-curl -s -X POST -H "Content-Type: multipart/form-data" -F "image=@images/sample.png" -F "oracle_script_name=oscript_classification" -F "fees=45000orai" -F "from=$(oraicli keys show duc -a)" -F "chain_id=Oraichain" -F "input=''" -F "expected_output=5000" -F "validator_count=1" "http://localhost:1317/airequest/aireq/kycreq" > unsignedTx.json
+# curl -s -X POST -H "Content-Type: multipart/form-data" -F "image=@images/sample.png" -F "oracle_script_name=oscript_classification" -F "fees=45000orai" -F "from=$(oraicli keys show duc -a)" -F "chain_id=Oraichain" -F "input=''" -F "expected_output=5000" -F "validator_count=1" "http://localhost:1317/airequest/aireq/kycreq" > unsignedTx.json
 
 # curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show duc -a)"
 
