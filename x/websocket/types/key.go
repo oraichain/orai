@@ -37,11 +37,6 @@ const (
 	// ResultSuccess is the success status of a result after the test case runs
 	ResultSuccess = "success"
 
-	// RngSeedSize is the size of the random seed for validator sampling.
-	RngSeedSize = 64
-
-	// NumSeedRemoval is the number of bytes an old seed is removed to generate a new one
-	NumSeedRemoval = 1
 	// Denom is the denominator of the currency
 	Denom = "orai"
 )

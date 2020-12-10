@@ -11,11 +11,10 @@ import (
 
 // Context is used for the overall websocket information storage
 type Context struct {
-	client    rpcclient.Client
-	validator sdk.ValAddress
-	gasPrices sdk.DecCoins
-	keys      chan keys.Info
-	//executor         executor.Executor
+	client           rpcclient.Client
+	validator        sdk.ValAddress
+	gasPrices        sdk.DecCoins
+	keys             chan keys.Info
 	fileCache        filecache.Cache
 	broadcastTimeout time.Duration
 	maxTry           uint64

@@ -24,7 +24,7 @@ import (
 type createOracleScriptReq struct {
 	BaseReq     rest.BaseReq `json:"base_req"`
 	Name        string       `json:"name"`
-	Code        string       `json:"code"`
+	CodePath    string       `json:"code_path"`
 	Description string       `json:"description"`
 }
 
@@ -32,15 +32,15 @@ type editOracleScriptReq struct {
 	BaseReq     rest.BaseReq `json:"base_req"`
 	OldName     string       `json:"old_name"`
 	NewName     string       `json:"new_name"`
-	Code        string       `json:"code"`
+	CodePath    string       `json:"code_path"`
 	Description string       `json:"description"`
 }
 
 type createDataSourceReq struct {
 	BaseReq     rest.BaseReq `json:"base_req"`
 	Name        string       `json:"name"`
-	Code        string       `json:"code"`
-	Fees        string       `json:"transaction_fee"`
+	CodePath    string       `json:"code_path"`
+	Fees        string       `json:"fees"`
 	Description string       `json:"description"`
 }
 
@@ -48,8 +48,8 @@ type editDataSourceReq struct {
 	BaseReq     rest.BaseReq `json:"base_req"`
 	OldName     string       `json:"old_name"`
 	NewName     string       `json:"new_name"`
-	Code        string       `json:"code"`
-	Fees        string       `json:"transaction_fee"`
+	CodePath    string       `json:"code_path"`
+	Fees        string       `json:"fees"`
 	Description string       `json:"description"`
 }
 
@@ -97,10 +97,9 @@ func setOracleScriptHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// collect the byte code of the source code based on the path
-		execBytes, err := ioutil.ReadFile(req.Code)
+		execBytes, err := getFileBytes(req.CodePath)
 		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintln("cannot read file from the given file path"+err.Error()))
 			return
 		}
 
@@ -139,7 +138,7 @@ func editOracleScriptHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// collect the byte code of the source code based on the path
-		execBytes, err := ioutil.ReadFile(req.Code)
+		execBytes, err := ioutil.ReadFile(req.CodePath)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
@@ -179,10 +178,9 @@ func setDataSourceHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// collect the byte code of the source code based on the path
-		execBytes, err := ioutil.ReadFile(req.Code)
+		execBytes, err := getFileBytes(req.CodePath)
 		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			rest.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintln("cannot read file from the given file path"+err.Error()))
 			return
 		}
 
@@ -221,7 +219,7 @@ func editDataSourceHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		// collect the byte code of the source code based on the path
-		execBytes, err := ioutil.ReadFile(req.Code)
+		execBytes, err := ioutil.ReadFile(req.CodePath)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return

@@ -11,6 +11,7 @@
   "dependencies": {
     "@cosmostation/cosmosjs": "^0.6.10",
     "axios": "^0.20.0",
+    "canvas": "^2.6.1",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
@@ -18,6 +19,7 @@
     "express-winston": "^3.4.0",
     "form-data": "^3.0.0",
     "jsonwebtoken": "^8.5.1",
+    "msgpack-lite": "^0.1.26",
     "multer": "^1.4.2",
     "nodemon": "^2.0.4",
     "request": "^2.88.2",

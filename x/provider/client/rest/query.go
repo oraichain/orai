@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/oraichain/orai/x/provider/types"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/types/rest"
@@ -102,8 +103,8 @@ func queryOracleScriptsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 
 		// In case the request does not include pagination parameters
 		if page == "" || limit == "" {
-			page = "1"
-			limit = "5"
+			page = types.DefaultQueryPage
+			limit = types.DefaultQueryLimit
 		}
 
 		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/oscripts", storeName), []byte(page+"-"+limit))
@@ -153,8 +154,8 @@ func queryDataSourcesHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 
 		// In case the request does not include pagination parameters
 		if page == "" || limit == "" {
-			page = "1"
-			limit = "5"
+			page = types.DefaultQueryPage
+			limit = types.DefaultQueryLimit
 		}
 
 		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/datasources", storeName), []byte(page+"-"+limit))
@@ -247,8 +248,8 @@ func queryTestCasesHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 
 		// In case the request does not include pagination parameters
 		if page == "" || limit == "" {
-			page = "1"
-			limit = "5"
+			page = types.DefaultQueryPage
+			limit = types.DefaultQueryLimit
 		}
 
 		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/testcases", storeName), []byte(page+"-"+limit))

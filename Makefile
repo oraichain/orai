@@ -29,6 +29,16 @@ watch-oraicli:
 watch-websocket:
 		air -c websocket.toml		
 
+# always rebuild all the binaries after saving 
+build: 
+		go build -o ./tmp/oraid -mod=readonly $(BUILD_FLAGS) ./cmd/oraid
+		go build -o ./tmp/oraicli -mod=readonly $(BUILD_FLAGS) ./cmd/oraicli
+		go build -o ./tmp/websocket -mod=readonly $(BUILD_FLAGS) ./cmd/websocket
+
+		go install -mod=readonly $(BUILD_FLAGS) ./cmd/oraid
+		go install -mod=readonly $(BUILD_FLAGS) ./cmd/oraicli
+		go install -mod=readonly $(BUILD_FLAGS) ./cmd/websocket
+
 build-oraid: 
 		go build -o ./tmp/oraid -mod=readonly $(BUILD_FLAGS) ./cmd/oraid	
 

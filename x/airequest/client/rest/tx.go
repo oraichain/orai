@@ -12,6 +12,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/oraichain/orai/x/airequest/types"
 	"github.com/segmentio/ksuid"
+	"github.com/tinylib/msgp/msgp"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -24,12 +25,17 @@ import (
 func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
 
 	r.HandleFunc(
-		fmt.Sprintf("/%s/aireq/pricereq", storeName),
+		fmt.Sprintf("/%s/aireq", storeName),
 		setAIRequestHandlerFn(cliCtx),
+	).Methods("POST")
+
+	r.HandleFunc(
+		fmt.Sprintf("/%s/aireq/testreq", storeName),
+		setTestRequestHandlerFn(cliCtx),
 	).Methods("POST")
 }
 
-type setAIRequestReq struct {
+type setTestRequestReq struct {
 	BaseReq          rest.BaseReq `json:"base_req"`
 	OracleScriptName string       `json:"oracle_script_name"`
 	Input            []byte       `json:"input"`
@@ -38,10 +44,10 @@ type setAIRequestReq struct {
 	ValidatorCount   int          `json:"validator_count"`
 }
 
-func setAIRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
+func setTestRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		var req setAIRequestReq
+		var req setTestRequestReq
 
 		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
@@ -71,4 +77,62 @@ func setAIRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		fmt.Println("base req: ", baseReq)
 		utils.WriteGenerateStdTxResponse(w, cliCtx, baseReq, []sdk.Msg{msg})
 	}
+}
+
+func setAIRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+
+		var req SetAIRequestReq
+
+		if !ReadRESTReq(w, r, &req) {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
+			return
+		}
+		//fmt.Println("read req after parsing: ", req)
+		// Collect fees & gas prices in Coins type. Bug: cannot set fee through json using REST API => This is the workaround
+		fees, _ := sdk.ParseCoins(req.Fees)
+		gas, _ := sdk.ParseCoins(req.GasPrices)
+		baseReq := rest.NewBaseReq(req.From, req.Memo, req.ChainID, req.Gas, req.GasAdjustment, req.AccountNumber, req.Sequence, fees, sdk.NewDecCoinsFromCoins(gas...), req.Simulate)
+		baseReq.Fees = fees
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
+		fmt.Println("base req: ", baseReq)
+		// collect valid address from the request address string
+		addr, err := sdk.AccAddressFromBech32(baseReq.From)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "AVXSD")
+			return
+		}
+
+		// create the message
+		msg := types.NewMsgSetAIRequest(ksuid.New().String(), req.OracleScriptName, addr, req.Fees, req.ValidatorCount, req.Input, req.ExpectedOutput)
+		err = msg.ValidateBasic()
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "GHYK")
+			return
+		}
+		utils.WriteGenerateStdTxResponse(w, cliCtx, baseReq, []sdk.Msg{msg})
+	}
+}
+
+// ReadRESTReq reads and unmarshals a Request's body to the the BaseReq stuct.
+// Writes an error response to ResponseWriter and returns true if errors occurred.
+func ReadRESTReq(w http.ResponseWriter, r *http.Request, req *SetAIRequestReq) bool {
+
+	err := msgp.Decode(r.Body, req)
+	if err != nil {
+		rest.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("failed to decode JSON payload: %s", err))
+		return false
+	}
+
+	reqSize := msgp.GuessSize(req)
+
+	// validate the request size
+	if reqSize > types.MaximumRequestBytesThreshold {
+		rest.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintf("the size of the request exceeds the amount allowed."))
+		return false
+	}
+
+	return true
 }

@@ -49,17 +49,20 @@ printHelp () {
     res=$(printHelp 0 | grep -A2 "\- '$2' \-")
     echo "$res"    
   else      
-    printBoldColor $BROWN "      - 'hello' - hello"
+    printBoldColor $BROWN "      - 'oraid' - Run the full node"
     printBoldColor $BLUE  "          fn hello --key value"           
     echo
-    printBoldColor $BROWN "      - 'broadcast' - broadcast"
+    printBoldColor $BROWN "      - 'broadcast' - broadcast transaction"
     printBoldColor $BLUE  "          fn broadcast --key value"           
     echo
-    printBoldColor $BROWN "      - 'restServer' - restServer"
+    printBoldColor $BROWN "      - 'restServer' - Start the restful server"
     printBoldColor $BLUE  "          fn restServer --key value"           
     echo
-    printBoldColor $BROWN "      - 'sign' - sign"
+    printBoldColor $BROWN "      - 'sign' - sign transaction"
     printBoldColor $BLUE  "          fn sign --key value"           
+    echo
+    printBoldColor $BROWN "      - 'clear' - Clear all existing data"
+    printBoldColor $BLUE  "          fn clear"           
     echo
   fi
 
@@ -147,9 +150,11 @@ case "$METHOD" in
 esac
 
 
-helloFn(){
-    local value=$(getArgument "value" world) 
-    echo "$value"
+clear(){
+    rm -rf .oraid/
+    rm -rf .oraicli/
+    rm -rf .oraifiles/
+    rm -rf .websocket/
 }
 
 oraidFn(){
@@ -161,12 +166,16 @@ websocketInitFn(){
     ./websocket-init.sh $USER $reporter
 }
 
+initFn(){    
+    ./init.sh $CHAIN_ID $USER
+}
+
 websocketRunFn(){
     websocket run
 }
 
 restServerFn(){
-    oraicli rest-server --chain-id Oraichain --laddr tcp://0.0.0.0:1317  --trust-node
+    oraicli rest-server --chain-id $CHAIN_ID --laddr tcp://0.0.0.0:1317  --trust-node
 }
 
 initScriptFn(){
@@ -187,12 +196,12 @@ initScriptFn(){
 
 unsignedFn(){
   local id=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.address" -r)
-  local unsigned=$(curl --location --request POST 'http://localhost:1317/airequest/aireq/pricereq' \
+  local unsigned=$(curl --location --request POST 'http://localhost:1317/airequest/aireq/testreq' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "base_req":{
         "from":"'$id'",
-        "chain_id":"Oraichain"
+        "chain_id":"'$CHAIN_ID'"
     },
     "oracle_script_name":"oscript_eth",
     "input":"",
@@ -202,23 +211,53 @@ unsignedFn(){
 }' > tmp/unsignedTx.json)
 }
 
+unsignedSetDsFn(){
+  local id=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.address" -r)
+  local unsigned=$(curl --location --request POST 'http://localhost:1317/provider/datasource' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "base_req":{
+        "from":"'$id'",
+        "chain_id":"Oraichain"
+    },
+    "name":"coingecko_eth",
+    "code_path":"/workspace/testfiles/coingecko_eth.py",
+    "description":"NTAwMA==",
+    "fees":"60000orai"
+}' > tmp/unsignedTx.json)
+}
+
 signFn(){     
     # $1 is account number
     local sequence=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.sequence" -r)
     local acc_num=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.account_number" -r)
-    oraicli tx sign tmp/unsignedTx.json --from $USER --offline --chain-id Oraichain --sequence $sequence --account-number $acc_num > tmp/signedTx.json
+    oraicli tx sign tmp/unsignedTx.json --from $USER --offline --chain-id $CHAIN_ID --sequence $sequence --account-number $acc_num > tmp/signedTx.json
 }
 
 broadcastFn(){
     oraicli tx broadcast tmp/signedTx.json
 }
 
+createValidatorFn() {
+  local amount=$(getArgument "amount" 10000orai)
+  local pubkey=$(getArgument "pubkey" oraivalconspub1addwnpepqvydmv22mkzc9rc92g43unew08cmj4q46dhk7vz0a9fj2xjsjn2lvqj0dfr)
+  local moniker=$(getArgument "moniker" ducphamle)
+  local commissionRate=$(getArgument "commission-rate" 0.10)
+  local commissionMaxRate==$(getArgument "commission-max-rate" 0.20)
+  local commissionMaxChangeRate==$(getArgument "commission-max-change-rate" 0.01)
+  oraicli tx staking create-validator --amount $amount --pubkey $pubkey --moniker $moniker --chain-id $CHAIN_ID --commission-rate $commissionRate --commission-max-rate $commissionMaxRate --commission-max-change-rate $commissionMaxChangeRate --min-self-delegation 100 --gas auto --gas-adjustment 1.15 --gas-prices 0.025orai --from $USER
+}
+
 USER=$(getArgument "user" duc)
+CHAIN_ID=$(getArgument "chain-id" Oraichain)
 
 # processing
 case "${METHOD}" in     
   hello)
     helloFn
+  ;;
+  init)
+    initFn
   ;;
   oraid)
     oraidFn
@@ -232,6 +271,9 @@ case "${METHOD}" in
   unsign)
     unsignedFn
   ;;
+  unsignedSetDsFn)
+    unsignedDsFn
+  ;;
   initScript)
     initScriptFn
   ;;
@@ -243,6 +285,9 @@ case "${METHOD}" in
   ;;
   restServer)
     restServerFn
+  ;;
+  createValidator)
+    createValidatorFn
   ;;
   *) 
     printHelp 1 ${args[0]}
