@@ -57,7 +57,7 @@ oraid collect-gentxs
 
 oraid validate-genesis
 
-#oraid start --minimum-gas-prices 0.025orai
+# oraid start --minimum-gas-prices 0.025orai
 
 #oraid start
 

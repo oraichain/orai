@@ -3,13 +3,12 @@ package cmd
 import (
 	"context"
 	"fmt"
-	"io"
-	"os"
-
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/spf13/cobra"
+	"io"
+	"os"
 )
 
 func init() {
@@ -36,16 +35,15 @@ func createCmdRun(containerName string) {
 	if err != nil {
 		panic(err)
 	}
-
 	reader, err := cli.ImagePull(ctx, imageName, types.ImagePullOptions{})
 	if err != nil {
 		panic(err)
 	}
 	io.Copy(os.Stdout, reader)
-
 	resp, err := cli.ContainerCreate(ctx, &container.Config{
-		Image: imageName,
-		Tty:   true,
+		Image:      imageName,
+		WorkingDir: "/.oraifiles",
+		Tty:        true,
 	}, nil, nil, nil, containerName)
 	if err != nil {
 		panic(err)
@@ -55,7 +53,7 @@ func createCmdRun(containerName string) {
 		panic(err)
 	}
 
-	fmt.Println(resp.ID)
+	fmt.Println(resp)
 
 	// if run then remove, need waiting
 	// statusCh, errCh := cli.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)
