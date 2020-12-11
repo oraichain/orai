@@ -81,7 +81,7 @@ type WebSocketKeeper interface {
 	DefaultValResultI() webSocket.ValResultI
 	GetKeyResultSuccess() string
 	NewValidator(address sdk.ValAddress, votingPower int64, status string) webSocket.ValidatorI
-	NewValResult(val sdk.ValAddress, result []byte) webSocket.ValResultI
+	NewValResult(val webSocket.ValidatorI, result []byte, status string) webSocket.ValResultI
 }
 
 // AIRequestKeeper defines the expected airequest keeper

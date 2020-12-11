@@ -27,6 +27,7 @@ type ReportI interface {
 	GetAggregatedResult() []byte
 	GetBlockHeight() int64
 	GetFees() sdk.Coins
+	GetResultStatus() string
 }
 
 // ReporterI is the generic Reporter interface that is used for other modules
@@ -45,6 +46,7 @@ type ValidatorI interface {
 
 // ValResultI is the generic ValidatorResult interface that is used for other modules
 type ValResultI interface {
-	GetValidator() sdk.ValAddress
+	GetValidator() ValidatorI
 	GetResult() []byte
+	GetResultStatus() string
 }

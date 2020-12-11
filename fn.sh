@@ -191,7 +191,7 @@ initScriptFn(){
 
   sleep 5
 
-  oraicli tx provider set-oscript oscript_eth ./testfiles/oscript_eth.sh "An oracle script that fetches and aggregates ETH price from different sources" --ds coingecko_eth crypto_compare_eth --tc testcase_price --from $USER --fees 5000orai
+  oraicli tx provider set-oscript oscript_eth ./testfiles/oscript_eth.sh "An oracle script that fetches and aggregates ETH price from different sources" --ds coingecko_eth,crypto_compare_eth --tc testcase_price --from $USER --fees 5000orai
 }
 
 unsignedFn(){

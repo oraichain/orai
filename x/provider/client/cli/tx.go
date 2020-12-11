@@ -92,12 +92,12 @@ func GetCmdSetOracleScript(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			dSources, err := cmd.Flags().GetStringArray(flagDataSources)
+			dSources, err := cmd.Flags().GetStringSlice(flagDataSources)
 			if err != nil {
 				return err
 			}
 
-			tCases, err := cmd.Flags().GetStringArray(flagTestCases)
+			tCases, err := cmd.Flags().GetStringSlice(flagTestCases)
 			if err != nil {
 				return err
 			}
@@ -112,8 +112,8 @@ func GetCmdSetOracleScript(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringArray(flagDataSources, make([]string, 0), "identifiers of the data sources")
-	cmd.Flags().StringArray(flagTestCases, make([]string, 0), "identifiers of the test cases")
+	cmd.Flags().StringSlice(flagDataSources, make([]string, 0), "identifiers of the data sources")
+	cmd.Flags().StringSlice(flagTestCases, make([]string, 0), "identifiers of the test cases")
 
 	return cmd
 }
@@ -123,7 +123,7 @@ func GetCmdEditOracleScript(cdc *codec.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "edit-oscript [old-name] [new-name] [code-path] [description]",
 		Short: "Edit an existing oscript in the system",
-		Args:  cobra.ExactArgs(4),
+		Args:  cobra.MinimumNArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			inBuf := bufio.NewReader(cmd.InOrStdin())
 			cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -135,12 +135,12 @@ func GetCmdEditOracleScript(cdc *codec.Codec) *cobra.Command {
 				return err
 			}
 
-			dSources, err := cmd.Flags().GetStringArray(flagDataSources)
+			dSources, err := cmd.Flags().GetStringSlice(flagDataSources)
 			if err != nil {
 				return err
 			}
 
-			tCases, err := cmd.Flags().GetStringArray(flagTestCases)
+			tCases, err := cmd.Flags().GetStringSlice(flagTestCases)
 			if err != nil {
 				return err
 			}
@@ -155,8 +155,8 @@ func GetCmdEditOracleScript(cdc *codec.Codec) *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringArray(flagDataSources, make([]string, 0), "identifiers of the data sources")
-	cmd.Flags().StringArray(flagTestCases, make([]string, 0), "identifiers of the test cases")
+	cmd.Flags().StringSlice(flagDataSources, make([]string, 0), "identifiers of the data sources")
+	cmd.Flags().StringSlice(flagTestCases, make([]string, 0), "identifiers of the test cases")
 
 	return cmd
 }

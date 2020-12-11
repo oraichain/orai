@@ -20,12 +20,10 @@ var (
 )
 
 // SubmitReport creates a new MsgCreateReport and submits it to the Oraichain to create a new report
-func SubmitReport(c *Context, l *Logger, key keys.Info, msgReport Report) {
+func SubmitReport(c *Context, l *Logger, key keys.Info, msgReport types.MsgCreateReport) {
 	cliCtx := sdkCtx.CLIContext{Client: c.client, TrustNode: true, Codec: cdc}
 	txHash := ""
-	reporter := types.NewReporter(key.GetAddress(), key.GetName(), msgReport.Validator)
-	msg := types.NewMsgCreateReport(msgReport.RequestID, msgReport.DataSourceResults, msgReport.TestCaseResults, reporter, msgReport.Fees, msgReport.AggregatedResult)
-	if err := msg.ValidateBasic(); err != nil {
+	if err := msgReport.ValidateBasic(); err != nil {
 		l.Error(":exploding_head: Failed to validate basic with error: %s", err.Error())
 		return
 	}
@@ -46,7 +44,7 @@ func SubmitReport(c *Context, l *Logger, key keys.Info, msgReport Report) {
 		// 	l.Error(":exploding_head: Failed to enrich with gas with error: %s", err.Error())
 		// 	return
 		// }
-		out, err := txBldr.WithKeybase(keybase).BuildAndSign(key.GetName(), ckeys.DefaultKeyPass, []sdk.Msg{msg})
+		out, err := txBldr.WithKeybase(keybase).BuildAndSign(key.GetName(), ckeys.DefaultKeyPass, []sdk.Msg{msgReport})
 		if err != nil {
 			l.Info(":warning: Failed to build tx with error: %s", err.Error())
 			time.Sleep(c.rpcPollInterval)

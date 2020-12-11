@@ -16,6 +16,7 @@ type Report struct {
 	BlockHeight       int64                        `json:"block_height"`
 	Fees              sdk.Coins                    `json:"report_fee"`
 	AggregatedResult  []byte                       `json:"aggregated_result"`
+	ResultStatus      string                       `json:"result_status"`
 	Reporter          Reporter                     `json:"reporter"`
 }
 
@@ -28,6 +29,7 @@ func NewReport(
 	fees sdk.Coins,
 	aggregatedResult []byte,
 	reporter Reporter,
+	status string,
 ) Report {
 	return Report{
 		RequestID:         requestID,
@@ -37,6 +39,7 @@ func NewReport(
 		BlockHeight:       blockHeight,
 		Fees:              fees,
 		AggregatedResult:  aggregatedResult,
+		ResultStatus:      status,
 	}
 }
 
@@ -78,4 +81,9 @@ func (r Report) GetBlockHeight() int64 {
 // GetFees is the getter method for getting Fees of a report
 func (r Report) GetFees() sdk.Coins {
 	return r.Fees
+}
+
+// GetResultStatus is the getter method for getting aggregated result status of a report
+func (r Report) GetResultStatus() string {
+	return r.ResultStatus
 }

@@ -178,9 +178,12 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 
 		fmt.Println("final result string: ", finalResultStr)
 		fmt.Println("final result after trimming: ", strings.TrimSuffix(finalResultStr, "-"))
-		msgReport := NewReport(req.RequestID, c.validator, dataSourceResults, testCaseResults, key.GetAddress(), sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(5000)))), []byte(finalResultStr))
+		// Create a new MsgCreateReport with a new reporter to the Oraichain
+		reporter := types.NewReporter(key.GetAddress(), key.GetName(), c.validator)
+		msgReport := types.NewMsgCreateReport(req.RequestID, dataSourceResults, testCaseResults, reporter, sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(5000)))), []byte(finalResultStr), types.ResultSuccess)
 		if len(finalResultStr) == 0 {
 			msgReport.AggregatedResult = []byte(types.FailedResponseOs)
+			msgReport.ResultStatus = types.ResultFailure
 			// Create a new MsgCreateReport to the Oraichain
 		} else {
 			// "2" here is the expected output that the user wants to get
@@ -197,7 +200,8 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 			fmt.Printf("final result from oScript: %s\n", ress)
 			msgReport.AggregatedResult = []byte(ress)
 		}
-		// Create a new MsgCreateReport to the Oraichain
+
+		// TODO: check aggregated result value of the oracle script to verify if it fails or success
 		SubmitReport(c, l, key, msgReport)
 	}(l.With("reqid", req.RequestID, "oscriptname", req.OracleScriptName), req)
 }

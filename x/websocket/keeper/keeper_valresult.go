@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/oraichain/orai/x/websocket/exported"
 	"github.com/oraichain/orai/x/websocket/types"
 )
@@ -14,7 +13,7 @@ func (k Keeper) DefaultValResultI() exported.ValResultI {
 // DefaultValResult is a default constructor for the validator result
 func (k Keeper) DefaultValResult() types.ValResult {
 	return types.ValResult{
-		Validator: nil,
+		Validator: types.Validator{},
 		Result:    []byte{},
 	}
 }
@@ -25,6 +24,6 @@ func (k Keeper) GetKeyResultSuccess() string {
 }
 
 // NewValResult is a wrapper function of the websocket module that allow others to initiate a new valresult entity through the keeper
-func (k Keeper) NewValResult(val sdk.ValAddress, result []byte) exported.ValResultI {
-	return types.NewValResult(val, result)
+func (k Keeper) NewValResult(val exported.ValidatorI, result []byte, status string) exported.ValResultI {
+	return types.NewValResult(val, result, status)
 }
