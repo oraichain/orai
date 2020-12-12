@@ -16,6 +16,7 @@ type Report struct {
 	BlockHeight       int64                        `json:"block_height"` // block height where the report is stored on Oraichain.
 	Fees              sdk.Coins                    `json:"report_fee"` // fees for reporting.
 	AggregatedResult  []byte                       `json:"aggregated_result"` // the aggregated result retrieved from the Oracle Script.
+	ResultStatus      string                       `json:"result_status"` // the status of the result, can be either fail or success.
 	Reporter          Reporter                     `json:"reporter"` // the account that is used to create the report transaciton.
 }
 ```
@@ -68,3 +69,17 @@ type Validator struct {
 	Status      string         `json:"status"` // the status of the validator (active or inactive)
 }
 ```
+
+## ValResult
+
+ValResult stores the result information from a validator that has executed the oracle script
+
+```go
+// ValResult stores the result information from a validator that has executed the oracle script
+type ValResult struct {
+	Validator    exported.ValidatorI `json:"validator"` // the validator object that mimics the real validator with custom attributes.
+	Result       []byte              `json:"result"` // the aggregated result in bytes
+	ResultStatus string              `json:"result_status"` // fail or success
+}
+```
+

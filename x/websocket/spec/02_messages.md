@@ -18,6 +18,7 @@ type MsgCreateReport struct {
 	Reporter          Reporter                     `json:"reporter"`
 	Fees              sdk.Coins                    `json:"report_fee"`
 	AggregatedResult  []byte                       `json:"aggregated_result"`
+	ResultStatus      string                       `json:"result_status"`
 }
 ```
 
@@ -29,6 +30,7 @@ If one of the below conditions occurs, the message will not be accepted by the n
 - The fee type is invalid.
 - The report already exists (by checking whether in that block height, the same request ID is reported twice)
 - Unexpected error in adding the report into the store.
+- the result status is different from the success and fail status.
 
 ## MsgAddReporter
 
