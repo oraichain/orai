@@ -163,7 +163,7 @@ oraidFn(){
 
 websocketInitFn(){
     local reporter="${USER}_reporter"
-    ./websocket-init.sh $USER $reporter
+    ./websocket.sh $USER $reporter
 }
 
 initFn(){    
@@ -196,6 +196,7 @@ initScriptFn(){
 
 unsignedFn(){
   local id=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.address" -r)
+  # echo "unsignedFn) id: $id"
   local unsigned=$(curl --location --request POST 'http://localhost:1317/airequest/aireq/testreq' \
 --header 'Content-Type: application/json' \
 --data-raw '{
@@ -209,6 +210,9 @@ unsignedFn(){
     "fees":"60000orai",
     "validator_count": "1"
 }' > tmp/unsignedTx.json)
+
+    res=$?  
+    verifyResult $res "Unsigned failed"
 }
 
 unsignedSetDsFn(){
@@ -232,10 +236,10 @@ signFn(){
     local sequence=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.sequence" -r)
     local acc_num=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.account_number" -r)
     oraicli tx sign tmp/unsignedTx.json --from $USER --offline --chain-id $CHAIN_ID --sequence $sequence --account-number $acc_num > tmp/signedTx.json
-}
-
-broadcastFn(){
     oraicli tx broadcast tmp/signedTx.json
+
+    res=$?  
+    verifyResult $res "Signed failed"
 }
 
 createValidatorFn() {
