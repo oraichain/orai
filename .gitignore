@@ -9,7 +9,7 @@
 cosmosjs/node_modules/
 images/
 cosmosjs/.uploads/
-
+.devcontainer
 signedTx.json
 unsignedTx.json
 test.json

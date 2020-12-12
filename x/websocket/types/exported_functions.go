@@ -35,5 +35,5 @@ type ValidatorSet interface {
 type ValResultSet interface {
 	DefaultValResultI() exported.ValResultI
 	GetKeyResultSuccess() string
-	NewValResult(val sdk.ValAddress, result []byte) exported.ValResultI
+	NewValResult(val exported.ValidatorI, result []byte, status string) exported.ValResultI
 }

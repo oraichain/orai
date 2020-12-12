@@ -52,27 +52,35 @@ var _ exported.ValResultI = (*ValResult)(nil)
 
 // ValResult stores the result information from a validator that has executed the oracle script
 type ValResult struct {
-	Validator sdk.ValAddress `json:"validator_address"`
-	Result    []byte         `json:"result"`
+	Validator    exported.ValidatorI `json:"validator"`
+	Result       []byte              `json:"result"`
+	ResultStatus string              `json:"result_status"` // fail or success
 }
 
 // NewValResult is a constructor for the validator result
 func NewValResult(
-	val sdk.ValAddress,
+	val exported.ValidatorI,
 	result []byte,
+	status string,
 ) ValResult {
 	return ValResult{
-		Validator: val,
-		Result:    result,
+		Validator:    val,
+		Result:       result,
+		ResultStatus: status,
 	}
 }
 
 // GetValidator is getter method for ValResult struct
-func (valRes ValResult) GetValidator() sdk.ValAddress {
+func (valRes ValResult) GetValidator() exported.ValidatorI {
 	return valRes.Validator
 }
 
 // GetResult is getter method for ValResult struct
 func (valRes ValResult) GetResult() []byte {
 	return valRes.Result
+}
+
+// GetResult is getter method for ValResult struct
+func (valRes ValResult) GetResultStatus() string {
+	return valRes.ResultStatus
 }

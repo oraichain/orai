@@ -5,11 +5,8 @@ const (
 	// TODO: Create your event types
 	// EventType<Action>    		= "action"
 	// Event type for set ai request
-	EventTypeRequestWithData          = "ai_request_data"
-	EventTypeSetKYCRequest            = "set_kyc_request"
-	EventTypeSetClassificationRequest = "set_classification_request"
-	EventTypeSetOCRRequest            = "set_ocr_request"
-	EventTypeSetPriceRequest          = "set_price_request"
+	EventTypeRequestWithData = "ai_request_data"
+	EventTypeSetAIRequest    = "set_ai_request"
 
 	// TODO: Create keys fo your events, the values will be derivided from the msg
 	// AttributeKeyAddress  		= "address"

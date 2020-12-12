@@ -10,10 +10,15 @@ import (
 // ResolveResult aggregates the results from the reports before storing it into the blockchain
 func (k Keeper) ResolveResult(ctx sdk.Context, req aiRequest.AIRequestI, rep webSocket.ReportI) {
 	// hard code the result first if the request does not have a result
+
+	// get a new validator object for the result object.
+	valAddress := rep.GetValidator()
+	validator := k.webSocketKeeper.NewValidator(valAddress, k.stakingKeeper.Validator(ctx, valAddress).GetConsensusPower(), "active")
+
 	if !k.HasResult(ctx, req.GetRequestID()) {
 		// if the the request only needs a validator to return a result from the report then it's finished
 		resultList := make([]webSocket.ValResultI, 0)
-		resultList = append(resultList, k.webSocketKeeper.NewValResult(rep.GetValidator(), rep.GetAggregatedResult()))
+		resultList = append(resultList, k.webSocketKeeper.NewValResult(validator, rep.GetAggregatedResult(), rep.GetResultStatus()))
 		if len(req.GetValidators()) == 1 {
 			k.SetResult(ctx, req.GetRequestID(), types.NewAIRequestResult(req.GetRequestID(), resultList, types.RequestStatusFinished))
 		} else {
@@ -25,7 +30,7 @@ func (k Keeper) ResolveResult(ctx sdk.Context, req aiRequest.AIRequestI, rep web
 		if len(req.GetValidators()) > 1 {
 			// if already has result then we add more results
 			result, _ := k.GetResult(ctx, req.GetRequestID())
-			result.Results = append(result.Results, k.webSocketKeeper.NewValResult(rep.GetValidator(), rep.GetAggregatedResult()))
+			result.Results = append(result.Results, k.webSocketKeeper.NewValResult(validator, rep.GetAggregatedResult(), rep.GetResultStatus()))
 			// check if there are enough results from the validators or not
 			if len(req.GetValidators()) == len(result.Results) {
 				result.Status = types.RequestStatusFinished

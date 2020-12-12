@@ -14,6 +14,7 @@ type MsgCreateReport struct {
 	Reporter          Reporter                     `json:"reporter"`
 	Fees              sdk.Coins                    `json:"report_fee"`
 	AggregatedResult  []byte                       `json:"aggregated_result"`
+	ResultStatus      string                       `json:"result_status"`
 }
 
 // NewMsgCreateReport is a constructor function for MsgCreateReport
@@ -24,6 +25,7 @@ func NewMsgCreateReport(
 	reporter Reporter,
 	fees sdk.Coins,
 	aggregatedResult []byte,
+	status string,
 ) MsgCreateReport {
 	return MsgCreateReport{
 		RequestID:         requestID,
@@ -32,6 +34,7 @@ func NewMsgCreateReport(
 		Reporter:          reporter,
 		Fees:              fees,
 		AggregatedResult:  aggregatedResult,
+		ResultStatus:      status,
 	}
 }
 
@@ -49,6 +52,8 @@ func (msg MsgCreateReport) ValidateBasic() error {
 		return sdkerrors.Wrap(ErrMsgReportInvalid, "Request ID / validator address cannot be empty")
 	} else if len(msg.DataSourceResults) == 0 || len(msg.TestCaseResults) == 0 || len(msg.AggregatedResult) == 0 {
 		return sdkerrors.Wrap(ErrMsgReportInvalid, "lengths of the data source and test case must be greater than zero, and there must be an aggregated result")
+	} else if msg.ResultStatus != ResultSuccess && msg.ResultStatus != ResultFailure {
+		return sdkerrors.Wrap(ErrMsgReportInvalid, "result status of the report is not valid")
 	} else {
 		_, err := sdk.ParseCoins(msg.Fees.String())
 		if err != nil {

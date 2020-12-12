@@ -16,15 +16,19 @@ type MsgCreateOracleScript struct {
 	Description string         `json:"description"`
 	Code        []byte         `json:"code"`
 	Owner       sdk.AccAddress `json:"owner"`
+	DataSources []string       `json:"data_sources"`
+	TestCases   []string       `json:"test_cases"`
 }
 
 // NewMsgCreateOracleScript is a constructor function for MsgCreateOracleScript
-func NewMsgCreateOracleScript(name string, code []byte, owner sdk.AccAddress, des string) MsgCreateOracleScript {
+func NewMsgCreateOracleScript(name string, code []byte, owner sdk.AccAddress, des string, dSources, tCases []string) MsgCreateOracleScript {
 	return MsgCreateOracleScript{
 		Name:        name,
 		Code:        code,
 		Owner:       owner,
 		Description: des,
+		DataSources: dSources,
+		TestCases:   tCases,
 	}
 }
 
@@ -40,7 +44,10 @@ func (msg MsgCreateOracleScript) ValidateBasic() error {
 	// 	return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	// }
 	if len(msg.Name) == 0 || len(msg.Code) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "Name and/or Code cannot be empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Name and/or Code cannot be empty")
+	}
+	if len(msg.DataSources) == 0 || len(msg.TestCases) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "data source & test case identifiers cannot be empty")
 	}
 	return nil
 }
@@ -62,16 +69,20 @@ type MsgEditOracleScript struct {
 	Description string         `json:"description"`
 	Code        []byte         `json:"code"`
 	Owner       sdk.AccAddress `json:"owner"`
+	DataSources []string       `json:"data_sources"`
+	TestCases   []string       `json:"test_cases"`
 }
 
 // NewMsgEditOracleScript is a constructor function for MsgEditOracleScript
-func NewMsgEditOracleScript(oldName string, newName string, code []byte, owner sdk.AccAddress, des string) MsgEditOracleScript {
+func NewMsgEditOracleScript(oldName string, newName string, code []byte, owner sdk.AccAddress, des string, dSources, tCases []string) MsgEditOracleScript {
 	return MsgEditOracleScript{
 		OldName:     oldName,
 		NewName:     newName,
 		Description: des,
 		Code:        code,
 		Owner:       owner,
+		DataSources: dSources,
+		TestCases:   tCases,
 	}
 }
 
@@ -87,7 +98,10 @@ func (msg MsgEditOracleScript) ValidateBasic() error {
 	// 	return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	// }
 	if len(msg.OldName) == 0 || len(msg.Code) == 0 || len(msg.NewName) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "Name and/or Code cannot be empty")
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Name and/or Code cannot be empty")
+	}
+	if len(msg.DataSources) == 0 || len(msg.TestCases) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "data source & test case identifiers cannot be empty")
 	}
 	return nil
 }

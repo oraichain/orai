@@ -67,7 +67,7 @@ func handleMsgSetAIRequest(ctx sdk.Context, k keeper.Keeper, msg types.MsgSetAIR
 
 	// TODO: Define your msg events
 	// Emit an event describing a data request and asked validators.
-	event := sdk.NewEvent(types.EventTypeSetPriceRequest)
+	event := sdk.NewEvent(types.EventTypeSetAIRequest)
 	event = event.AppendAttributes(
 		sdk.NewAttribute(types.AttributeRequestID, string(request.RequestID[:])),
 	)

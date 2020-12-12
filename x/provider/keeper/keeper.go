@@ -80,6 +80,7 @@ func (k Keeper) GetMinimumFees(ctx sdk.Context, dNames, tcNames []string, valNum
 	}
 
 	for j := 0; j < len(dNames); j++ {
+		fmt.Println("data source: ", dNames[j])
 		// collect all the data source objects to store in the ai request
 		aiDataSource, err := k.GetAIDataSource(ctx, dNames[j])
 		if err != nil {
