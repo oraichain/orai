@@ -31,32 +31,14 @@ func ExecPythonFile(id string, file string, input []string) (string, error) {
 
 	if !CheckExistsContainer(cli, "python") {
 		//create container
-		workDir, err := os.Getwd()
+		err = CreateContainer(ctx, cli)
 		if err != nil {
 			return "", err
-		}
-
-		err = CreateContainer(cli)
-		if err != nil {
-			return "", err
-		}
-
-		pythonDir := path.Join(workDir, fileDir)
-		fmt.Println("python dir: ", pythonDir)
-		files, err := ioutil.ReadDir(pythonDir)
-		if err != nil {
-			return "", err
-		}
-		for _, f := range files {
-			if !f.IsDir() {
-				fmt.Println("file copied: ", path.Join(pythonDir, f.Name()))
-				CopyFileToContainer("python", path.Join(pythonDir, f.Name()))
-			}
 		}
 	}
 
 	fileName := filepath.Base(file)
-	CopyFileToContainer("python", file)
+	CopyFileToContainer(ctx, cli, "python", file)
 
 	resp, err := cli.ContainerExecCreate(ctx, id, types.ExecConfig{
 		AttachStdout: true,
@@ -78,14 +60,9 @@ func ExecPythonFile(id string, file string, input []string) (string, error) {
 	return string(buf.Bytes()), nil
 }
 
-func CopyFileToContainer(id string, filePath string) {
-	ctx := context.Background()
+func CopyFileToContainer(ctx context.Context, cli *client.Client, id string, filePath string) {
 	fileName := filepath.Base(filePath)
 	content, err := ioutil.ReadFile(filePath)
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-	if err != nil {
-		panic(err)
-	}
 	var buf bytes.Buffer
 	tw := tar.NewWriter(&buf)
 	err = tw.WriteHeader(&tar.Header{
@@ -118,8 +95,7 @@ func CheckExistsContainer(cli *client.Client, id string) bool {
 	return len(containers) > 0
 }
 
-func CreateContainer(cli *client.Client) error {
-	ctx := context.Background()
+func CreateContainer(ctx context.Context, cli *client.Client) error {
 	reader, err := cli.ImagePull(ctx, "python:3.7-alpine", types.ImagePullOptions{})
 	if err != nil {
 		panic(err)
@@ -137,21 +113,34 @@ func CreateContainer(cli *client.Client) error {
 	if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
 		return err
 	}
+
+	workDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	pythonDir := path.Join(workDir, fileDir)
+	fmt.Println("python dir: ", pythonDir)
+	files, err := ioutil.ReadDir(pythonDir)
+	if err != nil {
+		return err
+	}
+	for _, f := range files {
+		if !f.IsDir() {
+			fmt.Println("file copied: ", path.Join(pythonDir, f.Name()))
+			CopyFileToContainer(ctx, cli, "python", path.Join(pythonDir, f.Name()))
+		}
+	}
+
 	fmt.Println("run install requirement...")
 	//exec import requirements
-	if err = InstallRequirements(); err != nil {
+	if err = InstallRequirements(ctx, cli); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func InstallRequirements() error {
-	ctx := context.Background()
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-	if err != nil {
-		panic(err)
-	}
+func InstallRequirements(ctx context.Context, cli *client.Client) error {
 	restInstall, err := cli.ContainerExecCreate(ctx, "python", types.ExecConfig{
 		AttachStdout: true,
 		AttachStderr: true,
