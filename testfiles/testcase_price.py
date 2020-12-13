@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 import sys
 import base64
-import umsgpack
+import json
 from importlib.util import spec_from_loader, module_from_spec
 from importlib.machinery import SourceFileLoader 
 
@@ -19,12 +19,10 @@ def data_source_res():
 
 def compare_result():
     data_source_result = data_source_res()
-    # convert base64 to string
-    expected_result = base64.b64decode(sys.argv[3]).decode("utf-8")
-    #unpacked = umsgpack.unpackb(bytearray(expected_result))
-    #print("unpacked message: ", unpacked)
+    # convert json to object
+    expected_result = json.loads(sys.argv[3])
     try:
-        deviation = data_source_result - float(expected_result)
+        deviation = data_source_result - float(expected_result['price'])
         if deviation < 10000:
             return data_source_result
         else:

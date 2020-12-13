@@ -23,12 +23,12 @@ func getOScriptPath(name string) string {
 }
 
 func getDSourcePath(name string) string {
-	return path.Join(getCurrentDir(), provider.ScriptPath, types.DataSourceStoreKeyString(name))
+	return path.Join(getCurrentDir(), provider.ScriptPath, types.DataSourceStoreFileString(name))
 }
 
 func getTCasePath(name string) string {
 	// get absolute path from working dir
-	return path.Join(getCurrentDir(), provider.ScriptPath, types.TestCaseStoreKeyString(name))
+	return path.Join(getCurrentDir(), provider.ScriptPath, types.TestCaseStoreFileString(name))
 }
 
 // trimResultEscapeChars is used to remove all escape characters in a string for cleaning the result

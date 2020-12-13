@@ -10,8 +10,8 @@ import (
 const (
 	DefaultParamspace = ModuleName
 	// TODO: Define your default parameters
-	DefaultMaximumRequestBytes   = 1000
-	MaximumRequestBytesThreshold = 5000
+	DefaultMaximumRequestBytes   = 1024 // 1MB
+	MaximumRequestBytesThreshold = 4096 // 4MB
 )
 
 // Parameter store keys

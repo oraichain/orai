@@ -1,15 +1,13 @@
 package websocket
 
 import (
-	"encoding/base64"
 	"fmt"
 	"strconv"
 	"strings"
 
-	provider "github.com/oraichain/orai/x/provider/types"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	aiRequest "github.com/oraichain/orai/x/airequest/types"
+	providerTypes "github.com/oraichain/orai/x/provider/types"
 	"github.com/oraichain/orai/x/websocket/exported"
 	"github.com/oraichain/orai/x/websocket/types"
 )
@@ -40,8 +38,6 @@ func GetEventAIRequest(log sdk.ABCIMessageLog) (AIRequest, error) {
 	inputStr, err := GetEventValue(log, ev, aiRequest.AttributeRequestInput)
 
 	expectedOutputStr, err := GetEventValue(log, ev, aiRequest.AttributeRequestExpectedOutput)
-
-	fmt.Println("expected output str: ", expectedOutputStr)
 
 	creator, err := sdk.AccAddressFromBech32(creatorStr)
 	if err != nil {
@@ -93,8 +89,8 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 		// collect data source name from the oScript script
 		oscriptPath := getOScriptPath(req.OracleScriptName)
 		// encode the input and output back to base64 type to forward to the test case
-		input := base64.StdEncoding.EncodeToString([]byte(req.Input))
-		expectedOutput := base64.StdEncoding.EncodeToString([]byte(req.ExpectedOutput))
+		//input := base64.StdEncoding.EncodeToString([]byte(req.Input))
+		//expectedOutput := base64.StdEncoding.EncodeToString([]byte(req.ExpectedOutput))
 
 		// collect ai data sources and test cases from the ai request event.
 		aiDataSources, testCases, err := getPaths(log)
@@ -113,7 +109,7 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 			//put the results from the data sources into the test case to verify if they are good enough
 			for j := range aiDataSources {
 				//// collect test case result from the script
-				outTestCase, err := ExecPythonFile("python", getTCasePath(testCases[i]), []string{provider.DataSourceStoreKeyString(aiDataSources[j]), input, expectedOutput})
+				outTestCase, err := ExecPythonFile("python", getTCasePath(testCases[i]), []string{providerTypes.DataSourceStoreKeyString(aiDataSources[j]), req.Input, req.ExpectedOutput})
 				if err != nil {
 					l.Error(":skull: failed to execute test case 1st loop: %s", err.Error())
 				}

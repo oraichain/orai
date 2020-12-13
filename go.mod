@@ -33,7 +33,6 @@ require (
 	github.com/tendermint/go-amino v0.15.1
 	github.com/tendermint/tendermint v0.33.7
 	github.com/tendermint/tm-db v0.5.1
-	github.com/tinylib/msgp v1.1.5
 	golang.org/x/sys v0.0.0-20201204225414-ed752295db88 // indirect
 	golang.org/x/tools/gopls v0.5.2 // indirect
 	gopkg.in/yaml.v2 v2.3.0

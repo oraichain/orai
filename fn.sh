@@ -196,7 +196,7 @@ initScriptFn(){
 
 unsignedFn(){
   local id=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.address" -r)
-  local unsigned=$(curl --location --request POST 'http://localhost:1317/airequest/aireq/testreq' \
+  local unsigned=$(curl --location --request POST 'http://localhost:1317/airequest/aireq' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "base_req":{
@@ -205,7 +205,7 @@ unsignedFn(){
     },
     "oracle_script_name":"oscript_eth",
     "input":"",
-    "expected_output":"NTAwMA==",
+    "expected_output":{"price":"5000"},
     "fees":"60000orai",
     "validator_count": "1"
 }' > tmp/unsignedTx.json)

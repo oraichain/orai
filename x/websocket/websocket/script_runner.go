@@ -140,10 +140,10 @@ func CreateContainer(ctx context.Context, cli *client.Client) error {
 			CopyFileToContainer(ctx, cli, "python", path.Join(pythonDir, f.Name()))
 		}
 	}
-	// fmt.Println("run init requirement...")
-	// if err = InitRequirements(ctx, cli); err != nil {
-	// 	return err
-	// }
+	fmt.Println("run init requirement...")
+	if err = InitRequirements(ctx, cli); err != nil {
+		return err
+	}
 	fmt.Println("run install requirement...")
 	//exec import requirements
 	if err = InstallRequirements(ctx, cli); err != nil {
@@ -155,11 +155,29 @@ func CreateContainer(ctx context.Context, cli *client.Client) error {
 
 // InitRequirements creates requirements.txt file in the python container
 func InitRequirements(ctx context.Context, cli *client.Client) error {
+
+	// install pipreqs to generate requirements.txt file
 	restInstall, err := cli.ContainerExecCreate(ctx, "python", types.ExecConfig{
 		AttachStdout: true,
 		AttachStderr: true,
 		Tty:          true,
-		Cmd:          []string{"pip", "freeze", ">", "requirements.txt"},
+		Cmd:          []string{"pip", "install", "pipreqs"},
+	})
+	if err != nil {
+		panic(err)
+	}
+	_, err = cli.ContainerExecAttach(ctx, restInstall.ID, types.ExecStartCheck{})
+
+	if err != nil {
+		panic(err)
+	}
+
+	// generate requirements.txt file in the python container
+	restInstall, err = cli.ContainerExecCreate(ctx, "python", types.ExecConfig{
+		AttachStdout: true,
+		AttachStderr: true,
+		Tty:          true,
+		Cmd:          []string{"pipreqs"},
 	})
 	if err != nil {
 		panic(err)
