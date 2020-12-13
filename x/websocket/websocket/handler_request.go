@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/oraichain/orai/x"
 	provider "github.com/oraichain/orai/x/provider/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -114,7 +113,7 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 			//put the results from the data sources into the test case to verify if they are good enough
 			for j := range aiDataSources {
 				//// collect test case result from the script
-				outTestCase, err := x.ExecPythonFile("python", getTCasePath(testCases[i]), []string{provider.DataSourceStoreKeyString(aiDataSources[j]), input, expectedOutput})
+				outTestCase, err := ExecPythonFile("python", getTCasePath(testCases[i]), []string{provider.DataSourceStoreKeyString(aiDataSources[j]), input, expectedOutput})
 				if err != nil {
 					l.Error(":skull: failed to execute test case 1st loop: %s", err.Error())
 				}
@@ -146,7 +145,7 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 			var outDataSource string
 			var dataSourceResult types.DataSourceResult
 			if dataSourceResultsTest[i].GetStatus() == types.ResultSuccess {
-				outDataSource, err = x.ExecPythonFile("python", getDSourcePath(dataSourceResultsTest[i].GetName()), []string{})
+				outDataSource, err = ExecPythonFile("python", getDSourcePath(dataSourceResultsTest[i].GetName()), []string{})
 
 				if err != nil {
 					l.Error(":skull: failed to execute data source script: %s", err.Error())
@@ -181,7 +180,7 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 			msgReport.ResultStatus = types.ResultFailure
 			// Create a new MsgCreateReport to the Oraichain
 		} else {
-			res, err := x.ExecPythonFile("python", oscriptPath, []string{"aggregation", finalResultStr})
+			res, err := ExecPythonFile("python", oscriptPath, []string{"aggregation", finalResultStr})
 			if err != nil {
 				l.Error(":skull: failed to aggregate results: %s", err.Error())
 			}
