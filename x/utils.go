@@ -137,21 +137,34 @@ func CreateContainer(cli *client.Client) error {
 	if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
 		return err
 	}
+	fmt.Println("run install requirement...")
 	//exec import requirements
+	if err = InstallRequirements(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func InstallRequirements() error {
+	ctx := context.Background()
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		panic(err)
+	}
 	restInstall, err := cli.ContainerExecCreate(ctx, "python", types.ExecConfig{
 		AttachStdout: true,
 		AttachStderr: true,
 		Tty:          true,
-		Cmd:          []string{"pip", "install", "-r", " requirements.txt"},
+		Cmd:          []string{"pip", "install", "-r", "requirements.txt"},
 	})
 	if err != nil {
-		return err
+		panic(err)
 	}
 	_, err = cli.ContainerExecAttach(ctx, restInstall.ID, types.ExecStartCheck{})
 
 	if err != nil {
-		return err
+		panic(err)
 	}
-
 	return nil
 }
