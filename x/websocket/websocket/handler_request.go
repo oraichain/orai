@@ -3,10 +3,11 @@ package websocket
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/oraichain/orai/x"
-	provider "github.com/oraichain/orai/x/provider/types"
 	"strconv"
 	"strings"
+
+	"github.com/oraichain/orai/x"
+	provider "github.com/oraichain/orai/x/provider/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	aiRequest "github.com/oraichain/orai/x/airequest/types"
@@ -87,6 +88,8 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 	defer func() {
 		c.keys <- key
 	}()
+
+	// invoke a new goroutine to run the thread in parallel
 	go func(l *Logger, req AIRequest) {
 		// collect data source name from the oScript script
 		oscriptPath := getOScriptPath(req.OracleScriptName)
@@ -110,23 +113,12 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 		for i := range testCases {
 			//put the results from the data sources into the test case to verify if they are good enough
 			for j := range aiDataSources {
-				// Aggregate the required fees for an AI request
-				//// run the test case script
-				//fmt.Println("test case path: ", getTCasePath(testCases[i])+provider.DataSourceStoreKeyString(aiDataSources[j]))
-				//cmdTestCase := exec.Command("bash", getTCasePath(testCases[i]), provider.DataSourceStoreKeyString(aiDataSources[j]), input, expectedOutput)
-				//var outTestCase bytes.Buffer
-				//cmdTestCase.Stdout = &outTestCase
-				//err = cmdTestCase.Run()
-				//if err != nil {
-				//	l.Error(":skull: failed to execute test case 1st loop: %s", err.Error())
-				//}
-				//
 				//// collect test case result from the script
 				outTestCase, err := x.ExecPythonFile("python", getTCasePath(testCases[i]), []string{provider.DataSourceStoreKeyString(aiDataSources[j]), input, expectedOutput})
 				if err != nil {
 					l.Error(":skull: failed to execute test case 1st loop: %s", err.Error())
 				}
-				result := strings.TrimSuffix(outTestCase, "\n")
+				result := trimResultEscapeChars(outTestCase)
 
 				fmt.Println("result after running test case: ", result)
 
@@ -151,24 +143,17 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 		// we use dataSourceResultsTest since this list is the complete list of data sources that have passed the test cases
 		for i := range dataSourceResultsTest {
 			// run the data source script
-			var outTestCase string
+			var outDataSource string
 			var dataSourceResult types.DataSourceResult
 			if dataSourceResultsTest[i].GetStatus() == types.ResultSuccess {
-				outTestCase, err = x.ExecPythonFile("python", getDSourcePath(dataSourceResultsTest[i].GetName()), []string{})
+				outDataSource, err = x.ExecPythonFile("python", getDSourcePath(dataSourceResultsTest[i].GetName()), []string{})
 
 				if err != nil {
 					l.Error(":skull: failed to execute data source script: %s", err.Error())
 				}
-				//dataSourceResult = types.NewDataSourceResult(dataSourceResultsTest[i].GetName(), []byte(result), types.ResultSuccess)
-				//
-				//cmdTestCase := exec.Command("bash", getDSourcePath(dataSourceResultsTest[i].GetName()))
-				//cmdTestCase.Stdout = &outTestCase
-				//err = cmdTestCase.Run()
-				//if err != nil {
-				//	l.Error(":skull: failed to execute data source script: %s", err.Error())
-				//}
 				// collect test case result from the script
-				result := strings.TrimSuffix(outTestCase, "\n")
+				result := trimResultEscapeChars(outDataSource)
+				//result = strings.TrimSuffix(result, "\r")
 				fmt.Println("result from data sources: ", result)
 				// By default, we consider returning null as failure. If any datasource does not follow this rule then it should not be used by any oracle scripts.
 				dataSourceResult = types.NewDataSourceResult(dataSourceResultsTest[i].GetName(), []byte(result), types.ResultSuccess)
@@ -177,6 +162,7 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 					dataSourceResult.Status = types.ResultFailure
 					dataSourceResult.Result = []byte(types.FailedResponseDs)
 				} else {
+					//resultArr = append(resultArr, resultFloat)
 					finalResultStr = finalResultStr + result + delimiter
 				}
 			} else {
@@ -185,9 +171,8 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 			// append an data source result into the list
 			dataSourceResults = append(dataSourceResults, dataSourceResult)
 		}
-
-		fmt.Println("final result string: ", finalResultStr)
-		fmt.Println("final result after trimming: ", strings.TrimSuffix(finalResultStr, "-"))
+		finalResultStr = strings.TrimSuffix(finalResultStr, "-")
+		fmt.Println("final result after trimming: ", finalResultStr)
 		// Create a new MsgCreateReport with a new reporter to the Oraichain
 		reporter := types.NewReporter(key.GetAddress(), key.GetName(), c.validator)
 		msgReport := types.NewMsgCreateReport(req.RequestID, dataSourceResults, testCaseResults, reporter, sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(5000)))), []byte(finalResultStr), types.ResultSuccess)
@@ -196,18 +181,13 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 			msgReport.ResultStatus = types.ResultFailure
 			// Create a new MsgCreateReport to the Oraichain
 		} else {
-			// "2" here is the expected output that the user wants to get
-			//cmd := exec.Command("bash", oscriptPath, "aggregation", finalResultStr)
-			//var res bytes.Buffer
-			//cmd.Stdout = &res
-			//err = cmd.Run()
-			res, err := x.ExecPythonFile("python", oscriptPath, []string{})
+			res, err := x.ExecPythonFile("python", oscriptPath, []string{"aggregation", finalResultStr})
 			if err != nil {
 				l.Error(":skull: failed to aggregate results: %s", err.Error())
 			}
 
 			// collect data source result from the script
-			ress := strings.TrimSuffix(res, "\n")
+			ress := trimResultEscapeChars(res)
 			fmt.Printf("final result from oScript: %s\n", ress)
 			msgReport.AggregatedResult = []byte(ress)
 		}

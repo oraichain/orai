@@ -4,16 +4,22 @@ import (
 	"archive/tar"
 	"bytes"
 	"context"
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/filters"
-	"github.com/docker/docker/client"
-	"github.com/docker/docker/pkg/stdcopy"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/filters"
+	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/stdcopy"
+)
+
+const (
+	fileDir = "/.oraifiles"
 )
 
 func ExecPythonFile(id string, file string, input []string) (string, error) {
@@ -26,15 +32,24 @@ func ExecPythonFile(id string, file string, input []string) (string, error) {
 	if !CheckExistsContainer(cli, "python") {
 		//create container
 		workDir, err := os.Getwd()
+		if err != nil {
+			return "", err
+		}
 
-		CreateContainer(cli)
-		pythonDir := path.Join(workDir, "/testfiles")
+		err = CreateContainer(cli)
+		if err != nil {
+			return "", err
+		}
+
+		pythonDir := path.Join(workDir, fileDir)
+		fmt.Println("python dir: ", pythonDir)
 		files, err := ioutil.ReadDir(pythonDir)
 		if err != nil {
-			panic(err)
+			return "", err
 		}
 		for _, f := range files {
 			if !f.IsDir() {
+				fmt.Println("file copied: ", path.Join(pythonDir, f.Name()))
 				CopyFileToContainer("python", path.Join(pythonDir, f.Name()))
 			}
 		}
@@ -85,7 +100,7 @@ func CopyFileToContainer(id string, filePath string) {
 	tw.Close()
 
 	// use &buf as argument for content in CopyToContainer
-	cli.CopyToContainer(ctx, id, "/.oraifiles", &buf, types.CopyToContainerOptions{})
+	cli.CopyToContainer(ctx, id, fileDir, &buf, types.CopyToContainerOptions{})
 }
 
 func CheckExistsContainer(cli *client.Client, id string) bool {
@@ -112,7 +127,7 @@ func CreateContainer(cli *client.Client) error {
 	io.Copy(os.Stdout, reader)
 	resp, err := cli.ContainerCreate(ctx, &container.Config{
 		Image:      "python:3.7-alpine",
-		WorkingDir: "/.oraifiles",
+		WorkingDir: fileDir,
 		Tty:        true,
 	}, nil, nil, nil, "python")
 	if err != nil {
@@ -129,7 +144,14 @@ func CreateContainer(cli *client.Client) error {
 		Tty:          true,
 		Cmd:          []string{"pip", "install", "-r", " requirements.txt"},
 	})
-	cli.ContainerExecAttach(ctx, restInstall.ID, types.ExecStartCheck{})
+	if err != nil {
+		return err
+	}
+	_, err = cli.ContainerExecAttach(ctx, restInstall.ID, types.ExecStartCheck{})
+
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

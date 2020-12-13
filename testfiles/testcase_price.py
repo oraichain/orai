@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 import sys
 import base64
-import numpy as np
 data_source = __import__(sys.argv[1])
 
 # argv1[1] is the name of the data source
