@@ -40,16 +40,6 @@ func ExecPythonFile(id string, file string, input []string) (string, error) {
 	fileName := filepath.Base(file)
 	CopyFileToContainer(ctx, cli, "python", file)
 
-	// fmt.Println("run init requirement...")
-	// if err = InitRequirements(ctx, cli); err != nil {
-	// 	return "", err
-	// }
-	// fmt.Println("run install requirement...")
-	// //exec import requirements
-	// if err = InstallRequirements(ctx, cli); err != nil {
-	// 	return "", err
-	// }
-
 	resp, err := cli.ContainerExecCreate(ctx, id, types.ExecConfig{
 		AttachStdout: true,
 		AttachStderr: true,
@@ -142,7 +132,26 @@ func CreateContainer(ctx context.Context, cli *client.Client) error {
 	}
 	fmt.Println("run install requirement...")
 	//exec import requirements
-	if err = InstallRequirements(ctx, cli); err != nil {
+
+	// install requirements for the python container
+
+	// install g++
+	if err = InstallRequirements(ctx, cli, []string{"apk", "add", "g++"}); err != nil {
+		return err
+	}
+
+	// install pipreqs
+	if err = InstallRequirements(ctx, cli, []string{"pip", "install", "pipreqs"}); err != nil {
+		return err
+	}
+
+	// run pipreqs
+	if err = InstallRequirements(ctx, cli, []string{"pipreqs"}); err != nil {
+		return err
+	}
+
+	// install requirements.txt
+	if err = InstallRequirements(ctx, cli, []string{"pip", "install", "-r", "requirements.txt"}); err != nil {
 		return err
 	}
 
@@ -150,21 +159,24 @@ func CreateContainer(ctx context.Context, cli *client.Client) error {
 }
 
 // InstallRequirements installs all the modules in the requirements.txt file
-func InstallRequirements(ctx context.Context, cli *client.Client) error {
+func InstallRequirements(ctx context.Context, cli *client.Client, cmd []string) error {
 	restInstall, err := cli.ContainerExecCreate(ctx, "python", types.ExecConfig{
 		AttachStdout: true,
 		AttachStderr: true,
 		Tty:          true,
 		//Cmd:          []string{"pip", "freeze", "-r", "requirements.txt", "&&", "pip", "install", "-r", "requirements.txt"},
-		Cmd: []string{"apk add g++ && pip install pipreqs && pipreqs && pip install -r requirements.txt"},
+		Cmd: cmd,
 	})
 	if err != nil {
 		panic(err)
 	}
-	_, err = cli.ContainerExecAttach(ctx, restInstall.ID, types.ExecStartCheck{})
+	logResp, err := cli.ContainerExecAttach(ctx, restInstall.ID, types.ExecStartCheck{})
 
 	if err != nil {
 		panic(err)
 	}
+
+	var buf, error bytes.Buffer
+	stdcopy.StdCopy(&buf, &error, logResp.Reader)
 	return nil
 }
