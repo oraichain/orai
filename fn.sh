@@ -191,13 +191,12 @@ initScriptFn(){
 
   sleep 5
 
-  oraicli tx provider set-oscript oscript_eth ./testfiles/oscript_eth.py "An oracle script that fetches and aggregates ETH price from different sources" --from $USER --fees 5000orai
+  oraicli tx provider set-oscript oscript_eth ./testfiles/oscript_eth.py "An oracle script that fetches and aggregates ETH price from different sources" --ds coingecko_eth,crypto_compare_eth --tc testcase_price --from $USER --fees 5000orai
 }
 
 unsignedFn(){
   local id=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.address" -r)
-  # echo "unsignedFn) id: $id"
-  local unsigned=$(curl --location --request POST 'http://localhost:1317/airequest/aireq/testreq' \
+  local unsigned=$(curl --location --request POST 'http://localhost:1317/airequest/aireq' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "base_req":{
@@ -206,7 +205,7 @@ unsignedFn(){
     },
     "oracle_script_name":"oscript_eth",
     "input":"",
-    "expected_output":"NTAwMA==",
+    "expected_output":{"price":"5000"},
     "fees":"60000orai",
     "validator_count": "1"
 }' > tmp/unsignedTx.json)
