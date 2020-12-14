@@ -78,7 +78,7 @@ func (k Keeper) EditTestCase(ctx sdk.Context, oldName, newName string, code []by
 
 // GetTestCaseFile gets the test case code stored in the file storage
 func (k Keeper) GetTestCaseFile(name string) []byte {
-	code, err := k.fileCache.GetFile(types.TestCaseStoreKeyString(name))
+	code, err := k.fileCache.GetFile(types.TestCaseStoreFileString(name))
 	if err != nil {
 		return []byte{}
 	}
@@ -87,15 +87,15 @@ func (k Keeper) GetTestCaseFile(name string) []byte {
 
 // AddTestCaseFile adds the file to filecache,
 func (k Keeper) AddTestCaseFile(file []byte, name string) {
-	k.fileCache.AddFile(file, types.TestCaseStoreKeyString(name))
+	k.fileCache.AddFile(file, types.TestCaseStoreFileString(name))
 }
 
 // EditTestCaseFile edit a file in the filecache,
 func (k Keeper) EditTestCaseFile(file []byte, name string) {
-	k.fileCache.EditFile(file, types.TestCaseStoreKeyString(name))
+	k.fileCache.EditFile(file, types.TestCaseStoreFileString(name))
 }
 
 // EraseTestCaseFile removes the file in the filecache,
 func (k Keeper) EraseTestCaseFile(name string) {
-	k.fileCache.EraseFile(types.OracleScriptStoreKeyString(name))
+	k.fileCache.EraseFile(types.TestCaseStoreFileString(name))
 }

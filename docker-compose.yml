@@ -34,8 +34,6 @@ services:
 
   orai:
     image: orai/orai
-    build:
-      context: .
     working_dir: /workspace
     tty: true
     ports:

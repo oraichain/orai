@@ -18,6 +18,7 @@ install: go.sum
 		@echo "--> Installing oraid & oraicli"
 		go install -mod=readonly $(BUILD_FLAGS) ./cmd/orai
 		go install -mod=readonly $(BUILD_FLAGS) ./cmd/oraid
+		go install -mod=readonly $(BUILD_FLAGS) ./cmd/orai
 		go install -mod=readonly $(BUILD_FLAGS) ./cmd/oraicli
 		go install -mod=readonly $(BUILD_FLAGS) ./cmd/websocket
 
@@ -34,11 +35,13 @@ watch-websocket:
 build: 
 		go build -o ./tmp/orai -mod=readonly $(BUILD_FLAGS) ./cmd/orai
 		go build -o ./tmp/oraid -mod=readonly $(BUILD_FLAGS) ./cmd/oraid
+		go build -o ./tmp/oraid -mod=readonly $(BUILD_FLAGS) ./cmd/orai
 		go build -o ./tmp/oraicli -mod=readonly $(BUILD_FLAGS) ./cmd/oraicli
 		go build -o ./tmp/websocket -mod=readonly $(BUILD_FLAGS) ./cmd/websocket
 
 		go install -mod=readonly $(BUILD_FLAGS) ./cmd/orai
 		go install -mod=readonly $(BUILD_FLAGS) ./cmd/oraid
+		go install -mod=readonly $(BUILD_FLAGS) ./cmd/orai
 		go install -mod=readonly $(BUILD_FLAGS) ./cmd/oraicli
 		go install -mod=readonly $(BUILD_FLAGS) ./cmd/websocket
 

@@ -79,22 +79,22 @@ func (k Keeper) EditAIDataSource(ctx sdk.Context, oldName, newName string, code 
 
 // AddAIDataSourceFile adds the file to filecache,
 func (k Keeper) AddAIDataSourceFile(file []byte, name string) {
-	k.fileCache.AddFile(file, types.DataSourceStoreKeyString(name))
+	k.fileCache.AddFile(file, types.DataSourceStoreFileString(name))
 }
 
 // EditAIDataSourceFile edit a file in the filecache,
 func (k Keeper) EditAIDataSourceFile(file []byte, name string) {
-	k.fileCache.EditFile(file, types.DataSourceStoreKeyString(name))
+	k.fileCache.EditFile(file, types.DataSourceStoreFileString(name))
 }
 
 // EraseAIDataSourceFile removes the file in the filecache,
 func (k Keeper) EraseAIDataSourceFile(name string) {
-	k.fileCache.EraseFile(types.OracleScriptStoreKeyString(name))
+	k.fileCache.EraseFile(types.DataSourceStoreFileString(name))
 }
 
 // GetAIDataSourceFile gets the data source code stored in the file storage
 func (k Keeper) GetAIDataSourceFile(name string) []byte {
-	code, err := k.fileCache.GetFile(types.DataSourceStoreKeyString(name))
+	code, err := k.fileCache.GetFile(types.DataSourceStoreFileString(name))
 	if err != nil {
 		return []byte{}
 	}

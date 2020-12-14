@@ -78,6 +78,10 @@ func main() {
 
 		// run websocket command worker
 		websocketCmd, err := websocket.ServeCommand(viper.GetString(flags.FlagHome))
+
+		// bug workaround: have to bind flag here since websocket cmd does not run
+		viper.BindPFlag(flags.FlagChainID, cmd.Flags().Lookup(flags.FlagChainID))
+
 		if err == nil {
 			wg.Add(1)
 			go worker(&wg, websocketCmd.RunE, cmd, args, 2000)
