@@ -11,8 +11,6 @@ rm -rf .oraifiles/
 
 # rm -rf .images/
 
-rm -rf .websocket/
-
 rm go.sum
 
 go get ./...

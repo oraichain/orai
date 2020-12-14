@@ -107,7 +107,7 @@ func ServeCommand(home string) (cmd *cobra.Command, err error) {
 	// Configure cobra to sort commands
 	ctx := &Context{}
 	keybase, err = keys.NewKeyring("orai", "test", home, nil)
-	viper.SetConfigFile(path.Join(home, "config.yaml"))
+	viper.SetConfigFile(path.Join(home, "config-websocket.yaml"))
 	_ = viper.ReadInConfig() // If we fail to read config file, we'll just rely on cmd flags.
 	err = viper.Unmarshal(&cfg)
 	cmd = runCmd(ctx)

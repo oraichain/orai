@@ -12,13 +12,13 @@ rm -rf .oraifiles/
 
 # rm -rf .images/
 
-rm -rf .websocket/
+# rm -rf .websocket/
 
-rm go.sum
+# rm go.sum
 
-go get ./...
+# go get ./...
 
-make install
+# make install
 
 oraid init dws --chain-id $CHAIN_ID
 

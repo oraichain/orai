@@ -50,16 +50,19 @@ printHelp () {
     echo "$res"    
   else      
     printBoldColor $BROWN "      - 'oraid' - Run the full node"
-    printBoldColor $BLUE  "          fn hello --key value"           
+    printBoldColor $BLUE  "          fn oraid"           
     echo
     printBoldColor $BROWN "      - 'broadcast' - broadcast transaction"
     printBoldColor $BLUE  "          fn broadcast --key value"           
     echo
-    printBoldColor $BROWN "      - 'restServer' - Start the restful server"
-    printBoldColor $BLUE  "          fn restServer --key value"           
+    printBoldColor $BROWN "      - 'init' - Init the orai node"
+    printBoldColor $BLUE  "          fn init"           
     echo
     printBoldColor $BROWN "      - 'sign' - sign transaction"
     printBoldColor $BLUE  "          fn sign --key value"           
+    echo
+    printBoldColor $BROWN "      - 'initScript' - init AI request script"
+    printBoldColor $BLUE  "          fn initScript --key value"           
     echo
     printBoldColor $BROWN "      - 'clear' - Clear all existing data"
     printBoldColor $BLUE  "          fn clear"           
@@ -153,30 +156,21 @@ esac
 clear(){
     rm -rf .oraid/
     rm -rf .oraicli/
-    rm -rf .oraifiles/
-    rm -rf .websocket/
+    rm -rf .oraifiles/    
 }
 
 oraidFn(){
-    oraid start
+    # oraid start
+    orai start --chain-id $CHAIN_ID --laddr tcp://0.0.0.0:1317 --trust-node
 }
 
-websocketInitFn(){
+
+initFn(){    
+    ./init.sh $CHAIN_ID $USER
     local reporter="${USER}_reporter"
     ./websocket.sh $USER $reporter
 }
 
-initFn(){    
-    ./init.sh $CHAIN_ID $USER
-}
-
-websocketRunFn(){
-    websocket run
-}
-
-restServerFn(){
-    oraicli rest-server --chain-id $CHAIN_ID --laddr tcp://0.0.0.0:1317  --trust-node
-}
 
 initScriptFn(){
   oraicli tx provider set-datasource coingecko_eth ./testfiles/coingecko_eth.py "A data source that fetches the ETH price from Coingecko API" --from $USER --fees 5000orai
@@ -266,13 +260,7 @@ case "${METHOD}" in
   ;;
   oraid)
     oraidFn
-  ;;
-  websocketInit)
-    websocketInitFn
-  ;;
-  websocketRun)
-    websocketRunFn
-  ;;
+  ;;  
   unsign)
     unsignedFn
   ;;
@@ -287,10 +275,7 @@ case "${METHOD}" in
   ;;
   broadcast)
     broadcastFn
-  ;;
-  restServer)
-    restServerFn
-  ;;
+  ;;  
   createValidator)
     createValidatorFn
   ;;
