@@ -31,6 +31,19 @@ var (
 	OracleScriptStoreKeyString = types.OracleScriptStoreKeyString
 	DataSourceStoreFileString  = types.DataSourceStoreFileString
 	TestCaseStoreFileString    = types.TestCaseStoreFileString
+	OracleScriptFileString     = types.OracleScriptFileString
+	EventTypeSetOracleScript   = types.EventTypeSetOracleScript
+	EventTypeEditOracleScript  = types.EventTypeEditOracleScript
+	EventTypeSetDataSource     = types.EventTypeSetDataSource
+	EventTypeEditDataSource    = types.EventTypeEditDataSource
+	EventTypeCreateTestCase    = types.EventTypeCreateTestCase
+	EventTypeEditTestCase      = types.EventTypeEditTestCase
+	AttributeDataSourceName    = types.AttributeDataSourceName
+	AttributeOracleScriptName  = types.AttributeOracleScriptName
+	AttributeTestCaseName      = types.AttributeTestCaseName
+	DataSourceFileSuffix       = types.DataSourceFileSuffix
+	TestCaseFileSuffix         = types.TestCaseFileSuffix
+	OScriptFileSuffix          = types.OScriptFileSuffix
 )
 
 type (

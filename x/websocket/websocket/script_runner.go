@@ -29,7 +29,12 @@ func ExecPythonFile(id string, file string, input []string) (string, error) {
 		return "", err
 	}
 
-	if !CheckExistsContainer(cli, "python") {
+	isExist, err := CheckExistsContainer(cli, "python")
+	if err != nil {
+		return "", err
+	}
+
+	if !isExist {
 		//create container
 		err = CreateContainer(ctx, cli)
 		if err != nil {
@@ -60,7 +65,7 @@ func ExecPythonFile(id string, file string, input []string) (string, error) {
 	return string(buf.Bytes()), nil
 }
 
-func CopyFileToContainer(ctx context.Context, cli *client.Client, id string, filePath string) {
+func CopyFileToContainer(ctx context.Context, cli *client.Client, id string, filePath string) error {
 	fileName := filepath.Base(filePath)
 	content, err := ioutil.ReadFile(filePath)
 	var buf bytes.Buffer
@@ -71,16 +76,17 @@ func CopyFileToContainer(ctx context.Context, cli *client.Client, id string, fil
 		Size: int64(len(content)), // filesize
 	})
 	if err != nil {
-		panic(err)
+		return err
 	}
 	tw.Write([]byte(content))
 	tw.Close()
 
 	// use &buf as argument for content in CopyToContainer
-	cli.CopyToContainer(ctx, id, fileDir, &buf, types.CopyToContainerOptions{})
+	err = cli.CopyToContainer(ctx, id, fileDir, &buf, types.CopyToContainerOptions{})
+	return err
 }
 
-func CheckExistsContainer(cli *client.Client, id string) bool {
+func CheckExistsContainer(cli *client.Client, id string) (bool, error) {
 	opts := types.ContainerListOptions{All: true}
 
 	opts.Filters = filters.NewArgs()
@@ -89,16 +95,16 @@ func CheckExistsContainer(cli *client.Client, id string) bool {
 	ctx := context.Background()
 	containers, err := cli.ContainerList(ctx, opts)
 	if err != nil {
-		panic(err)
+		return false, err
 	}
 
-	return len(containers) > 0
+	return len(containers) > 0, nil
 }
 
 func CreateContainer(ctx context.Context, cli *client.Client) error {
 	reader, err := cli.ImagePull(ctx, "python:3.7-alpine", types.ImagePullOptions{})
 	if err != nil {
-		panic(err)
+		return err
 	}
 	io.Copy(os.Stdout, reader)
 	resp, err := cli.ContainerCreate(ctx, &container.Config{
@@ -126,11 +132,10 @@ func CreateContainer(ctx context.Context, cli *client.Client) error {
 	}
 	for _, f := range files {
 		if !f.IsDir() {
-			fmt.Println("file copied: ", path.Join(pythonDir, f.Name()))
 			CopyFileToContainer(ctx, cli, "python", path.Join(pythonDir, f.Name()))
 		}
 	}
-	fmt.Println("run install requirement...")
+	fmt.Println("ready to install requirements ...")
 	//exec import requirements
 
 	// install requirements for the python container
@@ -146,7 +151,7 @@ func CreateContainer(ctx context.Context, cli *client.Client) error {
 	}
 
 	// run pipreqs
-	if err = InstallRequirements(ctx, cli, []string{"pipreqs"}); err != nil {
+	if err = InstallRequirements(ctx, cli, []string{"pipreqs", "--force"}); err != nil {
 		return err
 	}
 
@@ -168,12 +173,12 @@ func InstallRequirements(ctx context.Context, cli *client.Client, cmd []string) 
 		Cmd: cmd,
 	})
 	if err != nil {
-		panic(err)
+		return err
 	}
 	logResp, err := cli.ContainerExecAttach(ctx, restInstall.ID, types.ExecStartCheck{})
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	var buf, error bytes.Buffer

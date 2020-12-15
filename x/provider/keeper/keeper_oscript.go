@@ -73,22 +73,22 @@ func (k Keeper) EditOracleScript(ctx sdk.Context, oldName, newName string, code 
 
 // AddOracleScriptFile adds the file to filecache,
 func (k Keeper) AddOracleScriptFile(file []byte, name string) {
-	k.fileCache.AddFile(file, types.OracleScriptStoreKeyString(name))
+	k.fileCache.AddFile(file, types.OracleScriptFileString(name))
 }
 
 // EraseOracleScriptFile removes the file in the filecache,
 func (k Keeper) EraseOracleScriptFile(name string) {
-	k.fileCache.EraseFile(types.OracleScriptStoreKeyString(name))
+	k.fileCache.EraseFile(types.OracleScriptFileString(name))
 }
 
 // EditOracleScriptFile edit a file in the filecache,
 func (k Keeper) EditOracleScriptFile(file []byte, name string) {
-	k.fileCache.EditFile(file, types.OracleScriptStoreKeyString(name))
+	k.fileCache.EditFile(file, types.OracleScriptFileString(name))
 }
 
 // GetOracleScriptFile gets the oScript code stored in the file storage
 func (k Keeper) GetOracleScriptFile(name string) []byte {
-	code, err := k.fileCache.GetFile(types.OracleScriptStoreKeyString(name))
+	code, err := k.fileCache.GetFile(types.OracleScriptFileString(name))
 	if err != nil {
 		return []byte{}
 	}
@@ -98,7 +98,7 @@ func (k Keeper) GetOracleScriptFile(name string) []byte {
 // GetOScriptPath is the path for the complete oracle script file location
 func (k Keeper) GetOScriptPath(oScriptName string) string {
 	// collect data source name from the oScript script
-	return types.ScriptPath + types.OracleScriptStoreKeyString(oScriptName)
+	return types.ScriptPath + types.OracleScriptFileString(oScriptName)
 }
 
 // GetDNamesTcNames - an utility function for retriving data source and test case names from the oracle script

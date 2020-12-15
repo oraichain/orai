@@ -36,8 +36,6 @@ sleep 2
   $WEBSOCKET keys add $2
 # done
 
-oraid start
-
 sleep 2
 
 # send orai tokens to reporters
@@ -51,8 +49,6 @@ sleep 6
 echo "y" | oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $1 --fees 5000orai --keyring-backend test
 
 sleep 2
-
-pkill oraid
 
 # run websocket
 # $WEBSOCKET run
