@@ -6,7 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	aiRequestType "github.com/oraichain/orai/x/airequest/types"
+	aiRequest "github.com/oraichain/orai/x/airequest"
 	"github.com/oraichain/orai/x/airesult/types"
 )
 
@@ -32,7 +32,7 @@ func queryFullRequestByID(ctx sdk.Context, path []string, k Keeper) ([]byte, err
 	id := path[0]
 	request, err := k.aiRequestKeeper.GetAIRequest(ctx, id)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(aiRequestType.ErrRequestNotFound, err.Error())
+		return nil, sdkerrors.Wrapf(aiRequest.ErrRequestNotFound, err.Error())
 	}
 	// collect all the reports of a given request id
 	reports := k.webSocketKeeper.GetReports(ctx, id)

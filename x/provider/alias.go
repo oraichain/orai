@@ -11,6 +11,7 @@ const (
 	StoreKey          = types.StoreKey
 	QuerierRoute      = types.QuerierRoute
 	DefaultParamspace = types.DefaultParamspace
+	ScriptPath        = types.ScriptPath
 )
 
 var (
@@ -19,18 +20,27 @@ var (
 	NewMsgCreateOracleScript = types.NewMsgCreateOracleScript
 	NewMsgCreateAIDataSource = types.NewMsgCreateAIDataSource
 	//NewMsgSetAIRequest       = types.NewMsgSetAIRequest
-	ModuleCdc           = types.ModuleCdc
-	RegisterCodec       = types.RegisterCodec
-	NewGenesisState     = types.NewGenesisState
-	OScriptKeyPrefix    = types.OScriptKeyPrefix
-	DataSourceKeyPrefix = types.DataSourceKeyPrefix
-	TestCaseKeyPrefix   = types.TestCaseKeyPrefix
+	ModuleCdc                  = types.ModuleCdc
+	RegisterCodec              = types.RegisterCodec
+	NewGenesisState            = types.NewGenesisState
+	OScriptKeyPrefix           = types.OScriptKeyPrefix
+	DataSourceKeyPrefix        = types.DataSourceKeyPrefix
+	TestCaseKeyPrefix          = types.TestCaseKeyPrefix
+	DataSourceStoreKeyString   = types.DataSourceStoreKeyString
+	TestCaseStoreKeyString     = types.TestCaseStoreKeyString
+	OracleScriptStoreKeyString = types.OracleScriptStoreKeyString
+	DataSourceStoreFileString  = types.DataSourceStoreFileString
+	TestCaseStoreFileString    = types.TestCaseStoreFileString
 )
 
 type (
 	Keeper                = keeper.Keeper
 	MsgCreateOracleScript = types.MsgCreateOracleScript
+	MsgEditOracleScript   = types.MsgEditOracleScript
 	MsgCreateAIDataSource = types.MsgCreateAIDataSource
+	MsgEditAIDataSource   = types.MsgEditAIDataSource
+	MsgCreateTestCase     = types.MsgCreateTestCase
+	MsgEditTestCase       = types.MsgEditTestCase
 	//MsgSetAIRequest       = types.MsgSetAIRequest
 	QueryResOracleScript = types.QueryResOracleScript
 	QueryResAIDataSource = types.QueryResAIDataSource

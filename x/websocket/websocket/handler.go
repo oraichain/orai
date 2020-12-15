@@ -5,7 +5,8 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	aiRequest "github.com/oraichain/orai/x/airequest/types"
+	aiRequest "github.com/oraichain/orai/x/airequest"
+	"github.com/oraichain/orai/x/provider"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
@@ -34,6 +35,8 @@ func handleTransaction(c *Context, l *Logger, tx tmtypes.TxResult) {
 
 		if messageType == (aiRequest.MsgSetAIRequest{}).Type() {
 			go handleAIRequestLog(c, l, log)
+		} else if verifyProviderMessageType(messageType) {
+			go handleProviderMsgLog(c, l, log)
 		} else {
 			l.Debug(":ghost: Skipping non-{request/packet} type: %s", messageType)
 		} /*else if messageType == (ibc.MsgPacket{}).Type() {
@@ -92,4 +95,30 @@ func GetEventValue(log sdk.ABCIMessageLog, evType string, evKey string) (string,
 		return "", fmt.Errorf("Found more than one event with type: %s, key: %s", evType, evKey)
 	}
 	return values[0], nil
+}
+
+// verifyProviderMessageType checks if the message type from the system is from the provider module or not
+func verifyProviderMessageType(messageType string) bool {
+	switch messageType {
+	case (provider.MsgCreateAIDataSource{}).Type():
+		return true
+
+	case (provider.MsgCreateOracleScript{}).Type():
+		return true
+
+	case (provider.MsgCreateTestCase{}).Type():
+		return true
+
+	case (provider.MsgEditAIDataSource{}).Type():
+		return true
+
+	case (provider.MsgEditOracleScript{}).Type():
+		return true
+
+	case (provider.MsgEditTestCase{}).Type():
+		return true
+
+	default:
+		return false
+	}
 }
