@@ -9,6 +9,8 @@ import (
 	aiRequest "github.com/oraichain/orai/x/airequest"
 	aiResult "github.com/oraichain/orai/x/airesult"
 	"github.com/oraichain/orai/x/provider"
+	providerExported "github.com/oraichain/orai/x/provider/exported"
+	providerTypes "github.com/oraichain/orai/x/provider/types"
 	webSocket "github.com/oraichain/orai/x/websocket"
 	"github.com/spf13/viper"
 
@@ -55,6 +57,7 @@ var (
 	DefaultCoins  = sdk.NewCoins(sdk.NewInt64Coin("orai", 100000000))
 	TestCoins     = sdk.NewCoins(sdk.NewInt64Coin("orai", 99999999))
 	MinimumFees   = sdk.NewCoins(sdk.NewInt64Coin("orai", 1000))
+	MediumFees    = sdk.NewCoins(sdk.NewInt64Coin("orai", 5000))
 	randSource    = int64(1111111111)
 	keySize       = 100
 	Duc           Account
@@ -64,9 +67,9 @@ var (
 	FirstVal      Account
 	SecondVal     Account
 	ThirdVal      Account
-	OracleScripts []provider.OracleScript
-	DataSources   []provider.AIDataSource
-	TestCases     []provider.TestCase
+	OracleScripts []providerExported.OracleScriptI
+	DataSources   []providerExported.AIDataSourceI
+	TestCases     []providerExported.TestCaseI
 )
 
 // NewTestApp is the constructor of the TestApp struct
@@ -100,7 +103,20 @@ func GenerateTestApp() (TestApp, sdk.Context) {
 	testApp := NewTestApp()
 	//create a new context to have access to the KVStore and others
 	ctx := testApp.NewContext(true, abci.Header{})
+
 	return testApp, ctx
+}
+
+// InitScripts helps init some basic data sources, test cases and oracle scripts for testing
+func (testApp TestApp) InitScripts(k provider.Keeper, ctx sdk.Context) {
+
+	k.SetAIDataSource(ctx, "datasource", providerTypes.NewAIDataSource("datasource", Duc.Address, MinimumFees, "ABCDEF"))
+	k.SetTestCase(ctx, "testcase", providerTypes.NewTestCase("testcase", Duc.Address, MinimumFees, "ABCDGH"))
+
+	// init scripts
+	fees, _ := k.GetMinimumFees(ctx, []string{"datasource"}, []string{"testcase"}, 2)
+
+	k.SetOracleScript(ctx, "testcase", providerTypes.NewOracleScript("oraclescript", Duc.Address, "AX", fees, []string{"datasource"}, []string{"testcase"}))
 }
 
 // GetAccountKeeper is getter for the account keeper of TestApp
