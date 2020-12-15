@@ -43,16 +43,20 @@ var (
 	keybase keys.Keybase
 )
 
+func restoreConfig(home string) error {
+	viper.SetConfigFile(path.Join(home, "websocket.yaml"))
+	_ = viper.ReadInConfig() // If we fail to read config file, we'll just rely on cmd flags.
+	return viper.Unmarshal(&cfg)
+}
+
 func initConfig(cmd *cobra.Command) error {
 	home, err := cmd.PersistentFlags().GetString(flags.FlagHome)
 	if err != nil {
 		return err
 	}
 
-	viper.SetConfigFile(path.Join(home, "config.yaml"))
-	_ = viper.ReadInConfig() // If we fail to read config file, we'll just rely on cmd flags.
+	err = restoreConfig(home)
 
-	err = viper.Unmarshal(&cfg)
 	if err != nil {
 		return err
 	}
@@ -107,9 +111,7 @@ func ServeCommand(home string) (cmd *cobra.Command, err error) {
 	// Configure cobra to sort commands
 	ctx := &Context{}
 	keybase, err = keys.NewKeyring("orai", "test", home, nil)
-	viper.SetConfigFile(path.Join(home, "config-websocket.yaml"))
-	_ = viper.ReadInConfig() // If we fail to read config file, we'll just rely on cmd flags.
-	err = viper.Unmarshal(&cfg)
+	err = restoreConfig(home)
 	cmd = runCmd(ctx)
 	return cmd, err
 }

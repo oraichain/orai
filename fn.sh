@@ -49,8 +49,8 @@ printHelp () {
     res=$(printHelp 0 | grep -A2 "\- '$2' \-")
     echo "$res"    
   else      
-    printBoldColor $BROWN "      - 'oraid' - Run the full node"
-    printBoldColor $BLUE  "          fn oraid"           
+    printBoldColor $BROWN "      - 'start' - Run the full node"
+    printBoldColor $BLUE  "          fn start"           
     echo
     printBoldColor $BROWN "      - 'broadcast' - broadcast transaction"
     printBoldColor $BLUE  "          fn broadcast --key value"           
@@ -167,8 +167,13 @@ oraidFn(){
 
 initFn(){    
     ./init.sh $CHAIN_ID $USER
+    # run at background
+    oraid start &
+    sleep 8
     local reporter="${USER}_reporter"
-    ./websocket.sh $USER $reporter
+    ./websocket.sh $USER 5 #$reporter
+    sleep 8
+    pkill oraid
 }
 
 
@@ -257,7 +262,7 @@ case "${METHOD}" in
   init)
     initFn
   ;;
-  oraid)
+  start)
     oraidFn
   ;;  
   unsign)
