@@ -161,7 +161,7 @@ clear(){
 
 oraidFn(){
     # oraid start
-    orai start --chain-id $CHAIN_ID --laddr tcp://0.0.0.0:1317 --trust-node
+    orai start --chain-id $CHAIN_ID --laddr tcp://0.0.0.0:1317 --node tcp://0.0.0.0:26657 # --trust-node
 }
 
 
