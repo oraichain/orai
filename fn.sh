@@ -170,9 +170,10 @@ initFn(){
     sleep 8
 
     ./init.sh $CHAIN_ID $USER
-    # run at background
-    oraid start &
-    sleep 8
+    # run at background without websocket
+    oraid start --minimum-gas-prices 0.025orai &
+    # 30 seconds timeout
+    timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
     local reporter="${USER}_reporter"
     ./websocket.sh $USER $reporter #$reporter
     sleep 10
@@ -184,9 +185,10 @@ initDevFn(){
     make all
 
     ./init.sh $CHAIN_ID $USER
-    # run at background
-    oraid start &
-    sleep 8
+    # run at background without websocket
+    oraid start --minimum-gas-prices 0.025orai &
+    # 30 seconds timeout
+    timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
     local reporter="${USER}_reporter"
     ./websocket.sh $USER $reporter #$reporter
     sleep 10
