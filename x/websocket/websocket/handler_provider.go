@@ -2,7 +2,6 @@ package websocket
 
 import (
 	"context"
-	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/docker/docker/client"
@@ -28,7 +27,7 @@ func handleProviderMsgLog(c *Context, l *Logger, log sdk.ABCIMessageLog, scriptP
 		}
 		if !isExist {
 			//create container
-			fmt.Println("container does not exist")
+			l.Info(":question_mark: container not exist yet")
 			err = CreateContainer(ctx, cli)
 			if err != nil {
 				l.Error(":skull: Failed to create new python container for provider module: %s", err.Error())
