@@ -10,6 +10,7 @@ import (
 	keyring "github.com/cosmos/cosmos-sdk/crypto/keys"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/docker/docker/client"
+	"github.com/oraichain/orai/x/websocket"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/log"
@@ -69,6 +70,9 @@ func runImpl(c *Context, l *Logger) error {
 		case ev := <-eventChan:
 			fmt.Printf("ABCDEF: %v\n", ev.Data.(tmtypes.EventDataTx).TxResult)
 			go handleTransaction(c, l, ev.Data.(tmtypes.EventDataTx).TxResult)
+		case sig := <-websocket.OutSignals:
+			fmt.Println("received signal, send back to rest", sig)
+			websocket.InSignals <- sig
 		}
 	}
 }
