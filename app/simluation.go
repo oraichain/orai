@@ -57,7 +57,7 @@ var (
 	DefaultCoins  = sdk.NewCoins(sdk.NewInt64Coin("orai", 100000000))
 	TestCoins     = sdk.NewCoins(sdk.NewInt64Coin("orai", 99999999))
 	MinimumFees   = sdk.NewCoins(sdk.NewInt64Coin("orai", 1000))
-	MediumFees    = sdk.NewCoins(sdk.NewInt64Coin("orai", 5000))
+	MediumFees    = sdk.NewCoins(sdk.NewInt64Coin("orai", 10000))
 	randSource    = int64(1111111111)
 	keySize       = 100
 	Duc           Account
@@ -113,10 +113,9 @@ func (testApp TestApp) InitScripts(k provider.Keeper, ctx sdk.Context) {
 	k.SetAIDataSource(ctx, "datasource", providerTypes.NewAIDataSource("datasource", Duc.Address, MinimumFees, "ABCDEF"))
 	k.SetTestCase(ctx, "testcase", providerTypes.NewTestCase("testcase", Duc.Address, MinimumFees, "ABCDGH"))
 
-	// init scripts
-	fees, _ := k.GetMinimumFees(ctx, []string{"datasource"}, []string{"testcase"}, 2)
+	// // init scripts
 
-	k.SetOracleScript(ctx, "testcase", providerTypes.NewOracleScript("oraclescript", Duc.Address, "AX", fees, []string{"datasource"}, []string{"testcase"}))
+	k.SetOracleScript(ctx, "testcase", providerTypes.NewOracleScript("oraclescript", Duc.Address, "AX", MediumFees, []string{"datasource"}, []string{"testcase"}))
 }
 
 // GetAccountKeeper is getter for the account keeper of TestApp
