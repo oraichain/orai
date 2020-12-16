@@ -37,7 +37,6 @@ func handleTransaction(c *Context, l *Logger, tx tmtypes.TxResult) {
 		if messageType == (aiRequest.MsgSetAIRequest{}).Type() {
 			go handleAIRequestLog(c, l, log)
 		} else if isProvider {
-			fmt.Println("file name ready to be copied: ", msg)
 			go handleProviderMsgLog(c, l, log, msg)
 		} else {
 			l.Debug(":ghost: Skipping non-{request/packet} type: %s", messageType)

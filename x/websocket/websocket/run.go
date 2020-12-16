@@ -9,6 +9,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	keyring "github.com/cosmos/cosmos-sdk/crypto/keys"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/docker/docker/client"
+	"github.com/oraichain/orai/x/websocket"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/log"
@@ -25,13 +27,37 @@ const (
 
 func runImpl(c *Context, l *Logger) error {
 	l.Info(":rocket: Starting WebSocket subscriber")
-	err := c.client.Start()
+
+	ctx, cxl := context.WithTimeout(context.Background(), 100*time.Second)
+	defer cxl()
+
+	// before starting, we initiate the python container
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		l.Error(":skull: Failed to create new context and client for the python container: %s", err.Error())
+	}
+	// check if the container exist or not. if not then we create new
+	isExist, err := CheckExistsContainer(cli, "python")
+	if err != nil {
+		l.Error(":skull: Cannot check if the container exists or not: %s", err.Error())
+	}
+	if !isExist {
+		l.Info(":question_mark: container not exist yet")
+		// create a new go routine to create the new container
+		go func() {
+			ctxContainer := context.Background()
+			err = CreateContainer(ctxContainer, cli)
+			if err != nil {
+				l.Error(":skull: Failed to create new python container for provider module: %s", err.Error())
+			}
+		}()
+	}
+
+	// start listening to the events from the 26657 port after creating the container successfully
+	err = c.client.Start()
 	if err != nil {
 		return err
 	}
-
-	ctx, cxl := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cxl()
 
 	l.Info(":ear: Subscribing to events with query: %s...", TxQuery)
 	eventChan, err := c.client.Subscribe(ctx, "", TxQuery, EventChannelCapacity)
@@ -44,6 +70,9 @@ func runImpl(c *Context, l *Logger) error {
 		case ev := <-eventChan:
 			fmt.Printf("ABCDEF: %v\n", ev.Data.(tmtypes.EventDataTx).TxResult)
 			go handleTransaction(c, l, ev.Data.(tmtypes.EventDataTx).TxResult)
+		case sig := <-websocket.OutSignals:
+			fmt.Println("received signal, send back to rest", sig)
+			websocket.InSignals <- sig
 		}
 	}
 }

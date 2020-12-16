@@ -66,6 +66,7 @@ func ExecPythonFile(id string, file string, input []string) (string, error) {
 }
 
 func CopyFileToContainer(ctx context.Context, cli *client.Client, id string, filePath string) error {
+	fmt.Println("ready to copy file to container: ", filePath)
 	fileName := filepath.Base(filePath)
 	content, err := ioutil.ReadFile(filePath)
 	var buf bytes.Buffer
@@ -126,6 +127,21 @@ func CreateContainer(ctx context.Context, cli *client.Client) error {
 	}
 	pythonDir := path.Join(workDir, fileDir)
 	fmt.Println("python dir: ", pythonDir)
+
+	// check if the directory exists or not.
+	if _, err := os.Stat(pythonDir); err != nil {
+		if os.IsNotExist(err) {
+			// file does not exist, we will create new with full permission 777
+			err = os.MkdirAll(pythonDir, 777)
+			if err != nil {
+				return err
+			}
+		} else {
+			// other error like permissions, etc, then we will not handle this case
+			return err
+		}
+	}
+
 	files, err := ioutil.ReadDir(pythonDir)
 	if err != nil {
 		return err
