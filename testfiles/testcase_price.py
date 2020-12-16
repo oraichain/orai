@@ -1,7 +1,14 @@
 #!/usr/bin/python3
 import sys
 import base64
-import numpy as np
+import json
+# from importlib.util import spec_from_loader, module_from_spec
+# from importlib.machinery import SourceFileLoader 
+
+# # import module without using the .py extension
+# spec = spec_from_loader(sys.argv[1], SourceFileLoader(sys.argv[1], "./" + sys.argv[1]))
+# data_source = module_from_spec(spec)
+# spec.loader.exec_module(data_source)
 data_source = __import__(sys.argv[1])
 
 # argv1[1] is the name of the data source
@@ -13,10 +20,10 @@ def data_source_res():
 
 def compare_result():
     data_source_result = data_source_res()
-    # convert base64 to string
-    expected_result = base64.b64decode(sys.argv[3]).decode("utf-8")
+    # convert json to object
+    expected_result = json.loads(sys.argv[3])
     try:
-        deviation = data_source_result - float(expected_result)
+        deviation = data_source_result - float(expected_result['price'])
         if deviation < 10000:
             return data_source_result
         else:

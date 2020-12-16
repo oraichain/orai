@@ -49,17 +49,20 @@ printHelp () {
     res=$(printHelp 0 | grep -A2 "\- '$2' \-")
     echo "$res"    
   else      
-    printBoldColor $BROWN "      - 'oraid' - Run the full node"
-    printBoldColor $BLUE  "          fn hello --key value"           
+    printBoldColor $BROWN "      - 'start' - Run the full node"
+    printBoldColor $BLUE  "          fn start"           
     echo
     printBoldColor $BROWN "      - 'broadcast' - broadcast transaction"
     printBoldColor $BLUE  "          fn broadcast --key value"           
     echo
-    printBoldColor $BROWN "      - 'restServer' - Start the restful server"
-    printBoldColor $BLUE  "          fn restServer --key value"           
+    printBoldColor $BROWN "      - 'init' - Init the orai node"
+    printBoldColor $BLUE  "          fn init"           
     echo
     printBoldColor $BROWN "      - 'sign' - sign transaction"
     printBoldColor $BLUE  "          fn sign --key value"           
+    echo
+    printBoldColor $BROWN "      - 'initScript' - init AI request script"
+    printBoldColor $BLUE  "          fn initScript --key value"           
     echo
     printBoldColor $BROWN "      - 'clear' - Clear all existing data"
     printBoldColor $BLUE  "          fn clear"           
@@ -153,50 +156,65 @@ esac
 clear(){
     rm -rf .oraid/
     rm -rf .oraicli/
-    rm -rf .oraifiles/
-    rm -rf .websocket/
+    rm -rf .oraifiles/    
 }
 
 oraidFn(){
-    oraid start
+    # oraid start
+    orai start --chain-id $CHAIN_ID --laddr tcp://0.0.0.0:1317 --node tcp://0.0.0.0:26657 # --trust-node
 }
 
-websocketInitFn(){
-    local reporter="${USER}_reporter"
-    ./websocket.sh $USER $reporter
-}
 
-initFn(){    
+initFn(){
+
+    sleep 8
+
     ./init.sh $CHAIN_ID $USER
+    # run at background without websocket
+    oraid start --minimum-gas-prices 0.025orai &
+    # 30 seconds timeout
+    timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
+    local reporter="${USER}_reporter"
+    ./websocket.sh $USER $reporter #$reporter
+    sleep 10
+    pkill oraid
 }
 
-websocketRunFn(){
-    websocket run
+initDevFn(){
+
+    make all
+
+    ./init.sh $CHAIN_ID $USER
+    # run at background without websocket
+    oraid start --minimum-gas-prices 0.025orai &
+    # 30 seconds timeout
+    timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
+    local reporter="${USER}_reporter"
+    ./websocket.sh $USER $reporter #$reporter
+    sleep 10
+    pkill oraid
 }
 
-restServerFn(){
-    oraicli rest-server --chain-id $CHAIN_ID --laddr tcp://0.0.0.0:1317  --trust-node
-}
 
 initScriptFn(){
-  oraicli tx provider set-datasource coingecko_eth ./testfiles/coingecko_eth.sh "A data source that fetches the ETH price from Coingecko API" --from $USER --fees 5000orai
+  echo "y" | oraicli tx provider set-datasource coingecko_eth ./testfiles/coingecko_eth.py "A data source that fetches the ETH price from Coingecko API" --from $USER --fees 5000orai
 
   sleep 5
 
-  oraicli tx provider set-datasource crypto_compare_eth ./testfiles/crypto_compare_eth.sh "A data source that collects ETH price from crypto compare" --from $USER --fees 5000orai
+  echo "y" | oraicli tx provider set-datasource crypto_compare_eth ./testfiles/crypto_compare_eth.py "A data source that collects ETH price from crypto compare" --from $USER --fees 5000orai
 
   sleep 5
 
-  oraicli tx provider set-testcase testcase_price ./testfiles/testcase_price.sh "A sample test case that uses the expected output of users provided to verify the bitcoin price from the datasource" --from $USER --fees 5000orai
+  echo "y" | oraicli tx provider set-testcase testcase_price ./testfiles/testcase_price.py "A sample test case that uses the expected output of users provided to verify the bitcoin price from the datasource" --from $USER --fees 5000orai
 
   sleep 5
 
-  oraicli tx provider set-oscript oscript_eth ./testfiles/oscript_eth.sh "An oracle script that fetches and aggregates ETH price from different sources" --ds coingecko_eth,crypto_compare_eth --tc testcase_price --from $USER --fees 5000orai
+  echo "y" | oraicli tx provider set-oscript oscript_eth ./testfiles/oscript_eth.py "An oracle script that fetches and aggregates ETH price from different sources" --ds coingecko_eth,crypto_compare_eth --tc testcase_price --from $USER --fees 5000orai
 }
 
 unsignedFn(){
   local id=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.address" -r)
-  local unsigned=$(curl --location --request POST 'http://localhost:1317/airequest/aireq/testreq' \
+  local unsigned=$(curl --location --request POST 'http://localhost:1317/airequest/aireq' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "base_req":{
@@ -205,10 +223,13 @@ unsignedFn(){
     },
     "oracle_script_name":"oscript_eth",
     "input":"",
-    "expected_output":"NTAwMA==",
+    "expected_output":{"price":"5000"},
     "fees":"60000orai",
     "validator_count": "1"
 }' > tmp/unsignedTx.json)
+
+    res=$?  
+    verifyResult $res "Unsigned failed"
 }
 
 unsignedSetDsFn(){
@@ -233,17 +254,10 @@ signFn(){
     local sequence=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.sequence" -r)
     local acc_num=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.account_number" -r)
     oraicli tx sign tmp/unsignedTx.json --from $USER --offline --chain-id $CHAIN_ID --sequence $sequence --account-number $acc_num > tmp/signedTx.json
-
     oraicli tx broadcast tmp/signedTx.json
-}
 
-broadcastFn(){
-  # $1 is account number
-    local sequence=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.sequence" -r)
-    local acc_num=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.account_number" -r)
-    oraicli tx sign tmp/unsignedTx.json --from $USER --offline --chain-id $CHAIN_ID --sequence $sequence --account-number $acc_num > tmp/signedTx.json
-
-    oraicli tx broadcast tmp/signedTx.json
+    res=$?  
+    verifyResult $res "Signed failed"
 }
 
 createValidatorFn() {
@@ -267,15 +281,12 @@ case "${METHOD}" in
   init)
     initFn
   ;;
-  oraid)
+  initDev)
+    initDevFn
+  ;;
+  start)
     oraidFn
-  ;;
-  websocketInit)
-    websocketInitFn
-  ;;
-  websocketRun)
-    websocketRunFn
-  ;;
+  ;;  
   unsign)
     unsignedFn
   ;;
@@ -290,10 +301,7 @@ case "${METHOD}" in
   ;;
   broadcast)
     broadcastFn
-  ;;
-  restServer)
-    restServerFn
-  ;;
+  ;;  
   createValidator)
     createValidatorFn
   ;;

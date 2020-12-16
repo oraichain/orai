@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	aiRequest "github.com/oraichain/orai/x/airequest/types"
+	aiRequest "github.com/oraichain/orai/x/airequest"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
@@ -32,8 +32,13 @@ func handleTransaction(c *Context, l *Logger, tx tmtypes.TxResult) {
 
 		l.Info(":star: message type: %s", messageType)
 
+		msg, isProvider := verifyProviderMessageType(messageType, log)
+
 		if messageType == (aiRequest.MsgSetAIRequest{}).Type() {
 			go handleAIRequestLog(c, l, log)
+		} else if isProvider {
+			fmt.Println("file name ready to be copied: ", msg)
+			go handleProviderMsgLog(c, l, log, msg)
 		} else {
 			l.Debug(":ghost: Skipping non-{request/packet} type: %s", messageType)
 		} /*else if messageType == (ibc.MsgPacket{}).Type() {

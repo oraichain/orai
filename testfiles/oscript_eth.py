@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 import sys
 import base64
-import numpy as np
 
 # argv1[1] is the name of the data source
 # argv[2] is input, which should be encoded
@@ -23,7 +22,6 @@ def main():
         try:
             results = list(map(float, results))
             aggregated_result = sum(map(float,results))
-            print("aggregated result: ", aggregated_result)
             return aggregated_result / len(results)
         except ValueError:
             print("cannot convert the results into numbers")
