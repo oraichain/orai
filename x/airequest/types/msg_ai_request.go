@@ -47,6 +47,11 @@ func (msg MsgSetAIRequest) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrap(ErrRequestFeesInvalid, err.Error())
 	}
+
+	// threshold for the size of the request
+	if len(msg.ExpectedOutput)+len(msg.Input) > MaximumRequestBytesThreshold {
+		return sdkerrors.Wrap(ErrRequestInvalid, "The request is too large")
+	}
 	return nil
 }
 

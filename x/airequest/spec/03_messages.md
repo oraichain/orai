@@ -14,13 +14,13 @@ Requests a new data based on an existing Oracle Script. A data request will be a
 
 ```go
 type MsgSetAIRequest struct {
-	RequestID        string         `json:"request_id"`
-	OracleScriptName string         `json:"oscript_name"`
-	Creator          sdk.AccAddress `json:"creator"`
-	ValidatorCount   int            `json:"validator_count"`
-	Fees             string         `json:"transaction_fee"`
-	Input            []byte         `json:"request_input"`
-	ExpectedOutput   []byte         `json:"expected_output"`
+	RequestID        string         		 `json:"request_id"`
+	OracleScriptName string         		 `json:"oscript_name"`
+	Creator          sdk.AccAddress 		 `json:"creator"`
+	ValidatorCount   int            		 `json:"validator_count"`
+	Fees             string         		 `json:"transaction_fee"`
+	Input            json.RawMessage         `json:"request_input"`
+	ExpectedOutput   json.RawMessage         `json:"expected_output"`
 }
 ```
 
