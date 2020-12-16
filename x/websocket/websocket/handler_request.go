@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	aiRequest "github.com/oraichain/orai/x/airequest/types"
-	providerTypes "github.com/oraichain/orai/x/provider/types"
+	aiRequest "github.com/oraichain/orai/x/airequest"
+	"github.com/oraichain/orai/x/provider"
 	"github.com/oraichain/orai/x/websocket/exported"
 	"github.com/oraichain/orai/x/websocket/types"
 )
@@ -109,7 +109,7 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 			//put the results from the data sources into the test case to verify if they are good enough
 			for j := range aiDataSources {
 				//// collect test case result from the script
-				outTestCase, err := ExecPythonFile("python", getTCasePath(testCases[i]), []string{providerTypes.DataSourceStoreKeyString(aiDataSources[j]), req.Input, req.ExpectedOutput})
+				outTestCase, err := ExecPythonFile("python", getTCasePath(testCases[i]), []string{provider.DataSourceStoreKeyString(aiDataSources[j]), req.Input, req.ExpectedOutput})
 				if err != nil {
 					l.Error(":skull: failed to execute test case 1st loop: %s", err.Error())
 				}

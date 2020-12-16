@@ -165,33 +165,51 @@ oraidFn(){
 }
 
 
-initFn(){    
+initFn(){
+
+    sleep 8
+
     ./init.sh $CHAIN_ID $USER
     # run at background without websocket
     oraid start --minimum-gas-prices 0.025orai &
     # 30 seconds timeout
     timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
     local reporter="${USER}_reporter"
-    ./websocket.sh $USER $reporter
-    # sleep 8
+    ./websocket.sh $USER $reporter #$reporter
+    sleep 10
+    pkill oraid
+}
+
+initDevFn(){
+
+    make all
+
+    ./init.sh $CHAIN_ID $USER
+    # run at background without websocket
+    oraid start --minimum-gas-prices 0.025orai &
+    # 30 seconds timeout
+    timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
+    local reporter="${USER}_reporter"
+    ./websocket.sh $USER $reporter #$reporter
+    sleep 10
     pkill oraid
 }
 
 
 initScriptFn(){
-  oraicli tx provider set-datasource coingecko_eth ./testfiles/coingecko_eth.py "A data source that fetches the ETH price from Coingecko API" --from $USER --fees 5000orai
+  echo "y" | oraicli tx provider set-datasource coingecko_eth ./testfiles/coingecko_eth.py "A data source that fetches the ETH price from Coingecko API" --from $USER --fees 5000orai
 
   sleep 5
 
-  oraicli tx provider set-datasource crypto_compare_eth ./testfiles/crypto_compare_eth.py "A data source that collects ETH price from crypto compare" --from $USER --fees 5000orai
+  echo "y" | oraicli tx provider set-datasource crypto_compare_eth ./testfiles/crypto_compare_eth.py "A data source that collects ETH price from crypto compare" --from $USER --fees 5000orai
 
   sleep 5
 
-  oraicli tx provider set-testcase testcase_price ./testfiles/testcase_price.py "A sample test case that uses the expected output of users provided to verify the bitcoin price from the datasource" --from $USER --fees 5000orai
+  echo "y" | oraicli tx provider set-testcase testcase_price ./testfiles/testcase_price.py "A sample test case that uses the expected output of users provided to verify the bitcoin price from the datasource" --from $USER --fees 5000orai
 
   sleep 5
 
-  oraicli tx provider set-oscript oscript_eth ./testfiles/oscript_eth.py "An oracle script that fetches and aggregates ETH price from different sources" --ds coingecko_eth,crypto_compare_eth --tc testcase_price --from $USER --fees 5000orai
+  echo "y" | oraicli tx provider set-oscript oscript_eth ./testfiles/oscript_eth.py "An oracle script that fetches and aggregates ETH price from different sources" --ds coingecko_eth,crypto_compare_eth --tc testcase_price --from $USER --fees 5000orai
 }
 
 unsignedFn(){
@@ -262,6 +280,9 @@ case "${METHOD}" in
   ;;
   init)
     initFn
+  ;;
+  initDev)
+    initDevFn
   ;;
   start)
     oraidFn

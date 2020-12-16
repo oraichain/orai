@@ -186,8 +186,8 @@ func handleMsgEditTestCase(ctx sdk.Context, k keeper.Keeper, msg types.MsgEditTe
 	// TODO: Define your msg events
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
-			types.EventTypeEditDataSource,
-			sdk.NewAttribute(types.AttributeDataSourceName, msg.NewName),
+			types.EventTypeEditTestCase,
+			sdk.NewAttribute(types.AttributeTestCaseName, msg.NewName),
 		),
 	)
 

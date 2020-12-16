@@ -6,8 +6,7 @@ import (
 	"path"
 	"regexp"
 
-	"github.com/oraichain/orai/x/provider/types"
-	provider "github.com/oraichain/orai/x/provider/types"
+	"github.com/oraichain/orai/x/provider"
 )
 
 func getCurrentDir() string {
@@ -19,16 +18,16 @@ func getCurrentDir() string {
 }
 
 func getOScriptPath(name string) string {
-	return path.Join(getCurrentDir(), provider.ScriptPath, types.OracleScriptStoreKeyString(name))
+	return path.Join(getCurrentDir(), provider.ScriptPath, provider.OracleScriptStoreKeyString(name))
 }
 
 func getDSourcePath(name string) string {
-	return path.Join(getCurrentDir(), provider.ScriptPath, types.DataSourceStoreFileString(name))
+	return path.Join(getCurrentDir(), provider.ScriptPath, provider.DataSourceStoreFileString(name))
 }
 
 func getTCasePath(name string) string {
 	// get absolute path from working dir
-	return path.Join(getCurrentDir(), provider.ScriptPath, types.TestCaseStoreFileString(name))
+	return path.Join(getCurrentDir(), provider.ScriptPath, provider.TestCaseStoreFileString(name))
 }
 
 // trimResultEscapeChars is used to remove all escape characters in a string for cleaning the result
