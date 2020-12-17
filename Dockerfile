@@ -3,7 +3,7 @@ WORKDIR /workspace
 COPY . /workspace
 
 # install essential tools
-RUN apk add curl bash ncurses jq bc make
+RUN apk add curl bash ncurses jq bc make git
 
 # install go command
 RUN make all

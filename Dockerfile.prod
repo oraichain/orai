@@ -3,12 +3,17 @@ WORKDIR /workspace
 COPY . /workspace
 
 # install essential tools
-RUN apk add make
+RUN apk add make git upx
 
 # install go command
 RUN make all
 
+# make size smaller
+RUN go get github.com/pwaller/goupx
+RUN for file in /go/bin/*; do goupx "$file";done
+
 # remove redundant things
+RUN rm /go/bin/goupx
 # RUN rm -r /workspace/*
 
 FROM alpine:latest AS base
