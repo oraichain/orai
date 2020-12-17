@@ -13,6 +13,11 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	k.SetParam(ctx, types.KeyExpirationCount, data.Params.ExpirationCount)
 }
 
+// DefaultGenesisState returns the default airesult genesis state.
+func DefaultGenesisState() GenesisState {
+	return types.DefaultGenesisState()
+}
+
 // ExportGenesis writes the current store values
 // to a genesis file, which can be imported again
 // with InitGenesis

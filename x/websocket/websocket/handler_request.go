@@ -48,8 +48,6 @@ func GetEventAIRequest(log sdk.ABCIMessageLog) (AIRequest, error) {
 
 	req = NewAIRequest(requestID, oscriptName, creator, valCount, inputStr, expectedOutputStr)
 
-	fmt.Println("AI request: ", req)
-
 	return req, nil
 }
 
@@ -115,7 +113,7 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 				}
 				result := trimResultEscapeChars(outTestCase)
 
-				fmt.Println("result after running test case: ", result)
+				l.Info("star: result after running test case: ", result)
 
 				dataSourceResult := types.NewDataSourceResult(aiDataSources[j], []byte(result), types.ResultSuccess)
 
@@ -149,7 +147,7 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 				// collect test case result from the script
 				result := trimResultEscapeChars(outDataSource)
 				//result = strings.TrimSuffix(result, "\r")
-				fmt.Println("result from data sources: ", result)
+				l.Info("star: result from data sources: ", result)
 				// By default, we consider returning null as failure. If any datasource does not follow this rule then it should not be used by any oracle scripts.
 				dataSourceResult = types.NewDataSourceResult(dataSourceResultsTest[i].GetName(), []byte(result), types.ResultSuccess)
 				if result == types.FailedResult || len(result) == 0 {
@@ -167,7 +165,7 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 			dataSourceResults = append(dataSourceResults, dataSourceResult)
 		}
 		finalResultStr = strings.TrimSuffix(finalResultStr, "-")
-		fmt.Println("final result after trimming: ", finalResultStr)
+		l.Info("star: final result after trimming: ", finalResultStr)
 		// Create a new MsgCreateReport with a new reporter to the Oraichain
 		reporter := types.NewReporter(key.GetAddress(), key.GetName(), c.validator)
 		msgReport := types.NewMsgCreateReport(req.RequestID, dataSourceResults, testCaseResults, reporter, sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(5000)))), []byte(finalResultStr), types.ResultSuccess)

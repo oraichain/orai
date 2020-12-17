@@ -119,7 +119,7 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application
 		cache = store.NewCommitKVStoreCacheManager()
 	}
 
-	return app.NewProviderApp(
+	return app.NewOraichainApp(
 		logger, db, traceStore, true, invCheckPeriod,
 		viper.GetString(flags.FlagHome),
 		baseapp.SetMinGasPrices(viper.GetString(server.FlagMinGasPrices)),

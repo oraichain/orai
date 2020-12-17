@@ -148,8 +148,8 @@ type NewApp struct {
 // verify app interface at compile time
 var _ simapp.App = (*NewApp)(nil)
 
-// NewProviderApp is a constructor function for dexaiApp
-func NewProviderApp(
+// NewOraichainApp is a constructor function for dexaiApp
+func NewOraichainApp(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool,
 	invCheckPeriod uint, home string, baseAppOptions ...func(*bam.BaseApp),
 ) *NewApp {

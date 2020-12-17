@@ -79,7 +79,7 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer) abci.Application
 		cache = store.NewCommitKVStoreCacheManager()
 	}
 
-	return app.NewProviderApp(
+	return app.NewOraichainApp(
 		logger, db, traceStore, true, invCheckPeriod,
 		viper.GetString(flags.FlagHome),
 		baseapp.SetMinGasPrices(viper.GetString(server.FlagMinGasPrices)),
@@ -94,7 +94,7 @@ func exportAppStateAndTMValidators(
 ) (json.RawMessage, []tmtypes.GenesisValidator, error) {
 
 	if height != -1 {
-		aApp := app.NewProviderApp(logger, db, traceStore, false, uint(1), flags.FlagHome)
+		aApp := app.NewOraichainApp(logger, db, traceStore, false, uint(1), flags.FlagHome)
 		err := aApp.LoadHeight(height)
 		if err != nil {
 			return nil, nil, err
@@ -102,7 +102,7 @@ func exportAppStateAndTMValidators(
 		return aApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 	}
 
-	aApp := app.NewProviderApp(logger, db, traceStore, true, uint(1), flags.FlagHome)
+	aApp := app.NewOraichainApp(logger, db, traceStore, true, uint(1), flags.FlagHome)
 
 	return aApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
 }

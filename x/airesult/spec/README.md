@@ -1,17 +1,23 @@
-# provider module specification
+<!--
+order: 0
+title: Provider Overview
+parent:
+  title: "airesult"
+-->
+
+# `airesult`
 
 ## Abstract
 
-<!-- TODO: Create a abstract definition of what this module does, what functionality does it enable and how it can be used. -->
+This paper specifies the AI Result module of Oraichain.
+
+This module is the final destination of the AI Request, where all the results coming from the validators are collected and stored on-chain. It also handles storing & allocating rewards for entities that finish their jobs.
 
 ## Contents
 
-// TODO: Create the below files if they are needed.
-1. **[Concepts](01_concepts.md)**
-2. **[State](02_state.md)**
-3. **[Messages](03_messages.md)**
-4. **[Begin-Block](04_begin_block.md)**
-5. **[End-Block](06_end_bloc.md)**
-6. **[05_hooks](06_hooks.md)**
-7. **[Events](07_events.md)**
-8. **[Parameters](08_params.md)**
+1. **[Messages](01_state.md)**
+    - [AIRequestResult](01_state.md#AIRequestResult)
+    - [Reward](01_state.md#Reward)
+2. **[State transitions](02_state_transitions.md)**
+3. **[Begin block](03_begin_block.md)**
+4. **[End block](04_end_block.md)**

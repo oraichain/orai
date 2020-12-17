@@ -12,6 +12,11 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	// Init params for the airequest module
 }
 
+// DefaultGenesisState returns the default provider genesis state.
+func DefaultGenesisState() GenesisState {
+	return types.DefaultGenesisState()
+}
+
 // ExportGenesis writes the current store values
 // to a genesis file, which can be imported again
 // with InitGenesis

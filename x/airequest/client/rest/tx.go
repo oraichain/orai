@@ -56,17 +56,11 @@ func setAIRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		// threshold for the size of the request
-		if len(req.ExpectedOutput)+len(req.Input) > types.MaximumRequestBytesThreshold {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "The request is too large")
-			return
-		}
-
 		// create the message
 		msg := types.NewMsgSetAIRequest(ksuid.New().String(), req.OracleScriptName, addr, req.Fees, req.ValidatorCount, req.Input, req.ExpectedOutput)
 		err = msg.ValidateBasic()
 		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "GHYK")
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 		// Collect fees in Coins type. Bug: cannot set fee through json using REST API => This is the workaround
