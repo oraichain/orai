@@ -57,7 +57,7 @@ services:
       - ./fn.sh:/usr/local/bin/fn
 
   orai_2:
-    image: orai/orai:alpine
+    image: orai/orai:alpine-prod
     working_dir: /workspace
     tty: true
     ports:
