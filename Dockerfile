@@ -1,6 +1,12 @@
 FROM golang:1.13-alpine3.12
 WORKDIR /workspace
 COPY . /workspace
-RUN init.sh
 
-RUN apt update -y && apt install jq -y && apt-get install bc -y
+# install essential tools
+RUN apk add curl bash ncurses jq bc make
+
+# install go command
+RUN make all
+
+# remove redundant things
+RUN rm -r /workspace/*

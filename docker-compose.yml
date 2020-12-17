@@ -24,24 +24,24 @@ services:
   #   environment:
   #     - HOME=/wasmd
 
-  golang:
-    image: orai/godev
-    working_dir: /workspace
-    tty: true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./dockersdk/:/workspace
+  # golang:
+  #   image: orai/godev
+  #   working_dir: /workspace
+  #   tty: true
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - ./dockersdk/:/workspace
 
-  monitor:
-    image: orai/monitor
-    working_dir: /workspace
-    tty: true
-    # apk add build-base && pip install cffi pipenv
-    volumes:
-      - ../panic_cosmos:/workspace
+  # monitor:
+  #   image: orai/monitor
+  #   working_dir: /workspace
+  #   tty: true
+  #   # apk add build-base && pip install cffi pipenv
+  #   volumes:
+  #     - ../panic_cosmos:/workspace
 
   orai:
-    image: orai/orai
+    image: orai/orai:alpine
     working_dir: /workspace
     tty: true
     ports:
@@ -55,3 +55,15 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./:/workspace
       - ./fn.sh:/usr/local/bin/fn
+
+  orai_2:
+    image: orai/orai:alpine
+    working_dir: /workspace
+    tty: true
+    ports:
+      - 1318:1317
+    cap_add:
+      - SYS_PTRACE
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./:/workspace
