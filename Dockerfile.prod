@@ -1,0 +1,31 @@
+FROM golang:1.13-alpine3.12 AS build
+WORKDIR /workspace
+COPY . /workspace
+
+# install essential tools
+RUN apk add make git upx
+
+# install go command
+RUN make all
+
+# make size smaller
+RUN go get github.com/pwaller/goupx
+RUN for file in /go/bin/*; do goupx "$file";done
+
+# remove redundant things
+RUN rm /go/bin/goupx
+# RUN rm -r /workspace/*
+
+FROM alpine:latest AS base
+WORKDIR /app
+EXPOSE 1317
+
+COPY fn.sh /usr/local/bin/fn
+
+# install essential tools
+RUN apk add curl bash ncurses jq
+
+# copy build files
+COPY --from=build /go/bin/* /usr/local/bin
+
+# ENTRYPOINT fn init && fn start

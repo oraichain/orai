@@ -4,7 +4,8 @@ VERSION := $(shell echo $(shell git describe --tags --always) | sed 's/^v//')
 COMMIT := $(shell git log -1 --format='%H')
 
 # TODO: Update the ldflags with the app, client & server names
-ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=NewApp \
+ldflags = -s -w \
+	-X github.com/cosmos/cosmos-sdk/version.Name=NewApp \
 	-X github.com/cosmos/cosmos-sdk/version.ServerName=oraid \
 	-X github.com/cosmos/cosmos-sdk/version.ClientName=oraicli \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
