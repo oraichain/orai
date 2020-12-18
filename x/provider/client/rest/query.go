@@ -99,6 +99,7 @@ func queryOracleScriptsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		v := r.URL.Query()
 		page := v.Get("page")
 		limit := v.Get("limit")
+		name := v.Get("name")
 
 		// In case the request does not include pagination parameters
 		if page == "" || limit == "" {
@@ -106,7 +107,7 @@ func queryOracleScriptsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			limit = "5"
 		}
 
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/oscripts", storeName), []byte(page+"-"+limit))
+		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/oscripts", storeName), []byte(page+"-"+limit+"-"+name))
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -150,6 +151,7 @@ func queryDataSourcesHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		v := r.URL.Query()
 		page := v.Get("page")
 		limit := v.Get("limit")
+		name := v.Get("name")
 
 		// In case the request does not include pagination parameters
 		if page == "" || limit == "" {
@@ -157,7 +159,7 @@ func queryDataSourcesHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			limit = "5"
 		}
 
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/datasources", storeName), []byte(page+"-"+limit))
+		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/datasources", storeName), []byte(page+"-"+limit+"-"+name))
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -244,6 +246,7 @@ func queryTestCasesHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		v := r.URL.Query()
 		page := v.Get("page")
 		limit := v.Get("limit")
+		name := v.Get("name")
 
 		// In case the request does not include pagination parameters
 		if page == "" || limit == "" {
@@ -251,7 +254,7 @@ func queryTestCasesHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			limit = "5"
 		}
 
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/testcases", storeName), []byte(page+"-"+limit))
+		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/testcases", storeName), []byte(page+"-"+limit+"-"+name))
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return

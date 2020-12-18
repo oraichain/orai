@@ -90,6 +90,7 @@ func queryOracleScripts(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) (
 	if err != nil {
 		return []byte{}, sdkerrors.Wrap(types.ErrPaginationInputInvalid, err.Error())
 	}
+	name := pagiSlice[2]
 
 	// collect all the oracle scripts based on the pagination parameters
 	oScripts, err := keeper.GetOracleScripts(ctx, uint(page), uint(limit))
@@ -106,14 +107,15 @@ func queryOracleScripts(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) (
 
 	// get code of the each oScript
 	for _, oScript := range oScripts {
-		code, err := keeper.fileCache.GetFile(types.OracleScriptStoreKeyString(oScript.GetName()))
-		if err != nil {
-			return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
+		if name == "" || name == oScript.Name {
+			code, err := keeper.fileCache.GetFile(types.OracleScriptStoreKeyString(oScript.GetName()))
+			if err != nil {
+				return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
+			}
+			executable := base64.StdEncoding.EncodeToString(code)
+			// create a new queryResOracleScript
+			queryResOScripts = append(queryResOScripts, types.NewQueryResOracleScript(oScript.GetName(), oScript.GetOwner(), executable, oScript.GetDescription(), oScript.GetMinimumFees()))
 		}
-		executable := base64.StdEncoding.EncodeToString(code)
-
-		// create a new queryResOracleScript
-		queryResOScripts = append(queryResOScripts, types.NewQueryResOracleScript(oScript.GetName(), oScript.GetOwner(), executable, oScript.GetDescription(), oScript.GetMinimumFees()))
 	}
 
 	// return the query to the command
@@ -170,6 +172,8 @@ func queryDataSources(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]
 		return []byte{}, sdkerrors.Wrap(types.ErrDataSourceNotFound, err.Error())
 	}
 
+	name := pagiSlice[2]
+
 	// get the total number of data sources
 	count := 0
 	iterator := keeper.GetAllAIDataSourceNames(ctx)
@@ -179,14 +183,16 @@ func queryDataSources(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]
 
 	// get code of the each dSource
 	for _, dSource := range dSources {
-		code, err := keeper.fileCache.GetFile(types.DataSourceStoreKeyString(dSource.GetName()))
-		if err != nil {
-			return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
-		}
-		executable := base64.StdEncoding.EncodeToString(code)
+		if name == "" || name == dSource.Name {
+			code, err := keeper.fileCache.GetFile(types.DataSourceStoreKeyString(dSource.GetName()))
+			if err != nil {
+				return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
+			}
+			executable := base64.StdEncoding.EncodeToString(code)
 
-		// create a new queryResOracleScript
-		queryResAIDSources = append(queryResAIDSources, types.NewQueryResAIDataSource(dSource.GetName(), dSource.GetOwner(), executable, dSource.GetDescription()))
+			// create a new queryResOracleScript
+			queryResAIDSources = append(queryResAIDSources, types.NewQueryResAIDataSource(dSource.GetName(), dSource.GetOwner(), executable, dSource.GetDescription()))
+		}
 	}
 
 	// return the query to the command
@@ -275,6 +281,8 @@ func queryTestCases(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]by
 		return []byte{}, sdkerrors.Wrap(types.ErrPaginationInputInvalid, err.Error())
 	}
 
+	name := pagiSlice[2]
+
 	tCases, err := keeper.GetTestCases(ctx, uint(page), uint(limit))
 	if err != nil {
 		return []byte{}, sdkerrors.Wrap(types.ErrTestCaseNotFound, err.Error())
@@ -289,14 +297,16 @@ func queryTestCases(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]by
 
 	// get code of the each tCase
 	for _, tCase := range tCases {
-		code, err := keeper.fileCache.GetFile(types.TestCaseStoreKeyString(tCase.GetName()))
-		if err != nil {
-			return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
-		}
-		executable := base64.StdEncoding.EncodeToString(code)
+		if name == "" || name == tCase.Name {
+			code, err := keeper.fileCache.GetFile(types.TestCaseStoreKeyString(tCase.GetName()))
+			if err != nil {
+				return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
+			}
+			executable := base64.StdEncoding.EncodeToString(code)
 
-		// create a new queryResOracleScript
-		queryResTestCases = append(queryResTestCases, types.NewQueryResTestCase(tCase.GetDescription(), tCase.GetOwner(), executable, tCase.GetDescription()))
+			// create a new queryResOracleScript
+			queryResTestCases = append(queryResTestCases, types.NewQueryResTestCase(tCase.GetDescription(), tCase.GetOwner(), executable, tCase.GetDescription()))
+		}
 	}
 
 	// return the query to the command
