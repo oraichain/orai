@@ -34,7 +34,7 @@ func healthCheckHandler(in <-chan bool, out chan<- bool) func(http.ResponseWrite
 		// something may wrong event websocket routine alive
 		case ret := <-in:
 			io.WriteString(w, fmt.Sprintf(`{"alive": %v}`, ret))
-		case <-time.After(0 * time.Second):
+		case <-time.After(10 * time.Second):
 			io.WriteString(w, `{"alive": false}`)
 		}
 
