@@ -107,7 +107,7 @@ func queryOracleScripts(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) (
 
 	// get code of the each oScript
 	for _, oScript := range oScripts {
-		if name == "" || name == oScript.Name {
+		if name == "" || strings.Contains(oScript.Name, name) {
 			code, err := keeper.fileCache.GetFile(types.OracleScriptStoreKeyString(oScript.GetName()))
 			if err != nil {
 				return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
@@ -183,7 +183,7 @@ func queryDataSources(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]
 
 	// get code of the each dSource
 	for _, dSource := range dSources {
-		if name == "" || name == dSource.Name {
+		if name == "" || strings.Contains(dSource.Name, name) {
 			code, err := keeper.fileCache.GetFile(types.DataSourceStoreKeyString(dSource.GetName()))
 			if err != nil {
 				return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
@@ -297,7 +297,7 @@ func queryTestCases(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]by
 
 	// get code of the each tCase
 	for _, tCase := range tCases {
-		if name == "" || name == tCase.Name {
+		if name == "" || strings.Contains(tCase.Name, name) {
 			code, err := keeper.fileCache.GetFile(types.TestCaseStoreKeyString(tCase.GetName()))
 			if err != nil {
 				return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
