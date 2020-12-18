@@ -59,7 +59,7 @@ func queryOracleScript(ctx sdk.Context, path []string, keeper Keeper) ([]byte, e
 	}
 
 	// get code of the oScript
-	code, err := keeper.fileCache.GetFile(types.OracleScriptStoreKeyString(oScript.GetName()))
+	code, err := keeper.GetOracleScriptFile(oScript.GetName())
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
 	}
@@ -99,7 +99,7 @@ func queryOracleScripts(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) (
 
 	// get code of the each oScript
 	for _, oScript := range oScripts {
-		code, err := keeper.fileCache.GetFile(types.OracleScriptStoreKeyString(oScript.GetName()))
+		code, err := keeper.GetOracleScriptFile(oScript.GetName())
 		if err != nil {
 			return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
 		}
@@ -126,7 +126,7 @@ func queryDataSource(ctx sdk.Context, path []string, keeper Keeper) ([]byte, err
 	}
 
 	// get code of the data source
-	code, err := keeper.fileCache.GetFile(types.DataSourceStoreKeyString(aiDataSource.GetName()))
+	code, err := keeper.GetAIDataSourceFile(aiDataSource.GetName())
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
 	}
@@ -165,7 +165,7 @@ func queryDataSources(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]
 
 	// get code of the each dSource
 	for _, dSource := range dSources {
-		code, err := keeper.fileCache.GetFile(types.DataSourceStoreKeyString(dSource.GetName()))
+		code, err := keeper.GetAIDataSourceFile(dSource.GetName())
 		if err != nil {
 			return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
 		}
@@ -229,7 +229,7 @@ func queryTestCase(ctx sdk.Context, path []string, keeper Keeper) ([]byte, error
 	}
 
 	// get code of the test case
-	code, err := keeper.fileCache.GetFile(types.TestCaseStoreKeyString(testCase.GetName()))
+	code, err := keeper.GetTestCaseFile(testCase.GetName())
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
 	}
@@ -268,7 +268,7 @@ func queryTestCases(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]by
 
 	// get code of the each tCase
 	for _, tCase := range tCases {
-		code, err := keeper.fileCache.GetFile(types.TestCaseStoreKeyString(tCase.GetName()))
+		code, err := keeper.GetTestCaseFile(tCase.GetName())
 		if err != nil {
 			return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
 		}

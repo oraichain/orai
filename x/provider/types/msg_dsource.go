@@ -44,6 +44,9 @@ func (msg MsgCreateAIDataSource) ValidateBasic() error {
 	if len(msg.Name) == 0 || len(msg.Code) == 0 {
 		return sdkerrors.Wrap(ErrEmpty, "Name and/or Code cannot be empty")
 	}
+	if len(msg.Code) > MaximumCodeBytesThreshold {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "The size of the source code is too large!\n")
+	}
 	return checkFees(msg.Fees)
 }
 
@@ -92,6 +95,9 @@ func (msg MsgEditAIDataSource) ValidateBasic() error {
 	// }
 	if len(msg.OldName) == 0 || len(msg.Code) == 0 || len(msg.NewName) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Name and/or Code cannot be empty")
+	}
+	if len(msg.Code) > MaximumCodeBytesThreshold {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "The size of the source code is too large!\n")
 	}
 	return checkFees(msg.Fees)
 }

@@ -60,14 +60,14 @@ func (k Keeper) DefaultTestCase() types.TestCase {
 
 // EditTestCase allows users to edit a test case in the store
 func (k Keeper) EditTestCase(ctx sdk.Context, oldName, newName string, code []byte, testCase types.TestCase) {
-	key := types.TestCaseStoreKeyString(oldName)
+	key := types.TestCaseStoreKey(oldName)
 	// if the user does not want to reuse the old name
 	if oldName != newName {
 		store := ctx.KVStore(k.storeKey)
 		byteKey := []byte(key)
 		store.Delete(byteKey)
 		// delete the old file because it not pointed by any oScript
-		k.fileCache.EraseFile(key)
+		k.EraseTestCaseFile(oldName)
 		k.AddTestCaseFile(code, newName)
 	} else {
 		// edit the file instead since old name = new name
@@ -77,12 +77,12 @@ func (k Keeper) EditTestCase(ctx sdk.Context, oldName, newName string, code []by
 }
 
 // GetTestCaseFile gets the test case code stored in the file storage
-func (k Keeper) GetTestCaseFile(name string) []byte {
+func (k Keeper) GetTestCaseFile(name string) ([]byte, error) {
 	code, err := k.fileCache.GetFile(types.TestCaseStoreFileString(name))
 	if err != nil {
-		return []byte{}
+		return []byte{}, err
 	}
-	return code
+	return code, nil
 }
 
 // AddTestCaseFile adds the file to filecache,
