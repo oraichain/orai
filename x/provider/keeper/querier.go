@@ -97,6 +97,13 @@ func queryOracleScripts(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) (
 		return []byte{}, sdkerrors.Wrap(types.ErrOracleScriptNotFound, err.Error())
 	}
 
+	// get the total number of oracle scripts
+	count := 0
+	iterator := keeper.GetAllOracleScriptNames(ctx)
+	for ; iterator.Valid(); iterator.Next() {
+		count++
+	}
+
 	// get code of the each oScript
 	for _, oScript := range oScripts {
 		code, err := keeper.fileCache.GetFile(types.OracleScriptStoreKeyString(oScript.GetName()))
@@ -110,7 +117,7 @@ func queryOracleScripts(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) (
 	}
 
 	// return the query to the command
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResOracleScripts(queryResOScripts, len(oScripts)))
+	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResOracleScripts(queryResOScripts, count))
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -163,6 +170,13 @@ func queryDataSources(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]
 		return []byte{}, sdkerrors.Wrap(types.ErrDataSourceNotFound, err.Error())
 	}
 
+	// get the total number of data sources
+	count := 0
+	iterator := keeper.GetAllAIDataSourceNames(ctx)
+	for ; iterator.Valid(); iterator.Next() {
+		count++
+	}
+
 	// get code of the each dSource
 	for _, dSource := range dSources {
 		code, err := keeper.fileCache.GetFile(types.DataSourceStoreKeyString(dSource.GetName()))
@@ -176,7 +190,7 @@ func queryDataSources(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]
 	}
 
 	// return the query to the command
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResAIDataSources(queryResAIDSources, len(dSources)))
+	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResAIDataSources(queryResAIDSources, count))
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -266,6 +280,13 @@ func queryTestCases(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]by
 		return []byte{}, sdkerrors.Wrap(types.ErrTestCaseNotFound, err.Error())
 	}
 
+	// get the total number of test cases
+	count := 0
+	iterator := keeper.GetAllOracleScriptNames(ctx)
+	for ; iterator.Valid(); iterator.Next() {
+		count++
+	}
+
 	// get code of the each tCase
 	for _, tCase := range tCases {
 		code, err := keeper.fileCache.GetFile(types.TestCaseStoreKeyString(tCase.GetName()))
@@ -279,7 +300,7 @@ func queryTestCases(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]by
 	}
 
 	// return the query to the command
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResTestCases(queryResTestCases, len(tCases)))
+	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResTestCases(queryResTestCases, count))
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
