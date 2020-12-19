@@ -133,7 +133,7 @@ func queryDataSource(ctx sdk.Context, path []string, keeper Keeper) ([]byte, err
 
 	executable := base64.StdEncoding.EncodeToString(code)
 
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResAIDataSource(aiDataSource.GetName(), aiDataSource.GetOwner(), executable, aiDataSource.GetDescription()))
+	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResAIDataSource(aiDataSource.GetName(), aiDataSource.GetOwner(), executable, aiDataSource.GetDescription(), aiDataSource.Fees))
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -172,7 +172,7 @@ func queryDataSources(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]
 		executable := base64.StdEncoding.EncodeToString(code)
 
 		// create a new queryResOracleScript
-		queryResAIDSources = append(queryResAIDSources, types.NewQueryResAIDataSource(dSource.GetName(), dSource.GetOwner(), executable, dSource.GetDescription()))
+		queryResAIDSources = append(queryResAIDSources, types.NewQueryResAIDataSource(dSource.GetName(), dSource.GetOwner(), executable, dSource.GetDescription(), dSource.Fees))
 	}
 
 	// return the query to the command
@@ -236,7 +236,7 @@ func queryTestCase(ctx sdk.Context, path []string, keeper Keeper) ([]byte, error
 
 	executable := base64.StdEncoding.EncodeToString(code)
 
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResTestCase(testCase.GetName(), testCase.GetOwner(), executable, testCase.GetDescription()))
+	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResTestCase(testCase.GetName(), testCase.GetOwner(), executable, testCase.GetDescription(), testCase.Fees))
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -275,7 +275,7 @@ func queryTestCases(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]by
 		executable := base64.StdEncoding.EncodeToString(code)
 
 		// create a new queryResOracleScript
-		queryResTestCases = append(queryResTestCases, types.NewQueryResTestCase(tCase.GetDescription(), tCase.GetOwner(), executable, tCase.GetDescription()))
+		queryResTestCases = append(queryResTestCases, types.NewQueryResTestCase(tCase.GetDescription(), tCase.GetOwner(), executable, tCase.GetDescription(), tCase.Fees))
 	}
 
 	// return the query to the command

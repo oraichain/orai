@@ -22,21 +22,23 @@ type QueryResTestCase struct {
 	Owner       sdk.AccAddress `json:"owner"`
 	Code        string         `json:"code"`
 	Description string         `json:"description"`
+	Fees        sdk.Coins      `json:"fees"`
 }
 
 // NewQueryResTestCase is the constructor for the query test case request
-func NewQueryResTestCase(name string, owner sdk.AccAddress, code string, des string) QueryResTestCase {
+func NewQueryResTestCase(name string, owner sdk.AccAddress, code string, des string, fees sdk.Coins) QueryResTestCase {
 	return QueryResTestCase{
 		Name:        name,
 		Owner:       owner,
 		Code:        code,
 		Description: des,
+		Fees:        fees,
 	}
 }
 
 // implement fmt.Stringer
 func (tc QueryResTestCase) String() string {
-	return strings.TrimSpace(fmt.Sprintf(`Name: %s Owner: %s Code: %s Description: %s`, tc.Name, string(tc.Owner[:]), tc.Code, tc.Description))
+	return strings.TrimSpace(fmt.Sprintf(`Name: %s Owner: %s Code: %s Description: %s Fees: %s`, tc.Name, string(tc.Owner[:]), tc.Code, tc.Description, tc.Fees))
 }
 
 // QueryResTestCases Queries the list of test cases
