@@ -22,15 +22,17 @@ type QueryResTestCase struct {
 	Owner       sdk.AccAddress `json:"owner"`
 	Code        string         `json:"code"`
 	Description string         `json:"description"`
+	Fees        sdk.Coins      `json:"fees"`
 }
 
 // NewQueryResTestCase is the constructor for the query test case request
-func NewQueryResTestCase(name string, owner sdk.AccAddress, code string, des string) QueryResTestCase {
+func NewQueryResTestCase(name string, owner sdk.AccAddress, code string, des string, fees sdk.Coins) QueryResTestCase {
 	return QueryResTestCase{
 		Name:        name,
 		Owner:       owner,
 		Code:        code,
 		Description: des,
+		Fees:        fees,
 	}
 }
 
