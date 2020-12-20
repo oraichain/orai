@@ -1,0 +1,271 @@
+{
+    "genesis_time": "2020-12-20T04:23:43.580492643Z",
+    "chain_id": "Oraichain",
+    "consensus_params": {
+        "block": {
+            "max_bytes": "1000000",
+            "max_gas": "5000000",
+            "time_iota_ms": "1000"
+        },
+        "evidence": {
+            "max_age_num_blocks": "100000",
+            "max_age_duration": "172800000000000"
+        },
+        "validator": {
+            "pub_key_types": [
+                "secp256k1"
+            ]
+        }
+    },
+    "app_hash": "",
+    "app_state": {
+        "airesult": {
+            "ai_results": [],
+            "params": {
+                "expiration_count": "10"
+            }
+        },
+        "staking": {
+            "params": {
+                "unbonding_time": "1814400000000000",
+                "max_validators": 100,
+                "max_entries": 7,
+                "historical_entries": 1000,
+                "bond_denom": "orai"
+            },
+            "last_total_power": "0",
+            "last_validator_powers": null,
+            "validators": null,
+            "delegations": null,
+            "unbonding_delegations": null,
+            "redelegations": null,
+            "exported": false
+        },
+        "bank": {
+            "send_enabled": true
+        },
+        "slashing": {
+            "params": {
+                "signed_blocks_window": "30000",
+                "min_signed_per_window": "0.050000000000000000",
+                "downtime_jail_duration": "600000000000",
+                "slash_fraction_double_sign": "0.050000000000000000",
+                "slash_fraction_downtime": "0.000100000000000000"
+            },
+            "signing_infos": {},
+            "missed_blocks": {}
+        },
+        "evidence": {
+            "params": {
+                "max_evidence_age": "120000000000"
+            },
+            "evidence": []
+        },
+        "mint": {
+            "minter": {
+                "inflation": "0.130000000000000000",
+                "annual_provisions": "0.000000000000000000"
+            },
+            "params": {
+                "mint_denom": "orai",
+                "inflation_rate_change": "0.130000000000000000",
+                "inflation_max": "0.200000000000000000",
+                "inflation_min": "0.070000000000000000",
+                "goal_bonded": "0.670000000000000000",
+                "blocks_per_year": "6311200"
+            }
+        },
+        "provider": {
+            "oracle_scripts": [],
+            "datasources": [],
+            "test_cases": [],
+            "params": {
+                "oscript_reward_percentage": "70",
+                "maximum_code_bytes": "1024"
+            }
+        },
+        "crisis": {
+            "constant_fee": {
+                "denom": "orai",
+                "amount": "10000000"
+            }
+        },
+        "gov": {
+            "starting_proposal_id": "1",
+            "deposits": null,
+            "votes": null,
+            "proposals": null,
+            "deposit_params": {
+                "min_deposit": [
+                    {
+                        "denom": "orai",
+                        "amount": "10000000"
+                    }
+                ],
+                "max_deposit_period": "172800000000000"
+            },
+            "voting_params": {
+                "voting_period": "172800000000000"
+            },
+            "tally_params": {
+                "quorum": "0.334000000000000000",
+                "threshold": "0.500000000000000000",
+                "veto": "0.334000000000000000"
+            }
+        },
+        "airequest": {
+            "ai_requests": [],
+            "params": {
+                "maximum_request_bytes": "1024"
+            }
+        },
+        "websocket": {
+            "validator_report": [],
+            "validator_reporter": []
+        },
+        "auth": {
+            "params": {
+                "max_memo_characters": "256",
+                "tx_sig_limit": "7",
+                "tx_size_cost_per_byte": "5",
+                "sig_verify_cost_ed25519": "590",
+                "sig_verify_cost_secp256k1": "1000"
+            },
+            "accounts": [
+                {
+                    "type": "cosmos-sdk/Account",
+                    "value": {
+                        "address": "orai1tyle283vh76e576cpxjenxwjkvaqytsuwv7pv8",
+                        "coins": [
+                            {
+                                "denom": "orai",
+                                "amount": "9000000000000000"
+                            }
+                        ],
+                        "public_key": null,
+                        "account_number": "0",
+                        "sequence": "0"
+                    }
+                }
+            ]
+        },
+        "genutil": {
+            "gentxs": [
+                {
+                    "type": "cosmos-sdk/StdTx",
+                    "value": {
+                        "msg": [
+                            {
+                                "type": "cosmos-sdk/MsgCreateValidator",
+                                "value": {
+                                    "description": {
+                                        "moniker": "node1-moniker",
+                                        "identity": "",
+                                        "website": "",
+                                        "security_contact": "",
+                                        "details": ""
+                                    },
+                                    "commission": {
+                                        "rate": "0.100000000000000000",
+                                        "max_rate": "0.200000000000000000",
+                                        "max_change_rate": "0.010000000000000000"
+                                    },
+                                    "min_self_delegation": "100",
+                                    "delegator_address": "orai1tyle283vh76e576cpxjenxwjkvaqytsuwv7pv8",
+                                    "validator_address": "oraivaloper1tyle283vh76e576cpxjenxwjkvaqytsu8x9g8q",
+                                    "pubkey": "oraivalconspub1addwnpepq0axqkgnxym2z2msfj465v9kfhrfjc7zpeazywaflpzs8h5rg58zych82c7",
+                                    "value": {
+                                        "denom": "orai",
+                                        "amount": "900000000000"
+                                    }
+                                }
+                            }
+                        ],
+                        "fee": {
+                            "amount": [],
+                            "gas": "200000"
+                        },
+                        "signatures": [
+                            {
+                                "pub_key": {
+                                    "type": "tendermint/PubKeySecp256k1",
+                                    "value": "Azmc2qfhWxgtZtwYrOz01tDqOQH9WnT20DEfKsiL5p+B"
+                                },
+                                "signature": "6jJycbB3hRNaloFeFTwtrv8kReiEfvvIpP42jl74cyI6TmVL67cbRvDCJcL5LoUztAgcQZG+YhWhPMB/1G0Gvw=="
+                            }
+                        ],
+                        "memo": "d07e9e9aa17f5e4b5f2b953dc864d07f5bbca5d4@164.90.180.95:26656"
+                    }
+                },
+                {
+                    "type": "cosmos-sdk/StdTx",
+                    "value": {
+                        "msg": [
+                            {
+                                "type": "cosmos-sdk/MsgCreateValidator",
+                                "value": {
+                                    "description": {
+                                        "moniker": "node2-moniker",
+                                        "identity": "",
+                                        "website": "",
+                                        "security_contact": "",
+                                        "details": ""
+                                    },
+                                    "commission": {
+                                        "rate": "0.100000000000000000",
+                                        "max_rate": "0.200000000000000000",
+                                        "max_change_rate": "0.010000000000000000"
+                                    },
+                                    "min_self_delegation": "200",
+                                    "delegator_address": "orai1szff7upqrvvxt4vkr493sm2v84f3gt3au650vw",
+                                    "validator_address": "oraivaloper1szff7upqrvvxt4vkr493sm2v84f3gt3a4s0x8f",
+                                    "pubkey": "oraivalconspub1addwnpepqg6hsk9k8uxl4m7sx4gwfnzjvsde9gktz26zvdjc06q5nm4dt4w6vgd7kk2",
+                                    "value": {
+                                        "denom": "orai",
+                                        "amount": "900000000000"
+                                    }
+                                }
+                            }
+                        ],
+                        "fee": {
+                            "amount": [],
+                            "gas": "200000"
+                        },
+                        "signatures": [
+                            {
+                                "pub_key": {
+                                    "type": "tendermint/PubKeySecp256k1",
+                                    "value": "AqpDAEID1qTs+JaSXe/5Ylvrz0jGWhMn6sEdfx1OYSR7"
+                                },
+                                "signature": "2o6OhUb+Y5OTCqISIHEHb5o+YHkLvtu3FDs7z7OiFfEk0PfljBfJ23qu0WjKTZuGtvleI+cgty7ZZVuXkL5lUA=="
+                            }
+                        ],
+                        "memo": "bfc8a455fc95530692a70d6f7642291cbbea3ba1@157.230.22.169:26656"
+                    }
+                }
+            ]
+        },
+        "distribution": {
+            "params": {
+                "community_tax": "0.020000000000000000",
+                "base_proposer_reward": "0.100000000000000000",
+                "bonus_proposer_reward": "0.100000000000000000",
+                "withdraw_addr_enabled": true
+            },
+            "fee_pool": {
+                "community_pool": []
+            },
+            "delegator_withdraw_infos": [],
+            "previous_proposer": "",
+            "outstanding_rewards": [],
+            "validator_accumulated_commissions": [],
+            "validator_historical_rewards": [],
+            "validator_current_rewards": [],
+            "delegator_starting_infos": [],
+            "validator_slash_events": []
+        },
+        "supply": {
+            "supply": []
+        }
+    }
+}

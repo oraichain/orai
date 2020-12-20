@@ -63,10 +63,7 @@ func (p *Params) ParamSetPairs() params.ParamSetPairs {
 
 // DefaultParams defines the parameters for this module
 func DefaultParams() Params {
-	if DefaultMaximumRequestBytes > MaximumRequestBytesThreshold {
-		return NewParams(MaximumRequestBytesThreshold)
-	}
-	return NewParams(DefaultMaximumRequestBytes)
+	return NewParams(MaximumRequestBytesThreshold)
 }
 
 func validateMaximumRequestBytes(i interface{}) error {

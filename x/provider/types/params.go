@@ -66,7 +66,7 @@ func (p *Params) ParamSetPairs() params.ParamSetPairs {
 
 // DefaultParams defines the parameters for this module
 func DefaultParams() Params {
-	return NewParams(DefaultOracleScriptRewardPercentage, DefaultMaximumCodeBytes)
+	return NewParams(DefaultOracleScriptRewardPercentage, MaximumCodeBytesThreshold)
 }
 
 func validateOracleScriptRewardPercentage(i interface{}) error {
