@@ -1,8 +1,9 @@
 # Initialize configuration files and genesis file
 # moniker is the name of your node
 #nsd init <moniker> --chain-id namechain
-CHAIN_ID=${1:-Oraichain}
-USER=${2:-duc}
+USER=${1:-duc}
+MONIKER=${2:-"$USER"_"Oraichain"_$(($RANDOM%10000000000))}
+MIN_SELF_DELEGATION=${3:-100}
 
 rm -rf .oraid/
 
@@ -20,10 +21,10 @@ rm -rf .oraifiles/
 
 # make install
 
-oraid init dws --chain-id $CHAIN_ID
+oraid init $MONIKER --chain-id Oraichain
 
 # Configure your CLI to eliminate need to declare them as flags
-oraicli config chain-id $CHAIN_ID
+oraicli config chain-id Oraichain
 oraicli config output json
 oraicli config indent true
 oraicli config trust-node true
@@ -50,7 +51,7 @@ oraid add-genesis-account $(oraicli keys show $USER -a) 9000000000000000orai
 # The "nscli config" command saves configuration for the "nscli" command but not for "nsd" so we have to 
 # declare the keyring-backend with a flag here
 #nsd gentx --name jack <or your key_name> --keyring-backend test
-oraid gentx --amount 900000000000orai --name $USER --keyring-backend test --min-self-delegation 100
+oraid gentx --amount 900000000000orai --name $USER --keyring-backend test --min-self-delegation $MIN_SELF_DELEGATION
 
 # put the validators into the genesis file so the chain is aware of the validators
 oraid collect-gentxs
