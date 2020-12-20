@@ -38,7 +38,7 @@ func NewQueryResTestCase(name string, owner sdk.AccAddress, code string, des str
 
 // implement fmt.Stringer
 func (tc QueryResTestCase) String() string {
-	return strings.TrimSpace(fmt.Sprintf(`Name: %s Owner: %s Code: %s Description: %s`, tc.Name, string(tc.Owner[:]), tc.Code, tc.Description))
+	return strings.TrimSpace(fmt.Sprintf(`Name: %s Owner: %s Code: %s Description: %s Fees: %s`, tc.Name, string(tc.Owner[:]), tc.Code, tc.Description, tc.Fees))
 }
 
 // QueryResTestCases Queries the list of test cases

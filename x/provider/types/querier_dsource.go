@@ -39,7 +39,7 @@ func NewQueryResAIDataSource(name string, owner sdk.AccAddress, code string, des
 func (qre QueryResAIDataSource) String() string {
 	return strings.TrimSpace(fmt.Sprintf(`Name: %s
 Owner: %s
-Code: %s Description: %s`, qre.Name, string(qre.Owner[:]), qre.Code, qre.Description))
+Code: %s Description: %s fees: %s`, qre.Name, string(qre.Owner[:]), qre.Code, qre.Description, qre.Fees))
 }
 
 // QueryResAIDataSources Queries the list of data sources
