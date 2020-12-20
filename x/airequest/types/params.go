@@ -30,7 +30,7 @@ func ParamKeyTable() params.KeyTable {
 type Params struct {
 	// TODO: Add your Paramaters to the Paramter struct
 	// KeyParamName string `json:"key_param_name"`
-	MaximumRequestBytes int `json:"maximum_request_bytes" msg:"maximum_request_bytes"`
+	MaximumRequestBytes int `json:"maximum_request_bytes"`
 }
 
 // NewParams creates a new Params object
@@ -75,7 +75,7 @@ func validateMaximumRequestBytes(i interface{}) error {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
 
-	if v <= 1000 {
+	if v < 0 || v > MaximumRequestBytesThreshold {
 		return fmt.Errorf("invalid maximum bytes: %d", v)
 	}
 
