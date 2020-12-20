@@ -160,3 +160,4 @@ tmp
 registry_cache
 *.wasm
 wasmd/
+genesis.json

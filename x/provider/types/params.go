@@ -11,8 +11,8 @@ const (
 	DefaultParamspace = ModuleName
 	// TODO: Define your default parameters
 	DefaultOracleScriptRewardPercentage = uint64(70)
-	DefaultMaximumCodeBytes             = 1024 // 1MB
-	MaximumCodeBytesThreshold           = 4096 // 4MB
+	DefaultMaximumCodeBytes             = 1024
+	MaximumCodeBytesThreshold           = 1 * 1024 * 1024 // 1MB
 )
 
 // Parameter store keys
