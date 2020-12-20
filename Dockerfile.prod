@@ -26,6 +26,6 @@ COPY fn.sh /usr/local/bin/fn
 RUN apk add curl bash ncurses jq
 
 # copy build files
-COPY --from=build /go/bin/* /usr/local/bin
+COPY --from=build /go/bin/ /usr/local/bin
 
 # ENTRYPOINT fn init && fn start

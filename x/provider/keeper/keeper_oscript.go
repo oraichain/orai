@@ -56,14 +56,14 @@ func (k Keeper) GetPaginatedOracleScriptNames(ctx sdk.Context, page, limit uint)
 // EditOracleScript allows users to edit a oScript in the store
 func (k Keeper) EditOracleScript(ctx sdk.Context, oldName, newName string, code []byte, oScript types.OracleScript) {
 
-	key := types.OracleScriptStoreKeyString(oldName)
+	key := types.OracleScriptStoreKey(oldName)
 	// if the user does not want to reuse the old name
 	if oldName != newName {
 		store := ctx.KVStore(k.storeKey)
 		byteKey := []byte(key)
 		store.Delete(byteKey)
 		// delete the old file because it not pointed by any oScript
-		k.fileCache.EraseFile(key)
+		k.EraseOracleScriptFile(oldName)
 		k.AddOracleScriptFile(code, newName)
 	} else {
 		k.EditOracleScriptFile(code, oldName)
@@ -87,12 +87,12 @@ func (k Keeper) EditOracleScriptFile(file []byte, name string) {
 }
 
 // GetOracleScriptFile gets the oScript code stored in the file storage
-func (k Keeper) GetOracleScriptFile(name string) []byte {
+func (k Keeper) GetOracleScriptFile(name string) ([]byte, error) {
 	code, err := k.fileCache.GetFile(types.OracleScriptFileString(name))
 	if err != nil {
-		return []byte{}
+		return []byte{}, err
 	}
-	return code
+	return code, nil
 }
 
 // GetOScriptPath is the path for the complete oracle script file location
