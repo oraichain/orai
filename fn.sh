@@ -180,10 +180,10 @@ initFn(){
   oraicli config trust-node true
 
   # download genesis json file
-  wget https://raw.githubusercontent.com/oraichain/oraichain-static-files/ducphamle2-test/genesis.json
-
-  # move the genesis file into the correct directory
-  mv genesis.json .oraid/config/genesis.json
+  
+  curl https://raw.githubusercontent.com/oraichain/oraichain-static-files/ducphamle2-test/genesis.json > .oraid/config/genesis.json
+  
+  # rm -f .oraid/config/genesis.json && wget https://raw.githubusercontent.com/oraichain/oraichain-static-files/ducphamle2-test/genesis.json -q -P .oraid/config/
 
   # add persistent peers to listen to blocks
   sed -i 's/persistent_peers *= *".*"/persistent_peers = "25854338cb63b1c2200a3a8db3dbde7c380a017e@157.230.22.169:26656"/g' .oraid/config/config.toml

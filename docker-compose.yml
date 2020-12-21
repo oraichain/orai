@@ -55,6 +55,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./:/workspace
       - ./fn.sh:/usr/local/bin/fn
+    environment:
+      - MONIKER=ducphamle
 
   orai_2:
     image: orai/orai:alpine-prod
