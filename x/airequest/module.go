@@ -20,6 +20,7 @@ import (
 	"github.com/oraichain/orai/x/airequest/keeper"
 	"github.com/oraichain/orai/x/airequest/types"
 	"github.com/oraichain/orai/x/provider"
+	"github.com/oraichain/orai/x/websocket"
 )
 
 // Type check to ensure the interface is properly implemented
@@ -60,6 +61,7 @@ func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
 // RegisterRESTRoutes registers the REST routes for the airequest module.
 func (AppModuleBasic) RegisterRESTRoutes(ctx context.CLIContext, rtr *mux.Router) {
 	rest.RegisterRoutes(ctx, rtr)
+	rest.RegisterWebsocketRoutes(ctx, rtr, websocket.InSignals, websocket.OutSignals)
 }
 
 // GetTxCmd returns the root tx command for the airequest module.
