@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	Timeout = 10
+	Timeout = 5
 )
 
 func registerWebsocketQueryRoutes(cliCtx context.CLIContext, r *mux.Router, in <-chan bool, out chan<- bool) {
@@ -46,7 +46,7 @@ func healthCheckHandler(in <-chan bool, out chan<- bool) func(http.ResponseWrite
 			io.WriteString(w, fmt.Sprintf(`{"alive": %v}`, ret))
 		case <-timer.C:
 			w.WriteHeader(http.StatusRequestTimeout)
-			io.WriteString(w, fmt.Sprintf(`{"alive": false, "timeout": %d}`, Timeout))				
+			io.WriteString(w, `{"alive": false}`)				
 		}
 		
 
