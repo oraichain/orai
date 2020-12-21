@@ -28,4 +28,4 @@ RUN apk add curl bash ncurses jq
 # copy build files
 COPY --from=build /go/bin/ /usr/local/bin
 
-# ENTRYPOINT fn init && fn start
+ENTRYPOINT fn init && fn start

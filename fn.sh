@@ -167,29 +167,33 @@ oraidFn(){
 
 initFn(){ 
 
-  rm -rf .oraid/
-  rm -rf .oraicli/
-  rm -rf .oraifiles/
+  ### Check if a directory does not exist ###
+  if [[ ! -d "$PWD/.oraid/" || ! -d "$PWD/.oraicli/" ]] 
+  then
+    echo "Directory /path/to/dir DOES NOT exists."
 
-  oraid init $MONIKER --chain-id Oraichain
+    oraid init $MONIKER --chain-id Oraichain
 
-  # Configure your CLI to eliminate need to declare them as flags
-  oraicli config chain-id Oraichain
-  oraicli config output json
-  oraicli config indent true
-  oraicli config trust-node true
+    # Configure your CLI to eliminate need to declare them as flags
+    oraicli config chain-id Oraichain
+    oraicli config output json
+    oraicli config indent true
+    oraicli config trust-node true
 
-  # download genesis json file
-  wget https://raw.githubusercontent.com/oraichain/oraichain-static-files/master/genesis.json
+    oraicli keys add $USER
 
-  # move the genesis file into the correct directory
-  mv genesis.json .oraid/config/genesis.json
+    # download genesis json file
+    wget https://raw.githubusercontent.com/oraichain/oraichain-static-files/master/genesis.json
 
-  # add persistent peers to listen to blocks
-  sed -i 's/persistent_peers *= *".*"/persistent_peers = "dbb2fee9a55cbbe364afcf377cb2f82882fa4ad6@164.90.180.95:26656,a9f2161cb9d723c26e8f268a660b5cc1261e264a@157.230.22.169:26656,950e189e74134d9341d859c6132f5d4da7c19b58@165.232.118.44:26656,c5bcf6dd8efa1a2ee0efdec4a18da8d3a2654302@178.128.61.252:26656,4969be3fdf0e20c77ee252fb156d8bf2a9496317@178.128.57.195:26656,5efef6b1af1429a8c4ae30ed568d7fe97cf2f0c0@159.89.206.139:26656,3076fd764d2eda73bc3637d84549dff587897e51@178.128.220.155:26656"/g' .oraid/config/config.toml
+    # move the genesis file into the correct directory
+    mv genesis.json .oraid/config/genesis.json
 
-  oraid validate-genesis
-  # done init
+    # add persistent peers to listen to blocks
+    sed -i 's/persistent_peers *= *".*"/persistent_peers = "dbb2fee9a55cbbe364afcf377cb2f82882fa4ad6@164.90.180.95:26656,a9f2161cb9d723c26e8f268a660b5cc1261e264a@157.230.22.169:26656,950e189e74134d9341d859c6132f5d4da7c19b58@165.232.118.44:26656,c5bcf6dd8efa1a2ee0efdec4a18da8d3a2654302@178.128.61.252:26656,4969be3fdf0e20c77ee252fb156d8bf2a9496317@178.128.57.195:26656,5efef6b1af1429a8c4ae30ed568d7fe97cf2f0c0@159.89.206.139:26656,3076fd764d2eda73bc3637d84549dff587897e51@178.128.220.155:26656"/g' .oraid/config/config.toml
+
+    oraid validate-genesis
+    # done init
+  fi
 }
 
 websocketInitFn() {
