@@ -270,6 +270,9 @@ case "${METHOD}" in
   initScript)
     initScriptFn
   ;; 
+  clear)
+    clear
+  ;; 
   createValidator)
     createValidatorFn
   ;;
