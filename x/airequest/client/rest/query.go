@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	Timeout = 2
+	Timeout = 10
 )
 
 func registerWebsocketQueryRoutes(cliCtx context.CLIContext, r *mux.Router, in <-chan bool, out chan<- bool) {
