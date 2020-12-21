@@ -186,11 +186,13 @@ initFn(){
   # rm -f .oraid/config/genesis.json && wget https://raw.githubusercontent.com/oraichain/oraichain-static-files/ducphamle2-test/genesis.json -q -P .oraid/config/
 
   # add persistent peers to listen to blocks
-  sed -i 's/persistent_peers *= *".*"/persistent_peers = "25854338cb63b1c2200a3a8db3dbde7c380a017e@157.230.22.169:26656"/g' .oraid/config/config.toml
-
+  local persistentPeers=$(getArgument "--persistent_peers" "$PERSISTENT_PEERS")
+  [ ! -z $persistentPeers ] && sed -i 's/persistent_peers *= *".*"/persistent_peers = "25854338cb63b1c2200a3a8db3dbde7c380a017e@157.230.22.169:26656"/g' .oraid/config/config.toml  
+  
   oraid validate-genesis
   # done init
 }
+
 createValidatorFn() {
   local amount=$(getArgument "amount" "$AMOUNT")
   local pubkey=$(oraid tendermint show-validator)
