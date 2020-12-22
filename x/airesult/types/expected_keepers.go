@@ -1,6 +1,8 @@
 package types
 
 import (
+	"encoding/json"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
@@ -81,7 +83,7 @@ type WebSocketKeeper interface {
 	DefaultValResultI() webSocket.ValResultI
 	GetKeyResultSuccess() string
 	NewValidator(address sdk.ValAddress, votingPower int64, status string) webSocket.ValidatorI
-	NewValResult(val webSocket.ValidatorI, result []byte, status string) webSocket.ValResultI
+	NewValResult(val webSocket.ValidatorI, result json.RawMessage, status string) webSocket.ValResultI
 }
 
 // AIRequestKeeper defines the expected airequest keeper

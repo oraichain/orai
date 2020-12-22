@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"encoding/json"
+
 	"github.com/oraichain/orai/x/websocket/exported"
 	"github.com/oraichain/orai/x/websocket/types"
 )
@@ -24,6 +26,6 @@ func (k Keeper) GetKeyResultSuccess() string {
 }
 
 // NewValResult is a wrapper function of the websocket module that allow others to initiate a new valresult entity through the keeper
-func (k Keeper) NewValResult(val exported.ValidatorI, result []byte, status string) exported.ValResultI {
+func (k Keeper) NewValResult(val exported.ValidatorI, result json.RawMessage, status string) exported.ValResultI {
 	return types.NewValResult(val, result, status)
 }

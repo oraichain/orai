@@ -71,7 +71,7 @@ func (r Report) GetReporter() exported.ReporterI {
 }
 
 // GetAggregatedResult is the getter method for getting AggregatedResult of a report
-func (r Report) GetAggregatedResult() []byte {
+func (r Report) GetAggregatedResult() json.RawMessage {
 	return r.AggregatedResult
 }
 
