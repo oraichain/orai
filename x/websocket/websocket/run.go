@@ -112,7 +112,7 @@ func runCmd(c *Context) *cobra.Command {
 		Short:   "Run the oracle process",
 		Args:    cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Print("Chainid", cfg.ChainID)
+			fmt.Println("Chainid", cfg.ChainID)
 			if cfg.ChainID == "" {
 				return errors.New("Chain ID must not be empty")
 			}

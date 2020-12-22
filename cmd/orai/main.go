@@ -72,24 +72,28 @@ func main() {
 	var wg sync.WaitGroup
 	startCmd.RunE = func(cmd *cobra.Command, args []string) error {
 
+		// get persistent from command param
+		chainID := viper.GetString(flags.FlagChainID)
+
 		// run start command worker
 		wg.Add(1)
 		go worker(&wg, runE, cmd, args, 0)
-
-		// run websocket command worker
-		websocketCmd, err := websocket.ServeCommand(viper.GetString(flags.FlagHome))
-		if err == nil {
-			wg.Add(1)
-			go worker(&wg, websocketCmd.RunE, cmd, args, 2000)
-		}
 
 		// run rest server command worker
 		// oraicli rest-server --chain-id $CHAIN_ID --laddr tcp://0.0.0.0:1317  --trust-node
 		laddr := viper.GetString(flags.FlagListenAddr)
 		if laddr != "" {
 			restServerCmd := lcd.ServeCommand(cdc, registerRoutes)
+			viper.Set(flags.FlagChainID, chainID)
 			wg.Add(1)
 			go worker(&wg, restServerCmd.RunE, cmd, args, 2000)
+		}
+
+		// run websocket command worker
+		websocketCmd, err := websocket.ServeCommand(viper.GetString(flags.FlagHome))
+		if err == nil {
+			wg.Add(1)
+			go worker(&wg, websocketCmd.RunE, cmd, args, 2000)
 		}
 
 		// Main: Waiting for workers to finish

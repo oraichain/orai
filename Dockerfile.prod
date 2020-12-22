@@ -17,7 +17,7 @@ RUN rm /go/bin/goupx
 # RUN rm -r /workspace/*
 
 FROM alpine:latest AS base
-WORKDIR /app
+WORKDIR /workspace
 EXPOSE 1317
 
 COPY fn.sh /usr/local/bin/fn
