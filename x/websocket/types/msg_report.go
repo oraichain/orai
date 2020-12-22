@@ -1,6 +1,8 @@
 package types
 
 import (
+	"encoding/json"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/oraichain/orai/x/websocket/exported"
@@ -13,7 +15,7 @@ type MsgCreateReport struct {
 	TestCaseResults   []exported.TestCaseResultI   `json:"test_case_results"`
 	Reporter          Reporter                     `json:"reporter"`
 	Fees              sdk.Coins                    `json:"report_fee"`
-	AggregatedResult  []byte                       `json:"aggregated_result"`
+	AggregatedResult  json.RawMessage              `json:"aggregated_result"`
 	ResultStatus      string                       `json:"result_status"`
 }
 
@@ -24,7 +26,7 @@ func NewMsgCreateReport(
 	testCaseResults []exported.TestCaseResultI,
 	reporter Reporter,
 	fees sdk.Coins,
-	aggregatedResult []byte,
+	aggregatedResult json.RawMessage,
 	status string,
 ) MsgCreateReport {
 	return MsgCreateReport{

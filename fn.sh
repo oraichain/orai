@@ -247,6 +247,7 @@ websocketInitFn() {
 }
 
 createValidatorFn() {
+  local user=$(getArgument "user" $USER)
   local amount=$(getArgument "amount" $AMOUNT)
   local pubkey=$(oraid tendermint show-validator)
   local moniker=$(getArgument "moniker" $MONIKER)
@@ -261,12 +262,12 @@ createValidatorFn() {
   local identity=$(getArgument "identity" $IDENTITY)
   local website=$(getArgument "website" $WEBSITE)
   local details=$(getArgument "details" $DETAILS)
-  oraicli tx staking create-validator --amount $amount --pubkey $pubkey --moniker $moniker --identity $identity --website $website --details $details --security-contract $securityContract --chain-id Oraichain --commission-rate $commissionRate --commission-max-rate $commissionMaxRate --commission-max-change-rate $commissionMaxChangeRate --min-self-delegation $minDelegation --gas $gas --gas-adjustment $gasAdjustment --gas-prices $gasPrices --from $USER
+  oraicli tx staking create-validator --amount $amount --pubkey $pubkey --moniker $moniker --identity $identity --website $website --details $details --security-contract $securityContract --chain-id Oraichain --commission-rate $commissionRate --commission-max-rate $commissionMaxRate --commission-max-change-rate $commissionMaxChangeRate --min-self-delegation $minDelegation --gas $gas --gas-adjustment $gasAdjustment --gas-prices $gasPrices --from $user
 
   # run at background without websocket
   # # 30 seconds timeout to check if the node is alive or not
   timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
-  local reporter="${USER}_reporter"
+  local reporter="${user}_reporter"
   # for i in $(eval echo {1..$2})
   # do
     # add reporter key
@@ -283,7 +284,7 @@ createValidatorFn() {
   $WEBSOCKET config chain-id Oraichain
 
   # add validator to websocket config
-  $WEBSOCKET config validator $(oraicli keys show $1 -a --bech val --keyring-backend test)
+  $WEBSOCKET config validator $(oraicli keys show $user -a --bech val --keyring-backend test)
 
   # setup broadcast-timeout to websocket config
   $WEBSOCKET config broadcast-timeout "30s"
@@ -300,14 +301,14 @@ createValidatorFn() {
   sleep 2
 
   # send orai tokens to reporters
-  echo "y" | oraicli tx send $(oraicli keys show $USER -a) $($WEBSOCKET keys show $reporter) 10000000orai --from $(oraicli keys show $USER -a) --fees 5000orai
+  echo "y" | oraicli tx send $(oraicli keys show $user -a) $($WEBSOCKET keys show $reporter) 10000000orai --from $(oraicli keys show $user -a) --fees 5000orai
 
   sleep 6
 
   #wait for sending orai tokens transaction success
 
   # add reporter to oraichain
-  echo "y" | oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $USER --fees 5000orai --keyring-backend test
+  echo "y" | oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $user --fees 5000orai --keyring-backend test
   sleep 8
 
   $WEBSOCKET run

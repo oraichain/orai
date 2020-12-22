@@ -15,7 +15,7 @@ type Report struct {
 	TestCaseResults   []exported.TestCaseResultI   `json:"test_case_results"` // test case results after executing them.
 	BlockHeight       int64                        `json:"block_height"` // block height where the report is stored on Oraichain.
 	Fees              sdk.Coins                    `json:"report_fee"` // fees for reporting.
-	AggregatedResult  []byte                       `json:"aggregated_result"` // the aggregated result retrieved from the Oracle Script.
+	AggregatedResult  json.RawMessage              `json:"aggregated_result"` // the aggregated result retrieved from the Oracle Script.
 	ResultStatus      string                       `json:"result_status"` // the status of the result, can be either fail or success.
 	Reporter          Reporter                     `json:"reporter"` // the account that is used to create the report transaciton.
 }
