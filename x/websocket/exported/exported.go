@@ -1,6 +1,8 @@
 package exported
 
 import (
+	"encoding/json"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -24,7 +26,7 @@ type ReportI interface {
 	GetTestCaseResults() []TestCaseResultI
 	GetValidator() sdk.ValAddress
 	GetReporter() ReporterI
-	GetAggregatedResult() []byte
+	GetAggregatedResult() json.RawMessage
 	GetBlockHeight() int64
 	GetFees() sdk.Coins
 	GetResultStatus() string
