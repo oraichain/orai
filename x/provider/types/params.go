@@ -11,8 +11,8 @@ const (
 	DefaultParamspace = ModuleName
 	// TODO: Define your default parameters
 	DefaultOracleScriptRewardPercentage = uint64(70)
-	DefaultMaximumCodeBytes             = 1024 // 1MB
-	MaximumCodeBytesThreshold           = 4096 // 4MB
+	DefaultMaximumCodeBytes             = uint64(1024) // 1MB
+	MaximumCodeBytesThreshold           = 4096         // 4MB
 )
 
 // Parameter store keys
@@ -33,11 +33,11 @@ type Params struct {
 	// TODO: Add your Paramaters to the Paramter struct
 	// KeyParamName string `json:"key_param_name"`
 	OracleScriptRewardPercentage uint64 `json:"oscript_reward_percentage"`
-	MaximumCodeBytes             int    `json:"maximum_code_bytes"`
+	MaximumCodeBytes             uint64 `json:"maximum_code_bytes"`
 }
 
 // NewParams creates a new Params object
-func NewParams(rewardPercentage uint64, maxBytes int) Params {
+func NewParams(rewardPercentage uint64, maxBytes uint64) Params {
 	return Params{
 		OracleScriptRewardPercentage: rewardPercentage,
 		// TODO: Create your Params Type
@@ -60,7 +60,7 @@ func (p *Params) ParamSetPairs() params.ParamSetPairs {
 		// TODO: Pair your key with the param
 		// params.NewParamSetPair(KeyParamName, &p.ParamName),
 		params.NewParamSetPair(KeyOracleScriptRewardPercentage, &p.OracleScriptRewardPercentage, validateOracleScriptRewardPercentage),
-		params.NewParamSetPair(KeyMaximumCodeBytes, &p.MaximumCodeBytes, validateOracleScriptRewardPercentage),
+		params.NewParamSetPair(KeyMaximumCodeBytes, &p.MaximumCodeBytes, validateMaximumCodeBytes),
 	}
 }
 
@@ -83,7 +83,7 @@ func validateOracleScriptRewardPercentage(i interface{}) error {
 }
 
 func validateMaximumCodeBytes(i interface{}) error {
-	v, ok := i.(int)
+	v, ok := i.(uint64)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
