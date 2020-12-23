@@ -61,7 +61,7 @@ services:
     working_dir: /workspace
     tty: true
     ports:
-      - 1318:1317
+      - 1317:1317
     cap_add:
       - SYS_PTRACE
     volumes:

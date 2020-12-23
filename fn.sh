@@ -180,7 +180,22 @@ initFn(){
     oraicli config indent true
     oraicli config trust-node true
 
-    oraicli keys add $USER
+    expect -c "
+
+    spawn oraicli keys add $USER --recover
+    expect {
+        \"override the existing name*\" {send -- \"y\r\"}
+    }
+
+    expect \"*bip39 mnemonic\"
+
+    send -- \"$MNEMONIC\r\"
+
+    expect {
+        \"Enter keyring passphrase:\" send -- {\"$PASS\r\"; exp_continue }
+        \"Re-enter keyring passphrase:\" send -- {\"$PASS\r\"; exp_continue }
+        eof
+    }"
 
     # download genesis json file
   
