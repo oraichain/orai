@@ -91,12 +91,12 @@ func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep webSocket.Report
 
 func (k Keeper) validateBasic(ctx sdk.Context, req aiRequest.AIRequestI, rep webSocket.ReportI, blockHeight int64) bool {
 	// if the request has been expired
-	if req.GetBlockHeight()+int64(k.GetParam(ctx, types.KeyExpirationCount)) < blockHeight {
-		//TODO: NEED TO HANDLE THE EXPIRED REQUEST.
-		fmt.Println("Request has been expired")
-		k.ResolveExpiredRequest(ctx, req.GetRequestID())
-		return false
-	}
+	// if req.GetBlockHeight()+int64(k.GetParam(ctx, types.KeyExpirationCount)) < blockHeight {
+	// 	//TODO: NEED TO HANDLE THE EXPIRED REQUEST.
+	// 	fmt.Println("Request has been expired")
+	// 	k.ResolveExpiredRequest(ctx, req.GetRequestID())
+	// 	return false
+	// }
 
 	// Count the total number of data source results to see if it matches the requested data sources
 	if len(rep.GetDataSourceResults()) != len(req.GetAIDataSources()) {
