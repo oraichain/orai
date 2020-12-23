@@ -20,7 +20,7 @@ const (
 	QuerierRoute = ModuleName
 
 	// FailedResult represents a data source that cannot pass the test case
-	FailedResult = "null"
+	FailedResult = "None"
 
 	// FailedResponseOs represents an oracle script cannot collect or aggregate the data source results
 	FailedResponseOs = "The oracle script could not collect or aggregate the data source results"

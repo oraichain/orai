@@ -44,21 +44,6 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	).Methods("GET")
 
 	r.HandleFunc(
-		fmt.Sprintf("/%s/aireq/{%s}", storeName, restName),
-		queryAIRequestHandlerFn(cliCtx),
-	).Methods("GET")
-
-	r.HandleFunc(
-		fmt.Sprintf("/%s/aireqs", storeName),
-		queryAIRequestIDsHandlerFn(cliCtx),
-	).Methods("GET")
-
-	r.HandleFunc(
-		fmt.Sprintf("/%s/fullreq/{%s}", storeName, restName),
-		queryFullAIRequestHandlerFn(cliCtx),
-	).Methods("GET")
-
-	r.HandleFunc(
 		fmt.Sprintf("/%s/testcase/{%s}", storeName, restName),
 		queryTestCaseHandlerFn(cliCtx),
 	).Methods("GET")
@@ -100,6 +85,7 @@ func queryOracleScriptsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		v := r.URL.Query()
 		page := v.Get("page")
 		limit := v.Get("limit")
+		name := v.Get("name")
 
 		// In case the request does not include pagination parameters
 		if page == "" || limit == "" {
@@ -107,7 +93,7 @@ func queryOracleScriptsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			limit = types.DefaultQueryLimit
 		}
 
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/oscripts", storeName), []byte(page+"-"+limit))
+		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/oscripts", storeName), []byte(page+"-"+limit+"-"+name))
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -151,6 +137,7 @@ func queryDataSourcesHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		v := r.URL.Query()
 		page := v.Get("page")
 		limit := v.Get("limit")
+		name := v.Get("name")
 
 		// In case the request does not include pagination parameters
 		if page == "" || limit == "" {
@@ -158,7 +145,7 @@ func queryDataSourcesHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			limit = types.DefaultQueryLimit
 		}
 
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/datasources", storeName), []byte(page+"-"+limit))
+		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/datasources", storeName), []byte(page+"-"+limit+"-"+name))
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -172,49 +159,6 @@ func queryDataSourceNamesHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/dnames", storeName), nil)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
-			return
-		}
-
-		rest.PostProcessResponse(w, cliCtx, res)
-	}
-}
-
-func queryAIRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		id := vars[restName]
-
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/aireq/%s", storeName, id), nil)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
-			return
-		}
-
-		rest.PostProcessResponse(w, cliCtx, res)
-	}
-}
-
-func queryFullAIRequestHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		id := vars[restName]
-
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/fullreq/%s", storeName, id), nil)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
-			return
-		}
-
-		rest.PostProcessResponse(w, cliCtx, res)
-	}
-}
-
-func queryAIRequestIDsHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/aireqs", storeName), nil)
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return
@@ -245,6 +189,7 @@ func queryTestCasesHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		v := r.URL.Query()
 		page := v.Get("page")
 		limit := v.Get("limit")
+		name := v.Get("name")
 
 		// In case the request does not include pagination parameters
 		if page == "" || limit == "" {
@@ -252,7 +197,7 @@ func queryTestCasesHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			limit = types.DefaultQueryLimit
 		}
 
-		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/testcases", storeName), []byte(page+"-"+limit))
+		res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/testcases", storeName), []byte(page+"-"+limit+"-"+name))
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusNotFound, err.Error())
 			return

@@ -90,6 +90,7 @@ func queryOracleScripts(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) (
 	if err != nil {
 		return []byte{}, sdkerrors.Wrap(types.ErrPaginationInputInvalid, err.Error())
 	}
+	name := pagiSlice[2]
 
 	// collect all the oracle scripts based on the pagination parameters
 	oScripts, err := keeper.GetOracleScripts(ctx, uint(page), uint(limit))
@@ -97,20 +98,28 @@ func queryOracleScripts(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) (
 		return []byte{}, sdkerrors.Wrap(types.ErrOracleScriptNotFound, err.Error())
 	}
 
+	// get the total number of oracle scripts
+	count := 0
+	iterator := keeper.GetAllOracleScriptNames(ctx)
+	for ; iterator.Valid(); iterator.Next() {
+		count++
+	}
+
 	// get code of the each oScript
 	for _, oScript := range oScripts {
-		code, err := keeper.GetOracleScriptFile(oScript.GetName())
-		if err != nil {
-			return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
+		if name == "" || strings.Contains(oScript.Name, name) {
+			code, err := keeper.GetOracleScriptFile(oScript.GetName())
+			if err != nil {
+				return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
+			}
+			executable := base64.StdEncoding.EncodeToString(code)
+			// create a new queryResOracleScript
+			queryResOScripts = append(queryResOScripts, types.NewQueryResOracleScript(oScript.GetName(), oScript.GetOwner(), executable, oScript.GetDescription(), oScript.GetMinimumFees(), oScript.DSources, oScript.TCases))
 		}
-		executable := base64.StdEncoding.EncodeToString(code)
-
-		// create a new queryResOracleScript
-		queryResOScripts = append(queryResOScripts, types.NewQueryResOracleScript(oScript.GetName(), oScript.GetOwner(), executable, oScript.GetDescription(), oScript.GetMinimumFees(), oScript.DSources, oScript.TCases))
 	}
 
 	// return the query to the command
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResOracleScripts(queryResOScripts, len(oScripts)))
+	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResOracleScripts(queryResOScripts, count))
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -163,20 +172,31 @@ func queryDataSources(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]
 		return []byte{}, sdkerrors.Wrap(types.ErrDataSourceNotFound, err.Error())
 	}
 
+	name := pagiSlice[2]
+
+	// get the total number of data sources
+	count := 0
+	iterator := keeper.GetAllAIDataSourceNames(ctx)
+	for ; iterator.Valid(); iterator.Next() {
+		count++
+	}
+
 	// get code of the each dSource
 	for _, dSource := range dSources {
-		code, err := keeper.GetAIDataSourceFile(dSource.GetName())
-		if err != nil {
-			return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
-		}
-		executable := base64.StdEncoding.EncodeToString(code)
+		if name == "" || strings.Contains(dSource.Name, name) {
+			code, err := keeper.GetAIDataSourceFile(dSource.GetName())
+			if err != nil {
+				return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
+			}
+			executable := base64.StdEncoding.EncodeToString(code)
 
-		// create a new queryResOracleScript
-		queryResAIDSources = append(queryResAIDSources, types.NewQueryResAIDataSource(dSource.GetName(), dSource.GetOwner(), executable, dSource.GetDescription(), dSource.Fees))
+			// create a new queryResOracleScript
+			queryResAIDSources = append(queryResAIDSources, types.NewQueryResAIDataSource(dSource.GetName(), dSource.GetOwner(), executable, dSource.GetDescription(), dSource.Fees))
+		}
 	}
 
 	// return the query to the command
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResAIDataSources(queryResAIDSources, len(dSources)))
+	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResAIDataSources(queryResAIDSources, count))
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -261,25 +281,36 @@ func queryTestCases(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]by
 		return []byte{}, sdkerrors.Wrap(types.ErrPaginationInputInvalid, err.Error())
 	}
 
+	name := pagiSlice[2]
+
 	tCases, err := keeper.GetTestCases(ctx, uint(page), uint(limit))
 	if err != nil {
 		return []byte{}, sdkerrors.Wrap(types.ErrTestCaseNotFound, err.Error())
 	}
 
+	// get the total number of test cases
+	count := 0
+	iterator := keeper.GetAllOracleScriptNames(ctx)
+	for ; iterator.Valid(); iterator.Next() {
+		count++
+	}
+
 	// get code of the each tCase
 	for _, tCase := range tCases {
-		code, err := keeper.GetTestCaseFile(tCase.GetName())
-		if err != nil {
-			return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
-		}
-		executable := base64.StdEncoding.EncodeToString(code)
+		if name == "" || strings.Contains(tCase.Name, name) {
+			code, err := keeper.GetTestCaseFile(tCase.GetName())
+			if err != nil {
+				return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
+			}
+			executable := base64.StdEncoding.EncodeToString(code)
 
-		// create a new queryResOracleScript
-		queryResTestCases = append(queryResTestCases, types.NewQueryResTestCase(tCase.GetDescription(), tCase.GetOwner(), executable, tCase.GetDescription(), tCase.Fees))
+			// create a new queryResOracleScript
+			queryResTestCases = append(queryResTestCases, types.NewQueryResTestCase(tCase.GetDescription(), tCase.GetOwner(), executable, tCase.GetDescription(), tCase.Fees))
+		}
 	}
 
 	// return the query to the command
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResTestCases(queryResTestCases, len(tCases)))
+	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResTestCases(queryResTestCases, count))
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}

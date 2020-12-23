@@ -10,8 +10,8 @@ import (
 const (
 	DefaultParamspace = ModuleName
 	// TODO: Define your default parameters
-	DefaultMaximumRequestBytes   = 1024 // 1MB
-	MaximumRequestBytesThreshold = 4096 // 4MB
+	DefaultMaximumRequestBytes   = 1024
+	MaximumRequestBytesThreshold = 1 * 1024 * 1024 // 1MB
 )
 
 // Parameter store keys
@@ -63,10 +63,7 @@ func (p *Params) ParamSetPairs() params.ParamSetPairs {
 
 // DefaultParams defines the parameters for this module
 func DefaultParams() Params {
-	if DefaultMaximumRequestBytes > MaximumRequestBytesThreshold {
-		return NewParams(MaximumRequestBytesThreshold)
-	}
-	return NewParams(DefaultMaximumRequestBytes)
+	return NewParams(MaximumRequestBytesThreshold)
 }
 
 func validateMaximumRequestBytes(i interface{}) error {

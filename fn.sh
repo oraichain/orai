@@ -161,117 +161,159 @@ clear(){
 
 oraidFn(){
     # oraid start
-    orai start --chain-id $CHAIN_ID --laddr tcp://0.0.0.0:1317 --node tcp://0.0.0.0:26657 # --trust-node
+    orai start --chain-id Oraichain --laddr tcp://0.0.0.0:1317 --node tcp://0.0.0.0:26657 # --trust-node
 }
 
 
-initFn(){
+initFn(){ 
 
-    sleep 8
+  ### Check if a directory does not exist ###
+  if [[ ! -d "$PWD/.oraid/" || ! -d "$PWD/.oraicli/" ]] 
+  then
+    echo "Directory /path/to/dir DOES NOT exists."
 
-    ./init.sh $CHAIN_ID $USER
-    # run at background without websocket
-    oraid start --minimum-gas-prices 0.025orai &
-    # 30 seconds timeout
-    timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
-    local reporter="${USER}_reporter"
-    ./websocket.sh $USER $reporter #$reporter
-    sleep 10
-    pkill oraid
+    oraid init $MONIKER --chain-id Oraichain
+
+    # Configure your CLI to eliminate need to declare them as flags
+    oraicli config chain-id Oraichain
+    oraicli config output json
+    oraicli config indent true
+    oraicli config trust-node true
+
+    oraicli keys add $USER
+
+    # download genesis json file
+    wget https://raw.githubusercontent.com/oraichain/oraichain-static-files/master/genesis.json
+
+    # move the genesis file into the correct directory
+    mv genesis.json .oraid/config/genesis.json
+
+    # add persistent peers to listen to blocks
+    sed -i 's/persistent_peers *= *".*"/persistent_peers = "dbb2fee9a55cbbe364afcf377cb2f82882fa4ad6@164.90.180.95:26656,a9f2161cb9d723c26e8f268a660b5cc1261e264a@157.230.22.169:26656,950e189e74134d9341d859c6132f5d4da7c19b58@165.232.118.44:26656,c5bcf6dd8efa1a2ee0efdec4a18da8d3a2654302@178.128.61.252:26656,4969be3fdf0e20c77ee252fb156d8bf2a9496317@178.128.57.195:26656,5efef6b1af1429a8c4ae30ed568d7fe97cf2f0c0@159.89.206.139:26656,3076fd764d2eda73bc3637d84549dff587897e51@178.128.220.155:26656"/g' .oraid/config/config.toml
+
+    oraid validate-genesis
+    # done init
+  fi
 }
 
-initDevFn(){
+websocketInitFn() {
+  # run at background without websocket
+  # # 30 seconds timeout to check if the node is alive or not
+  timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
+  local reporter="${USER}_reporter"
+  # for i in $(eval echo {1..$2})
+  # do
+    # add reporter key
 
-    make all
+  ###################### init websocket for the validator
 
-    ./init.sh $CHAIN_ID $USER
-    # run at background without websocket
-    oraid start --minimum-gas-prices 0.025orai &
-    # 30 seconds timeout
-    timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
-    local reporter="${USER}_reporter"
-    ./websocket.sh $USER $reporter #$reporter
-    sleep 10
-    pkill oraid
-}
+  HOME=$PWD/.oraid
+  # rm -rf ~/.websocket
+  WEBSOCKET="websocket --home $HOME"
+  #$WEBSOCKET keys delete-all
+  $WEBSOCKET keys add $reporter
 
+  # config chain id
+  $WEBSOCKET config chain-id Oraichain
 
-initScriptFn(){
-  echo "y" | oraicli tx provider set-datasource coingecko_eth ./testfiles/coingecko_eth.py "A data source that fetches the ETH price from Coingecko API" --from $USER --fees 5000orai
+  # add validator to websocket config
+  $WEBSOCKET config validator $(oraicli keys show $USER -a --bech val --keyring-backend test)
 
-  sleep 5
+  # setup broadcast-timeout to websocket config
+  $WEBSOCKET config broadcast-timeout "30s"
 
-  echo "y" | oraicli tx provider set-datasource crypto_compare_eth ./testfiles/crypto_compare_eth.py "A data source that collects ETH price from crypto compare" --from $USER --fees 5000orai
+  # setup rpc-poll-interval to websocket config
+  $WEBSOCKET config rpc-poll-interval "1s"
 
-  sleep 5
+  # setup max-try to websocket config
+  $WEBSOCKET config max-try 5
 
-  echo "y" | oraicli tx provider set-testcase testcase_price ./testfiles/testcase_price.py "A sample test case that uses the expected output of users provided to verify the bitcoin price from the datasource" --from $USER --fees 5000orai
+  # config log type
+  $WEBSOCKET config log-level debug
 
-  sleep 5
+  sleep 2
 
-  echo "y" | oraicli tx provider set-oscript oscript_eth ./testfiles/oscript_eth.py "An oracle script that fetches and aggregates ETH price from different sources" --ds coingecko_eth,crypto_compare_eth --tc testcase_price --from $USER --fees 5000orai
-}
+  # send orai tokens to reporters
+  echo "y" | oraicli tx send $(oraicli keys show $USER -a) $($WEBSOCKET keys show $reporter) 10000000orai --from $(oraicli keys show $USER -a) --fees 5000orai
 
-unsignedFn(){
-  local id=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.address" -r)
-  local unsigned=$(curl --location --request POST 'http://localhost:1317/airequest/aireq' \
---header 'Content-Type: application/json' \
---data-raw '{
-    "base_req":{
-        "from":"'$id'",
-        "chain_id":"'$CHAIN_ID'"
-    },
-    "oracle_script_name":"oscript_eth",
-    "input":"",
-    "expected_output":{"price":"5000"},
-    "fees":"60000orai",
-    "validator_count": "1"
-}' > tmp/unsignedTx.json)
+  sleep 6
 
-    res=$?  
-    verifyResult $res "Unsigned failed"
-}
+  #wait for sending orai tokens transaction success
 
-unsignedSetDsFn(){
-  local id=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.address" -r)
-  local unsigned=$(curl --location --request POST 'http://localhost:1317/provider/datasource' \
---header 'Content-Type: application/json' \
---data-raw '{
-    "base_req":{
-        "from":"'$id'",
-        "chain_id":"Oraichain"
-    },
-    "name":"coingecko_eth",
-    "code_path":"/workspace/testfiles/coingecko_eth.py",
-    "description":"NTAwMA==",
-    "fees":"60000orai",
-    "test":["abc","efgh"]
-}' > tmp/unsignedTx.json)
-}
-
-signFn(){     
-    # $1 is account number
-    local sequence=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.sequence" -r)
-    local acc_num=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.account_number" -r)
-    oraicli tx sign tmp/unsignedTx.json --from $USER --offline --chain-id $CHAIN_ID --sequence $sequence --account-number $acc_num > tmp/signedTx.json
-    oraicli tx broadcast tmp/signedTx.json
-
-    res=$?  
-    verifyResult $res "Signed failed"
+  # add reporter to oraichain
+  echo "y" | oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $USER --fees 5000orai --keyring-backend test
+  sleep 8
+  pkill oraid
 }
 
 createValidatorFn() {
-  local amount=$(getArgument "amount" 10000orai)
-  local pubkey=$(getArgument "pubkey" oraivalconspub1addwnpepqvydmv22mkzc9rc92g43unew08cmj4q46dhk7vz0a9fj2xjsjn2lvqj0dfr)
-  local moniker=$(getArgument "moniker" ducphamle)
-  local commissionRate=$(getArgument "commission-rate" 0.10)
-  local commissionMaxRate==$(getArgument "commission-max-rate" 0.20)
-  local commissionMaxChangeRate==$(getArgument "commission-max-change-rate" 0.01)
-  oraicli tx staking create-validator --amount $amount --pubkey $pubkey --moniker $moniker --chain-id $CHAIN_ID --commission-rate $commissionRate --commission-max-rate $commissionMaxRate --commission-max-change-rate $commissionMaxChangeRate --min-self-delegation 100 --gas auto --gas-adjustment 1.15 --gas-prices 0.025orai --from $USER
+  local amount=$(getArgument "amount" $AMOUNT)
+  local pubkey=$(oraid tendermint show-validator)
+  local moniker=$(getArgument "moniker" $MONIKER)
+  local commissionRate=$(getArgument "commission-rate" $COMMISSION_RATE)
+  local commissionMaxRate==$(getArgument "commission-max-rate" $COMMISSON_MAX_RATE)
+  local commissionMaxChangeRate==$(getArgument "commission-max-change-rate" "$COMMISSION_MAX_RATE_CHANGE")
+  local minDelegation=$(getArgument "min-self-delegation" $MIN_SELF_DELEGATION)
+  local gas=$(getArgument "gas" "$GAS")
+  local gasAdjustment=$(getArgument "gas-adjustment" $GAS_ADJUSTMENT)
+  local gasPrices=$(getArgument "gas-prices" $GAS_PRICE)
+  local securityContract=$(getArgument "security-contract" $SECURITY_CONTRACT)
+  local identity=$(getArgument "identity" $IDENTITY)
+  local website=$(getArgument "website" $WEBSITE)
+  local details=$(getArgument "details" $DETAILS)
+  oraicli tx staking create-validator --amount $amount --pubkey $pubkey --moniker $moniker --identity $identity --website $website --details $details --security-contract $securityContract --chain-id Oraichain --commission-rate $commissionRate --commission-max-rate $commissionMaxRate --commission-max-change-rate $commissionMaxChangeRate --min-self-delegation $minDelegation --gas $gas --gas-adjustment $gasAdjustment --gas-prices $gasPrices --from $USER
+
+  # run at background without websocket
+  # # 30 seconds timeout to check if the node is alive or not
+  timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
+  local reporter="${USER}_reporter"
+  # for i in $(eval echo {1..$2})
+  # do
+    # add reporter key
+
+  ###################### init websocket for the validator
+
+  HOME=$PWD/.oraid
+  # rm -rf ~/.websocket
+  WEBSOCKET="websocket --home $HOME"
+  #$WEBSOCKET keys delete-all
+  $WEBSOCKET keys add $reporter
+
+  # config chain id
+  $WEBSOCKET config chain-id Oraichain
+
+  # add validator to websocket config
+  $WEBSOCKET config validator $(oraicli keys show $1 -a --bech val --keyring-backend test)
+
+  # setup broadcast-timeout to websocket config
+  $WEBSOCKET config broadcast-timeout "30s"
+
+  # setup rpc-poll-interval to websocket config
+  $WEBSOCKET config rpc-poll-interval "1s"
+
+  # setup max-try to websocket config
+  $WEBSOCKET config max-try 5
+
+  # config log type
+  $WEBSOCKET config log-level debug
+
+  sleep 2
+
+  # send orai tokens to reporters
+  echo "y" | oraicli tx send $(oraicli keys show $USER -a) $($WEBSOCKET keys show $reporter) 10000000orai --from $(oraicli keys show $USER -a) --fees 5000orai
+
+  sleep 6
+
+  #wait for sending orai tokens transaction success
+
+  # add reporter to oraichain
+  echo "y" | oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $USER --fees 5000orai --keyring-backend test
+  sleep 8
+
+  $WEBSOCKET run
 }
 
 USER=$(getArgument "user" duc)
-CHAIN_ID=$(getArgument "chain-id" Oraichain)
 
 # processing
 case "${METHOD}" in     
@@ -281,27 +323,15 @@ case "${METHOD}" in
   init)
     initFn
   ;;
-  initDev)
-    initDevFn
+  websocketInit)
+  websocketInitFn
   ;;
   start)
     oraidFn
-  ;;  
-  unsign)
-    unsignedFn
-  ;;
-  unsignedSetDs)
-    unsignedSetDsFn
   ;;
   initScript)
     initScriptFn
-  ;;
-  sign)
-    signFn
-  ;;
-  broadcast)
-    broadcastFn
-  ;;  
+  ;; 
   createValidator)
     createValidatorFn
   ;;
