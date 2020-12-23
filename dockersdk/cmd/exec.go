@@ -5,13 +5,14 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/filters"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/spf13/cobra"
-	"io/ioutil"
-	"path/filepath"
 )
 
 func init() {
@@ -24,10 +25,8 @@ var execCmd = &cobra.Command{
 	Use:   "exec",
 	Short: "Print the docker container exec",
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) > 2 {
-			execCmdRun(args[0], args[1], []string{args[2]})
-		} else if len(args) > 1 {
-			execCmdRun(args[0], args[1], []string{})
+		if len(args) >= 2 {
+			execCmdRun(args...)
 		}
 	},
 }
@@ -73,6 +72,7 @@ func copyCmdRun(id string, filePath string) {
 	cli.CopyToContainer(ctx, id, "/.oraifiles", &buf, types.CopyToContainerOptions{})
 }
 
+// CheckExistsContainer check container existed
 func CheckExistsContainer(id string) {
 	opts := types.ContainerListOptions{All: true}
 
@@ -92,19 +92,22 @@ func CheckExistsContainer(id string) {
 	fmt.Println(len(containers) > 0)
 }
 
-func execCmdRun(id string, filename string, input []string) {
+func execCmdRun(input ...string) {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		panic(err)
 	}
+	id := input[0]
+	filename := input[1]
 
 	resp, err := cli.ContainerExecCreate(ctx, id, types.ExecConfig{
+		AttachStdin:  true,
 		AttachStdout: true,
 		AttachStderr: true,
 		Tty:          true,
-		//Cmd:          append([]string{"python", "coingecko_eth.py"}, input...),
-		Cmd: []string{"pip", "install", "-r", "requirements.txt"},
+		Cmd:          append([]string{"python", filename + ".py"}, input[2:]...),
+		// Cmd: []string{"pip", "install", "-r", "requirements.txt"},
 	})
 	if err != nil {
 		panic(err)
@@ -115,7 +118,8 @@ func execCmdRun(id string, filename string, input []string) {
 		panic(err)
 	}
 
-	//buf := &bytes.Buffer
+	defer logResp.Close()
+
 	var out bytes.Buffer
 	var error bytes.Buffer
 	stdcopy.StdCopy(&out, &error, logResp.Reader)
