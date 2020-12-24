@@ -37,7 +37,7 @@ func SubmitReport(c *Context, l *Logger, key keys.Info, msgReport types.MsgCreat
 		}
 		txBldr := auth.NewTxBuilder(
 			auth.DefaultTxEncoder(cdc), acc.GetAccountNumber(), acc.GetSequence(),
-			200000, 1, false, cfg.ChainID, fmt.Sprintf("websocket"), sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(5000)))), c.gasPrices,
+			400000, 1, false, cfg.ChainID, fmt.Sprintf("websocket"), sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(5000)))), c.gasPrices,
 		)
 		// txBldr, err = utils.EnrichWithGas(txBldr, cliCtx, []sdk.Msg{msg})
 		// if err != nil {

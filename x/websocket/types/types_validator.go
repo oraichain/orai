@@ -1,8 +1,6 @@
 package types
 
 import (
-	"encoding/json"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/oraichain/orai/x/websocket/exported"
 )
@@ -55,14 +53,14 @@ var _ exported.ValResultI = (*ValResult)(nil)
 // ValResult stores the result information from a validator that has executed the oracle script
 type ValResult struct {
 	Validator    exported.ValidatorI `json:"validator"`
-	Result       json.RawMessage     `json:"result"`
+	Result       []byte              `json:"result"`
 	ResultStatus string              `json:"result_status"` // fail or success
 }
 
 // NewValResult is a constructor for the validator result
 func NewValResult(
 	val exported.ValidatorI,
-	result json.RawMessage,
+	result []byte,
 	status string,
 ) ValResult {
 	return ValResult{

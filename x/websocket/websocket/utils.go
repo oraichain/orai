@@ -18,7 +18,7 @@ func getCurrentDir() string {
 }
 
 func getOScriptPath(name string) string {
-	return path.Join(getCurrentDir(), provider.ScriptPath, provider.OracleScriptStoreKeyString(name))
+	return path.Join(getCurrentDir(), provider.ScriptPath, provider.OracleScriptFileString(name))
 }
 
 func getDSourcePath(name string) string {

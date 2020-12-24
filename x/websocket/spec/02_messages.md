@@ -17,7 +17,7 @@ type MsgCreateReport struct {
 	TestCaseResults   []exported.TestCaseResultI   `json:"test_case_results"`
 	Reporter          Reporter                     `json:"reporter"`
 	Fees              sdk.Coins                    `json:"report_fee"`
-	AggregatedResult  json.RawMessage              `json:"aggregated_result"`
+	AggregatedResult  []byte              		   `json:"aggregated_result"`
 	ResultStatus      string                       `json:"result_status"`
 }
 ```

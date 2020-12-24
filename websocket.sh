@@ -51,4 +51,4 @@ echo "y" | oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from 
 sleep 2
 
 # run websocket
-# $WEBSOCKET run
+#$WEBSOCKET run

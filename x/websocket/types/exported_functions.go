@@ -1,8 +1,6 @@
 package types
 
 import (
-	"encoding/json"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	aiRequest "github.com/oraichain/orai/x/airequest/exported"
 	"github.com/oraichain/orai/x/websocket/exported"
@@ -37,5 +35,5 @@ type ValidatorSet interface {
 type ValResultSet interface {
 	DefaultValResultI() exported.ValResultI
 	GetKeyResultSuccess() string
-	NewValResult(val exported.ValidatorI, result json.RawMessage, status string) exported.ValResultI
+	NewValResult(val exported.ValidatorI, result []byte, status string) exported.ValResultI
 }

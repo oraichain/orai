@@ -1,8 +1,6 @@
 package types
 
 import (
-	"encoding/json"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/oraichain/orai/x/websocket/exported"
 )
@@ -17,7 +15,7 @@ type Report struct {
 	TestCaseResults   []exported.TestCaseResultI   `json:"test_case_results"`
 	BlockHeight       int64                        `json:"block_height"`
 	Fees              sdk.Coins                    `json:"report_fee"`
-	AggregatedResult  json.RawMessage              `json:"aggregated_result"`
+	AggregatedResult  []byte                       `json:"aggregated_result"`
 	ResultStatus      string                       `json:"result_status"`
 	Reporter          Reporter                     `json:"reporter"`
 }
@@ -29,7 +27,7 @@ func NewReport(
 	testCaseResults []exported.TestCaseResultI,
 	blockHeight int64,
 	fees sdk.Coins,
-	aggregatedResult json.RawMessage,
+	aggregatedResult []byte,
 	reporter Reporter,
 	status string,
 ) Report {
@@ -71,7 +69,7 @@ func (r Report) GetReporter() exported.ReporterI {
 }
 
 // GetAggregatedResult is the getter method for getting AggregatedResult of a report
-func (r Report) GetAggregatedResult() json.RawMessage {
+func (r Report) GetAggregatedResult() []byte {
 	return r.AggregatedResult
 }
 

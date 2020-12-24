@@ -18,24 +18,11 @@ data_source = __import__(sys.argv[1])
 def data_source_res():
     return data_source.main()
 
-def compare_result():
-    data_source_result = data_source_res()
-    # convert json to object
-    expected_result = json.loads(sys.argv[3])
-    try:
-        deviation = data_source_result - float(expected_result['price'])
-        if deviation < 10000:
-            return data_source_result
-        else:
-            return None
-    except ValueError:
-        return None
-
 def main():
-    return compare_result()
+    return data_source_res()
 
 if __name__ == "__main__":
     try:
         print(main())
     except ArithmeticError:
-        print("None")
+        print("null")

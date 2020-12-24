@@ -196,6 +196,24 @@ initFn(){
         \"Re-enter keyring passphrase:\" send -- {\"$PASS\r\"; exp_continue }
         eof
     }"
+#EOF
+#     expect << EOF
+
+#     spawn oraicli keys add $USER --recover
+#     expect {
+#         "override the existing name*" {send -- "y\r"}
+#     }
+
+#     expect "*bip39 mnemonic"
+
+#     send -- "$MNEMONIC\r"
+
+#     expect {
+#         "Enter keyring passphrase:" send -- {"$PASS\r"; exp_continue }
+#         "Re-enter keyring passphrase:" send -- {"$PASS\r"; exp_continue }
+#         eof
+#     }
+# EOF
 
     # download genesis json file
   
@@ -266,26 +284,31 @@ websocketInitFn() {
 }
 
 createValidatorFn() {
-  local user=$(getArgument "user" $USER)
-  local amount=$(getArgument "amount" $AMOUNT)
-  local pubkey=$(oraid tendermint show-validator)
-  local moniker=$(getArgument "moniker" $MONIKER)
-  local commissionRate=$(getArgument "commission-rate" $COMMISSION_RATE)
-  local commissionMaxRate==$(getArgument "commission-max-rate" $COMMISSON_MAX_RATE)
-  local commissionMaxChangeRate==$(getArgument "commission-max-change-rate" "$COMMISSION_MAX_RATE_CHANGE")
-  local minDelegation=$(getArgument "min-self-delegation" $MIN_SELF_DELEGATION)
-  local gas=$(getArgument "gas" "$GAS")
-  local gasAdjustment=$(getArgument "gas-adjustment" $GAS_ADJUSTMENT)
-  local gasPrices=$(getArgument "gas-prices" $GAS_PRICE)
-  local securityContract=$(getArgument "security-contract" $SECURITY_CONTRACT)
-  local identity=$(getArgument "identity" $IDENTITY)
-  local website=$(getArgument "website" $WEBSITE)
-  local details=$(getArgument "details" $DETAILS)
-  oraicli tx staking create-validator --amount $amount --pubkey $pubkey --moniker $moniker --identity $identity --website $website --details $details --security-contract $securityContract --chain-id Oraichain --commission-rate $commissionRate --commission-max-rate $commissionMaxRate --commission-max-change-rate $commissionMaxChangeRate --min-self-delegation $minDelegation --gas $gas --gas-adjustment $gasAdjustment --gas-prices $gasPrices --from $user
 
   # run at background without websocket
   # # 30 seconds timeout to check if the node is alive or not
-  timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
+  oraid start --minimum-gas-prices 0.025orai
+    # # 30 seconds timeout
+    # timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
+  
+  timeout 30
+
+  local user=$(getArgument "user" $USER)
+  local amount=$(getArgument "amount" 1000orai)
+  local pubkey=$(oraid tendermint show-validator)
+  local moniker=$(getArgument "moniker" dube)
+  local commissionRate=$(getArgument "commission_rate" 0.10)
+  local commissionMaxRate=$(getArgument "commission_max_rate" 0.20)
+  local commissionMaxChangeRate=$(getArgument "commission_max_change_rate" 0.01)
+  local minDelegation=$(getArgument "min_self_delegation" 10)
+  local gas=$(getArgument "gas" auto)
+  local gasPrices=$(getArgument "gas_prices" 0.025orai)
+  local securityContract=$(getArgument "security_contract" $SECURITY_CONTRACT)
+  local identity=$(getArgument "identity" $IDENTITY)
+  local website=$(getArgument "website" $WEBSITE)
+  local details=$(getArgument "details" $DETAILS)
+  oraicli tx staking create-validator --amount $amount --pubkey $pubkey --moniker $moniker --chain-id Oraichain --commission-rate $commissionRate --commission-max-rate $commissionMaxRate --commission-max-change-rate $commissionMaxChangeRate --min-self-delegation $minDelegation --gas $gas --gas-prices $gasPrices --from $user
+
   local reporter="${user}_reporter"
   # for i in $(eval echo {1..$2})
   # do
@@ -303,7 +326,7 @@ createValidatorFn() {
   $WEBSOCKET config chain-id Oraichain
 
   # add validator to websocket config
-  $WEBSOCKET config validator $(oraicli keys show $user -a --bech val --keyring-backend test)
+  $WEBSOCKET config validator $(oraicli keys show $user -a --bech val)
 
   # setup broadcast-timeout to websocket config
   $WEBSOCKET config broadcast-timeout "30s"
@@ -327,10 +350,10 @@ createValidatorFn() {
   #wait for sending orai tokens transaction success
 
   # add reporter to oraichain
-  echo "y" | oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $user --fees 5000orai --keyring-backend test
+  echo "y" | oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $user --fees 5000orai
   sleep 8
 
-  $WEBSOCKET run
+  pkill oraid
 }
 
 USER=$(getArgument "user" duc)

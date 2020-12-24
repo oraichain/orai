@@ -113,7 +113,9 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 				}
 				result := trimResultEscapeChars(outTestCase)
 
-				l.Info("star: result after running test case: ", result)
+				fmt.Println("result after running test case: ", result)
+
+				//l.Info("star: result after running test case: ", result)
 
 				dataSourceResult := types.NewDataSourceResult(aiDataSources[j], []byte(result), types.ResultSuccess)
 

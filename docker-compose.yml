@@ -47,14 +47,20 @@ services:
     ports:
       - 1317:1317
       - 40000:40000
+      - 26656:26656
+      - 26657:26657
     security_opt:
       - 'seccomp:unconfined'
     cap_add:
       - SYS_PTRACE
+    env_file: 
+      - orai.env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./:/workspace
       - ./fn.sh:/usr/local/bin/fn
+    command: 
+      - bash -c "apt-get install expect && ./fn.sh init && ./fn.sh createValidator && ./fn.sh start"
 
   orai_2:
     image: orai/orai:alpine-prod
@@ -62,6 +68,8 @@ services:
     tty: true
     ports:
       - 1317:1317
+      - 26656:26656
+      - 26657:26657
     cap_add:
       - SYS_PTRACE
     volumes:
@@ -79,6 +87,8 @@ services:
       - 'seccomp:unconfined'
     cap_add:
       - SYS_PTRACE
+    env_file: 
+      - orai.env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./:/workspace
