@@ -172,7 +172,7 @@ initFn(){
   then
     echo "Directory /path/to/dir DOES NOT exists."
 
-    oraid init $MONIKER --chain-id Oraichain
+    oraid init $(getArgument "moniker" $MONIKER) --chain-id Oraichain
 
     # Configure your CLI to eliminate need to declare them as flags
     oraicli config chain-id Oraichain
@@ -284,37 +284,43 @@ websocketInitFn() {
 }
 
 createValidatorFn() {
-
-  # run at background without websocket
-  # # 30 seconds timeout to check if the node is alive or not
-  oraid start --minimum-gas-prices 0.025orai
-    # # 30 seconds timeout
-    # timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
-  
-  timeout 30
-
   local user=$(getArgument "user" $USER)
-  local amount=$(getArgument "amount" 1000orai)
+  # run at background without websocket
+  # # 30 seconds timeout to check if the node is alive or not, the '&' symbol allows to run below commands while still having the process running
+  oraid start &
+    # 30 seconds timeout
+  timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
+
+  # loop to query the account, since the account may not exist until a specific block, so we need to constantly check
+  local acc=$(oraicli query auth account $(oraicli keys show $user -a) | jq .type)
+  while [[ "$acc" != \""cosmos-sdk/Account"\" ]];
+  do 
+    # reset the value for the loop condition
+    acc=$(oraicli query auth account $(oraicli keys show tester -a) | jq .type)
+    sleep 10
+  done
+
+  local amount=$(getArgument "amount" $AMOUNT)
   local pubkey=$(oraid tendermint show-validator)
-  local moniker=$(getArgument "moniker" dube)
-  local commissionRate=$(getArgument "commission_rate" 0.10)
-  local commissionMaxRate=$(getArgument "commission_max_rate" 0.20)
-  local commissionMaxChangeRate=$(getArgument "commission_max_change_rate" 0.01)
-  local minDelegation=$(getArgument "min_self_delegation" 10)
-  local gas=$(getArgument "gas" auto)
-  local gasPrices=$(getArgument "gas_prices" 0.025orai)
+  local moniker=$(getArgument "moniker" $MONIKER)
+  local commissionRate=$(getArgument "commission_rate" $COMMISSION_RATE)
+  local commissionMaxRate=$(getArgument "commission_max_rate" $COMMISSION_MAX_RATE)
+  local commissionMaxChangeRate=$(getArgument "commission_max_change_rate" $COMMISSION_MAX_CHANGE_RATE)
+  local minDelegation=$(getArgument "min_self_delegation" $MIN_SELF_DELEGATION)
+  local gas=$(getArgument "gas" "auto")
+  local gasPrices=$(getArgument "gas_prices" $GAS_PRICES)
   local securityContract=$(getArgument "security_contract" $SECURITY_CONTRACT)
   local identity=$(getArgument "identity" $IDENTITY)
   local website=$(getArgument "website" $WEBSITE)
   local details=$(getArgument "details" $DETAILS)
-  oraicli tx staking create-validator --amount $amount --pubkey $pubkey --moniker $moniker --chain-id Oraichain --commission-rate $commissionRate --commission-max-rate $commissionMaxRate --commission-max-change-rate $commissionMaxChangeRate --min-self-delegation $minDelegation --gas $gas --gas-prices $gasPrices --from $user
+  echo "y" | oraicli tx staking create-validator --amount $amount --pubkey $pubkey --moniker $moniker --chain-id Oraichain --commission-rate $commissionRate --commission-max-rate $commissionMaxRate --commission-max-change-rate $commissionMaxChangeRate --min-self-delegation $minDelegation --gas $gas --gas-prices $gasPrices --from $user
 
   local reporter="${user}_reporter"
-  # for i in $(eval echo {1..$2})
-  # do
-    # add reporter key
+  # # for i in $(eval echo {1..$2})
+  # # do
+  #   # add reporter key
 
-  ###################### init websocket for the validator
+  # ###################### init websocket for the validator
 
   HOME=$PWD/.oraid
   # rm -rf ~/.websocket
