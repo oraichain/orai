@@ -22,6 +22,8 @@ const (
 	flagMaxTry           = "max-try"
 	// Bech32MainPrefix is the prefix of different addresses
 	Bech32MainPrefix = "orai"
+
+	defaultFees = "5000orai"
 )
 
 // Config data structure for the websocket daemon.

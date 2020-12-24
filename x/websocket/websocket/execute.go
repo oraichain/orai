@@ -27,6 +27,7 @@ func SubmitReport(c *Context, l *Logger, key keys.Info, msgReport types.MsgCreat
 		l.Error(":exploding_head: Failed to validate basic with error: %s", err.Error())
 		return
 	}
+
 	for try := uint64(1); try <= c.maxTry; try++ {
 		l.Info(":e-mail: Try to broadcast report transaction(%d/%d)", try, c.maxTry)
 		acc, err := auth.NewAccountRetriever(cliCtx).GetAccount(key.GetAddress())
@@ -35,9 +36,10 @@ func SubmitReport(c *Context, l *Logger, key keys.Info, msgReport types.MsgCreat
 			time.Sleep(c.rpcPollInterval)
 			continue
 		}
+
 		txBldr := auth.NewTxBuilder(
 			auth.DefaultTxEncoder(cdc), acc.GetAccountNumber(), acc.GetSequence(),
-			200000, 1, false, cfg.ChainID, fmt.Sprintf("websocket"), sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(5000)))), c.gasPrices,
+			c.gas, c.gasAdj, false, cfg.ChainID, fmt.Sprintf("websocket"), c.fees, c.gasPrices,
 		)
 		// txBldr, err = utils.EnrichWithGas(txBldr, cliCtx, []sdk.Msg{msg})
 		// if err != nil {
