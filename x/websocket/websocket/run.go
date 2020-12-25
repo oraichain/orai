@@ -58,8 +58,6 @@ func runImpl(c *Context, l *Logger) error {
 	if err != nil {
 		return err
 	}
-
-	l.Info(":ear: Subscribing to events with query: %s...", TxQuery)
 	eventChan, err := c.client.Subscribe(ctx, "", TxQuery, EventChannelCapacity)
 	if err != nil {
 		return err
@@ -68,7 +66,7 @@ func runImpl(c *Context, l *Logger) error {
 	for {
 		select {
 		case ev := <-eventChan:
-			fmt.Printf("ABCDEF: %v\n", ev.Data.(tmtypes.EventDataTx).TxResult)
+			l.Info("%v\n", ev.Data.(tmtypes.EventDataTx).TxResult)
 			go handleTransaction(c, l, ev.Data.(tmtypes.EventDataTx).TxResult)
 		case sig := <-websocket.OutSignals:
 			fmt.Println("received signal, send back to rest", sig)
@@ -149,7 +147,7 @@ func runCmd(c *Context) *cobra.Command {
 			// if err != nil {
 			// 	return err
 			// }
-			l.Info(":star: Creating HTTP client with node URI: %s", cfg.NodeURI)
+			l.Info(":star: Creating the daemon listening to node: %s", cfg.NodeURI)
 			c.client, err = httpclient.New(cfg.NodeURI, "/websocket")
 			if err != nil {
 				return err
