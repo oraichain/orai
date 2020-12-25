@@ -14,6 +14,9 @@ type Context struct {
 	client           rpcclient.Client
 	validator        sdk.ValAddress
 	gasPrices        sdk.DecCoins
+	gas              uint64
+	gasAdj           float64
+	fees             sdk.Coins
 	keys             chan keys.Info
 	fileCache        filecache.Cache
 	broadcastTimeout time.Duration

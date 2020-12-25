@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -110,11 +111,41 @@ func runCmd(c *Context) *cobra.Command {
 		Short:   "Run the oracle process",
 		Args:    cobra.ExactArgs(0),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("Chainid", cfg.ChainID)
 			if cfg.ChainID == "" {
 				return errors.New("Chain ID must not be empty")
 			}
 
+			gasAdj, err := cmd.Flags().GetFloat64(flags.FlagGasAdjustment) // 1
+			if err != nil {
+				gasAdj, err = strconv.ParseFloat(cfg.GasAdjustment, 64)
+				if err != nil {
+					gasAdj = flags.DefaultGasAdjustment
+				}
+			}
+			c.gasAdj = gasAdj
+
+			gas, err := cmd.Flags().GetUint64("gas") // 200000
+			if err != nil {
+				gasInt, err := strconv.Atoi(cfg.Gas)
+				if err != nil {
+					gas = flags.DefaultGasLimit
+				}
+				gas = uint64(gasInt)
+			}
+			c.gas = gas
+			feesStr, err := cmd.Flags().GetString(flags.FlagFees) // 5000orai
+			if err != nil {
+				feesStr = defaultFees
+				c.fees, _ = sdk.ParseCoins(defaultFees)
+			} else {
+				fees, err := sdk.ParseCoins(feesStr)
+				if err != nil {
+					fees, _ = sdk.ParseCoins(defaultFees)
+				}
+				c.fees = fees
+			}
+
+			// other params
 			keys, err := keybase.List()
 			if err != nil {
 				return err

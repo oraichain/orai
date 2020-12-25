@@ -22,6 +22,8 @@ const (
 	flagMaxTry           = "max-try"
 	// Bech32MainPrefix is the prefix of different addresses
 	Bech32MainPrefix = "orai"
+
+	defaultFees = "5000orai"
 )
 
 // Config data structure for the websocket daemon.
@@ -30,6 +32,8 @@ type Config struct {
 	NodeURI          string `mapstructure:"node"`              // Remote RPC URI of Oraichain node to connect to
 	Validator        string `mapstructure:"validator"`         // The validator address that I'm responsible for
 	GasPrices        string `mapstructure:"gas-prices"`        // Gas prices of the transaction
+	GasAdjustment    string `mapstructure:"gas-adjustment"`    // Gas adjustment from the gas
+	Gas              string `mapstructure:"gas"`               // gas used for the transaction
 	LogLevel         string `mapstructure:"log-level"`         // Log level of the logger
 	Executor         string `mapstructure:"executor"`          // Executor name and URL (example: "Executor name:URL")
 	BroadcastTimeout string `mapstructure:"broadcast-timeout"` // The time that the websocket will wait for tx commit
@@ -107,6 +111,7 @@ func Main() {
 	}
 }
 
+// ServeCommand supports orai command to have a quick start for a node
 func ServeCommand(home string) (cmd *cobra.Command, err error) {
 	// Configure cobra to sort commands
 	ctx := &Context{}

@@ -381,6 +381,10 @@ createValidatorFn() {
   # config log type
   $WEBSOCKET config log-level debug
 
+  $WEBSOCKET config gas-prices $gasPrices
+
+  $WEBSOCKET config gas $gas
+
   sleep 10
 
   # send orai tokens to reporters
