@@ -30,11 +30,11 @@ func ParamKeyTable() params.KeyTable {
 type Params struct {
 	// TODO: Add your Paramaters to the Paramter struct
 	// KeyParamName string `json:"key_param_name"`
-	MaximumRequestBytes int `json:"maximum_request_bytes"`
+	MaximumRequestBytes uint64 `json:"maximum_request_bytes"`
 }
 
 // NewParams creates a new Params object
-func NewParams(maximumReqBytes int) Params {
+func NewParams(maximumReqBytes uint64) Params {
 	// if the value exceeds the threshold => default is the maximum value
 	if maximumReqBytes > MaximumRequestBytesThreshold {
 		return Params{
