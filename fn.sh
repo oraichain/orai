@@ -254,7 +254,7 @@ websocketInitFn() {
   $WEBSOCKET config chain-id Oraichain
 
   # add validator to websocket config
-  $WEBSOCKET config validator $(oraicli keys show $USER -a --bech val --keyring-backend test)
+  $WEBSOCKET config validator $(oraicli keys show $USER -a --bech val)
 
   # setup broadcast-timeout to websocket config
   $WEBSOCKET config broadcast-timeout "30s"
@@ -271,16 +271,14 @@ websocketInitFn() {
   sleep 2
 
   # send orai tokens to reporters
-  echo "y" | oraicli tx send $(oraicli keys show $USER -a) $($WEBSOCKET keys show $reporter) 10000000orai --from $(oraicli keys show $USER -a) --fees 5000orai
+  echo "y" | oraicli tx send $(oraicli keys show $USER -a) $($WEBSOCKET keys show $reporter) 10000000orai --from $(oraicli keys show $USER -a)
 
   sleep 6
 
   #wait for sending orai tokens transaction success
 
   # add reporter to oraichain
-  echo "y" | oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $USER --fees 5000orai --keyring-backend test
-  sleep 8
-  pkill oraid
+  echo "y" | oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $USER
 }
 
 createValidatorFn() {
@@ -339,7 +337,7 @@ createValidatorFn() {
 
   local gasPrices=$(getArgument "gas_prices" $GAS_PRICES)
   if [[ $gasPrices == "" ]]; then
-    gasPrices="0.025orai"
+    gasPrices="0.000000000025orai"
   fi
   local securityContract=$(getArgument "security_contract" $SECURITY_CONTRACT)
   local identity=$(getArgument "identity" $IDENTITY)
@@ -387,8 +385,10 @@ createValidatorFn() {
 
   sleep 10
 
+  local reporterAmount=$(getArgument "reporter_amount" $REPORTER_AMOUNT)
+
   # send orai tokens to reporters
-  echo "y" | oraicli tx send $(oraicli keys show $user -a) $($WEBSOCKET keys show $reporter) 10000000orai --from $(oraicli keys show $user -a) --gas-prices $gasPrices
+  echo "y" | oraicli tx send $(oraicli keys show $user -a) $($WEBSOCKET keys show $reporter) $reporterAmount --from $(oraicli keys show $user -a) --gas-prices $gasPrices
 
   sleep 10
 
