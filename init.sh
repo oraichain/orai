@@ -29,9 +29,6 @@ oraicli config output json
 oraicli config indent true
 oraicli config trust-node true
 
-# We'll use the "test" keyring backend which save keys unencrypted in the configuration directory of your project (defaults to ~/.nsd). You should **never** use the "test" keyring backend in production. For more information about other options for keyring-backend take a look at https://docs.cosmos.network/master/interfaces/keyring.html
-oraicli config keyring-backend test
-
 # Copy the `Address` output here and save it for later use
 # [optional] add "--ledger" at the end to use a Ledger Nano S
 # Note: In order for a new full node to join the network, after creating a local 
@@ -51,7 +48,7 @@ oraid add-genesis-account $(oraicli keys show $USER -a) 9000000000000000orai
 # The "nscli config" command saves configuration for the "nscli" command but not for "nsd" so we have to 
 # declare the keyring-backend with a flag here
 #nsd gentx --name jack <or your key_name> --keyring-backend test
-oraid gentx --amount 900000000000orai --name $USER --keyring-backend test --min-self-delegation $MIN_SELF_DELEGATION
+oraid gentx --amount 900000000000orai --name $USER --min-self-delegation $MIN_SELF_DELEGATION
 
 # put the validators into the genesis file so the chain is aware of the validators
 oraid collect-gentxs
