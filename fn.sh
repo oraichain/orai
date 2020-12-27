@@ -189,45 +189,34 @@ initFn(){
     oraicli config indent true
     oraicli config trust-node true
 
-    expect -c "
-    spawn oraicli keys add $USER --recover
-    expect {
-        \"override the existing name*\" {send -- \"y\r\"}
-    }
-    expect \"*bip39 mnemonic\"
-    send -- \"$MNEMONIC\r\"
-    expect {
-        \"Enter keyring passphrase:\" send -- {\"$PASS\r\"; exp_continue }
-        \"Re-enter keyring passphrase:\" send -- {\"$PASS\r\"; exp_continue }
-        eof
-    }"
-#EOF
-#     expect << EOF
+    expect << EOF
 
-#     spawn oraicli keys add $USER --recover
-#     expect {
-#         "override the existing name*" {send -- "y\r"}
-#     }
+        spawn oraicli keys add $USER --recover
+        expect {
+          "override the existing name*" {send -- "y\r"}
+        }
 
-#     expect "*bip39 mnemonic"
+        expect "*bip39 mnemonic"
 
-#     send -- "$MNEMONIC\r"
+        send -- "$MNEMONIC\r"
 
-#     expect {
-#         "Enter keyring passphrase:" send -- {"$PASS\r"; exp_continue }
-#         "Re-enter keyring passphrase:" send -- {"$PASS\r"; exp_continue }
-#         eof
-#     }
-# EOF
+        expect {
+          "*passphrase:" { send -- "$PASS\r" }
+        }
+        expect {
+          "*passphrase:" { send -- "$PASS\r" }
+        }
+        expect eof
+EOF
 
     # download genesis json file
   
-    curl GENESIS_URL > .oraid/config/genesis.json
+    curl $GENESIS_URL > .oraid/config/genesis.json
     
     # rm -f .oraid/config/genesis.json && wget https://raw.githubusercontent.com/oraichain/oraichain-static-files/ducphamle2-test/genesis.json -q -P .oraid/config/
 
     # add persistent peers to listen to blocks
-    # local persistentPeers=$(getArgument "--persistent_peers" "$PERSISTENT_PEERS")
+    local persistentPeers=$(getArgument "--persistent_peers" "$PERSISTENT_PEERS")
     [ ! -z $persistentPeers ] && sed -i 's/persistent_peers *= *".*"/persistent_peers = "$PERSISTENT_PEERS"/g' .oraid/config/config.toml 
 
     # sed -i 's/persistent_peers *= *".*"/persistent_peers = "25e3dd0839fa44a89735b38b7b749acdfac8438e@164.90.180.95:26656,e07a89a185c538820258b977b01b44a806dfcece@157.230.22.169:26656,db13b4e2d1fd922640904590d6c9b5ae698de85c@165.232.118.44:26656,b46c45fdbb59ef0509d93e89e574b2080a146b14@178.128.61.252:26656,2a8c59cfdeccd2ed30471b90f626da09adcf3342@178.128.57.195:26656,b495da1980d3cd7c3686044e800412af53ae4be4@159.89.206.139:26656,addb91a1dbc48ffb7ddba30964ae649343179822@178.128.220.155:26656"/g' .oraid/config/config.toml
@@ -275,7 +264,7 @@ websocketInitFn() {
   sleep 2
 
   # send orai tokens to reporters
-  echo "y" | oraicli tx send $(getKey $USER -a) $($WEBSOCKET keys show $reporter) 10000000orai --from $(getKey $USER -a)
+  echo "y" | oraicli tx send $(getKey $USER -a) $($WEBSOCKET keys show $reporter) $REPORTER_AMOUNT --from $(getKey $USER -a)
 
   sleep 6
 
@@ -292,15 +281,6 @@ createValidatorFn() {
   # oraid start &
     # 30 seconds timeout
   timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
-
-  # loop to query the account, since the account may not exist until a specific block, so we need to constantly check
-  local acc=$(oraicli query auth account $(getKey $user -a) | jq .type)
-  while [[ "$acc" != \""cosmos-sdk/Account"\" ]];
-  do 
-    # reset the value for the loop condition
-    acc=$(oraicli query auth account $(getKey tester -a) | jq .type)
-    sleep 10
-  done
 
   local amount=$(getArgument "amount" $AMOUNT)
   local pubkey=$(oraid tendermint show-validator)
