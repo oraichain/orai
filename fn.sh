@@ -289,7 +289,7 @@ createValidatorFn() {
   local user=$(getArgument "user" $USER)
   # run at background without websocket
   # # 30 seconds timeout to check if the node is alive or not, the '&' symbol allows to run below commands while still having the process running
-  oraid start &
+  # oraid start &
     # 30 seconds timeout
   timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
 
@@ -402,7 +402,7 @@ createValidatorFn() {
   echo "y" | oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $user --gas-prices $gasPrices
   sleep 8
 
-  pkill oraid
+  # pkill oraid
 }
 
 USER=$(getArgument "user" $USER)
