@@ -23,7 +23,7 @@ EXPOSE 1317
 COPY fn.sh /usr/local/bin/fn
 
 # install essential tools
-RUN apk add curl bash ncurses jq
+RUN apk add curl bash ncurses jq expect nano
 
 # copy build files
 COPY --from=build /go/bin/ /usr/local/bin

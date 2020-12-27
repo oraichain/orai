@@ -76,6 +76,15 @@ printHelp () {
   exit ${1:-0}
 }
 
+getKey() {
+    expect << EOF
+    set timeout 3
+    spawn spawn oraicli keys show $@
+    expect "Enter keyring passphrase:"
+    send -- "$PASS\r"
+    expect eof
+EOF
+}
 
 # Get a value:
 getArgument() {     
@@ -181,16 +190,12 @@ initFn(){
     oraicli config trust-node true
 
     expect -c "
-
     spawn oraicli keys add $USER --recover
     expect {
         \"override the existing name*\" {send -- \"y\r\"}
     }
-
     expect \"*bip39 mnemonic\"
-
     send -- \"$MNEMONIC\r\"
-
     expect {
         \"Enter keyring passphrase:\" send -- {\"$PASS\r\"; exp_continue }
         \"Re-enter keyring passphrase:\" send -- {\"$PASS\r\"; exp_continue }
@@ -217,16 +222,15 @@ initFn(){
 
     # download genesis json file
   
-    curl https://raw.githubusercontent.com/oraichain/oraichain-static-files/master/genesis.json > .oraid/config/genesis.json
+    curl GENESIS_URL > .oraid/config/genesis.json
     
     # rm -f .oraid/config/genesis.json && wget https://raw.githubusercontent.com/oraichain/oraichain-static-files/ducphamle2-test/genesis.json -q -P .oraid/config/
 
     # add persistent peers to listen to blocks
     # local persistentPeers=$(getArgument "--persistent_peers" "$PERSISTENT_PEERS")
-    # [ ! -z $persistentPeers ] && sed -i 's/persistent_peers *= *".*"/persistent_peers = "$PERSISTENT_PEERS"/g' .oraid/config/config.toml 
+    [ ! -z $persistentPeers ] && sed -i 's/persistent_peers *= *".*"/persistent_peers = "$PERSISTENT_PEERS"/g' .oraid/config/config.toml 
 
-    # add persistent peers to listen to blocks
-    sed -i 's/persistent_peers *= *".*"/persistent_peers = "dbb2fee9a55cbbe364afcf377cb2f82882fa4ad6@164.90.180.95:26656,a9f2161cb9d723c26e8f268a660b5cc1261e264a@157.230.22.169:26656,950e189e74134d9341d859c6132f5d4da7c19b58@165.232.118.44:26656,c5bcf6dd8efa1a2ee0efdec4a18da8d3a2654302@178.128.61.252:26656,4969be3fdf0e20c77ee252fb156d8bf2a9496317@178.128.57.195:26656,5efef6b1af1429a8c4ae30ed568d7fe97cf2f0c0@159.89.206.139:26656,3076fd764d2eda73bc3637d84549dff587897e51@178.128.220.155:26656"/g' .oraid/config/config.toml
+    # sed -i 's/persistent_peers *= *".*"/persistent_peers = "25e3dd0839fa44a89735b38b7b749acdfac8438e@164.90.180.95:26656,e07a89a185c538820258b977b01b44a806dfcece@157.230.22.169:26656,db13b4e2d1fd922640904590d6c9b5ae698de85c@165.232.118.44:26656,b46c45fdbb59ef0509d93e89e574b2080a146b14@178.128.61.252:26656,2a8c59cfdeccd2ed30471b90f626da09adcf3342@178.128.57.195:26656,b495da1980d3cd7c3686044e800412af53ae4be4@159.89.206.139:26656,addb91a1dbc48ffb7ddba30964ae649343179822@178.128.220.155:26656"/g' .oraid/config/config.toml
 
     oraid validate-genesis
     # done init
@@ -254,7 +258,7 @@ websocketInitFn() {
   $WEBSOCKET config chain-id Oraichain
 
   # add validator to websocket config
-  $WEBSOCKET config validator $(oraicli keys show $USER -a --bech val)
+  $WEBSOCKET config validator $(getKey $USER -a --bech val)
 
   # setup broadcast-timeout to websocket config
   $WEBSOCKET config broadcast-timeout "30s"
@@ -271,7 +275,7 @@ websocketInitFn() {
   sleep 2
 
   # send orai tokens to reporters
-  echo "y" | oraicli tx send $(oraicli keys show $USER -a) $($WEBSOCKET keys show $reporter) 10000000orai --from $(oraicli keys show $USER -a)
+  echo "y" | oraicli tx send $(getKey $USER -a) $($WEBSOCKET keys show $reporter) 10000000orai --from $(getKey $USER -a)
 
   sleep 6
 
@@ -290,11 +294,11 @@ createValidatorFn() {
   timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
 
   # loop to query the account, since the account may not exist until a specific block, so we need to constantly check
-  local acc=$(oraicli query auth account $(oraicli keys show $user -a) | jq .type)
+  local acc=$(oraicli query auth account $(getKey $user -a) | jq .type)
   while [[ "$acc" != \""cosmos-sdk/Account"\" ]];
   do 
     # reset the value for the loop condition
-    acc=$(oraicli query auth account $(oraicli keys show tester -a) | jq .type)
+    acc=$(oraicli query auth account $(getKey tester -a) | jq .type)
     sleep 10
   done
 
@@ -365,7 +369,7 @@ createValidatorFn() {
   $WEBSOCKET config chain-id Oraichain
 
   # add validator to websocket config
-  $WEBSOCKET config validator $(oraicli keys show $user -a --bech val)
+  $WEBSOCKET config validator $(getKey $user -a --bech val)
 
   # setup broadcast-timeout to websocket config
   $WEBSOCKET config broadcast-timeout "30s"
@@ -388,7 +392,7 @@ createValidatorFn() {
   local reporterAmount=$(getArgument "reporter_amount" $REPORTER_AMOUNT)
 
   # send orai tokens to reporters
-  echo "y" | oraicli tx send $(oraicli keys show $user -a) $($WEBSOCKET keys show $reporter) $reporterAmount --from $(oraicli keys show $user -a) --gas-prices $gasPrices
+  echo "y" | oraicli tx send $(getKey $user -a) $($WEBSOCKET keys show $reporter) $reporterAmount --from $(getKey $user -a) --gas-prices $gasPrices
 
   sleep 10
 
