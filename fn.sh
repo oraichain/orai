@@ -477,6 +477,7 @@ case "${METHOD}" in
   ;;
   wsRun)
   websocketRunFn
+  ;;
   start)
     oraidFn
   ;;
