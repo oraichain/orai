@@ -251,6 +251,23 @@ websocketInitFn() {
   # # 30 seconds timeout to check if the node is alive or not
   timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
   local reporter="${USER}_reporter"
+
+
+  local gas=$(getArgument "gas" $GAS)
+  if [[ $gas != "auto" && !$gas =~ $re ]]; then
+    gas=200000
+  fi
+
+  # workaround, since auto gas in this case is not good, sometimes get out of gas
+  if [[ $gas == "auto" || $gas < 200000 ]]; then
+    gas=200000
+  fi
+
+  local gasPrices=$(getArgument "gas_prices" $GAS_PRICES)
+  if [[ $gasPrices == "" ]]; then
+    gasPrices="0.000000000025orai"
+  fi
+
   # for i in $(eval echo {1..$2})
   # do
     # add reporter key
@@ -311,6 +328,14 @@ websocketInitFn() {
   # add reporter to oraichain
   enterPassPhrase oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $user --gas-prices $gasPrices
   sleep 8
+}
+
+websocketRunFn() {
+  HOME=$PWD/.oraid
+  # rm -rf ~/.websocket
+  WEBSOCKET="websocket --home $HOME"
+
+  $WEBSOCKET run
 }
 
 createValidatorFn() {
@@ -447,9 +472,11 @@ case "${METHOD}" in
   init)
     initFn
   ;;
-  websocketInit)
+  wsInit)
   websocketInitFn
   ;;
+  wsRun)
+  websocketRunFn
   start)
     oraidFn
   ;;
