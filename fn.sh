@@ -257,6 +257,7 @@ websocketInitFn() {
 
   ###################### init websocket for the validator
 
+  echo "start initiating websocket..."
   HOME=$PWD/.oraid
   # rm -rf ~/.websocket
   WEBSOCKET="websocket --home $HOME"
@@ -267,7 +268,9 @@ websocketInitFn() {
   $WEBSOCKET config chain-id Oraichain
 
   # add validator to websocket config
-  $WEBSOCKET config validator $(getKey $USER -a --bech val)
+  echo "get user validator address..."
+  local val_address=$(getKeyAddr $user -a --bech val)
+  $WEBSOCKET config validator $val_address
 
   # setup broadcast-timeout to websocket config
   $WEBSOCKET config broadcast-timeout "30s"
@@ -281,17 +284,33 @@ websocketInitFn() {
   # config log type
   $WEBSOCKET config log-level debug
 
-  sleep 2
+  $WEBSOCKET config gas-prices $gasPrices
+
+  $WEBSOCKET config gas $gas
+
+  echo "start sending tokens to the reporter"
+
+  sleep 10
+
+  local reporterAmount=$(getArgument "reporter_amount" $REPORTER_AMOUNT)
+
+  echo "collecting user account address from local node..."
+  local user_address=$(getKeyAddr $user -a)
 
   # send orai tokens to reporters
-  echo "y" | oraicli tx send $(getKey $USER -a) $($WEBSOCKET keys show $reporter) $REPORTER_AMOUNT --from $(getKey $USER -a)
 
-  sleep 6
+  echo "collecting the reporter's information..."
+
+  enterPassPhrase oraicli tx send $user_address $($WEBSOCKET keys show $reporter) $reporterAmount --from $user_address --gas-prices $gasPrices
+
+  echo "start broadcasting the reporter..."
+  sleep 10
 
   #wait for sending orai tokens transaction success
 
   # add reporter to oraichain
-  echo "y" | oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $USER
+  enterPassPhrase oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $user --gas-prices $gasPrices
+  sleep 8
 }
 
 createValidatorFn() {
