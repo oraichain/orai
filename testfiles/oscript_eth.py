@@ -1,4 +1,41 @@
 #!/usr/bin/python3
+"""
+Oracle script description
+---
+parameters:
+  - name: body
+    in: body
+    required: true
+    schema:
+      id: SampleRequest
+      required:
+        - name
+        - email
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+responses:
+  201:
+    description: Created new Sample
+    schema:
+      id: SampleResponse
+      properties:
+        id:
+         type: integer
+        name:
+         type: string
+        email:
+         type: string
+  400:
+    description: Invalid any property
+    schema:
+      id: ErrorResponse
+      properties:
+        msg:
+          type: string
+"""
 import sys
 import base64
 

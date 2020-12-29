@@ -1,14 +1,17 @@
 package rest
 
 import (
+	"bytes"
+	goContext "context"
 	"fmt"
-	"net/http"
-
-	"github.com/gorilla/mux"
-	"github.com/oraichain/orai/x/provider/types"
-
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/types/rest"
+	dockerType "github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
+	"github.com/docker/docker/pkg/stdcopy"
+	"github.com/gorilla/mux"
+	"github.com/oraichain/orai/x/provider/types"
+	"net/http"
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
@@ -61,6 +64,11 @@ func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
 	r.HandleFunc(
 		fmt.Sprintf("/%s/min_fees/{%s}", storeName, restName),
 		queryMinimumFeesHandlerFn(cliCtx),
+	).Methods("GET")
+
+	r.HandleFunc(
+		fmt.Sprintf("/%s/spec_oscript/{%s}", storeName, restName),
+		querySpecPythonFile(cliCtx),
 	).Methods("GET")
 }
 
@@ -234,5 +242,53 @@ func queryMinimumFeesHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		rest.PostProcessResponse(w, cliCtx, res)
+	}
+}
+
+func querySpecPythonFile(cliCtx context.CLIContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		name := vars[restName]
+		ctx := goContext.Background()
+		cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+		if err != nil {
+			rest.PostProcessResponse(w, cliCtx, err.Error())
+		}
+		script := "" +
+			"import yaml, json\n" +
+			"import sys\n" +
+			"\n" +
+			"if __name__ == \"__main__\":\n" +
+			"    try:\n" +
+			"        data_source = __import__(sys.argv[1])\n" +
+			"        doc = data_source.__doc__\n" +
+			"        if doc:\n" +
+			"            comment_index = doc.rfind('---')\n" +
+			"            if comment_index > 0:\n" +
+			"                comment_index = comment_index + 3\n" +
+			"            else:\n" +
+			"                comment_index = 0\n" +
+			"            code = yaml.safe_load((doc[comment_index:]))\n" +
+			"            print(json.dumps(code))\n" +
+			"    except ArithmeticError:\n" +
+			"        print(\"\")"
+		resp, err := cli.ContainerExecCreate(ctx, "python", dockerType.ExecConfig{
+			AttachStdout: true,
+			AttachStderr: true,
+			Tty:          true,
+			Cmd:          append([]string{"python", "-c", script, name}),
+		})
+		if err != nil {
+			rest.PostProcessResponse(w, cliCtx, err.Error())
+		}
+
+		logResp, err := cli.ContainerExecAttach(ctx, resp.ID, dockerType.ExecStartCheck{})
+		if err != nil {
+			rest.PostProcessResponse(w, cliCtx, err.Error())
+		}
+
+		var buf, error bytes.Buffer
+		stdcopy.StdCopy(&buf, &error, logResp.Reader)
+		rest.PostProcessResponse(w, cliCtx, string(buf.Bytes()))
 	}
 }
