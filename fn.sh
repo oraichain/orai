@@ -79,11 +79,16 @@ printHelp () {
 getKey() {
     expect << EOF
     set timeout 3
-    spawn spawn oraicli keys show $@
+    spawn oraicli keys show $@
     expect "Enter keyring passphrase:"
     send -- "$PASS\r"
     expect eof
 EOF
+}
+
+getKeyAddr() {
+  key=$(getKey $@)
+  echo "$key" | tail -1 | xargs
 }
 
 # Get a value:
@@ -173,6 +178,22 @@ oraidFn(){
     orai start --chain-id Oraichain --laddr tcp://0.0.0.0:1317 --node tcp://0.0.0.0:26657 # --trust-node
 }
 
+enterPassPhrase(){
+  expect << EOF
+        spawn $@
+        expect {
+          "*passphrase:" { send -- "$PASS\r" }
+        }
+        expect {
+          "confirm transaction*" {send -- "y\r"}
+        }
+        expect {
+          "*passphrase:" { send -- "$PASS\r" }
+        }
+        expect eof
+EOF
+}
+
 
 initFn(){ 
 
@@ -196,8 +217,7 @@ initFn(){
           "override the existing name*" {send -- "y\r"}
         }
 
-        expect "*bip39 mnemonic"
-
+        expect "Enter your bip39 mnemonic*"
         send -- "$MNEMONIC\r"
 
         expect {
@@ -216,8 +236,8 @@ EOF
     # rm -f .oraid/config/genesis.json && wget https://raw.githubusercontent.com/oraichain/oraichain-static-files/ducphamle2-test/genesis.json -q -P .oraid/config/
 
     # add persistent peers to listen to blocks
-    local persistentPeers=$(getArgument "--persistent_peers" "$PERSISTENT_PEERS")
-    [ ! -z $persistentPeers ] && sed -i 's/persistent_peers *= *".*"/persistent_peers = "$PERSISTENT_PEERS"/g' .oraid/config/config.toml 
+    local persistentPeers=$(getArgument "persistent_peers" "$PERSISTENT_PEERS")
+    [ ! -z $persistentPeers ] && sed -i 's/persistent_peers *= *".*"/persistent_peers = "'"$persistentPeers"'"/g' .oraid/config/config.toml 
 
     # sed -i 's/persistent_peers *= *".*"/persistent_peers = "25e3dd0839fa44a89735b38b7b749acdfac8438e@164.90.180.95:26656,e07a89a185c538820258b977b01b44a806dfcece@157.230.22.169:26656,db13b4e2d1fd922640904590d6c9b5ae698de85c@165.232.118.44:26656,b46c45fdbb59ef0509d93e89e574b2080a146b14@178.128.61.252:26656,2a8c59cfdeccd2ed30471b90f626da09adcf3342@178.128.57.195:26656,b495da1980d3cd7c3686044e800412af53ae4be4@159.89.206.139:26656,addb91a1dbc48ffb7ddba30964ae649343179822@178.128.220.155:26656"/g' .oraid/config/config.toml
 
@@ -328,9 +348,10 @@ createValidatorFn() {
   local website=$(getArgument "website" $WEBSITE)
   local details=$(getArgument "details" $DETAILS)
 
+  echo "start creating validator..."
   sleep 10
 
-  echo "y" | oraicli tx staking create-validator --amount $amount --pubkey $pubkey --moniker $moniker --chain-id Oraichain --commission-rate $commissionRate --commission-max-rate $commissionMaxRate --commission-max-change-rate $commissionMaxChangeRate --min-self-delegation $minDelegation --gas $gas --gas-prices $gasPrices --security-contact $securityContract --identity $identity --website $website --details $details --from $user
+  enterPassPhrase oraicli tx staking create-validator --amount $amount --pubkey $pubkey --moniker $moniker --chain-id Oraichain --commission-rate $commissionRate --commission-max-rate $commissionMaxRate --commission-max-change-rate $commissionMaxChangeRate --min-self-delegation $minDelegation --gas $gas --gas-prices $gasPrices --security-contact $securityContract --identity $identity --website $website --details $details --from $user
 
   local reporter="${user}_reporter"
   # # for i in $(eval echo {1..$2})
@@ -339,6 +360,7 @@ createValidatorFn() {
 
   # ###################### init websocket for the validator
 
+  echo "start initiating websocket..."
   HOME=$PWD/.oraid
   # rm -rf ~/.websocket
   WEBSOCKET="websocket --home $HOME"
@@ -349,7 +371,9 @@ createValidatorFn() {
   $WEBSOCKET config chain-id Oraichain
 
   # add validator to websocket config
-  $WEBSOCKET config validator $(getKey $user -a --bech val)
+  echo "get user validator address..."
+  local val_address=$(getKeyAddr $user -a --bech val)
+  $WEBSOCKET config validator $val_address
 
   # setup broadcast-timeout to websocket config
   $WEBSOCKET config broadcast-timeout "30s"
@@ -367,19 +391,28 @@ createValidatorFn() {
 
   $WEBSOCKET config gas $gas
 
+  echo "start sending tokens to the reporter"
+
   sleep 10
 
   local reporterAmount=$(getArgument "reporter_amount" $REPORTER_AMOUNT)
 
-  # send orai tokens to reporters
-  echo "y" | oraicli tx send $(getKey $user -a) $($WEBSOCKET keys show $reporter) $reporterAmount --from $(getKey $user -a) --gas-prices $gasPrices
+  echo "collecting user account address from local node..."
+  local user_address=$(getKeyAddr $user -a)
 
+  # send orai tokens to reporters
+
+  echo "collecting the reporter's information..."
+
+  enterPassPhrase oraicli tx send $user_address $($WEBSOCKET keys show $reporter) $reporterAmount --from $user_address --gas-prices $gasPrices
+
+  echo "start broadcasting the reporter..."
   sleep 10
 
   #wait for sending orai tokens transaction success
 
   # add reporter to oraichain
-  echo "y" | oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $user --gas-prices $gasPrices
+  enterPassPhrase oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $user --gas-prices $gasPrices
   sleep 8
 
   # pkill oraid

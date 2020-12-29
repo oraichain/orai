@@ -11,7 +11,7 @@ $WEBSOCKET keys delete-all
 $WEBSOCKET config chain-id Oraichain
 
 # add validator to websocket config
-$WEBSOCKET config validator $(oraicli keys show $1 -a --bech val --keyring-backend test)
+$WEBSOCKET config validator $(oraicli keys show $1 -a --bech val)
 
 # setup broadcast-timeout to websocket config
 $WEBSOCKET config broadcast-timeout "30s"
@@ -46,7 +46,7 @@ sleep 6
 #wait for sending orai tokens transaction success
 
 # add reporter to oraichain
-echo "y" | oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $1 --fees 5000orai --keyring-backend test
+echo "y" | oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $1 --fees 5000orai
 
 sleep 2
 
