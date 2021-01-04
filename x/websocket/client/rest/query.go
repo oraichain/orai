@@ -11,7 +11,7 @@ import (
 
 
 const (
-	Timeout = 5
+	Timeout = 60000
 )
 
 func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router, in <-chan bool, out chan<- bool) {
@@ -34,7 +34,7 @@ func healthCheckHandler(in <-chan bool, out chan<- bool) func(http.ResponseWrite
 		go pingChannel(out)		
 
 		// timeout 10 seconds
-		timer := time.NewTimer(Timeout * time.Second)
+		timer := time.NewTimer(Timeout * time.Millisecond)
 				
 		select {
 			

@@ -70,7 +70,7 @@ func runImpl(c *Context, l *Logger) error {
 			l.Info("%v\n", ev.Data.(tmtypes.EventDataTx).TxResult)
 			go handleTransaction(c, l, ev.Data.(tmtypes.EventDataTx).TxResult)
 		case sig := <-websocket.OutSignals:
-			fmt.Println("received signal, send back to rest", sig)
+			fmt.Println("received signal, send back to rest", sig)			
 			websocket.InSignals <- sig
 		}
 	}
