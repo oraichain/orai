@@ -41,4 +41,4 @@ Note: After `make all`, you need to re-run the fn commands to apply new binaries
 
 # Build docker
 
-`docker build -t orai/orai:alpine .` for development and `docker build -t orai/orai:alpine-prod -t Dockerfile.prod .` for production
+`docker build -t orai/orai:alpine .` for development and `docker build -t orai/orai:alpine-prod -f Dockerfile.prod .` for production

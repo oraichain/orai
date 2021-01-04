@@ -167,32 +167,68 @@ oraidFn(){
 
 initFn(){
 
-    sleep 8
+    # make all
 
     ./init.sh $CHAIN_ID $USER
     # run at background without websocket
-    oraid start --minimum-gas-prices 0.025orai &
+    oraid start --minimum-gas-prices $GAS_PRICES &
     # 30 seconds timeout
-    timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
-    local reporter="${USER}_reporter"
-    ./websocket.sh $USER $reporter #$reporter
+    websocketInitFn
+    
+    res=$?      
+    verifyResult $res "can not run websocket.sh"
     sleep 10
     pkill oraid
 }
 
-initDevFn(){
+websocketInitFn() {
+  # run at background without websocket
+  # # 30 seconds timeout to check if the node is alive or not
+  timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
+  local reporter="${USER}_reporter"
+  # for i in $(eval echo {1..$2})
+  # do
+    # add reporter key
 
-    make all
+  ###################### init websocket for the validator
 
-    ./init.sh $CHAIN_ID $USER
-    # run at background without websocket
-    oraid start --minimum-gas-prices 0.025orai &
-    # 30 seconds timeout
-    timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
-    local reporter="${USER}_reporter"
-    ./websocket.sh $USER $reporter #$reporter
-    sleep 10
-    pkill oraid
+  HOME=$PWD/.oraid
+  # rm -rf ~/.websocket
+  WEBSOCKET="websocket --home $HOME"
+  #$WEBSOCKET keys delete-all
+  $WEBSOCKET keys add $reporter
+
+  # config chain id
+  $WEBSOCKET config chain-id Oraichain
+
+  # add validator to websocket config
+  $WEBSOCKET config validator $(oraicli keys show $USER -a --bech val --keyring-backend test)
+
+  # setup broadcast-timeout to websocket config
+  $WEBSOCKET config broadcast-timeout "30s"
+
+  # setup rpc-poll-interval to websocket config
+  $WEBSOCKET config rpc-poll-interval "1s"
+
+  # setup max-try to websocket config
+  $WEBSOCKET config max-try 5
+
+  # config log type
+  $WEBSOCKET config log-level debug
+
+  sleep 2
+
+  # send orai tokens to reporters
+  echo "y" | oraicli tx send $(oraicli keys show $USER -a) $($WEBSOCKET keys show $reporter) 10000000orai --from $(oraicli keys show $USER -a) --fees 5000orai
+
+  sleep 6
+
+  #wait for sending orai tokens transaction success
+
+  # add reporter to oraichain
+  echo "y" | oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $USER --fees 5000orai --keyring-backend test
+  sleep 8
+  pkill oraid
 }
 
 
@@ -261,16 +297,16 @@ signFn(){
 }
 
 createValidatorFn() {
-  local amount=$(getArgument "amount" 10000orai)
+  local amount=$(getArgument "amount" $AMOUNT)
   local pubkey=$(getArgument "pubkey" oraivalconspub1addwnpepqvydmv22mkzc9rc92g43unew08cmj4q46dhk7vz0a9fj2xjsjn2lvqj0dfr)
-  local moniker=$(getArgument "moniker" ducphamle)
-  local commissionRate=$(getArgument "commission-rate" 0.10)
-  local commissionMaxRate==$(getArgument "commission-max-rate" 0.20)
-  local commissionMaxChangeRate==$(getArgument "commission-max-change-rate" 0.01)
+  local moniker=$(getArgument "moniker" $MONIKER)
+  local commissionRate=$(getArgument "commission-rate" $COMMISSION_RATE)
+  local commissionMaxRate==$(getArgument "commission-max-rate" $COMMISSION_MAX_RATE)
+  local commissionMaxChangeRate==$(getArgument "commission-max-change-rate" $COMMISSION_MAX_CHANGE_RATE)
   oraicli tx staking create-validator --amount $amount --pubkey $pubkey --moniker $moniker --chain-id $CHAIN_ID --commission-rate $commissionRate --commission-max-rate $commissionMaxRate --commission-max-change-rate $commissionMaxChangeRate --min-self-delegation 100 --gas auto --gas-adjustment 1.15 --gas-prices 0.025orai --from $USER
 }
 
-USER=$(getArgument "user" duc)
+USER=$(getArgument "user" $USER)
 CHAIN_ID=$(getArgument "chain-id" Oraichain)
 
 # processing
