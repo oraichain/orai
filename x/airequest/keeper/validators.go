@@ -36,8 +36,6 @@ func (k Keeper) RandomValidators(ctx sdk.Context, size int, nonce []byte) ([]sdk
 	} else {
 		fmt.Println("enough validators")
 		valOperators := k.createValSamplingList(ctx, maxValidatorSize)
-		fmt.Println("valOperators list: ", valOperators)
-
 		randomGenerator, err := rng.NewRng(k.GetRngSeed(ctx), nonce, []byte(ctx.ChainID()))
 		if err != nil {
 			return nil, sdkerrors.Wrapf(types.ErrSeedinitiation, err.Error())
@@ -115,7 +113,6 @@ func (k Keeper) sampleIndexes(valOperators []sdk.ValAddress, size int, randomGen
 			// if it has been chosen already, we decrement the loop index to continue choosing a new one
 			i--
 		}
-		fmt.Println("All validators: ", validators)
 	}
 	return validators
 }

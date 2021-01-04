@@ -21,6 +21,7 @@ func InitGenesis(ctx sdk.Context, keeper Keeper, data GenesisState) {
 
 	// Init params for the provider module
 	keeper.SetParam(ctx, types.KeyOracleScriptRewardPercentage, data.Params.OracleScriptRewardPercentage)
+	keeper.SetParam(ctx, types.KeyMaximumCodeBytes, data.Params.MaximumCodeBytes)
 }
 
 // DefaultGenesisState returns the default provider genesis state.

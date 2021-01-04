@@ -11,6 +11,7 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 	// TODO: Define logic for when you would like to initialize a new genesis
 	// Init params for the airequest module
 	k.SetRngSeed(ctx, make([]byte, types.RngSeedSize))
+	k.SetParam(ctx, types.KeyMaximumRequestBytes, data.Params.MaximumRequestBytes)
 }
 
 // DefaultGenesisState returns the default airequest genesis state.

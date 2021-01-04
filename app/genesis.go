@@ -43,7 +43,6 @@ func NewDefaultGenesisState() GenesisState {
 	stakingGenesis.Params.BondDenom = denom
 	stakingGenesis.Params.HistoricalEntries = 1000
 	// maximum bonded validators
-	stakingGenesis.Params.MaxValidators = 50
 	distrGenesis.Params.BaseProposerReward = sdk.NewDecWithPrec(10, 2)  // 5%
 	distrGenesis.Params.BonusProposerReward = sdk.NewDecWithPrec(10, 2) // 12%
 	mintGenesis.Params.BlocksPerYear = 6311200                          // target 5-second block time
