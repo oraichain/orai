@@ -175,7 +175,10 @@ clear(){
 
 oraidFn(){
     # oraid start
-    orai start --chain-id Oraichain --laddr tcp://0.0.0.0:1317 --node tcp://0.0.0.0:26657 # --trust-node
+    # kill everything and then start again
+    pkill oraicli && pkill websocket && pkill orai && pkill oraid
+    sleep 2
+    orai start --chain-id Oraichain --laddr tcp://0.0.0.0:1317 --node tcp://0.0.0.0:26657 --trust-node
 }
 
 enterPassPhrase(){

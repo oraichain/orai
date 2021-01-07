@@ -202,7 +202,11 @@ initFn(){
   websocketInitFn    
   
   sleep 10
+  pkill orai
   pkill oraid
+  pkill oraicli
+  pkill websocket
+  sleep 2
 }
 
 websocketInitFn() {

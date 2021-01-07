@@ -17,10 +17,10 @@ all: install
 
 install: go.sum
 		@echo "--> Installing oraid & oraicli"
-		install-orai
-		install-oraicli
-		install-oraid
-		install-websocket
+		go install -mod=readonly $(BUILD_FLAGS) ./cmd/orai
+		go install -mod=readonly $(BUILD_FLAGS) ./cmd/oraicli
+		go install -mod=readonly $(BUILD_FLAGS) ./cmd/oraid
+		go install -mod=readonly $(BUILD_FLAGS) ./cmd/websocket
 
 
 install-orai:
