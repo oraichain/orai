@@ -175,7 +175,13 @@ clear(){
 
 oraidFn(){
     # oraid start
-    orai start --chain-id Oraichain --laddr tcp://0.0.0.0:1317 --node tcp://0.0.0.0:26657 # --trust-node
+    #orai start --chain-id Oraichain --laddr tcp://0.0.0.0:1317 --trust-node
+    oraid start &
+    timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
+
+    oraicli rest-server --chain-id Oraichain --trust-node --laddr tcp://0.0.0.0:1317 --node tcp://0.0.0.0:26657 & 
+    timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
+    websocket --home $PWD/.oraid run
 }
 
 enterPassPhrase(){

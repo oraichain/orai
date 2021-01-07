@@ -49,7 +49,7 @@ func (msg MsgCreateOracleScript) ValidateBasic() error {
 	if len(msg.DataSources) == 0 || len(msg.TestCases) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "data source & test case identifiers cannot be empty")
 	}
-	if len(msg.Code) > MaximumCodeBytesThreshold {
+	if len(msg.Code) > 1*1024*1024 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "The size of the source code is too large!\n")
 	}
 	return nil
@@ -106,7 +106,7 @@ func (msg MsgEditOracleScript) ValidateBasic() error {
 	if len(msg.DataSources) == 0 || len(msg.TestCases) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "data source & test case identifiers cannot be empty")
 	}
-	if len(msg.Code) > MaximumCodeBytesThreshold {
+	if len(msg.Code) > 1*1024*1024 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "The size of the source code is too large!\n")
 	}
 	return nil
