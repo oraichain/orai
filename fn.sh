@@ -178,7 +178,12 @@ oraidFn(){
     #orai start --chain-id Oraichain --laddr tcp://0.0.0.0:1317 --trust-node
     # kill everything and then start again
     pkill oraicli && pkill websocket && pkill orai && pkill oraid
-    sleep 2
+    kill -9 `lsof -t -i:1317`
+    sleep 3
+    kill -9 `lsof -t -i:26656`
+    sleep 3
+    kill -9 `lsof -t -i:26657`
+    sleep 3
     oraid start &
     timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
 
