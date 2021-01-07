@@ -10,6 +10,7 @@
 # colors
 BROWN='\033[0;33m'
 BLUE='\033[0;34m'
+RED='\033[0;31m'
 NC='\033[0m'
 BOLD=$(tput bold)
 NORMAL=$(tput sgr0)
@@ -20,9 +21,8 @@ SCRIPT_NAME=`basename "$0"`
 
 # verify the result of the end-to-end test
 verifyResult() {  
-  if [ $1 -ne 0 ] ; then
-    echo "!!!!!!!!!!!!!!! "$2" !!!!!!!!!!!!!!!!"
-    echo "========= ERROR !!! FAILED to execute End-2-End Scenario ==========="
+  if [ $1 -ne 0 ] ; then    
+    printBoldColor $RED  "========= $2 ==========="
     echo
       exit 1
   fi
@@ -166,33 +166,97 @@ oraidFn(){
 
 
 initFn(){
+  clear    
+  oraid init $MONIKER --chain-id Oraichain
+  res=$?        
+  verifyResult $res "can not run oraid init"  
 
-    sleep 8
+  # Configure your CLI to eliminate need to declare them as flags
+  oraicli config chain-id Oraichain
+  oraicli config output json
+  oraicli config indent true
+  oraicli config trust-node true
+  oraicli config keyring-backend test
 
-    ./init.sh $CHAIN_ID $USER
-    # run at background without websocket
-    oraid start --minimum-gas-prices 0.025orai &
-    # 30 seconds timeout
-    timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
-    local reporter="${USER}_reporter"
-    ./websocket.sh $USER $reporter #$reporter
-    sleep 10
-    pkill oraid
+  oraicli keys add $USER
+  res=$?        
+  verifyResult $res "can not add $USER"  
+
+  oraid add-genesis-account $(oraicli keys show $USER -a) 9000000000000000orai
+  res=$?        
+  verifyResult $res "can not add-genesis-account $USER"  
+
+  oraid gentx --keyring-backend test --amount 900000000000orai --name $USER --min-self-delegation $MIN_SELF_DELEGATION
+  res=$?        
+  verifyResult $res "can not gentx $USER"  
+
+  # put the validators into the genesis file so the chain is aware of the validators
+  oraid collect-gentxs
+
+  oraid validate-genesis
+
+  # run at background without websocket
+  oraid start --minimum-gas-prices $GAS_PRICES &  
+
+  # 30 seconds timeout
+  websocketInitFn    
+  
+  sleep 10
+  pkill orai
+  pkill oraid
+  pkill oraicli
+  pkill websocket
+  sleep 2
 }
 
-initDevFn(){
+websocketInitFn() {
+  # run at background without websocket
+  # # 30 seconds timeout to check if the node is alive or not
+  timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
+  local reporter="${USER}_reporter"
+  # for i in $(eval echo {1..$2})
+  # do
+    # add reporter key
 
-    make all
+  ###################### init websocket for the validator
 
-    ./init.sh $CHAIN_ID $USER
-    # run at background without websocket
-    oraid start --minimum-gas-prices 0.025orai &
-    # 30 seconds timeout
-    timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
-    local reporter="${USER}_reporter"
-    ./websocket.sh $USER $reporter #$reporter
-    sleep 10
-    pkill oraid
+  HOME=$PWD/.oraid
+  # rm -rf ~/.websocket
+  WEBSOCKET="websocket --home $HOME"
+  #$WEBSOCKET keys delete-all
+  $WEBSOCKET keys add $reporter  
+
+  # config chain id
+  $WEBSOCKET config chain-id Oraichain
+
+  # add validator to websocket config
+  $WEBSOCKET config validator $(oraicli keys show $USER -a --bech val --keyring-backend test)
+
+  # setup broadcast-timeout to websocket config
+  $WEBSOCKET config broadcast-timeout "30s"
+
+  # setup rpc-poll-interval to websocket config
+  $WEBSOCKET config rpc-poll-interval "1s"
+
+  # setup max-try to websocket config
+  $WEBSOCKET config max-try 5
+
+  # config log type
+  $WEBSOCKET config log-level debug
+
+  sleep 10
+
+  # send orai tokens to reporters
+  echo "y" | oraicli tx send $(oraicli keys show $USER -a) $($WEBSOCKET keys show $reporter) 10000000orai --from $(oraicli keys show $USER -a) --fees 5000orai
+
+  sleep 6
+
+  #wait for sending orai tokens transaction success
+
+  # add reporter to oraichain
+  echo "y" | oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $USER --fees 5000orai --keyring-backend test
+  sleep 8
+  pkill oraid
 }
 
 
@@ -249,6 +313,12 @@ unsignedSetDsFn(){
 }' > tmp/unsignedTx.json)
 }
 
+clear(){
+    rm -rf .oraid/
+    rm -rf .oraicli/
+    rm -rf .oraifiles/    
+}
+
 signFn(){     
     # $1 is account number
     local sequence=$(curl -s "http://localhost:1317/auth/accounts/$(oraicli keys show $USER -a)" | jq ".result.value.sequence" -r)
@@ -260,17 +330,8 @@ signFn(){
     verifyResult $res "Signed failed"
 }
 
-createValidatorFn() {
-  local amount=$(getArgument "amount" 10000orai)
-  local pubkey=$(getArgument "pubkey" oraivalconspub1addwnpepqvydmv22mkzc9rc92g43unew08cmj4q46dhk7vz0a9fj2xjsjn2lvqj0dfr)
-  local moniker=$(getArgument "moniker" ducphamle)
-  local commissionRate=$(getArgument "commission-rate" 0.10)
-  local commissionMaxRate==$(getArgument "commission-max-rate" 0.20)
-  local commissionMaxChangeRate==$(getArgument "commission-max-change-rate" 0.01)
-  oraicli tx staking create-validator --amount $amount --pubkey $pubkey --moniker $moniker --chain-id $CHAIN_ID --commission-rate $commissionRate --commission-max-rate $commissionMaxRate --commission-max-change-rate $commissionMaxChangeRate --min-self-delegation 100 --gas auto --gas-adjustment 1.15 --gas-prices 0.025orai --from $USER
-}
 
-USER=$(getArgument "user" duc)
+USER=$(getArgument "user" $USER)
 CHAIN_ID=$(getArgument "chain-id" Oraichain)
 
 # processing
@@ -302,9 +363,9 @@ case "${METHOD}" in
   broadcast)
     broadcastFn
   ;;  
-  createValidator)
-    createValidatorFn
-  ;;
+  clear)
+    clear
+  ;; 
   *) 
     printHelp 1 ${args[0]}
   ;;
