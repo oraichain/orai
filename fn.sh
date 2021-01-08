@@ -174,22 +174,28 @@ clear(){
 }
 
 oraidFn(){
-    # oraid start
-    #orai start --chain-id Oraichain --laddr tcp://0.0.0.0:1317 --trust-node
-    # kill everything and then start again
-    pkill oraicli && pkill websocket && pkill orai && pkill oraid
-    kill -9 `lsof -t -i:1317`
+    pkill oraid 
     sleep 3
-    kill -9 `lsof -t -i:26656`
+    pkill oraicli
     sleep 3
-    kill -9 `lsof -t -i:26657`
+    pkill websocket
+    # # kill -9 `lsof -t -i:1317`
+    # # sleep 3
+    # # kill -9 `lsof -t -i:26656`
+    # # sleep 3
+    # # kill -9 `lsof -t -i:26657`
     sleep 3
     oraid start &
     timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
 
-    oraicli rest-server --chain-id Oraichain --trust-node --laddr tcp://0.0.0.0:1317 --node tcp://0.0.0.0:26657 & 
-    timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
-    websocket --home $PWD/.oraid run
+    if [ -f $PWD/.oraid/websocket.yaml ]; then
+      echo "Found configuration files for the websocket"
+      oraicli rest-server --chain-id Oraichain --trust-node --laddr tcp://0.0.0.0:1317 &
+      sleep 5
+      websocket --home $PWD/.oraid run
+    else
+      oraicli rest-server --chain-id Oraichain --trust-node --laddr tcp://0.0.0.0:1317
+    fi
 }
 
 enterPassPhrase(){
@@ -300,7 +306,7 @@ websocketInitFn() {
 
   # add validator to websocket config
   echo "get user validator address..."
-  local val_address=$(getKeyAddr $user -a --bech val)
+  local val_address=$(getKeyAddr $USER -a --bech val)
   $WEBSOCKET config validator $val_address
 
   # setup broadcast-timeout to websocket config
@@ -342,6 +348,14 @@ websocketInitFn() {
   # add reporter to oraichain
   enterPassPhrase oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $user --gas-prices $gasPrices
   sleep 8
+
+  pkill oraid 
+  sleep 3
+  pkill oraicli
+  sleep 3
+  pkill websocket
+  sleep 3
+  echo "Finished setting up the websocket. you can restart your node again ..."
 }
 
 websocketRunFn() {
@@ -473,7 +487,20 @@ createValidatorFn() {
   enterPassPhrase oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $user --gas-prices $gasPrices
   sleep 8
 
-  # pkill oraid
+  echo "killing the processes to get ready to restart the node..."
+  pkill oraid 
+  sleep 3
+  pkill oraicli
+  sleep 3
+  pkill websocket
+  # kill -9 `lsof -t -i:1317`
+  # sleep 3
+  # kill -9 `lsof -t -i:26656`
+  # sleep 3
+  # kill -9 `lsof -t -i:26657`
+  sleep 3
+  echo "done!"
+  echo ""
 }
 
 USER=$(getArgument "user" $USER)

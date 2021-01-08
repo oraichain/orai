@@ -154,14 +154,34 @@ esac
 
 
 clear(){
-    rm -rf .oraid/
-    rm -rf .oraicli/
-    rm -rf .oraifiles/    
+  rm -rf .oraid/
+  rm -rf .oraicli/
+  rm -rf .oraifiles/    
 }
 
 oraidFn(){
-    # oraid start
-    orai start --chain-id $CHAIN_ID --laddr tcp://0.0.0.0:1317 --node tcp://0.0.0.0:26657 # --trust-node
+  pkill oraid 
+  sleep 3
+  pkill oraicli
+  sleep 3
+  pkill websocket
+  # # kill -9 `lsof -t -i:1317`
+  # # sleep 3
+  # # kill -9 `lsof -t -i:26656`
+  # # sleep 3
+  # # kill -9 `lsof -t -i:26657`
+  sleep 3
+  oraid start &
+  timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
+
+  if [ -f $PWD/.oraid/websocket.yaml ]; then
+    echo "Found configuration files for the websocket"
+    oraicli rest-server --chain-id Oraichain --trust-node --laddr tcp://0.0.0.0:1317 &
+    sleep 5
+    websocket --home $PWD/.oraid run
+  else
+    oraicli rest-server --chain-id Oraichain --trust-node --laddr tcp://0.0.0.0:1317
+  fi
 }
 
 
@@ -199,10 +219,9 @@ initFn(){
   oraid start --minimum-gas-prices $GAS_PRICES &  
 
   # 30 seconds timeout
-  websocketInitFn    
+  #websocketInitFn    
   
   sleep 10
-  pkill orai
   pkill oraid
   pkill oraicli
   pkill websocket
@@ -256,7 +275,13 @@ websocketInitFn() {
   # add reporter to oraichain
   echo "y" | oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $USER --fees 5000orai --keyring-backend test
   sleep 8
-  pkill oraid
+  pkill oraid 
+  sleep 3
+  pkill oraicli
+  sleep 3
+  pkill websocket
+  sleep 3
+  echo "Finished setting up the websocket. you can restart your node again ..."
 }
 
 
@@ -356,6 +381,9 @@ case "${METHOD}" in
   ;;
   initScript)
     initScriptFn
+  ;;
+  websocketInit)
+    websocketInitFn
   ;;
   sign)
     signFn
