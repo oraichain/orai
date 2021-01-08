@@ -271,7 +271,7 @@ websocketInitFn() {
   # # 30 seconds timeout to check if the node is alive or not
   timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
   local reporter="${USER}_reporter"
-
+  local user=$(getArgument "user" $USER)
 
   local gas=$(getArgument "gas" $GAS)
   if [[ $gas != "auto" && !$gas =~ $re ]]; then
