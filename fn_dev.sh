@@ -219,7 +219,7 @@ initFn(){
   oraid start --minimum-gas-prices $GAS_PRICES &  
 
   # 30 seconds timeout
-  #websocketInitFn    
+  websocketInitFn    
   
   sleep 10
   pkill oraid
@@ -313,7 +313,6 @@ unsignedFn(){
     "oracle_script_name":"oscript_eth",
     "input":"",
     "expected_output":{"price":"5000"},
-    "fees":"60000orai",
     "validator_count": "1"
 }' > tmp/unsignedTx.json)
 

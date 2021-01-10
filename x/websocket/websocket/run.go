@@ -70,7 +70,7 @@ func runImpl(c *Context, l *Logger) error {
 			l.Info("%v\n", ev.Data.(tmtypes.EventDataTx).TxResult)
 			go handleTransaction(c, l, ev.Data.(tmtypes.EventDataTx).TxResult)
 		case sig := <-websocket.OutSignals:
-			fmt.Println("received signal, send back to rest", sig)			
+			fmt.Println("received signal, send back to rest", sig)
 			websocket.InSignals <- sig
 		}
 	}
@@ -118,19 +118,19 @@ func runCmd(c *Context) *cobra.Command {
 			gasAdj, err := cmd.Flags().GetFloat64(flags.FlagGasAdjustment) // 1
 			if err != nil {
 				gasAdj, err = strconv.ParseFloat(cfg.GasAdjustment, 64)
-				if err != nil {
+				if err != nil || gasAdj == float64(0) {
 					gasAdj = flags.DefaultGasAdjustment
 				}
 			}
 			c.gasAdj = gasAdj
-
 			gas, err := cmd.Flags().GetUint64("gas") // 200000
 			if err != nil {
 				gasInt, err := strconv.Atoi(cfg.Gas)
-				if err != nil {
+				if err != nil || gas == uint64(0) {
 					gas = flags.DefaultGasLimit
+				} else {
+					gas = uint64(gasInt)
 				}
-				gas = uint64(gasInt)
 			}
 			c.gas = gas
 			feesStr, err := cmd.Flags().GetString(flags.FlagFees) // 5000orai
