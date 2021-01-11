@@ -14,8 +14,8 @@ services:
     tty: true
     ulimits:
       nofile:
-        soft: "65536"
-        hard: "65536"
+        soft: 65536
+        hard: 65536
     ports:
       - 1317:1317
       - 40000:40000
