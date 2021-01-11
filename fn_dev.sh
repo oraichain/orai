@@ -213,6 +213,10 @@ initFn(){
   # put the validators into the genesis file so the chain is aware of the validators
   oraid collect-gentxs
 
+  # add persistent peers to listen to blocks
+  local persistentPeers=$(getArgument "persistent_peers" "$PERSISTENT_PEERS")
+  [ ! -z $persistentPeers ] && sed -i 's/persistent_peers *= *".*"/persistent_peers = "'"$persistentPeers"'"/g' .oraid/config/config.toml 
+
   oraid validate-genesis
 
   # run at background without websocket
