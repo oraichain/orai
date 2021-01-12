@@ -96,6 +96,9 @@ FLEX_BUILD_FLAGS := -tags "$(build_tags_comma_sep)" -ldflags '$(flex_ldflags)' -
 
 all: install lint test
 
+watch-oraid:
+	air -c oraid.toml
+
 build: go.sum
 ifeq ($(OS),Windows_NT)
 	exit 1
@@ -128,7 +131,7 @@ else
 endif
 
 install: go.sum
-	go install -mod=readonly $(BUILD_FLAGS) ./cmd/wasmd
+	go install -mod=readonly $(BUILD_FLAGS) ./cmd/oraid
 
 ########################################
 ### Tools & dependencies
