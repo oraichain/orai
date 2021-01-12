@@ -3,20 +3,20 @@ package keeper
 import (
 	"encoding/json"
 	"io/ioutil"
-	"os"
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-
-	wasmTypes "github.com/CosmWasm/go-cosmwasm/types"
-	"github.com/oraichain/orai/x/wasm/internal/types"
+	"github.com/CosmWasm/wasmd/x/wasm/internal/types"
+	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 	"github.com/cosmos/cosmos-sdk/codec"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/bank"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 // MaskInitMsg is {}
@@ -32,7 +32,7 @@ type ownerPayload struct {
 }
 
 type reflectPayload struct {
-	Msgs []wasmTypes.CosmosMsg `json:"msgs"`
+	Msgs []wasmvmtypes.CosmosMsg `json:"msgs"`
 }
 
 // MaskQueryMsg is used to encode query messages
@@ -43,7 +43,7 @@ type MaskQueryMsg struct {
 }
 
 type ChainQuery struct {
-	Request *wasmTypes.QueryRequest `json:"request,omitempty"`
+	Request *wasmvmtypes.QueryRequest `json:"request,omitempty"`
 }
 
 type Text struct {
@@ -72,14 +72,12 @@ func mustParse(t *testing.T, data []byte, res interface{}) {
 const MaskFeatures = "staking,mask"
 
 func TestMaskReflectContractSend(t *testing.T) {
-	tempDir, err := ioutil.TempDir("", "wasm")
-	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
-	ctx, keepers := CreateTestInput(t, false, tempDir, MaskFeatures, maskEncoders(MakeTestCodec()), nil)
-	accKeeper, keeper := keepers.AccountKeeper, keepers.WasmKeeper
+	cdc := MakeTestCodec(t)
+	ctx, keepers := CreateTestInput(t, false, MaskFeatures, maskEncoders(cdc), nil)
+	accKeeper, keeper, bankKeeper := keepers.AccountKeeper, keepers.WasmKeeper, keepers.BankKeeper
 
 	deposit := sdk.NewCoins(sdk.NewInt64Coin("denom", 100000))
-	creator := createFakeFundedAccount(ctx, accKeeper, deposit)
+	creator := createFakeFundedAccount(t, ctx, accKeeper, bankKeeper, deposit)
 	_, _, bob := keyPubAddr()
 
 	// upload mask code
@@ -103,7 +101,7 @@ func TestMaskReflectContractSend(t *testing.T) {
 	require.NotEmpty(t, maskAddr)
 
 	// now we set contract as verifier of an escrow
-	initMsg := InitMsg{
+	initMsg := HackatomExampleInitMsg{
 		Verifier:    maskAddr,
 		Beneficiary: bob,
 	}
@@ -115,22 +113,22 @@ func TestMaskReflectContractSend(t *testing.T) {
 	require.NotEmpty(t, escrowAddr)
 
 	// let's make sure all balances make sense
-	checkAccount(t, ctx, accKeeper, creator, sdk.NewCoins(sdk.NewInt64Coin("denom", 35000))) // 100k - 40k - 25k
-	checkAccount(t, ctx, accKeeper, maskAddr, maskStart)
-	checkAccount(t, ctx, accKeeper, escrowAddr, escrowStart)
-	checkAccount(t, ctx, accKeeper, bob, nil)
+	checkAccount(t, ctx, accKeeper, bankKeeper, creator, sdk.NewCoins(sdk.NewInt64Coin("denom", 35000))) // 100k - 40k - 25k
+	checkAccount(t, ctx, accKeeper, bankKeeper, maskAddr, maskStart)
+	checkAccount(t, ctx, accKeeper, bankKeeper, escrowAddr, escrowStart)
+	checkAccount(t, ctx, accKeeper, bankKeeper, bob, nil)
 
 	// now for the trick.... we reflect a message through the mask to call the escrow
 	// we also send an additional 14k tokens there.
 	// this should reduce the mask balance by 14k (to 26k)
 	// this 14k is added to the escrow, then the entire balance is sent to bob (total: 39k)
 	approveMsg := []byte(`{"release":{}}`)
-	msgs := []wasmTypes.CosmosMsg{{
-		Wasm: &wasmTypes.WasmMsg{
-			Execute: &wasmTypes.ExecuteMsg{
+	msgs := []wasmvmtypes.CosmosMsg{{
+		Wasm: &wasmvmtypes.WasmMsg{
+			Execute: &wasmvmtypes.ExecuteMsg{
 				ContractAddr: escrowAddr.String(),
 				Msg:          approveMsg,
-				Send: []wasmTypes.Coin{{
+				Send: []wasmvmtypes.Coin{{
 					Denom:  "denom",
 					Amount: "14000",
 				}},
@@ -148,23 +146,21 @@ func TestMaskReflectContractSend(t *testing.T) {
 	require.NoError(t, err)
 
 	// did this work???
-	checkAccount(t, ctx, accKeeper, creator, sdk.NewCoins(sdk.NewInt64Coin("denom", 35000)))  // same as before
-	checkAccount(t, ctx, accKeeper, maskAddr, sdk.NewCoins(sdk.NewInt64Coin("denom", 26000))) // 40k - 14k (from send)
-	checkAccount(t, ctx, accKeeper, escrowAddr, sdk.Coins{})                                  // emptied reserved
-	checkAccount(t, ctx, accKeeper, bob, sdk.NewCoins(sdk.NewInt64Coin("denom", 39000)))      // all escrow of 25k + 14k
+	checkAccount(t, ctx, accKeeper, bankKeeper, creator, sdk.NewCoins(sdk.NewInt64Coin("denom", 35000)))  // same as before
+	checkAccount(t, ctx, accKeeper, bankKeeper, maskAddr, sdk.NewCoins(sdk.NewInt64Coin("denom", 26000))) // 40k - 14k (from send)
+	checkAccount(t, ctx, accKeeper, bankKeeper, escrowAddr, sdk.Coins{})                                  // emptied reserved
+	checkAccount(t, ctx, accKeeper, bankKeeper, bob, sdk.NewCoins(sdk.NewInt64Coin("denom", 39000)))      // all escrow of 25k + 14k
 
 }
 
 func TestMaskReflectCustomMsg(t *testing.T) {
-	tempDir, err := ioutil.TempDir("", "wasm")
-	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
-	ctx, keepers := CreateTestInput(t, false, tempDir, MaskFeatures, maskEncoders(MakeTestCodec()), maskPlugins())
-	accKeeper, keeper := keepers.AccountKeeper, keepers.WasmKeeper
+	cdc := MakeTestCodec(t)
+	ctx, keepers := CreateTestInput(t, false, MaskFeatures, maskEncoders(cdc), maskPlugins())
+	accKeeper, keeper, bankKeeper := keepers.AccountKeeper, keepers.WasmKeeper, keepers.BankKeeper
 
 	deposit := sdk.NewCoins(sdk.NewInt64Coin("denom", 100000))
-	creator := createFakeFundedAccount(ctx, accKeeper, deposit)
-	bob := createFakeFundedAccount(ctx, accKeeper, deposit)
+	creator := createFakeFundedAccount(t, ctx, accKeeper, bankKeeper, deposit)
+	bob := createFakeFundedAccount(t, ctx, accKeeper, bankKeeper, deposit)
 	_, _, fred := keyPubAddr()
 
 	// upload code
@@ -192,17 +188,17 @@ func TestMaskReflectCustomMsg(t *testing.T) {
 	require.NoError(t, err)
 
 	// check some account values
-	checkAccount(t, ctx, accKeeper, contractAddr, contractStart)
-	checkAccount(t, ctx, accKeeper, bob, deposit)
-	checkAccount(t, ctx, accKeeper, fred, nil)
+	checkAccount(t, ctx, accKeeper, bankKeeper, contractAddr, contractStart)
+	checkAccount(t, ctx, accKeeper, bankKeeper, bob, deposit)
+	checkAccount(t, ctx, accKeeper, bankKeeper, fred, nil)
 
 	// bob can send contract's tokens to fred (using SendMsg)
-	msgs := []wasmTypes.CosmosMsg{{
-		Bank: &wasmTypes.BankMsg{
-			Send: &wasmTypes.SendMsg{
+	msgs := []wasmvmtypes.CosmosMsg{{
+		Bank: &wasmvmtypes.BankMsg{
+			Send: &wasmvmtypes.SendMsg{
 				FromAddress: contractAddr.String(),
 				ToAddress:   fred.String(),
-				Amount: []wasmTypes.Coin{{
+				Amount: []wasmvmtypes.Coin{{
 					Denom:  "denom",
 					Amount: "15000",
 				}},
@@ -220,22 +216,22 @@ func TestMaskReflectCustomMsg(t *testing.T) {
 	require.NoError(t, err)
 
 	// fred got coins
-	checkAccount(t, ctx, accKeeper, fred, sdk.NewCoins(sdk.NewInt64Coin("denom", 15000)))
+	checkAccount(t, ctx, accKeeper, bankKeeper, fred, sdk.NewCoins(sdk.NewInt64Coin("denom", 15000)))
 	// contract lost them
-	checkAccount(t, ctx, accKeeper, contractAddr, sdk.NewCoins(sdk.NewInt64Coin("denom", 25000)))
-	checkAccount(t, ctx, accKeeper, bob, deposit)
+	checkAccount(t, ctx, accKeeper, bankKeeper, contractAddr, sdk.NewCoins(sdk.NewInt64Coin("denom", 25000)))
+	checkAccount(t, ctx, accKeeper, bankKeeper, bob, deposit)
 
 	// construct an opaque message
-	var sdkSendMsg sdk.Msg = &bank.MsgSend{
-		FromAddress: contractAddr,
-		ToAddress:   fred,
+	var sdkSendMsg sdk.Msg = &banktypes.MsgSend{
+		FromAddress: contractAddr.String(),
+		ToAddress:   fred.String(),
 		Amount:      sdk.NewCoins(sdk.NewInt64Coin("denom", 23000)),
 	}
-	opaque, err := toMaskRawMsg(keeper.cdc, sdkSendMsg)
+	opaque, err := toMaskRawMsg(cdc, sdkSendMsg)
 	require.NoError(t, err)
 	reflectOpaque := MaskHandleMsg{
 		Reflect: &reflectPayload{
-			Msgs: []wasmTypes.CosmosMsg{opaque},
+			Msgs: []wasmvmtypes.CosmosMsg{opaque},
 		},
 	}
 	reflectOpaqueBz, err := json.Marshal(reflectOpaque)
@@ -245,21 +241,19 @@ func TestMaskReflectCustomMsg(t *testing.T) {
 	require.NoError(t, err)
 
 	// fred got more coins
-	checkAccount(t, ctx, accKeeper, fred, sdk.NewCoins(sdk.NewInt64Coin("denom", 38000)))
+	checkAccount(t, ctx, accKeeper, bankKeeper, fred, sdk.NewCoins(sdk.NewInt64Coin("denom", 38000)))
 	// contract lost them
-	checkAccount(t, ctx, accKeeper, contractAddr, sdk.NewCoins(sdk.NewInt64Coin("denom", 2000)))
-	checkAccount(t, ctx, accKeeper, bob, deposit)
+	checkAccount(t, ctx, accKeeper, bankKeeper, contractAddr, sdk.NewCoins(sdk.NewInt64Coin("denom", 2000)))
+	checkAccount(t, ctx, accKeeper, bankKeeper, bob, deposit)
 }
 
 func TestMaskReflectCustomQuery(t *testing.T) {
-	tempDir, err := ioutil.TempDir("", "wasm")
-	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
-	ctx, keepers := CreateTestInput(t, false, tempDir, MaskFeatures, maskEncoders(MakeTestCodec()), maskPlugins())
-	accKeeper, keeper := keepers.AccountKeeper, keepers.WasmKeeper
+	cdc := MakeTestCodec(t)
+	ctx, keepers := CreateTestInput(t, false, MaskFeatures, maskEncoders(cdc), maskPlugins())
+	accKeeper, keeper, bankKeeper := keepers.AccountKeeper, keepers.WasmKeeper, keepers.BankKeeper
 
 	deposit := sdk.NewCoins(sdk.NewInt64Coin("denom", 100000))
-	creator := createFakeFundedAccount(ctx, accKeeper, deposit)
+	creator := createFakeFundedAccount(t, ctx, accKeeper, bankKeeper, deposit)
 
 	// upload code
 	maskCode, err := ioutil.ReadFile("./testdata/reflect.wasm")
@@ -308,14 +302,11 @@ type maskState struct {
 }
 
 func TestMaskReflectWasmQueries(t *testing.T) {
-	tempDir, err := ioutil.TempDir("", "wasm")
-	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
-	ctx, keepers := CreateTestInput(t, false, tempDir, MaskFeatures, maskEncoders(MakeTestCodec()), nil)
+	ctx, keepers := CreateTestInput(t, false, MaskFeatures, maskEncoders(MakeTestCodec(t)), nil)
 	accKeeper, keeper := keepers.AccountKeeper, keepers.WasmKeeper
 
 	deposit := sdk.NewCoins(sdk.NewInt64Coin("denom", 100000))
-	creator := createFakeFundedAccount(ctx, accKeeper, deposit)
+	creator := createFakeFundedAccount(t, ctx, accKeeper, keepers.BankKeeper, deposit)
 
 	// upload mask code
 	maskCode, err := ioutil.ReadFile("./testdata/reflect.wasm")
@@ -346,8 +337,8 @@ func TestMaskReflectWasmQueries(t *testing.T) {
 	require.Equal(t, stateRes.Owner, []byte(creator))
 
 	// now, let's reflect a smart query into the x/wasm handlers and see if we get the same result
-	reflectOwnerQuery := MaskQueryMsg{Chain: &ChainQuery{Request: &wasmTypes.QueryRequest{Wasm: &wasmTypes.WasmQuery{
-		Smart: &wasmTypes.SmartQuery{
+	reflectOwnerQuery := MaskQueryMsg{Chain: &ChainQuery{Request: &wasmvmtypes.QueryRequest{Wasm: &wasmvmtypes.WasmQuery{
+		Smart: &wasmvmtypes.SmartQuery{
 			ContractAddr: maskAddr.String(),
 			Msg:          ownerQuery,
 		},
@@ -363,8 +354,8 @@ func TestMaskReflectWasmQueries(t *testing.T) {
 	require.Equal(t, reflectOwnerRes.Owner, creator.String())
 
 	// and with queryRaw
-	reflectStateQuery := MaskQueryMsg{Chain: &ChainQuery{Request: &wasmTypes.QueryRequest{Wasm: &wasmTypes.WasmQuery{
-		Raw: &wasmTypes.RawQuery{
+	reflectStateQuery := MaskQueryMsg{Chain: &ChainQuery{Request: &wasmvmtypes.QueryRequest{Wasm: &wasmvmtypes.WasmQuery{
+		Raw: &wasmvmtypes.RawQuery{
 			ContractAddr: maskAddr.String(),
 			Key:          configKey,
 		},
@@ -382,14 +373,11 @@ func TestMaskReflectWasmQueries(t *testing.T) {
 }
 
 func TestWasmRawQueryWithNil(t *testing.T) {
-	tempDir, err := ioutil.TempDir("", "wasm")
-	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
-	ctx, keepers := CreateTestInput(t, false, tempDir, MaskFeatures, maskEncoders(MakeTestCodec()), nil)
+	ctx, keepers := CreateTestInput(t, false, MaskFeatures, maskEncoders(MakeTestCodec(t)), nil)
 	accKeeper, keeper := keepers.AccountKeeper, keepers.WasmKeeper
 
 	deposit := sdk.NewCoins(sdk.NewInt64Coin("denom", 100000))
-	creator := createFakeFundedAccount(ctx, accKeeper, deposit)
+	creator := createFakeFundedAccount(t, ctx, accKeeper, keepers.BankKeeper, deposit)
 
 	// upload mask code
 	maskCode, err := ioutil.ReadFile("./testdata/reflect.wasm")
@@ -410,8 +398,8 @@ func TestWasmRawQueryWithNil(t *testing.T) {
 	require.Nil(t, raw)
 
 	// and with queryRaw
-	reflectQuery := MaskQueryMsg{Chain: &ChainQuery{Request: &wasmTypes.QueryRequest{Wasm: &wasmTypes.WasmQuery{
-		Raw: &wasmTypes.RawQuery{
+	reflectQuery := MaskQueryMsg{Chain: &ChainQuery{Request: &wasmvmtypes.QueryRequest{Wasm: &wasmvmtypes.WasmQuery{
+		Raw: &wasmvmtypes.RawQuery{
 			ContractAddr: maskAddr.String(),
 			Key:          missingKey,
 		},
@@ -429,7 +417,7 @@ func TestWasmRawQueryWithNil(t *testing.T) {
 	require.Equal(t, []byte{}, reflectRawRes.Data)
 }
 
-func checkAccount(t *testing.T, ctx sdk.Context, accKeeper auth.AccountKeeper, addr sdk.AccAddress, expected sdk.Coins) {
+func checkAccount(t *testing.T, ctx sdk.Context, accKeeper authkeeper.AccountKeeper, bankKeeper bankkeeper.Keeper, addr sdk.AccAddress, expected sdk.Coins) {
 	acct := accKeeper.GetAccount(ctx, addr)
 	if expected == nil {
 		assert.Nil(t, acct)
@@ -437,9 +425,9 @@ func checkAccount(t *testing.T, ctx sdk.Context, accKeeper auth.AccountKeeper, a
 		assert.NotNil(t, acct)
 		if expected.Empty() {
 			// there is confusion between nil and empty slice... let's just treat them the same
-			assert.True(t, acct.GetCoins().Empty())
+			assert.True(t, bankKeeper.GetAllBalances(ctx, acct.GetAddress()).Empty())
 		} else {
-			assert.Equal(t, acct.GetCoins(), expected)
+			assert.Equal(t, bankKeeper.GetAllBalances(ctx, acct.GetAddress()), expected)
 		}
 	}
 }
@@ -451,32 +439,36 @@ type maskCustomMsg struct {
 	Raw   []byte `json:"raw,omitempty"`
 }
 
-// toMaskRawMsg encodes an sdk msg using amino json encoding.
+// toMaskRawMsg encodes an sdk msg using any type with json encoding.
 // Then wraps it as an opaque message
-func toMaskRawMsg(cdc *codec.Codec, msg sdk.Msg) (wasmTypes.CosmosMsg, error) {
-	rawBz, err := cdc.MarshalJSON(msg)
+func toMaskRawMsg(cdc codec.Marshaler, msg sdk.Msg) (wasmvmtypes.CosmosMsg, error) {
+	any, err := codectypes.NewAnyWithValue(msg)
 	if err != nil {
-		return wasmTypes.CosmosMsg{}, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
+		return wasmvmtypes.CosmosMsg{}, err
+	}
+	rawBz, err := cdc.MarshalJSON(any)
+	if err != nil {
+		return wasmvmtypes.CosmosMsg{}, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
 	customMsg, err := json.Marshal(maskCustomMsg{
 		Raw: rawBz,
 	})
-	res := wasmTypes.CosmosMsg{
+	res := wasmvmtypes.CosmosMsg{
 		Custom: customMsg,
 	}
 	return res, nil
 }
 
 // maskEncoders needs to be registered in test setup to handle custom message callbacks
-func maskEncoders(cdc *codec.Codec) *MessageEncoders {
+func maskEncoders(cdc codec.Marshaler) *MessageEncoders {
 	return &MessageEncoders{
 		Custom: fromMaskRawMsg(cdc),
 	}
 }
 
-// fromMaskRawMsg decodes msg.Data to an sdk.Msg using amino json encoding.
+// fromMaskRawMsg decodes msg.Data to an sdk.Msg using proto Any and json encoding.
 // this needs to be registered on the Encoders
-func fromMaskRawMsg(cdc *codec.Codec) CustomEncoder {
+func fromMaskRawMsg(cdc codec.Marshaler) CustomEncoder {
 	return func(_sender sdk.AccAddress, msg json.RawMessage) ([]sdk.Msg, error) {
 		var custom maskCustomMsg
 		err := json.Unmarshal(msg, &custom)
@@ -484,12 +476,15 @@ func fromMaskRawMsg(cdc *codec.Codec) CustomEncoder {
 			return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 		}
 		if custom.Raw != nil {
-			var sdkMsg sdk.Msg
-			err := cdc.UnmarshalJSON(custom.Raw, &sdkMsg)
-			if err != nil {
+			var any codectypes.Any
+			if err := cdc.UnmarshalJSON(custom.Raw, &any); err != nil {
 				return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 			}
-			return []sdk.Msg{sdkMsg}, nil
+			var msg sdk.Msg
+			if err := cdc.UnpackAny(&any, &msg); err != nil {
+				return nil, err
+			}
+			return []sdk.Msg{msg}, nil
 		}
 		if custom.Debug != "" {
 			return nil, sdkerrors.Wrapf(types.ErrInvalidMsg, "Custom Debug: %s", custom.Debug)

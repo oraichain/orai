@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   orai:
-    image: orai/orai:alpine
+    image: orai/orai:alpine-wasm
     working_dir: /workspace
     tty: true
     ulimits:
@@ -22,6 +22,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./:/workspace
-      - ./fn_dev.sh:/usr/local/bin/fn
+      # - ./fn_dev.sh:/usr/local/bin/fn
     #command:
     # - bash -c "fn init && fn createValidator && fn start"

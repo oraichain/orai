@@ -4,17 +4,16 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/cosmos/cosmos-sdk/client/context"
+	wasmUtils "github.com/CosmWasm/wasmd/x/wasm/client/utils"
+	"github.com/CosmWasm/wasmd/x/wasm/internal/types"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 	"github.com/gorilla/mux"
-
-	wasmUtils "github.com/oraichain/orai/x/wasm/client/utils"
-	"github.com/oraichain/orai/x/wasm/internal/types"
 )
 
-func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
+func registerTxRoutes(cliCtx client.Context, r *mux.Router) {
 	r.HandleFunc("/wasm/code", storeCodeHandlerFn(cliCtx)).Methods("POST")
 	r.HandleFunc("/wasm/code/{codeId}", instantiateContractHandlerFn(cliCtx)).Methods("POST")
 	r.HandleFunc("/wasm/contract/{contractAddr}", executeContractHandlerFn(cliCtx)).Methods("POST")
@@ -29,10 +28,11 @@ type storeCodeReq struct {
 }
 
 type instantiateContractReq struct {
-	BaseReq rest.BaseReq   `json:"base_req" yaml:"base_req"`
-	Deposit sdk.Coins      `json:"deposit" yaml:"deposit"`
-	Admin   sdk.AccAddress `json:"admin,omitempty" yaml:"admin"`
-	InitMsg []byte         `json:"init_msg" yaml:"init_msg"`
+	BaseReq rest.BaseReq `json:"base_req" yaml:"base_req"`
+	Label   string       `json:"label" yaml:"label"`
+	Deposit sdk.Coins    `json:"deposit" yaml:"deposit"`
+	Admin   string       `json:"admin,omitempty" yaml:"admin"`
+	InitMsg []byte       `json:"init_msg" yaml:"init_msg"`
 }
 
 type executeContractReq struct {
@@ -41,10 +41,10 @@ type executeContractReq struct {
 	Amount  sdk.Coins    `json:"coins" yaml:"coins"`
 }
 
-func storeCodeHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
+func storeCodeHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req storeCodeReq
-		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+		if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
 			return
 		}
 
@@ -72,31 +72,25 @@ func storeCodeHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		fromAddr, err := sdk.AccAddressFromBech32(req.BaseReq.From)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
 		// build and sign the transaction, then broadcast to Tendermint
 		msg := types.MsgStoreCode{
-			Sender:       fromAddr,
+			Sender:       req.BaseReq.From,
 			WASMByteCode: wasm,
 		}
 
-		err = msg.ValidateBasic()
-		if err != nil {
+		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
+		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, &msg)
 	}
 }
 
-func instantiateContractHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
+func instantiateContractHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req instantiateContractReq
-		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+		if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
 			return
 		}
 		vars := mux.Vars(r)
@@ -114,27 +108,27 @@ func instantiateContractHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 		}
 
 		msg := types.MsgInstantiateContract{
-			Sender:    cliCtx.GetFromAddress(),
+			Sender:    req.BaseReq.From,
 			CodeID:    codeID,
+			Label:     req.Label,
 			InitFunds: req.Deposit,
 			InitMsg:   req.InitMsg,
 			Admin:     req.Admin,
 		}
 
-		err = msg.ValidateBasic()
-		if err != nil {
+		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
+		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, &msg)
 	}
 }
 
-func executeContractHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
+func executeContractHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req executeContractReq
-		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+		if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
 			return
 		}
 		vars := mux.Vars(r)
@@ -145,24 +139,18 @@ func executeContractHandlerFn(cliCtx context.CLIContext) http.HandlerFunc {
 			return
 		}
 
-		contractAddress, err := sdk.AccAddressFromBech32(contractAddr)
-		if err != nil {
-			return
-		}
-
 		msg := types.MsgExecuteContract{
-			Sender:    cliCtx.GetFromAddress(),
-			Contract:  contractAddress,
+			Sender:    req.BaseReq.From,
+			Contract:  contractAddr,
 			Msg:       req.ExecMsg,
 			SentFunds: req.Amount,
 		}
 
-		err = msg.ValidateBasic()
-		if err != nil {
+		if err := msg.ValidateBasic(); err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
-		utils.WriteGenerateStdTxResponse(w, cliCtx, req.BaseReq, []sdk.Msg{msg})
+		tx.WriteGeneratedTxResponse(cliCtx, w, req.BaseReq, &msg)
 	}
 }

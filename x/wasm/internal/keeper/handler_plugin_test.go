@@ -3,16 +3,16 @@ package keeper
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/oraichain/orai/x/wasm/internal/types"
-	"github.com/cosmos/cosmos-sdk/x/distribution"
-	"github.com/cosmos/cosmos-sdk/x/staking"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"testing"
 
-	wasmTypes "github.com/CosmWasm/go-cosmwasm/types"
+	"github.com/CosmWasm/wasmd/x/wasm/internal/types"
+	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/bank"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	distributiontypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestEncoding(t *testing.T) {
@@ -28,7 +28,7 @@ func TestEncoding(t *testing.T) {
 
 	cases := map[string]struct {
 		sender sdk.AccAddress
-		input  wasmTypes.CosmosMsg
+		input  wasmvmtypes.CosmosMsg
 		// set if valid
 		output []sdk.Msg
 		// set if invalid
@@ -36,12 +36,12 @@ func TestEncoding(t *testing.T) {
 	}{
 		"simple send": {
 			sender: addr1,
-			input: wasmTypes.CosmosMsg{
-				Bank: &wasmTypes.BankMsg{
-					Send: &wasmTypes.SendMsg{
+			input: wasmvmtypes.CosmosMsg{
+				Bank: &wasmvmtypes.BankMsg{
+					Send: &wasmvmtypes.SendMsg{
 						FromAddress: addr1.String(),
 						ToAddress:   addr2.String(),
-						Amount: []wasmTypes.Coin{
+						Amount: []wasmvmtypes.Coin{
 							{
 								Denom:  "uatom",
 								Amount: "12345",
@@ -55,9 +55,9 @@ func TestEncoding(t *testing.T) {
 				},
 			},
 			output: []sdk.Msg{
-				bank.MsgSend{
-					FromAddress: addr1,
-					ToAddress:   addr2,
+				&banktypes.MsgSend{
+					FromAddress: addr1.String(),
+					ToAddress:   addr2.String(),
 					Amount: sdk.Coins{
 						sdk.NewInt64Coin("uatom", 12345),
 						sdk.NewInt64Coin("usdt", 54321),
@@ -67,12 +67,12 @@ func TestEncoding(t *testing.T) {
 		},
 		"invalid send amount": {
 			sender: addr1,
-			input: wasmTypes.CosmosMsg{
-				Bank: &wasmTypes.BankMsg{
-					Send: &wasmTypes.SendMsg{
+			input: wasmvmtypes.CosmosMsg{
+				Bank: &wasmvmtypes.BankMsg{
+					Send: &wasmvmtypes.SendMsg{
 						FromAddress: addr1.String(),
 						ToAddress:   addr2.String(),
-						Amount: []wasmTypes.Coin{
+						Amount: []wasmvmtypes.Coin{
 							{
 								Denom:  "uatom",
 								Amount: "123.456",
@@ -85,12 +85,12 @@ func TestEncoding(t *testing.T) {
 		},
 		"invalid address": {
 			sender: addr1,
-			input: wasmTypes.CosmosMsg{
-				Bank: &wasmTypes.BankMsg{
-					Send: &wasmTypes.SendMsg{
+			input: wasmvmtypes.CosmosMsg{
+				Bank: &wasmvmtypes.BankMsg{
+					Send: &wasmvmtypes.SendMsg{
 						FromAddress: addr1.String(),
 						ToAddress:   invalidAddr,
-						Amount: []wasmTypes.Coin{
+						Amount: []wasmvmtypes.Coin{
 							{
 								Denom:  "uatom",
 								Amount: "7890",
@@ -99,25 +99,34 @@ func TestEncoding(t *testing.T) {
 					},
 				},
 			},
-			isError: true,
+			isError: false, // addresses are checked in the handler
+			output: []sdk.Msg{
+				&banktypes.MsgSend{
+					FromAddress: addr1.String(),
+					ToAddress:   invalidAddr,
+					Amount: sdk.Coins{
+						sdk.NewInt64Coin("uatom", 7890),
+					},
+				},
+			},
 		},
 		"wasm execute": {
 			sender: addr1,
-			input: wasmTypes.CosmosMsg{
-				Wasm: &wasmTypes.WasmMsg{
-					Execute: &wasmTypes.ExecuteMsg{
+			input: wasmvmtypes.CosmosMsg{
+				Wasm: &wasmvmtypes.WasmMsg{
+					Execute: &wasmvmtypes.ExecuteMsg{
 						ContractAddr: addr2.String(),
 						Msg:          jsonMsg,
-						Send: []wasmTypes.Coin{
-							wasmTypes.NewCoin(12, "eth"),
+						Send: []wasmvmtypes.Coin{
+							wasmvmtypes.NewCoin(12, "eth"),
 						},
 					},
 				},
 			},
 			output: []sdk.Msg{
-				types.MsgExecuteContract{
-					Sender:    addr1,
-					Contract:  addr2,
+				&types.MsgExecuteContract{
+					Sender:    addr1.String(),
+					Contract:  addr2.String(),
 					Msg:       jsonMsg,
 					SentFunds: sdk.NewCoins(sdk.NewInt64Coin("eth", 12)),
 				},
@@ -125,20 +134,20 @@ func TestEncoding(t *testing.T) {
 		},
 		"wasm instantiate": {
 			sender: addr1,
-			input: wasmTypes.CosmosMsg{
-				Wasm: &wasmTypes.WasmMsg{
-					Instantiate: &wasmTypes.InstantiateMsg{
+			input: wasmvmtypes.CosmosMsg{
+				Wasm: &wasmvmtypes.WasmMsg{
+					Instantiate: &wasmvmtypes.InstantiateMsg{
 						CodeID: 7,
 						Msg:    jsonMsg,
-						Send: []wasmTypes.Coin{
-							wasmTypes.NewCoin(123, "eth"),
+						Send: []wasmvmtypes.Coin{
+							wasmvmtypes.NewCoin(123, "eth"),
 						},
 					},
 				},
 			},
 			output: []sdk.Msg{
-				types.MsgInstantiateContract{
-					Sender: addr1,
+				&types.MsgInstantiateContract{
+					Sender: addr1.String(),
 					CodeID: 7,
 					// TODO: fix this
 					Label:     fmt.Sprintf("Auto-created by %s", addr1),
@@ -149,110 +158,117 @@ func TestEncoding(t *testing.T) {
 		},
 		"staking delegate": {
 			sender: addr1,
-			input: wasmTypes.CosmosMsg{
-				Staking: &wasmTypes.StakingMsg{
-					Delegate: &wasmTypes.DelegateMsg{
+			input: wasmvmtypes.CosmosMsg{
+				Staking: &wasmvmtypes.StakingMsg{
+					Delegate: &wasmvmtypes.DelegateMsg{
 						Validator: valAddr.String(),
-						Amount:    wasmTypes.NewCoin(777, "stake"),
+						Amount:    wasmvmtypes.NewCoin(777, "stake"),
 					},
 				},
 			},
 			output: []sdk.Msg{
-				staking.MsgDelegate{
-					DelegatorAddress: addr1,
-					ValidatorAddress: valAddr,
+				&stakingtypes.MsgDelegate{
+					DelegatorAddress: addr1.String(),
+					ValidatorAddress: valAddr.String(),
 					Amount:           sdk.NewInt64Coin("stake", 777),
 				},
 			},
 		},
 		"staking delegate to non-validator": {
 			sender: addr1,
-			input: wasmTypes.CosmosMsg{
-				Staking: &wasmTypes.StakingMsg{
-					Delegate: &wasmTypes.DelegateMsg{
+			input: wasmvmtypes.CosmosMsg{
+				Staking: &wasmvmtypes.StakingMsg{
+					Delegate: &wasmvmtypes.DelegateMsg{
 						Validator: addr2.String(),
-						Amount:    wasmTypes.NewCoin(777, "stake"),
+						Amount:    wasmvmtypes.NewCoin(777, "stake"),
 					},
 				},
 			},
-			isError: true,
+			isError: false, // fails in the handler
+			output: []sdk.Msg{
+				&stakingtypes.MsgDelegate{
+					DelegatorAddress: addr1.String(),
+					ValidatorAddress: addr2.String(),
+					Amount:           sdk.NewInt64Coin("stake", 777),
+				},
+			},
 		},
 		"staking undelegate": {
 			sender: addr1,
-			input: wasmTypes.CosmosMsg{
-				Staking: &wasmTypes.StakingMsg{
-					Undelegate: &wasmTypes.UndelegateMsg{
+			input: wasmvmtypes.CosmosMsg{
+				Staking: &wasmvmtypes.StakingMsg{
+					Undelegate: &wasmvmtypes.UndelegateMsg{
 						Validator: valAddr.String(),
-						Amount:    wasmTypes.NewCoin(555, "stake"),
+						Amount:    wasmvmtypes.NewCoin(555, "stake"),
 					},
 				},
 			},
 			output: []sdk.Msg{
-				staking.MsgUndelegate{
-					DelegatorAddress: addr1,
-					ValidatorAddress: valAddr,
+				&stakingtypes.MsgUndelegate{
+					DelegatorAddress: addr1.String(),
+					ValidatorAddress: valAddr.String(),
 					Amount:           sdk.NewInt64Coin("stake", 555),
 				},
 			},
 		},
 		"staking redelegate": {
 			sender: addr1,
-			input: wasmTypes.CosmosMsg{
-				Staking: &wasmTypes.StakingMsg{
-					Redelegate: &wasmTypes.RedelegateMsg{
+			input: wasmvmtypes.CosmosMsg{
+				Staking: &wasmvmtypes.StakingMsg{
+					Redelegate: &wasmvmtypes.RedelegateMsg{
 						SrcValidator: valAddr.String(),
 						DstValidator: valAddr2.String(),
-						Amount:       wasmTypes.NewCoin(222, "stake"),
+						Amount:       wasmvmtypes.NewCoin(222, "stake"),
 					},
 				},
 			},
 			output: []sdk.Msg{
-				staking.MsgBeginRedelegate{
-					DelegatorAddress:    addr1,
-					ValidatorSrcAddress: valAddr,
-					ValidatorDstAddress: valAddr2,
+				&stakingtypes.MsgBeginRedelegate{
+					DelegatorAddress:    addr1.String(),
+					ValidatorSrcAddress: valAddr.String(),
+					ValidatorDstAddress: valAddr2.String(),
 					Amount:              sdk.NewInt64Coin("stake", 222),
 				},
 			},
 		},
 		"staking withdraw (implicit recipient)": {
 			sender: addr1,
-			input: wasmTypes.CosmosMsg{
-				Staking: &wasmTypes.StakingMsg{
-					Withdraw: &wasmTypes.WithdrawMsg{
+			input: wasmvmtypes.CosmosMsg{
+				Staking: &wasmvmtypes.StakingMsg{
+					Withdraw: &wasmvmtypes.WithdrawMsg{
 						Validator: valAddr2.String(),
 					},
 				},
 			},
 			output: []sdk.Msg{
-				distribution.MsgSetWithdrawAddress{
-					DelegatorAddress: addr1,
-					WithdrawAddress:  addr1,
+				&distributiontypes.MsgSetWithdrawAddress{
+					DelegatorAddress: addr1.String(),
+					WithdrawAddress:  addr1.String(),
 				},
-				distribution.MsgWithdrawDelegatorReward{
-					DelegatorAddress: addr1,
-					ValidatorAddress: valAddr2,
+				&distributiontypes.MsgWithdrawDelegatorReward{
+					DelegatorAddress: addr1.String(),
+					ValidatorAddress: valAddr2.String(),
 				},
 			},
 		},
 		"staking withdraw (explicit recipient)": {
 			sender: addr1,
-			input: wasmTypes.CosmosMsg{
-				Staking: &wasmTypes.StakingMsg{
-					Withdraw: &wasmTypes.WithdrawMsg{
+			input: wasmvmtypes.CosmosMsg{
+				Staking: &wasmvmtypes.StakingMsg{
+					Withdraw: &wasmvmtypes.WithdrawMsg{
 						Validator: valAddr2.String(),
 						Recipient: addr2.String(),
 					},
 				},
 			},
 			output: []sdk.Msg{
-				distribution.MsgSetWithdrawAddress{
-					DelegatorAddress: addr1,
-					WithdrawAddress:  addr2,
+				&distributiontypes.MsgSetWithdrawAddress{
+					DelegatorAddress: addr1.String(),
+					WithdrawAddress:  addr2.String(),
 				},
-				distribution.MsgWithdrawDelegatorReward{
-					DelegatorAddress: addr1,
-					ValidatorAddress: valAddr2,
+				&distributiontypes.MsgWithdrawDelegatorReward{
+					DelegatorAddress: addr1.String(),
+					ValidatorAddress: valAddr2.String(),
 				},
 			},
 		},
