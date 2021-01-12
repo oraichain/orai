@@ -7,9 +7,9 @@ COMMIT := $(shell git log -1 --format='%H')
 ldflags = -s -w \
 	-X github.com/cosmos/cosmos-sdk/version.Name=NewApp \
 	-X github.com/cosmos/cosmos-sdk/version.ServerName=oraid \
-	-X github.com/cosmos/cosmos-sdk/version.ClientName=oraicli \
-	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
-	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) 
+	-X github.com/cosmos/cosmos-sdk/version.ClientName=oraicli 
+#	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
+#	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) 
 
 BUILD_FLAGS := -ldflags '$(ldflags)'
 

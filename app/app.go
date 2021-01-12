@@ -4,6 +4,9 @@ import (
 	"io"
 	"os"
 
+	"github.com/oraichain/orai/x/wasm"
+	wasmclient "github.com/oraichain/orai/x/wasm/client"
+
 	aiRequest "github.com/oraichain/orai/x/airequest"
 	aiResult "github.com/oraichain/orai/x/airesult"
 	"github.com/oraichain/orai/x/provider"
@@ -24,12 +27,16 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
+	distrclient "github.com/cosmos/cosmos-sdk/x/distribution/client"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
+	"github.com/cosmos/cosmos-sdk/x/gov"
 	"github.com/cosmos/cosmos-sdk/x/mint"
 	"github.com/cosmos/cosmos-sdk/x/params"
+	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
+	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 )
 
 const (
@@ -68,6 +75,10 @@ var (
 		aiRequest.AppModuleBasic{},
 		webSocket.AppModuleBasic{},
 		aiResult.AppModuleBasic{},
+
+		gov.NewAppModuleBasic(
+			append(wasmclient.ProposalHandlers, paramsclient.ProposalHandler, distrclient.ProposalHandler, upgradeclient.ProposalHandler, upgradeclient.CancelProposalHandler)...,
+		),
 		// TODO: Add your module(s) AppModuleBasic
 	)
 
