@@ -5,7 +5,7 @@ import "gogoproto/gogo.proto";
 import "x/wasm/internal/types/types.proto";
 import "x/wasm/internal/types/tx.proto";
 
-option go_package = "github.com/CosmWasm/wasmd/x/wasmd/internal/types";
+option go_package = "github.com/oraichain/orai/x/wasmd/internal/types";
 
 // GenesisState - genesis state of x/wasm
 message GenesisState {

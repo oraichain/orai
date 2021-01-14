@@ -124,16 +124,7 @@ func BankQuerier(bankKeeper bankkeeper.ViewKeeper) func(ctx sdk.Context, request
 }
 
 func NoCustomQuerier(_ sdk.Context, query json.RawMessage) ([]byte, error) {
-	fmt.Printf("xyuzzzzzzzzz: %s", query);
-	resp, _ := http.Get("https://api.coindesk.com/v1/bpi/currentprice.json")	
-
-	defer resp.Body.Close()
-	contents, _ := ioutil.ReadAll(resp.Body);
-
-	n := map[string]string{"msg": string(contents)}
-
-	return json.Marshal(n);
-	// return nil, wasmvmtypes.UnsupportedRequest{Kind: "custom"}
+	return nil, wasmvmtypes.UnsupportedRequest{Kind: "custom"}
 }
 
 func StakingQuerier(keeper stakingkeeper.Keeper, distKeeper distributionkeeper.Keeper) func(ctx sdk.Context, request *wasmvmtypes.StakingQuery) ([]byte, error) {
@@ -251,7 +242,7 @@ func sdkToFullDelegation(ctx sdk.Context, keeper stakingkeeper.Keeper, distKeepe
 	delegationCoins := convertSdkCoinToWasmCoin(amount)
 
 	// FIXME: this is very rough but better than nothing...
-	// https://github.com/CosmWasm/wasmd/issues/282
+	// https://github.com/oraichain/orai/issues/282
 	// if this (val, delegate) pair is receiving a redelegation, it cannot redelegate more
 	// otherwise, it can redelegate the full amount
 	// (there are cases of partial funds redelegated, but this is a start)

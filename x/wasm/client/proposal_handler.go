@@ -1,8 +1,8 @@
 package client
 
 import (
-	"github.com/CosmWasm/wasmd/x/wasm/client/cli"
-	"github.com/CosmWasm/wasmd/x/wasm/client/rest"
+	"github.com/oraichain/orai/x/wasm/client/cli"
+	"github.com/oraichain/orai/x/wasm/client/rest"
 	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
 )
 

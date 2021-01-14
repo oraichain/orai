@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/CosmWasm/wasmd/x/wasm"
+	"github.com/oraichain/orai/x/wasm"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
 	vestingcli "github.com/cosmos/cosmos-sdk/x/auth/vesting/client/cli"
 	bankcmd "github.com/cosmos/cosmos-sdk/x/bank/client/cli"
@@ -16,7 +16,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/CosmWasm/wasmd/app"
+	"github.com/oraichain/orai/app"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/debug"

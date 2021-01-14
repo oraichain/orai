@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/CosmWasm/wasmd/x/wasm/internal/keeper"
-	"github.com/CosmWasm/wasmd/x/wasm/internal/types"
+	"github.com/oraichain/orai/x/wasm/internal/keeper"
+	"github.com/oraichain/orai/x/wasm/internal/types"
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"

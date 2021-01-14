@@ -3,7 +3,7 @@ package app
 import (
 	"testing"
 
-	"github.com/CosmWasm/wasmd/x/wasm"
+	"github.com/oraichain/orai/x/wasm"
 	"github.com/cosmos/cosmos-sdk/codec"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	ibctransferkeeper "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/keeper"

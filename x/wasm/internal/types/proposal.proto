@@ -5,7 +5,7 @@ import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "x/wasm/internal/types/types.proto";
 
-option go_package = "github.com/CosmWasm/wasmd/x/wasmd/internal/types";
+option go_package = "github.com/oraichain/orai/x/wasmd/internal/types";
 option (gogoproto.goproto_stringer_all) = false;
 option (gogoproto.goproto_getters_all) = false;
 option (gogoproto.equal_all) = true;

@@ -1,4 +1,4 @@
-module github.com/CosmWasm/wasmd
+module github.com/oraichain/orai
 
 go 1.15
 

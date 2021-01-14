@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/CosmWasm/wasmd/x/wasm/internal/keeper"
-	"github.com/CosmWasm/wasmd/x/wasm/internal/types"
+	"github.com/oraichain/orai/x/wasm/internal/keeper"
+	"github.com/oraichain/orai/x/wasm/internal/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"

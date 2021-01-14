@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/CosmWasm/wasmd/x/wasm/internal/types"
+	"github.com/oraichain/orai/x/wasm/internal/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

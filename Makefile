@@ -9,7 +9,7 @@ SDK_PACK := $(shell go list -m github.com/cosmos/cosmos-sdk | sed  's/ /\@/g')
 # for dockerized protobuf tools
 PROTO_CONTAINER := cosmwasm/prototools-docker:v0.1.0
 DOCKER_BUF := docker run --rm -v $(shell pwd)/buf.yaml:/workspace/buf.yaml -v $(shell go list -f "{{ .Dir }}" -m github.com/cosmos/cosmos-sdk):/workspace/cosmos_sdk_dir -v $(shell pwd):/workspace/wasmd  --workdir /workspace $(PROTO_CONTAINER)
-HTTPS_GIT := https://github.com/CosmWasm/wasmd.git
+HTTPS_GIT := https://github.com/oraichain/orai.git
 
 export GO111MODULE = on
 
@@ -56,7 +56,7 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=wasm \
 		  -X github.com/cosmos/cosmos-sdk/version.AppName=wasmd \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
-		  -X github.com/CosmWasm/wasmd/app.Bech32Prefix=wasm \
+		  -X github.com/oraichain/orai/app.Bech32Prefix=wasm \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)"
 
 ifeq ($(WITH_CLEVELDB),yes)
@@ -69,11 +69,11 @@ coral_ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=coral \
 				  -X github.com/cosmos/cosmos-sdk/version.AppName=corald \
 				  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 				  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
-				  -X github.com/CosmWasm/wasmd/app.NodeDir=.corald \
-				  -X github.com/CosmWasm/wasmd/app.Bech32Prefix=coral \
+				  -X github.com/oraichain/orai/app.NodeDir=.corald \
+				  -X github.com/oraichain/orai/app.Bech32Prefix=coral \
 				  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)"
 # we could consider enabling governance override?
-#				  -X github.com/CosmWasm/wasmd/app.EnableSpecificProposals=MigrateContract,UpdateAdmin,ClearAdmin \
+#				  -X github.com/oraichain/orai/app.EnableSpecificProposals=MigrateContract,UpdateAdmin,ClearAdmin \
 
 coral_ldflags += $(LDFLAGS)
 coral_ldflags := $(strip $(coral_ldflags))
@@ -82,9 +82,9 @@ flex_ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=gaiaflex \
 				  -X github.com/cosmos/cosmos-sdk/version.AppName=gaiaflexd \
 				  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 				  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
-				  -X github.com/CosmWasm/wasmd/app.ProposalsEnabled=true \
-				  -X github.com/CosmWasm/wasmd/app.NodeDir=.gaiaflexd \
-				  -X github.com/CosmWasm/wasmd/app.Bech32Prefix=cosmos \
+				  -X github.com/oraichain/orai/app.ProposalsEnabled=true \
+				  -X github.com/oraichain/orai/app.NodeDir=.gaiaflexd \
+				  -X github.com/oraichain/orai/app.Bech32Prefix=cosmos \
 				  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)"
 
 flex_ldflags += $(LDFLAGS)
@@ -187,7 +187,7 @@ lint:
 format:
 	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lcd/statik/statik.go" | xargs gofmt -w -s
 	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lcd/statik/statik.go" | xargs misspell -w
-	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lcd/statik/statik.go" | xargs goimports -w -local github.com/CosmWasm/wasmd
+	find . -name '*.go' -type f -not -path "./vendor*" -not -path "*.git*" -not -path "./client/lcd/statik/statik.go" | xargs goimports -w -local github.com/oraichain/orai
 
 
 ###############################################################################

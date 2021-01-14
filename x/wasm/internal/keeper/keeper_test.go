@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/CosmWasm/wasmd/x/wasm/internal/types"
+	"github.com/oraichain/orai/x/wasm/internal/types"
 	stypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -35,7 +35,7 @@ func TestCreate(t *testing.T) {
 	wasmCode, err := ioutil.ReadFile("./testdata/hackatom.wasm")
 	require.NoError(t, err)
 
-	contractID, err := keeper.Create(ctx, creator, wasmCode, "https://github.com/CosmWasm/wasmd/blob/master/x/wasm/testdata/escrow.wasm", "any/builder:tag", nil)
+	contractID, err := keeper.Create(ctx, creator, wasmCode, "https://github.com/oraichain/orai/blob/master/x/wasm/testdata/escrow.wasm", "any/builder:tag", nil)
 	require.NoError(t, err)
 	require.Equal(t, uint64(1), contractID)
 	// and verify content
@@ -84,7 +84,7 @@ func TestCreateStoresInstantiatePermission(t *testing.T) {
 			})
 			fundAccounts(t, ctx, accKeeper, bankKeeper, myAddr, deposit)
 
-			codeID, err := keeper.Create(ctx, myAddr, wasmCode, "https://github.com/CosmWasm/wasmd/blob/master/x/wasm/testdata/escrow.wasm", "any/builder:tag", nil)
+			codeID, err := keeper.Create(ctx, myAddr, wasmCode, "https://github.com/oraichain/orai/blob/master/x/wasm/testdata/escrow.wasm", "any/builder:tag", nil)
 			require.NoError(t, err)
 
 			codeInfo := keeper.GetCodeInfo(ctx, codeID)
@@ -132,7 +132,7 @@ func TestCreateWithParamPermissions(t *testing.T) {
 			params := types.DefaultParams()
 			params.CodeUploadAccess = spec.srcPermission
 			keeper.setParams(ctx, params)
-			_, err := keeper.Create(ctx, creator, wasmCode, "https://github.com/CosmWasm/wasmd/blob/master/x/wasm/testdata/escrow.wasm", "any/builder:tag", nil)
+			_, err := keeper.Create(ctx, creator, wasmCode, "https://github.com/oraichain/orai/blob/master/x/wasm/testdata/escrow.wasm", "any/builder:tag", nil)
 			require.True(t, spec.expError.Is(err), err)
 			if spec.expError != nil {
 				return
@@ -152,12 +152,12 @@ func TestCreateDuplicate(t *testing.T) {
 	require.NoError(t, err)
 
 	// create one copy
-	contractID, err := keeper.Create(ctx, creator, wasmCode, "https://github.com/CosmWasm/wasmd/blob/master/x/wasm/testdata/escrow.wasm", "any/builder:tag", nil)
+	contractID, err := keeper.Create(ctx, creator, wasmCode, "https://github.com/oraichain/orai/blob/master/x/wasm/testdata/escrow.wasm", "any/builder:tag", nil)
 	require.NoError(t, err)
 	require.Equal(t, uint64(1), contractID)
 
 	// create second copy
-	duplicateID, err := keeper.Create(ctx, creator, wasmCode, "https://github.com/CosmWasm/wasmd/blob/master/x/wasm/testdata/escrow.wasm", "any/builder:tag", nil)
+	duplicateID, err := keeper.Create(ctx, creator, wasmCode, "https://github.com/oraichain/orai/blob/master/x/wasm/testdata/escrow.wasm", "any/builder:tag", nil)
 	require.NoError(t, err)
 	require.Equal(t, uint64(2), duplicateID)
 
@@ -184,14 +184,14 @@ func TestCreateWithSimulation(t *testing.T) {
 	require.NoError(t, err)
 
 	// create this once in simulation mode
-	contractID, err := keeper.Create(ctx, creator, wasmCode, "https://github.com/CosmWasm/wasmd/blob/master/x/wasm/testdata/escrow.wasm", "any/builder:tag", nil)
+	contractID, err := keeper.Create(ctx, creator, wasmCode, "https://github.com/oraichain/orai/blob/master/x/wasm/testdata/escrow.wasm", "any/builder:tag", nil)
 	require.NoError(t, err)
 	require.Equal(t, uint64(1), contractID)
 
 	// then try to create it in non-simulation mode (should not fail)
 	ctx, keepers = CreateTestInput(t, false, SupportedFeatures, nil, nil)
 	accKeeper, keeper = keepers.AccountKeeper, keepers.WasmKeeper
-	contractID, err = keeper.Create(ctx, creator, wasmCode, "https://github.com/CosmWasm/wasmd/blob/master/x/wasm/testdata/escrow.wasm", "any/builder:tag", nil)
+	contractID, err = keeper.Create(ctx, creator, wasmCode, "https://github.com/oraichain/orai/blob/master/x/wasm/testdata/escrow.wasm", "any/builder:tag", nil)
 	require.NoError(t, err)
 	require.Equal(t, uint64(1), contractID)
 
@@ -236,7 +236,7 @@ func TestCreateWithGzippedPayload(t *testing.T) {
 	wasmCode, err := ioutil.ReadFile("./testdata/hackatom.wasm.gzip")
 	require.NoError(t, err)
 
-	contractID, err := keeper.Create(ctx, creator, wasmCode, "https://github.com/CosmWasm/wasmd/blob/master/x/wasm/testdata/escrow.wasm", "", nil)
+	contractID, err := keeper.Create(ctx, creator, wasmCode, "https://github.com/oraichain/orai/blob/master/x/wasm/testdata/escrow.wasm", "", nil)
 	require.NoError(t, err)
 	require.Equal(t, uint64(1), contractID)
 	// and verify content
@@ -257,7 +257,7 @@ func TestInstantiate(t *testing.T) {
 	wasmCode, err := ioutil.ReadFile("./testdata/hackatom.wasm")
 	require.NoError(t, err)
 
-	codeID, err := keeper.Create(ctx, creator, wasmCode, "https://github.com/CosmWasm/wasmd/blob/master/x/wasm/testdata/escrow.wasm", "", nil)
+	codeID, err := keeper.Create(ctx, creator, wasmCode, "https://github.com/oraichain/orai/blob/master/x/wasm/testdata/escrow.wasm", "", nil)
 	require.NoError(t, err)
 
 	_, _, bob := keyPubAddr()
@@ -338,7 +338,7 @@ func TestInstantiateWithDeposit(t *testing.T) {
 			if spec.fundAddr {
 				fundAccounts(t, ctx, accKeeper, bankKeeper, spec.srcActor, sdk.NewCoins(sdk.NewInt64Coin("denom", 200)))
 			}
-			contractID, err := keeper.Create(ctx, spec.srcActor, wasmCode, "https://github.com/CosmWasm/wasmd/blob/master/x/wasm/testdata/escrow.wasm", "", nil)
+			contractID, err := keeper.Create(ctx, spec.srcActor, wasmCode, "https://github.com/oraichain/orai/blob/master/x/wasm/testdata/escrow.wasm", "", nil)
 			require.NoError(t, err)
 
 			// when
@@ -406,7 +406,7 @@ func TestInstantiateWithPermissions(t *testing.T) {
 			accKeeper, bankKeeper, keeper := keepers.AccountKeeper, keepers.BankKeeper, keepers.WasmKeeper
 			fundAccounts(t, ctx, accKeeper, bankKeeper, spec.srcActor, deposit)
 
-			contractID, err := keeper.Create(ctx, myAddr, wasmCode, "https://github.com/CosmWasm/wasmd/blob/master/x/wasm/testdata/escrow.wasm", "", &spec.srcPermission)
+			contractID, err := keeper.Create(ctx, myAddr, wasmCode, "https://github.com/oraichain/orai/blob/master/x/wasm/testdata/escrow.wasm", "", &spec.srcPermission)
 			require.NoError(t, err)
 
 			_, err = keeper.Instantiate(ctx, contractID, spec.srcActor, nil, initMsgBz, "demo contract 1", nil)
