@@ -1,0 +1,8 @@
+syntax = "proto3";
+package CosmWasm.wasmd.oracle;
+
+option go_package = "github.com/CosmWasm/wasmd/x/oracle/types";
+
+// GenesisState defines the oracle module's genesis state.
+message GenesisState {
+}

@@ -1,6 +1,8 @@
 #!/bin/sh
 #set -o errexit -o nounset -o pipefail
 
+alias wasmd=$(pwd)/build/wasmd
+
 PASSWORD=${PASSWORD:-1234567890}
 STAKE=${STAKE_TOKEN:-ustake}
 FEE=${FEE_TOKEN:-ucosm}
@@ -13,13 +15,21 @@ sed -i "s/\"stake\"/\"$STAKE\"/" "$HOME"/.wasmd/config/genesis.json
 if ! wasmd keys show validator; then
   (echo "$PASSWORD"; echo "$PASSWORD") | wasmd keys add validator
 fi
+
+if ! wasmd keys show thinh; then
+  (echo "$PASSWORD"; echo "$PASSWORD") | wasmd keys add thinh
+fi
+
 # hardcode the validator account for this instance
 echo "$PASSWORD" | wasmd add-genesis-account validator "1000000000$STAKE,1000000000$FEE"
+echo "$PASSWORD" | wasmd add-genesis-account thinh "1000000000$STAKE,1000000000$FEE"
+
 # (optionally) add a few more genesis accounts
 for addr in "$@"; do
   echo $addr
   wasmd add-genesis-account "$addr" "1000000000$STAKE,1000000000$FEE"
 done
+
 # submit a genesis validator tx
 ## Workraround for https://github.com/cosmos/cosmos-sdk/issues/8251
 (echo "$PASSWORD"; echo "$PASSWORD"; echo "$PASSWORD") | wasmd gentx validator "250000000$STAKE" --chain-id="$CHAIN_ID" --amount="250000000$STAKE"

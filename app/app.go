@@ -88,6 +88,9 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
+	"github.com/CosmWasm/wasmd/x/oracle"
+	"github.com/CosmWasm/wasmd/x/oracle/custom_plugins"
+
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 )
@@ -170,6 +173,8 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
+
+		oracle.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -236,6 +241,7 @@ type WasmApp struct {
 	// simulation manager
 	sm *module.SimulationManager
 }
+
 
 // NewWasmApp returns a reference to an initialized WasmApp.
 func NewWasmApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool,
@@ -356,6 +362,8 @@ func NewWasmApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	// The last arguments can contain custom message handlers, and custom query handlers,
 	// if we want to allow any custom callbacks
 	supportedFeatures := "staking"
+
+	plugins = CreateQueryPlugins();
 	app.wasmKeeper = wasm.NewKeeper(
 		appCodec,
 		keys[wasm.StoreKey],
@@ -369,7 +377,7 @@ func NewWasmApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		wasmConfig,
 		supportedFeatures,
 		nil,
-		nil,
+		plugins
 	)
 
 	// The gov proposal types can be individually enabled

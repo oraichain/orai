@@ -2,6 +2,9 @@ package keeper
 
 import (
 	"encoding/json"
+	"fmt"
+	"net/http"
+	"io/ioutil"
 
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -120,8 +123,17 @@ func BankQuerier(bankKeeper bankkeeper.ViewKeeper) func(ctx sdk.Context, request
 	}
 }
 
-func NoCustomQuerier(sdk.Context, json.RawMessage) ([]byte, error) {
-	return nil, wasmvmtypes.UnsupportedRequest{Kind: "custom"}
+func NoCustomQuerier(_ sdk.Context, query json.RawMessage) ([]byte, error) {
+	fmt.Printf("xyuzzzzzzzzz: %s", query);
+	resp, _ := http.Get("https://api.coindesk.com/v1/bpi/currentprice.json")	
+
+	defer resp.Body.Close()
+	contents, _ := ioutil.ReadAll(resp.Body);
+
+	n := map[string]string{"msg": string(contents)}
+
+	return json.Marshal(n);
+	// return nil, wasmvmtypes.UnsupportedRequest{Kind: "custom"}
 }
 
 func StakingQuerier(keeper stakingkeeper.Keeper, distKeeper distributionkeeper.Keeper) func(ctx sdk.Context, request *wasmvmtypes.StakingQuery) ([]byte, error) {
