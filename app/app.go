@@ -20,7 +20,6 @@ import (
 
 	"github.com/oraichain/orai/x/wasm"
 	wasmclient "github.com/oraichain/orai/x/wasm/client"
-	"github.com/oraichain/orai/x/wasm/custom_plugins"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
@@ -360,7 +359,7 @@ func NewWasmApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	// if we want to allow any custom callbacks
 	supportedFeatures := "staking"
 
-	plugins := CreateQueryPlugins();
+	plugins := wasm.CreateQueryPlugins();
 	app.wasmKeeper = wasm.NewKeeper(
 		appCodec,
 		keys[wasm.StoreKey],
@@ -374,7 +373,7 @@ func NewWasmApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		wasmConfig,
 		supportedFeatures,
 		nil,
-		plugins
+		&plugins,
 	)
 
 	// The gov proposal types can be individually enabled

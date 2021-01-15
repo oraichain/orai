@@ -2,9 +2,6 @@ package keeper
 
 import (
 	"encoding/json"
-	"fmt"
-	"net/http"
-	"io/ioutil"
 
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"

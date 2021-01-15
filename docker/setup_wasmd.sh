@@ -36,3 +36,6 @@ done
 ## should be:
 # (echo "$PASSWORD"; echo "$PASSWORD"; echo "$PASSWORD") | wasmd gentx validator "250000000$STAKE" --chain-id="$CHAIN_ID"
 wasmd collect-gentxs
+
+
+cp ./build/wasmd /usr/bin/wasmd

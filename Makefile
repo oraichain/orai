@@ -99,6 +99,9 @@ all: install lint test
 watch-oraid:
 	air -c oraid.toml
 
+build-oraid:
+	LEDGER_ENABLED=false BUILD_TAGS=muslc make build
+
 build: go.sum
 ifeq ($(OS),Windows_NT)
 	exit 1
