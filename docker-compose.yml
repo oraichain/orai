@@ -22,6 +22,3 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./:/workspace
-      # - ./fn_dev.sh:/usr/local/bin/fn
-    #command:
-    # - bash -c "fn init && fn createValidator && fn start"
