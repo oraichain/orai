@@ -22,3 +22,9 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./:/workspace
+
+  rust:
+    image: cosmwasm/rust-optimizer:0.10.7
+    entrypoint: tail -f /dev/null
+    volumes:
+      - ./smart-contracts:/code
