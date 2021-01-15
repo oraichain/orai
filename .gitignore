@@ -46,3 +46,8 @@ dependency-graph.png
 *.out
 *.synctex.gz
 contract_tests/*
+
+.devcontainer/
+.oraicli/
+.oraid/
+registry_cache/
