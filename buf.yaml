@@ -1,10 +1,9 @@
 version: v1beta1
 build:
   roots:
-    # Note: these are not local path. These roots are mounted into the docker container
-    - wasmd/
-    - cosmos_sdk_dir/third_party/proto/
-    - cosmos_sdk_dir/proto/
+    # Note: these are not local path. These roots are mounted into the docker container    
+    - /work/third_party/proto/
+    - /work/proto/
   excludes:
 #    - cosmos_sdk_dir
 lint:

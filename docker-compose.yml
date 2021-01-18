@@ -29,3 +29,9 @@ services:
     volumes:
       - ./registry_cache:/usr/local/cargo/registry
       - ./smart-contracts:/code
+
+  proto:
+    image: cosmwasm/prototools-docker
+    tty: true
+    volumes:
+      - ./:/work

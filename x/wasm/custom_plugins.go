@@ -2,7 +2,6 @@ package wasm
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -36,7 +35,7 @@ func (oracleQueryPlugin OracleQueryPlugin) Custom(ctx sdk.Context, query json.Ra
 		request.Fetch.Method = "GET"
 	}
 
-	fmt.Printf("Request :%v\n", request.Fetch)
+	// fmt.Printf("Request :%v\n", request.Fetch)
 
 	r := strings.NewReader(request.Fetch.Body)
 	req, err := http.NewRequest(request.Fetch.Method, request.Fetch.Url, r)
