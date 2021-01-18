@@ -55,3 +55,4 @@ registry_cache/
 .ash_history
 .cache
 smart-contracts/**/artifacts/
+libwasmvm_muslc.a

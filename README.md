@@ -2,7 +2,8 @@
 
 ```bash
 docker-compose up -d && docker-compose exec orai ash
-cp $PWD/libwasmvm_muslc.a /lib/libwasmvm_muslc.a
+# cp $PWD/libwasmvm_muslc.a /lib/libwasmvm_muslc.a
+wget https://github.com/CosmWasm/wasmvm/releases/download/v0.13.0/libwasmvm_muslc.a -O /lib/libwasmvm_muslc.a
 make build-oraid
 ln -s $PWD/build/wasmd /usr/bin/wasmd
 
