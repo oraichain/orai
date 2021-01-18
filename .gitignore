@@ -50,4 +50,8 @@ contract_tests/*
 .devcontainer/
 .oraicli/
 .oraid/
+.wasmd/
 registry_cache/
+.ash_history
+.cache
+smart-contracts/**/artifacts/

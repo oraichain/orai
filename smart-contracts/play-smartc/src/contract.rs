@@ -1,10 +1,12 @@
+use crate::error::ContractError;
+use crate::msg::{
+    CapitalizedResponse, CountResponse, HandleMsg, InitMsg, QueryMsg, SpecialQuery, SpecialResponse,
+};
+use crate::state::{config, config_read, State};
 use cosmwasm_std::{
     to_binary, Api, Binary, Env, Extern, HandleResponse, InitResponse, MessageInfo, Querier,
-    StdResult, Storage
+    StdResult, Storage,
 };
-use crate::error::ContractError;
-use crate::msg::{CountResponse, HandleMsg, InitMsg,QueryMsg,SpecialQuery, CapitalizedResponse, SpecialResponse};
-use crate::state::{config, config_read, State};
 
 // Note, you can use StdResult in some functions where you do not
 // make use of the custom errors
@@ -31,25 +33,24 @@ pub fn handle<S: Storage, A: Api, Q: Querier>(
     msg: HandleMsg,
 ) -> Result<HandleResponse, ContractError> {
     match msg {
-        HandleMsg::Increment {} => try_increment(deps),
-        // HandleMsg::Hello {} => print_message(deps),
+        HandleMsg::Increment {} => try_increment(deps, info),
         HandleMsg::Reset { count } => try_reset(deps, info, count),
     }
 }
 
-pub fn print_message<S: Storage, A: Api, Q: Querier>(
-    deps: &mut Extern<S, A, Q>,
-) -> Result<HandleResponse, ContractError> {
-
-    Ok(HandleResponse::default())
-}
-
 pub fn try_increment<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
+    info: MessageInfo,
 ) -> Result<HandleResponse, ContractError> {
-    let req = SpecialQuery::Capitalized { text: "testxx".to_string() }.into();
-    deps.querier.custom_query(&req)?;
-
+    let api = &deps.api;
+    config(&mut deps.storage).update(|mut state| -> Result<_, ContractError> {
+        // println!("Info : {} {}", info.sender, state.owner);
+        if api.canonical_address(&info.sender)? != state.owner {
+            return Err(ContractError::Unauthorized {});
+        }
+        state.count += 1;
+        Ok(state)
+    })?;
     Ok(HandleResponse::default())
 }
 
@@ -77,12 +78,14 @@ pub fn query<S: Storage, A: Api, Q: Querier>(
     match msg {
         QueryMsg::GetCount {} => to_binary(&query_count(deps)?),
         QueryMsg::Capitalized { text } => to_binary(&query_capitalized(deps, text)?),
-
-        QueryMsg::Fetch { url } => to_binary(&query_fetch(deps, url)?)
+        QueryMsg::Fetch { url } => to_binary(&query_fetch(deps, url)?),
     }
 }
 
-fn query_capitalized<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>, text: String) -> StdResult<CapitalizedResponse> {
+fn query_capitalized<S: Storage, A: Api, Q: Querier>(
+    deps: &Extern<S, A, Q>,
+    text: String,
+) -> StdResult<CapitalizedResponse> {
     let req = SpecialQuery::Capitalized { text }.into();
     let response: SpecialResponse = deps.querier.custom_query(&req)?;
     Ok(CapitalizedResponse { text: response.msg })
@@ -93,7 +96,10 @@ fn query_count<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> StdRes
     Ok(CountResponse { count: state.count })
 }
 
-fn query_fetch<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>, url: String) -> StdResult<String> {
+fn query_fetch<S: Storage, A: Api, Q: Querier>(
+    deps: &Extern<S, A, Q>,
+    url: String,
+) -> StdResult<String> {
     let req = SpecialQuery::Fetch { url }.into();
     let response: Binary = deps.querier.custom_query(&req)?;
     Ok(String::from_utf8(response.to_vec()).unwrap())
@@ -131,7 +137,7 @@ mod tests {
         let _res = init(&mut deps, mock_env(), info, msg).unwrap();
 
         // beneficiary can release it
-        let info = mock_info("anyone", &coins(2, "token"));
+        let info = mock_info("creator", &coins(2, "token"));
         let msg = HandleMsg::Increment {};
         let _res = handle(&mut deps, mock_env(), info, msg).unwrap();
 
