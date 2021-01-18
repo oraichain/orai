@@ -74,18 +74,24 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo) {
 	}
 	// reward for the validators that contribute in the ai request test
 	// transfer collected fees to the distribution module account to distribute the oracle rewards to the validators. Note that if we transfer all the transaction fees, then other modules won't be able to handle allocation
-	for _, val := range rewardObj.Validators {
-		powerFraction := sdk.NewDec(val.GetVotingPower()).QuoTruncate(sdk.NewDec(rewardObj.TotalPower))
-		valRewardDec := sdk.NewDecCoinsFromCoins(rewardObj.ValidatorFees...).MulDec(powerFraction)
-		valRewardInt, _ := valRewardDec.TruncateDecimal()
-		err = k.supplyKeeper.SendCoinsFromModuleToModule(ctx, k.feeCollectorName, distr.ModuleName, valRewardInt)
-		if err != nil {
-			fmt.Println("error in sending coins from fee collector to distrution module: ", err)
-			return
+
+	// fix check division by zero
+	if rewardObj.TotalPower <= int64(0) {
+		return
+	} else {
+		for _, val := range rewardObj.Validators {
+			powerFraction := sdk.NewDec(val.GetVotingPower()).QuoTruncate(sdk.NewDec(rewardObj.TotalPower))
+			valRewardDec := sdk.NewDecCoinsFromCoins(rewardObj.ValidatorFees...).MulDec(powerFraction)
+			valRewardInt, _ := valRewardDec.TruncateDecimal()
+			err = k.supplyKeeper.SendCoinsFromModuleToModule(ctx, k.feeCollectorName, distr.ModuleName, valRewardInt)
+			if err != nil {
+				fmt.Println("error in sending coins from fee collector to distrution module: ", err)
+				return
+			}
+			// allocate tokens to validator with a specific commission
+			k.distrKeeper.AllocateTokensToValidator(ctx, k.stakingKeeper.Validator(ctx, val.GetAddress()), valRewardDec)
+			remaining = remaining.Sub(valRewardDec)
 		}
-		// allocate tokens to validator with a specific commission
-		k.distrKeeper.AllocateTokensToValidator(ctx, k.stakingKeeper.Validator(ctx, val.GetAddress()), valRewardDec)
-		remaining = remaining.Sub(valRewardDec)
 	}
 	fmt.Println("Finish allocating the tokens")
 }

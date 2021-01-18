@@ -90,6 +90,11 @@ func (k Keeper) GetMinimumFees(ctx sdk.Context, dNames, tcNames []string, valNum
 		totalFees = totalFees.Add(aiDataSource.GetFees()...)
 	}
 	rewardRatio := sdk.NewDecWithPrec(int64(k.GetParam(ctx, types.KeyOracleScriptRewardPercentage)), 2)
+
+	// check division by zero or negative figure
+	if rewardRatio.IsZero() || rewardRatio.IsNegative() {
+		rewardRatio = sdk.NewDecWithPrec(int64(60), 2)
+	}
 	//valFees = 2/5 total dsource and test case fees (70% total in 100% of total fees split into 20% and 50% respectively)
 	valFees, _ := sdk.NewDecCoinsFromCoins(totalFees...).MulDec(sdk.NewDecWithPrec(int64(40), 2)).TruncateDecimal()
 	//50% + 20% = 70% * validatorCount fees (since k validators will execute, the fees need to be propotional to the number of vals)

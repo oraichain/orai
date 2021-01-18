@@ -51,6 +51,12 @@ func calucateMol(dividend, divisor uint64) uint64 {
 	divisorBig := new(big.Int)
 	divisorBig.SetUint64(divisor)
 
+	// check division by zero or negative
+	if divisor <= uint64(0) {
+		// fix divisor to 1 to prevent division by zero
+		divisorBig.SetInt64(1)
+	}
+
 	tenmodfour := new(big.Int)
 
 	quotient := tenmodfour.Mod(dividendBig, divisorBig)
