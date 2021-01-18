@@ -185,7 +185,7 @@ oraidFn(){
     # # sleep 3
     # # kill -9 `lsof -t -i:26657`
     sleep 3
-    oraid start &
+    oraid start --rpc.laddr tcp://0.0.0.0:26657 &
     timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
 
     if [ -f $PWD/.oraid/websocket.yaml ]; then

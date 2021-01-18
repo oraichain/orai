@@ -171,7 +171,7 @@ oraidFn(){
   # # sleep 3
   # # kill -9 `lsof -t -i:26657`
   sleep 3
-  oraid start &
+  oraid start --rpc.laddr tcp://0.0.0.0:26657 &
   timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
 
   if [ -f $PWD/.oraid/websocket.yaml ]; then
@@ -212,6 +212,10 @@ initFn(){
 
   # put the validators into the genesis file so the chain is aware of the validators
   oraid collect-gentxs
+
+  # add persistent peers to listen to blocks
+  local persistentPeers=$(getArgument "persistent_peers" "$PERSISTENT_PEERS")
+  [ ! -z $persistentPeers ] && sed -i 's/persistent_peers *= *".*"/persistent_peers = "'"$persistentPeers"'"/g' .oraid/config/config.toml 
 
   oraid validate-genesis
 
