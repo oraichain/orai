@@ -1,6 +1,7 @@
+
 use crate::error::ContractError;
 use crate::msg::{
-    CapitalizedResponse, CountResponse, HandleMsg, InitMsg, QueryMsg, SpecialQuery, SpecialResponse,
+     CountResponse, HandleMsg, InitMsg, QueryMsg, SpecialQuery,
 };
 use crate::state::{config, config_read, State};
 use cosmwasm_std::{
@@ -44,7 +45,6 @@ pub fn try_increment<S: Storage, A: Api, Q: Querier>(
 ) -> Result<HandleResponse, ContractError> {
     let api = &deps.api;
     config(&mut deps.storage).update(|mut state| -> Result<_, ContractError> {
-        // println!("Info : {} {}", info.sender, state.owner);
         if api.canonical_address(&info.sender)? != state.owner {
             return Err(ContractError::Unauthorized {});
         }
@@ -77,19 +77,10 @@ pub fn query<S: Storage, A: Api, Q: Querier>(
 ) -> StdResult<Binary> {
     match msg {
         QueryMsg::GetCount {} => to_binary(&query_count(deps)?),
-        QueryMsg::Capitalized { text } => to_binary(&query_capitalized(deps, text)?),
-        QueryMsg::Fetch { url } => to_binary(&query_fetch(deps, url)?),
+        QueryMsg::Fetch { url, method, authorization, body } => to_binary(&query_fetch(deps, url, method, authorization, body)?),
     }
 }
 
-fn query_capitalized<S: Storage, A: Api, Q: Querier>(
-    deps: &Extern<S, A, Q>,
-    text: String,
-) -> StdResult<CapitalizedResponse> {
-    let req = SpecialQuery::Capitalized { text }.into();
-    let response: SpecialResponse = deps.querier.custom_query(&req)?;
-    Ok(CapitalizedResponse { text: response.msg })
-}
 
 fn query_count<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> StdResult<CountResponse> {
     let state = config_read(&deps.storage).load()?;
@@ -99,8 +90,19 @@ fn query_count<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> StdRes
 fn query_fetch<S: Storage, A: Api, Q: Querier>(
     deps: &Extern<S, A, Q>,
     url: String,
+    method: Option<String>,
+    authorization: Option<String>,
+    body: Option<String>,
 ) -> StdResult<String> {
-    let req = SpecialQuery::Fetch { url }.into();
+
+    // create specialquery with default empty string
+    let req = SpecialQuery::Fetch {
+        url,
+        method: method.unwrap_or(String::new()),
+        authorization: authorization.unwrap_or(String::new()),
+        body: body.unwrap_or(String::new()),
+    }.into();
+
     let response: Binary = deps.querier.custom_query(&req)?;
     Ok(String::from_utf8(response.to_vec()).unwrap())
 }

@@ -11,9 +11,12 @@ pub struct InitMsg {
 #[serde(rename_all = "snake_case")]
 /// An implementation of QueryRequest::Custom to show this works and can be extended in the contract
 pub enum SpecialQuery {
-    Ping {},
-    Capitalized { text: String },
-    Fetch { url: String },
+    Fetch {
+        url: String,
+        method: String,
+        authorization: String,
+        body: String,
+    },
 }
 
 impl CustomQuery for SpecialQuery {}
@@ -30,31 +33,12 @@ pub enum HandleMsg {
 pub enum QueryMsg {
     // GetCount returns the current count as a json-encoded number
     GetCount {},
-    Capitalized {
-        text: String,
-    },
     Fetch {
         url: String,
+        method: Option<String>,
+        authorization: Option<String>,
+        body: Option<String>,
     },
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-#[serde(rename_all = "snake_case")]
-/// The response data for all `SpecialQuery`s
-pub struct SpecialResponse {
-    pub msg: String,
-}
-// #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-// #[serde(rename_all = "snake_case")]
-// /// The response data for all `SpecialQuery`s
-// pub struct QueryResponse {
-//     pub result: Binary,
-// }
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-#[serde(rename_all = "snake_case")]
-pub struct CapitalizedResponse {
-    pub text: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]

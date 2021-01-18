@@ -2,24 +2,52 @@ package wasm
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 )
 
 type Request struct {
 	Fetch struct {
-		Url string `json:"url"`
+		Method        string `json:"method,omitempty"`
+		Authorization string `json:"authorization,omitempty"`
+		Body          string `json:"body,omitempty"`
+		Url           string `json:"url"`
 	} `json:"fetch"`
 }
 
-func RunCustomQuerier(_ sdk.Context, query json.RawMessage) ([]byte, error) {
+type OracleQueryPlugin struct {
+	client  *http.Client
+	bank    bankkeeper.ViewKeeper
+	staking stakingkeeper.Keeper
+}
+
+func (oracleQueryPlugin OracleQueryPlugin) Custom(ctx sdk.Context, query json.RawMessage) ([]byte, error) {
 	var request Request
 	json.Unmarshal(query, &request)
 
-	url := request.Fetch.Url
-	resp, err := http.Get(url)
+	if request.Fetch.Method == "" {
+		request.Fetch.Method = "GET"
+	}
+
+	fmt.Printf("Request :%v\n", request.Fetch)
+
+	r := strings.NewReader(request.Fetch.Body)
+	req, err := http.NewRequest(request.Fetch.Method, request.Fetch.Url, r)
+
+	// authorization header
+	if request.Fetch.Authorization != "" {
+		req.Header.Add("Authorization", request.Fetch.Authorization)
+	}
+
+	// call request
+	resp, err := oracleQueryPlugin.client.Do(req)
 
 	if err != nil {
 		return json.Marshal(map[string]string{"error": err.Error()})
@@ -32,8 +60,16 @@ func RunCustomQuerier(_ sdk.Context, query json.RawMessage) ([]byte, error) {
 
 }
 
-func CreateQueryPlugins() QueryPlugins {
-	return QueryPlugins{
-		Custom: RunCustomQuerier,
+func CreateQueryPlugins(bank bankkeeper.ViewKeeper, staking stakingkeeper.Keeper) *QueryPlugins {
+
+	client := &http.Client{Timeout: time.Duration(60) * time.Second}
+	oracleQueryPlugin := OracleQueryPlugin{
+		client:  client,
+		bank:    bank,
+		staking: staking,
+	}
+
+	return &QueryPlugins{
+		Custom: oracleQueryPlugin.Custom,
 	}
 }

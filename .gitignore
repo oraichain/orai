@@ -56,3 +56,5 @@ registry_cache/
 .cache
 smart-contracts/**/artifacts/
 libwasmvm_muslc.a
+.vscode-server
+.gitconfig

@@ -31,11 +31,20 @@ wasmd tx wasm store smart-contracts/play-smartc/target/wasm32-unknown-unknown/re
 # step 2: get code id from response and instantiate it
 wasmd tx wasm instantiate $CODE_ID '{"count":10}' --from $USER --label "oracle 1" --gas="auto" --gas-adjustment="1.2" --chain-id=testing -y
 
+# if using genesis smart contract
+CONTRACT=$(wasmd add-wasm-genesis-message list-contracts | jq '.[0].contract_address' -r)
+
 # step 3: get smart contract address and query it
 wasmd query wasm list-contract-by-code $CODE_ID
 wasmd query wasm contract-state smart $CONTRACT '{"fetch":{"url":"https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"}}'
+# can change method to POST and optional authorization header
+wasmd query wasm contract-state smart $CONTRACT '{"fetch":{"url":"https://my-json-server.typicode.com/typicode/demo/posts","method":"POST"}}'
 
 # step 4: test execute and query the updated state
 wasmd tx wasm execute $CONTRACT '{"increment":{}}' --from $USER --gas="auto" --gas-adjustment="1.2" --chain-id=testing -y
 wasmd query wasm contract-state smart $CONTRACT '{"get_count":{}}'
+
+# step 5: migrate contract to a new code
+# TODO: this is for oracle aggregation only in the future with latest version of wasmvm
+
 ```

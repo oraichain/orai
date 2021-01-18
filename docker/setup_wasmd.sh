@@ -25,6 +25,28 @@ for addr in "$@"; do
   wasmd add-genesis-account "$addr" "1000000000$STAKE,1000000000$FEE"
 done
 
+# (optionally) add smart contract
+if [ ! -z $LOCAL ];then     
+  echo "## Genesis CosmWasm contract"
+  wasmd add-wasm-genesis-message store x/wasm/internal/keeper/testdata/play_smartc.wasm --instantiate-everybody false --run-as $USER
+
+  echo "-----------------------"
+  echo "## Genesis CosmWasm instance"
+  INIT='{"count":10}'
+  BASE_ACCOUNT=$(wasmd keys show $USER -a)
+  wasmd add-wasm-genesis-message instantiate-contract 1 $INIT --run-as $USER --label=oracle --amount=100ustake --admin $BASE_ACCOUNT
+
+  # if need execute
+  CONTRACT=$(wasmd add-wasm-genesis-message list-contracts | jq '.[0].contract_address' -r)
+  echo "-----------------------"
+  echo "## List Genesis CosmWasm codes"
+  wasmd add-wasm-genesis-message list-codes
+
+  echo "-----------------------"
+  echo "## List Genesis CosmWasm contracts"
+  wasmd add-wasm-genesis-message list-contracts
+fi
+
 # submit a genesis validator tx
 ## Workraround for https://github.com/cosmos/cosmos-sdk/issues/8251
 (echo "$PASSWORD"; echo "$PASSWORD"; echo "$PASSWORD") | wasmd gentx $USER "250000000$STAKE" --chain-id="$CHAIN_ID" --amount="250000000$STAKE"
