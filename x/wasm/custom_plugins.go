@@ -1,14 +1,9 @@
-
-
-
-
 package wasm
 
 import (
-	"fmt"
 	"encoding/json"
-	"net/http"
 	"io/ioutil"
+	"net/http"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
@@ -27,17 +22,17 @@ func RunCustomQuerier(_ sdk.Context, query json.RawMessage) ([]byte, error) {
 	resp, _ := http.Get(url)
 
 	defer resp.Body.Close()
-	contents, _ := ioutil.ReadAll(resp.Body);
+	contents, _ := ioutil.ReadAll(resp.Body)
 
 	// n := map[string][]byte{"result": contents}
 	// fmt.Printf("resxxx %s", n);
-	return json.Marshal(contents);
+	return json.Marshal(contents)
 
 	// return nil, wasmvmtypes.UnsupportedRequest{Kind: "custom"}
 }
 
 func CreateQueryPlugins() QueryPlugins {
-	return QueryPlugins {
-		Custom:  RunCustomQuerier,
+	return QueryPlugins{
+		Custom: RunCustomQuerier,
 	}
 }
