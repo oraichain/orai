@@ -3,12 +3,10 @@
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
 COMMIT := $(shell git log -1 --format='%H')
-LEDGER_ENABLED ?= true
+LEDGER_ENABLED ?= false
 SDK_PACK := $(shell go list -m github.com/cosmos/cosmos-sdk | sed  's/ /\@/g')
 
 # for dockerized protobuf tools
-PROTO_CONTAINER := cosmwasm/prototools-docker:v0.1.0
-DOCKER_BUF := docker run --rm -v $(shell pwd)/buf.yaml:/workspace/buf.yaml -v $(shell go list -f "{{ .Dir }}" -m github.com/cosmos/cosmos-sdk):/workspace/cosmos_sdk_dir -v $(shell pwd):/workspace/wasmd  --workdir /workspace $(PROTO_CONTAINER)
 HTTPS_GIT := https://github.com/oraichain/orai.git
 
 export GO111MODULE = on
@@ -52,11 +50,11 @@ build_tags_comma_sep := $(subst $(empty),$(comma),$(build_tags))
 
 # process linker flags
 
-ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=wasm \
-		  -X github.com/cosmos/cosmos-sdk/version.AppName=wasmd \
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=orai \
+		  -X github.com/cosmos/cosmos-sdk/version.AppName=oraid \
 		  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
-		  -X github.com/oraichain/orai/app.Bech32Prefix=wasm \
+		  -X github.com/oraichain/orai/app.Bech32Prefix=orai \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)"
 
 ifeq ($(WITH_CLEVELDB),yes)
@@ -65,66 +63,22 @@ endif
 ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
 
-coral_ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=coral \
-				  -X github.com/cosmos/cosmos-sdk/version.AppName=corald \
-				  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
-				  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
-				  -X github.com/oraichain/orai/app.NodeDir=.corald \
-				  -X github.com/oraichain/orai/app.Bech32Prefix=coral \
-				  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)"
-# we could consider enabling governance override?
-#				  -X github.com/oraichain/orai/app.EnableSpecificProposals=MigrateContract,UpdateAdmin,ClearAdmin \
-
-coral_ldflags += $(LDFLAGS)
-coral_ldflags := $(strip $(coral_ldflags))
-
-flex_ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=gaiaflex \
-				  -X github.com/cosmos/cosmos-sdk/version.AppName=gaiaflexd \
-				  -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
-				  -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
-				  -X github.com/oraichain/orai/app.ProposalsEnabled=true \
-				  -X github.com/oraichain/orai/app.NodeDir=.gaiaflexd \
-				  -X github.com/oraichain/orai/app.Bech32Prefix=cosmos \
-				  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)"
-
-flex_ldflags += $(LDFLAGS)
-flex_ldflags := $(strip $(flex_ldflags))
-
 BUILD_FLAGS := -tags "$(build_tags_comma_sep)" -ldflags '$(ldflags)' -trimpath
-CORAL_BUILD_FLAGS := -tags "$(build_tags_comma_sep)" -ldflags '$(coral_ldflags)' -trimpath
-FLEX_BUILD_FLAGS := -tags "$(build_tags_comma_sep)" -ldflags '$(flex_ldflags)' -trimpath
 
 all: install lint test
 
-watch-oraid:
+watch:
 	air -c oraid.toml
 
-build-oraid:
-	LEDGER_ENABLED=false BUILD_TAGS=muslc make build
+build:
+	BUILD_TAGS=muslc make go-build
 
-build: go.sum
+go-build: go.sum
 ifeq ($(OS),Windows_NT)
 	exit 1
 else
-	go build -mod=readonly $(BUILD_FLAGS) -o build/wasmd ./cmd/wasmd
+	go build -mod=readonly $(BUILD_FLAGS) -o build/oraid ./cmd/oraid
 endif
-
-build-coral: go.sum
-ifeq ($(OS),Windows_NT)
-	exit 1
-else
-	go build -mod=readonly $(CORAL_BUILD_FLAGS) -o build/corald ./cmd/wasmd
-endif
-
-build-gaiaflex: go.sum
-ifeq ($(OS),Windows_NT)
-	exit 1
-else
-	go build -mod=readonly $(FLEX_BUILD_FLAGS) -o build/gaiaflexd ./cmd/wasmd
-endif
-
-build-linux: go.sum
-	LEDGER_ENABLED=false GOOS=linux GOARCH=amd64 $(MAKE) build
 
 build-contract-tests-hooks:
 ifeq ($(OS),Windows_NT)
@@ -150,7 +104,7 @@ go.sum: go.mod
 draw-deps:
 	@# requires brew install graphviz or apt-get install graphviz
 	go get github.com/RobotsAndPencils/goviz
-	@goviz -i ./cmd/wasmd -d 2 | dot -Tpng -o dependency-graph.png
+	@goviz -i ./cmd/oraid -d 2 | dot -Tpng -o dependency-graph.png
 
 clean:
 	rm -rf snapcraft-local.yaml build/
@@ -201,15 +155,15 @@ proto-all: proto-gen proto-lint proto-check-breaking
 .PHONY: proto-all
 
 proto-gen: proto-lint
-	@docker run --rm -v $(shell go list -f "{{ .Dir }}" -m github.com/cosmos/cosmos-sdk):/workspace/cosmos_sdk_dir -v $(shell pwd):/workspace --workdir /workspace --env COSMOS_SDK_DIR=/workspace/cosmos_sdk_dir $(PROTO_CONTAINER) ./scripts/protocgen.sh
+	./scripts/protocgen.sh
 .PHONY: proto-gen
 
 proto-lint:
-	@$(DOCKER_BUF) buf check lint --error-format=json
+	buf check lint --error-format=json
 .PHONY: proto-lint
 
 proto-check-breaking:
-	@$(DOCKER_BUF) buf check breaking --against-input $(HTTPS_GIT)#branch=master
+	buf check breaking --against-input $(HTTPS_GIT)#branch=master
 .PHONY: proto-check-breaking
 
 .PHONY: all build-linux install install-debug \

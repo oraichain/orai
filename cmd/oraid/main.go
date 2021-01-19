@@ -3,8 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/oraichain/orai/app"
 	"github.com/cosmos/cosmos-sdk/server"
+	"github.com/oraichain/orai/app"
 )
 
 func main() {

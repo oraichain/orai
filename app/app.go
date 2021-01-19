@@ -88,16 +88,18 @@ import (
 	"github.com/oraichain/orai/x/wasm"
 	wasmclient "github.com/oraichain/orai/x/wasm/client"
 
+	// "github.com/oraichain/orai/x/provider"
+
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 )
 
-const appName = "WasmApp"
+const appName = "Oraichain"
 
 // We pull these out so we can set them with LDFLAGS in the Makefile
 var (
-	NodeDir      = ".wasmd"
-	Bech32Prefix = "wasm"
+	NodeDir      = ".oraid"
+	Bech32Prefix = "orai"
 
 	// If EnabledSpecificProposals is "", and this is "true", then enable all x/wasm proposals.
 	// If EnabledSpecificProposals is "", and this is not "true", then disable all x/wasm proposals.
