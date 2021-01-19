@@ -129,7 +129,7 @@ func (k Keeper) SetAIDataSource(ctx sdk.Context, name string, aiDataSource *type
 }
 
 // EditAIDataSource allows users to edit a data source in the store, just change address
-func (k Keeper) EditAIDataSource(ctx sdk.Context, oldName, newName string, contract string, aiDataSource *types.AIDataSource) {
+func (k Keeper) EditAIDataSource(ctx sdk.Context, oldName, newName string, aiDataSource *types.AIDataSource) {
 	key := types.DataSourceStoreKey(oldName)
 	// if the user does not want to reuse the old name
 	if oldName != newName {
@@ -191,7 +191,7 @@ func (k Keeper) GetPaginatedOracleScriptNames(ctx sdk.Context, page, limit uint)
 }
 
 // EditOracleScript allows users to edit a oScript in the store
-func (k Keeper) EditOracleScript(ctx sdk.Context, oldName, newName string, contract string, oScript *types.OracleScript) {
+func (k Keeper) EditOracleScript(ctx sdk.Context, oldName, newName string, oScript *types.OracleScript) {
 
 	key := types.OracleScriptStoreKey(oldName)
 	// if the user does not want to reuse the old name
@@ -279,7 +279,7 @@ func (k Keeper) DefaultTestCase() types.TestCase {
 }
 
 // EditTestCase allows users to edit a test case in the store
-func (k Keeper) EditTestCase(ctx sdk.Context, oldName, newName string, contract string, testCase *types.TestCase) {
+func (k Keeper) EditTestCase(ctx sdk.Context, oldName, newName string, testCase *types.TestCase) {
 	key := types.TestCaseStoreKey(oldName)
 	// if the user does not want to reuse the old name
 	if oldName != newName {

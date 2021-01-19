@@ -24,6 +24,9 @@ const (
 
 	// MemStoreKey defines the in-memory store key
 	MemStoreKey = "mem_capability"
+
+	// Denom is the denominator of the currency
+	Denom = "orai"
 )
 
 func KeyPrefix(p string) []byte {

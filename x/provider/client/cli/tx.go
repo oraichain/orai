@@ -22,6 +22,7 @@ func GetTxCmd() *cobra.Command {
 	}
 	txCmd.AddCommand(
 		GetCmdCreateAIDataSource(),
+		GetCmdCreateOracleScript(),
 	)
 	return txCmd
 }

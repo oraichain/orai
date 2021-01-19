@@ -689,6 +689,7 @@ MsgEditTestCaseRes returns edit result data.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | name | [string](#string) |  |  |
+| contract | [string](#string) |  |  |
 | owner | [bytes](#bytes) |  | Owner is the address who is allowed to make further changes to the data source. |
 | description | [string](#string) |  |  |
 | fees | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
@@ -723,6 +724,7 @@ MsgEditTestCaseRes returns edit result data.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | name | [string](#string) |  |  |
+| contract | [string](#string) |  |  |
 | owner | [bytes](#bytes) |  | Owner is the address who is allowed to make further changes to the data source. |
 | description | [string](#string) |  |  |
 | minimum_fees | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
@@ -759,6 +761,7 @@ MsgEditTestCaseRes returns edit result data.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | name | [string](#string) |  |  |
+| contract | [string](#string) |  |  |
 | owner | [bytes](#bytes) |  | Owner is the address who is allowed to make further changes to the data source. |
 | description | [string](#string) |  |  |
 | fees | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |

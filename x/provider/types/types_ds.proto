@@ -7,8 +7,9 @@ option go_package = "github.com/oraichain/orai/x/provider/types";
 message AIDataSource {
   option (gogoproto.goproto_stringer) = true;
   string name = 1;
+  string contract = 2;
   // Owner is the address who is allowed to make further changes to the data source.
-  bytes owner = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  string description = 3;
-  repeated cosmos.base.v1beta1.Coin fees = 4 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "json:\"transaction_fee\""];
+  bytes owner = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+  string description = 4;
+  repeated cosmos.base.v1beta1.Coin fees = 5 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "json:\"transaction_fee\""];
 }

@@ -8,7 +8,6 @@ option go_package = "github.com/oraichain/orai/x/provider/types";
 
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
-import "google/api/annotations.proto";
 import "x/provider/types/types_os.proto";
 
 // OracleScriptInfoReq is the request type for the Query/OracleScriptInfo RPC method

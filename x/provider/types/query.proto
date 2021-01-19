@@ -6,7 +6,6 @@ option go_package = "github.com/oraichain/orai/x/provider/types";
 
 // this line is used by starport scaffolding # 3
 
-import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "x/provider/types/query_dsource.proto";
 import "x/provider/types/query_oscript.proto";
