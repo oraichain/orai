@@ -55,8 +55,8 @@ oraid query wasm contract-state smart $CONTRACT '{"get_count":{}}'
 docker-compose exec protoc ash
 
 # check protobuf lint
-buf check lint --error-format=json
+make proto-lint
 
 # build protobuf templates
-./scripts/protocgen.sh
+make proto-gen
 ```
