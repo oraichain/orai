@@ -28,7 +28,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 type MsgCreateAIDataSource struct {
 	Name        string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Code        []byte `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`
+	Contract    string `protobuf:"bytes,3,opt,name=contract,proto3" json:"contract,omitempty"`
 	// Owner is the address who is allowed to make further changes to the data source.
 	Owner github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,4,opt,name=owner,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"owner,omitempty"`
 	Fees  string                                        `protobuf:"bytes,5,opt,name=fees,proto3" json:"fees,omitempty" json:"transaction_fee"`
@@ -81,11 +81,11 @@ func (m *MsgCreateAIDataSource) GetDescription() string {
 	return ""
 }
 
-func (m *MsgCreateAIDataSource) GetCode() []byte {
+func (m *MsgCreateAIDataSource) GetContract() string {
 	if m != nil {
-		return m.Code
+		return m.Contract
 	}
-	return nil
+	return ""
 }
 
 func (m *MsgCreateAIDataSource) GetOwner() github_com_cosmos_cosmos_sdk_types.AccAddress {
@@ -106,7 +106,7 @@ func (m *MsgCreateAIDataSource) GetFees() string {
 type MsgCreateAIDataSourceRes struct {
 	Name        string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Code        []byte `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`
+	Contract    string `protobuf:"bytes,3,opt,name=contract,proto3" json:"contract,omitempty"`
 	// Owner is the address who is allowed to make further changes to the data source.
 	Owner github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,4,opt,name=owner,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"owner,omitempty"`
 	Fees  string                                        `protobuf:"bytes,5,opt,name=fees,proto3" json:"fees,omitempty" json:"transaction_fee"`
@@ -159,11 +159,11 @@ func (m *MsgCreateAIDataSourceRes) GetDescription() string {
 	return ""
 }
 
-func (m *MsgCreateAIDataSourceRes) GetCode() []byte {
+func (m *MsgCreateAIDataSourceRes) GetContract() string {
 	if m != nil {
-		return m.Code
+		return m.Contract
 	}
-	return nil
+	return ""
 }
 
 func (m *MsgCreateAIDataSourceRes) GetOwner() github_com_cosmos_cosmos_sdk_types.AccAddress {
@@ -185,7 +185,7 @@ type MsgEditAIDataSource struct {
 	OldName     string `protobuf:"bytes,1,opt,name=old_name,json=oldName,proto3" json:"old_name,omitempty"`
 	NewName     string `protobuf:"bytes,2,opt,name=new_name,json=newName,proto3" json:"new_name,omitempty"`
 	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Code        []byte `protobuf:"bytes,4,opt,name=code,proto3" json:"code,omitempty"`
+	Contract    string `protobuf:"bytes,4,opt,name=contract,proto3" json:"contract,omitempty"`
 	// Owner is the address who is allowed to make further changes to the data source.
 	Owner github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,5,opt,name=owner,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"owner,omitempty"`
 	Fees  string                                        `protobuf:"bytes,6,opt,name=fees,proto3" json:"fees,omitempty" json:"transaction_fee"`
@@ -245,11 +245,11 @@ func (m *MsgEditAIDataSource) GetDescription() string {
 	return ""
 }
 
-func (m *MsgEditAIDataSource) GetCode() []byte {
+func (m *MsgEditAIDataSource) GetContract() string {
 	if m != nil {
-		return m.Code
+		return m.Contract
 	}
-	return nil
+	return ""
 }
 
 func (m *MsgEditAIDataSource) GetOwner() github_com_cosmos_cosmos_sdk_types.AccAddress {
@@ -270,7 +270,7 @@ func (m *MsgEditAIDataSource) GetFees() string {
 type MsgEditAIDataSourceRes struct {
 	Name        string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Code        []byte `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`
+	Contract    string `protobuf:"bytes,3,opt,name=contract,proto3" json:"contract,omitempty"`
 	// Owner is the address who is allowed to make further changes to the data source.
 	Owner github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,4,opt,name=owner,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"owner,omitempty"`
 	Fees  string                                        `protobuf:"bytes,5,opt,name=fees,proto3" json:"fees,omitempty" json:"transaction_fee"`
@@ -323,11 +323,11 @@ func (m *MsgEditAIDataSourceRes) GetDescription() string {
 	return ""
 }
 
-func (m *MsgEditAIDataSourceRes) GetCode() []byte {
+func (m *MsgEditAIDataSourceRes) GetContract() string {
 	if m != nil {
-		return m.Code
+		return m.Contract
 	}
-	return nil
+	return ""
 }
 
 func (m *MsgEditAIDataSourceRes) GetOwner() github_com_cosmos_cosmos_sdk_types.AccAddress {
@@ -354,31 +354,32 @@ func init() {
 func init() { proto.RegisterFile("x/provider/types/tx_dsource.proto", fileDescriptor_476f07e0d1e13bf8) }
 
 var fileDescriptor_476f07e0d1e13bf8 = []byte{
-	// 383 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x94, 0xbf, 0x0e, 0x12, 0x41,
-	0x10, 0xc6, 0x59, 0x39, 0xfe, 0xb8, 0x5a, 0x9d, 0x8a, 0x07, 0xc5, 0x81, 0x57, 0x11, 0x13, 0xee,
-	0x62, 0xec, 0xec, 0x40, 0x8c, 0xb1, 0x80, 0xe2, 0xec, 0x6c, 0xc8, 0xb2, 0x3b, 0x1c, 0xa7, 0xb0,
-	0x73, 0xd9, 0x5d, 0x04, 0xdf, 0xc2, 0xc7, 0xb2, 0xa4, 0x34, 0x1a, 0x89, 0x81, 0x37, 0xb0, 0xa4,
-	0x32, 0xb7, 0xa7, 0x06, 0xcd, 0x99, 0x58, 0x58, 0x51, 0xed, 0x97, 0x99, 0x6f, 0x76, 0xf6, 0x97,
-	0xc9, 0x2c, 0x7d, 0xb0, 0x8b, 0x32, 0x85, 0x6f, 0x53, 0x01, 0x2a, 0x32, 0xef, 0x32, 0xd0, 0x91,
-	0xd9, 0xcd, 0x84, 0xc6, 0x8d, 0xe2, 0x10, 0x66, 0x0a, 0x0d, 0xba, 0xf7, 0x51, 0xb1, 0x94, 0x2f,
-	0x59, 0x2a, 0xc3, 0x5c, 0x85, 0x3f, 0xfd, 0x9d, 0xbb, 0x09, 0x26, 0x68, 0x3d, 0x51, 0xae, 0x0a,
-	0x7b, 0xf0, 0x89, 0xd0, 0x7b, 0x13, 0x9d, 0x3c, 0x55, 0xc0, 0x0c, 0x0c, 0x5f, 0x8c, 0x99, 0x61,
-	0x2f, 0xed, 0x75, 0xae, 0x4b, 0x1d, 0xc9, 0xd6, 0xe0, 0x91, 0x1e, 0xe9, 0xdf, 0x8c, 0xad, 0x76,
-	0x7b, 0xf4, 0x96, 0x00, 0xcd, 0x55, 0x9a, 0x99, 0x14, 0xa5, 0x77, 0xc3, 0xa6, 0x2e, 0x43, 0x79,
-	0x15, 0x47, 0x01, 0x5e, 0xb5, 0x47, 0xfa, 0xb7, 0x63, 0xab, 0xdd, 0xe7, 0xb4, 0x86, 0x5b, 0x09,
-	0xca, 0x73, 0xf2, 0xe0, 0xe8, 0xd1, 0xf9, 0xd0, 0x1d, 0x24, 0xa9, 0x59, 0x6e, 0xe6, 0x21, 0xc7,
-	0x75, 0xc4, 0x51, 0xaf, 0x51, 0xff, 0x38, 0x06, 0x5a, 0xbc, 0x29, 0xd0, 0xc2, 0x21, 0xe7, 0x43,
-	0x21, 0x14, 0x68, 0x1d, 0x17, 0xf5, 0x6e, 0x48, 0x9d, 0x05, 0x80, 0xf6, 0x6a, 0x79, 0xdf, 0x51,
-	0xe7, 0xdb, 0xa1, 0xdb, 0x7a, 0xad, 0x51, 0x3e, 0x09, 0x8c, 0x62, 0x52, 0x33, 0x9e, 0xbf, 0x60,
-	0xb6, 0x00, 0x08, 0x62, 0xeb, 0x0b, 0xbe, 0x10, 0xea, 0x95, 0xc2, 0xc5, 0xa0, 0xaf, 0x81, 0xef,
-	0x4c, 0xe8, 0x9d, 0x89, 0x4e, 0x9e, 0x89, 0xd4, 0xfc, 0x36, 0xba, 0x36, 0x6d, 0xe2, 0x4a, 0xcc,
-	0x2e, 0xf0, 0x1a, 0xb8, 0x12, 0xd3, 0x9c, 0xb0, 0x4d, 0x9b, 0x12, 0xb6, 0x45, 0xaa, 0xc0, 0x6b,
-	0x48, 0xd8, 0x4e, 0x4b, 0xe0, 0xab, 0x7f, 0x87, 0x77, 0xca, 0xe0, 0x6b, 0xff, 0x09, 0xbe, 0xfe,
-	0x8f, 0xf0, 0x9f, 0x09, 0x6d, 0x95, 0xc0, 0x5f, 0xc7, 0x68, 0x47, 0xe3, 0x0f, 0x47, 0x9f, 0xec,
-	0x8f, 0x3e, 0xf9, 0x7a, 0xf4, 0xc9, 0xfb, 0x93, 0x5f, 0xd9, 0x9f, 0xfc, 0xca, 0xc7, 0x93, 0x5f,
-	0x79, 0xf5, 0xf0, 0xa2, 0xff, 0xaf, 0x5d, 0xb7, 0x2a, 0xfa, 0xf3, 0x77, 0x98, 0xd7, 0xed, 0x92,
-	0x3f, 0xfe, 0x1e, 0x00, 0x00, 0xff, 0xff, 0x94, 0x08, 0x2a, 0x58, 0x38, 0x04, 0x00, 0x00,
+	// 392 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x54, 0xb1, 0xae, 0xd3, 0x30,
+	0x14, 0xad, 0xdf, 0x4b, 0xdf, 0x2b, 0x86, 0x29, 0x40, 0x49, 0x3b, 0xa4, 0x25, 0x53, 0x85, 0xd4,
+	0x44, 0x88, 0x8d, 0xad, 0xa5, 0x08, 0x31, 0xb4, 0x43, 0xd8, 0x58, 0x2a, 0xd7, 0xbe, 0x4d, 0x03,
+	0xad, 0x6f, 0x64, 0xbb, 0xb4, 0xac, 0x7c, 0x01, 0x9f, 0xc5, 0xd8, 0x91, 0xa9, 0x42, 0x89, 0xf8,
+	0x01, 0x46, 0x26, 0x14, 0x07, 0xaa, 0x82, 0x0a, 0x62, 0x78, 0x53, 0x27, 0x1f, 0xfb, 0x1e, 0xfb,
+	0xfa, 0x9c, 0x2b, 0x1d, 0xfa, 0x70, 0x1b, 0x65, 0x0a, 0xdf, 0xa5, 0x02, 0x54, 0x64, 0xde, 0x67,
+	0xa0, 0x23, 0xb3, 0x9d, 0x0a, 0x8d, 0x6b, 0xc5, 0x21, 0xcc, 0x14, 0x1a, 0x74, 0x1f, 0xa0, 0x62,
+	0x29, 0x5f, 0xb0, 0x54, 0x86, 0x25, 0x0a, 0x7f, 0xf1, 0xdb, 0xf7, 0x12, 0x4c, 0xd0, 0x72, 0xa2,
+	0x12, 0x55, 0xf4, 0x20, 0x27, 0xf4, 0xfe, 0x58, 0x27, 0xcf, 0x14, 0x30, 0x03, 0x83, 0x97, 0x23,
+	0x66, 0xd8, 0x2b, 0xfb, 0x9c, 0xeb, 0x52, 0x47, 0xb2, 0x15, 0x78, 0xa4, 0x4b, 0x7a, 0xb7, 0x62,
+	0x8b, 0xdd, 0x2e, 0xbd, 0x2d, 0x40, 0x73, 0x95, 0x66, 0x26, 0x45, 0xe9, 0x5d, 0xd8, 0xd2, 0xf1,
+	0x91, 0xdb, 0xa6, 0x0d, 0x8e, 0xd2, 0x28, 0xc6, 0x8d, 0x77, 0x69, 0xcb, 0x87, 0xbd, 0xfb, 0x82,
+	0xd6, 0x71, 0x23, 0x41, 0x79, 0x4e, 0x97, 0xf4, 0xee, 0x0c, 0x1f, 0x7f, 0xdf, 0x77, 0xfa, 0x49,
+	0x6a, 0x16, 0xeb, 0x59, 0xc8, 0x71, 0x15, 0x71, 0xd4, 0x2b, 0xd4, 0x3f, 0x97, 0xbe, 0x16, 0x6f,
+	0x2b, 0x89, 0xe1, 0x80, 0xf3, 0x81, 0x10, 0x0a, 0xb4, 0x8e, 0xab, 0xfb, 0x6e, 0x48, 0x9d, 0x39,
+	0x80, 0xf6, 0xea, 0x65, 0x83, 0x61, 0xfb, 0xdb, 0xbe, 0xd3, 0x7c, 0xa3, 0x51, 0x3e, 0x0d, 0x8c,
+	0x62, 0x52, 0x33, 0x5e, 0xfe, 0x64, 0x3a, 0x07, 0x08, 0x62, 0xcb, 0x0b, 0xbe, 0x12, 0xea, 0x9d,
+	0x14, 0x19, 0x83, 0x3e, 0x27, 0x9d, 0x1f, 0x2e, 0xe8, 0xdd, 0xb1, 0x4e, 0x9e, 0x8b, 0xd4, 0xfc,
+	0x36, 0xca, 0x16, 0x6d, 0xe0, 0x52, 0x4c, 0x8f, 0x64, 0x5e, 0xe3, 0x52, 0x4c, 0x4a, 0xa5, 0x2d,
+	0xda, 0x90, 0xb0, 0xa9, 0x4a, 0x95, 0xcc, 0x6b, 0x09, 0x9b, 0xc9, 0x09, 0x13, 0x2e, 0xff, 0x6d,
+	0x82, 0xf3, 0x37, 0x13, 0xea, 0x37, 0x64, 0xc2, 0xd5, 0x7f, 0x9a, 0x50, 0x10, 0xda, 0x3c, 0x61,
+	0xc2, 0x79, 0x8d, 0x7a, 0x38, 0xfa, 0x94, 0xfb, 0x64, 0x97, 0xfb, 0xe4, 0x4b, 0xee, 0x93, 0x8f,
+	0x85, 0x5f, 0xdb, 0x15, 0x7e, 0xed, 0x73, 0xe1, 0xd7, 0x5e, 0x3f, 0x3a, 0xea, 0x7f, 0xc8, 0x02,
+	0x8b, 0xa2, 0x3f, 0xd3, 0x63, 0x76, 0x65, 0x43, 0xe0, 0xc9, 0x8f, 0x00, 0x00, 0x00, 0xff, 0xff,
+	0xe8, 0x09, 0xb1, 0x17, 0x58, 0x04, 0x00, 0x00,
 }
 
 func (m *MsgCreateAIDataSource) Marshal() (dAtA []byte, err error) {
@@ -415,10 +416,10 @@ func (m *MsgCreateAIDataSource) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x22
 	}
-	if len(m.Code) > 0 {
-		i -= len(m.Code)
-		copy(dAtA[i:], m.Code)
-		i = encodeVarintTxDsource(dAtA, i, uint64(len(m.Code)))
+	if len(m.Contract) > 0 {
+		i -= len(m.Contract)
+		copy(dAtA[i:], m.Contract)
+		i = encodeVarintTxDsource(dAtA, i, uint64(len(m.Contract)))
 		i--
 		dAtA[i] = 0x1a
 	}
@@ -473,10 +474,10 @@ func (m *MsgCreateAIDataSourceRes) MarshalToSizedBuffer(dAtA []byte) (int, error
 		i--
 		dAtA[i] = 0x22
 	}
-	if len(m.Code) > 0 {
-		i -= len(m.Code)
-		copy(dAtA[i:], m.Code)
-		i = encodeVarintTxDsource(dAtA, i, uint64(len(m.Code)))
+	if len(m.Contract) > 0 {
+		i -= len(m.Contract)
+		copy(dAtA[i:], m.Contract)
+		i = encodeVarintTxDsource(dAtA, i, uint64(len(m.Contract)))
 		i--
 		dAtA[i] = 0x1a
 	}
@@ -531,10 +532,10 @@ func (m *MsgEditAIDataSource) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x2a
 	}
-	if len(m.Code) > 0 {
-		i -= len(m.Code)
-		copy(dAtA[i:], m.Code)
-		i = encodeVarintTxDsource(dAtA, i, uint64(len(m.Code)))
+	if len(m.Contract) > 0 {
+		i -= len(m.Contract)
+		copy(dAtA[i:], m.Contract)
+		i = encodeVarintTxDsource(dAtA, i, uint64(len(m.Contract)))
 		i--
 		dAtA[i] = 0x22
 	}
@@ -596,10 +597,10 @@ func (m *MsgEditAIDataSourceRes) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 		i--
 		dAtA[i] = 0x22
 	}
-	if len(m.Code) > 0 {
-		i -= len(m.Code)
-		copy(dAtA[i:], m.Code)
-		i = encodeVarintTxDsource(dAtA, i, uint64(len(m.Code)))
+	if len(m.Contract) > 0 {
+		i -= len(m.Contract)
+		copy(dAtA[i:], m.Contract)
+		i = encodeVarintTxDsource(dAtA, i, uint64(len(m.Contract)))
 		i--
 		dAtA[i] = 0x1a
 	}
@@ -645,7 +646,7 @@ func (m *MsgCreateAIDataSource) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTxDsource(uint64(l))
 	}
-	l = len(m.Code)
+	l = len(m.Contract)
 	if l > 0 {
 		n += 1 + l + sovTxDsource(uint64(l))
 	}
@@ -674,7 +675,7 @@ func (m *MsgCreateAIDataSourceRes) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTxDsource(uint64(l))
 	}
-	l = len(m.Code)
+	l = len(m.Contract)
 	if l > 0 {
 		n += 1 + l + sovTxDsource(uint64(l))
 	}
@@ -707,7 +708,7 @@ func (m *MsgEditAIDataSource) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTxDsource(uint64(l))
 	}
-	l = len(m.Code)
+	l = len(m.Contract)
 	if l > 0 {
 		n += 1 + l + sovTxDsource(uint64(l))
 	}
@@ -736,7 +737,7 @@ func (m *MsgEditAIDataSourceRes) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTxDsource(uint64(l))
 	}
-	l = len(m.Code)
+	l = len(m.Contract)
 	if l > 0 {
 		n += 1 + l + sovTxDsource(uint64(l))
 	}
@@ -852,9 +853,9 @@ func (m *MsgCreateAIDataSource) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Code", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Contract", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTxDsource
@@ -864,25 +865,23 @@ func (m *MsgCreateAIDataSource) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthTxDsource
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthTxDsource
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Code = append(m.Code[:0], dAtA[iNdEx:postIndex]...)
-			if m.Code == nil {
-				m.Code = []byte{}
-			}
+			m.Contract = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
@@ -1069,9 +1068,9 @@ func (m *MsgCreateAIDataSourceRes) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Code", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Contract", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTxDsource
@@ -1081,25 +1080,23 @@ func (m *MsgCreateAIDataSourceRes) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthTxDsource
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthTxDsource
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Code = append(m.Code[:0], dAtA[iNdEx:postIndex]...)
-			if m.Code == nil {
-				m.Code = []byte{}
-			}
+			m.Contract = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
@@ -1318,9 +1315,9 @@ func (m *MsgEditAIDataSource) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Code", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Contract", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTxDsource
@@ -1330,25 +1327,23 @@ func (m *MsgEditAIDataSource) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthTxDsource
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthTxDsource
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Code = append(m.Code[:0], dAtA[iNdEx:postIndex]...)
-			if m.Code == nil {
-				m.Code = []byte{}
-			}
+			m.Contract = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
@@ -1535,9 +1530,9 @@ func (m *MsgEditAIDataSourceRes) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Code", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Contract", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTxDsource
@@ -1547,25 +1542,23 @@ func (m *MsgEditAIDataSourceRes) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthTxDsource
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthTxDsource
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Code = append(m.Code[:0], dAtA[iNdEx:postIndex]...)
-			if m.Code == nil {
-				m.Code = []byte{}
-			}
+			m.Contract = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {

@@ -9,7 +9,7 @@ option go_package = "github.com/oraichain/orai/x/provider/types";
 message MsgCreateTestCase {
   string name = 1;
   string description = 2;
-  bytes code = 3;
+  string contract = 3;
   // Owner is the address who is allowed to make further changes to the test case.
   bytes owner = 4 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
   string fees = 5 [(gogoproto.moretags) = "json:\"transaction_fee\""];
@@ -18,7 +18,7 @@ message MsgCreateTestCase {
 message MsgCreateTestCaseRes{
   string name = 1;
   string description = 2;
-  bytes code = 3;
+  string contract = 3;
   // Owner is the address who is allowed to make further changes to the test case.
   bytes owner = 4 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
   string fees = 5 [(gogoproto.moretags) = "json:\"transaction_fee\""];
@@ -29,7 +29,7 @@ message MsgEditTestCase {
   string old_name = 1;
   string new_name = 2;
   string description = 3;
-  bytes code = 4;
+  string contract = 4;
   // Owner is the address who is allowed to make further changes to the test case.
   bytes owner = 5 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
   string fees = 6 [(gogoproto.moretags) = "json:\"transaction_fee\""];
@@ -38,7 +38,7 @@ message MsgEditTestCase {
 message MsgEditTestCaseRes{
   string name = 1;
   string description = 2;
-  bytes code = 3;
+  string contract = 3;
   // Owner is the address who is allowed to make further changes to the test case.
   bytes owner = 4 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
   string fees = 5 [(gogoproto.moretags) = "json:\"transaction_fee\""];

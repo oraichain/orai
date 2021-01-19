@@ -19,16 +19,22 @@ func NewAIDataSource(
 	}
 }
 
+// verify interface at compile time
+var _ sdk.Msg = &MsgCreateAIDataSource{}
+
 // NewMsgCreateAIDataSource is a constructor function for MsgCreateAIDataSource
-func NewMsgCreateAIDataSource(name string, code []byte, owner sdk.AccAddress, fees string, des string) MsgCreateAIDataSource {
-	return MsgCreateAIDataSource{
+func NewMsgCreateAIDataSource(name string, contract string, owner sdk.AccAddress, fees string, des string) *MsgCreateAIDataSource {
+	return &MsgCreateAIDataSource{
 		Name:        name,
 		Description: des,
-		Code:        code,
+		Contract:    contract,
 		Owner:       owner,
 		Fees:        fees,
 	}
 }
+
+// verify interface at compile time
+var _ sdk.Msg = &OracleScript{}
 
 // NewOracleScript is the constructor of the oScript struct
 func NewOracleScript(
@@ -38,8 +44,8 @@ func NewOracleScript(
 	minimumFees sdk.Coins,
 	dSources []string,
 	tCases []string,
-) OracleScript {
-	return OracleScript{
+) *OracleScript {
+	return &OracleScript{
 		Name:        name,
 		Owner:       owner,
 		Description: des,
@@ -49,11 +55,13 @@ func NewOracleScript(
 	}
 }
 
+var _ sdk.Msg = &MsgCreateOracleScript{}
+
 // NewMsgCreateOracleScript is a constructor function for MsgCreateOracleScript
-func NewMsgCreateOracleScript(name string, code []byte, owner sdk.AccAddress, des string, dSources, tCases []string) MsgCreateOracleScript {
-	return MsgCreateOracleScript{
+func NewMsgCreateOracleScript(name string, contract string, owner sdk.AccAddress, des string, dSources, tCases []string) *MsgCreateOracleScript {
+	return &MsgCreateOracleScript{
 		Name:        name,
-		Code:        code,
+		Contract:    contract,
 		Owner:       owner,
 		Description: des,
 		DataSources: dSources,

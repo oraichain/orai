@@ -7,6 +7,8 @@ const (
 	DefaultOracleScriptRewardPercentage = uint64(70)
 	DefaultMaximumCodeBytes             = uint64(1024) // 1MB
 	MaximumCodeBytesThreshold           = 4096         // 4MB
+
+	MaximumContractLength = 50
 )
 
 // // Parameter store keys

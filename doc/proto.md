@@ -3,163 +3,82 @@
 
 ## Table of Contents
 
-- [x/wasm/internal/types/genesis.proto](#x/wasm/internal/types/genesis.proto)
-    - [Code](#cosmwasm.wasm.v1beta1.Code)
-    - [Contract](#cosmwasm.wasm.v1beta1.Contract)
-    - [GenesisState](#cosmwasm.wasm.v1beta1.GenesisState)
-    - [GenesisState.GenMsgs](#cosmwasm.wasm.v1beta1.GenesisState.GenMsgs)
-    - [Sequence](#cosmwasm.wasm.v1beta1.Sequence)
+- [x/provider/types/genesis.proto](#x/provider/types/genesis.proto)
+    - [GenesisState](#oraichain.orai.provider.GenesisState)
   
-- [x/wasm/internal/types/proposal.proto](#x/wasm/internal/types/proposal.proto)
-    - [ClearAdminProposal](#cosmwasm.wasm.v1beta1.ClearAdminProposal)
-    - [InstantiateContractProposal](#cosmwasm.wasm.v1beta1.InstantiateContractProposal)
-    - [MigrateContractProposal](#cosmwasm.wasm.v1beta1.MigrateContractProposal)
-    - [StoreCodeProposal](#cosmwasm.wasm.v1beta1.StoreCodeProposal)
-    - [UpdateAdminProposal](#cosmwasm.wasm.v1beta1.UpdateAdminProposal)
+- [x/provider/types/query.proto](#x/provider/types/query.proto)
+    - [Query](#oraichain.orai.provider.Query)
   
-- [x/wasm/internal/types/query.proto](#x/wasm/internal/types/query.proto)
-    - [CodeInfoResponse](#cosmwasm.wasm.v1beta1.CodeInfoResponse)
-    - [ContractInfoWithAddress](#cosmwasm.wasm.v1beta1.ContractInfoWithAddress)
-    - [QueryAllContractStateRequest](#cosmwasm.wasm.v1beta1.QueryAllContractStateRequest)
-    - [QueryAllContractStateResponse](#cosmwasm.wasm.v1beta1.QueryAllContractStateResponse)
-    - [QueryCodeRequest](#cosmwasm.wasm.v1beta1.QueryCodeRequest)
-    - [QueryCodeResponse](#cosmwasm.wasm.v1beta1.QueryCodeResponse)
-    - [QueryCodesRequest](#cosmwasm.wasm.v1beta1.QueryCodesRequest)
-    - [QueryCodesResponse](#cosmwasm.wasm.v1beta1.QueryCodesResponse)
-    - [QueryContractHistoryRequest](#cosmwasm.wasm.v1beta1.QueryContractHistoryRequest)
-    - [QueryContractHistoryResponse](#cosmwasm.wasm.v1beta1.QueryContractHistoryResponse)
-    - [QueryContractInfoRequest](#cosmwasm.wasm.v1beta1.QueryContractInfoRequest)
-    - [QueryContractInfoResponse](#cosmwasm.wasm.v1beta1.QueryContractInfoResponse)
-    - [QueryContractsByCodeRequest](#cosmwasm.wasm.v1beta1.QueryContractsByCodeRequest)
-    - [QueryContractsByCodeResponse](#cosmwasm.wasm.v1beta1.QueryContractsByCodeResponse)
-    - [QueryRawContractStateRequest](#cosmwasm.wasm.v1beta1.QueryRawContractStateRequest)
-    - [QueryRawContractStateResponse](#cosmwasm.wasm.v1beta1.QueryRawContractStateResponse)
-    - [QuerySmartContractStateRequest](#cosmwasm.wasm.v1beta1.QuerySmartContractStateRequest)
-    - [QuerySmartContractStateResponse](#cosmwasm.wasm.v1beta1.QuerySmartContractStateResponse)
+- [x/provider/types/query_dsource.proto](#x/provider/types/query_dsource.proto)
+    - [DataSourceInfoReq](#oraichain.orai.provider.DataSourceInfoReq)
+    - [DataSourceInfoRes](#oraichain.orai.provider.DataSourceInfoRes)
+    - [ListDataSourcesReq](#oraichain.orai.provider.ListDataSourcesReq)
+    - [ListDataSourcesRes](#oraichain.orai.provider.ListDataSourcesRes)
   
-    - [Query](#cosmwasm.wasm.v1beta1.Query)
+- [x/provider/types/query_oscript.proto](#x/provider/types/query_oscript.proto)
+    - [ListOracleScriptsReq](#oraichain.orai.provider.ListOracleScriptsReq)
+    - [ListOracleScriptsRes](#oraichain.orai.provider.ListOracleScriptsRes)
+    - [OracleScriptInfoReq](#oraichain.orai.provider.OracleScriptInfoReq)
+    - [OracleScriptInfoRes](#oraichain.orai.provider.OracleScriptInfoRes)
   
-- [x/wasm/internal/types/tx.proto](#x/wasm/internal/types/tx.proto)
-    - [MsgClearAdmin](#cosmwasm.wasm.v1beta1.MsgClearAdmin)
-    - [MsgClearAdminResponse](#cosmwasm.wasm.v1beta1.MsgClearAdminResponse)
-    - [MsgExecuteContract](#cosmwasm.wasm.v1beta1.MsgExecuteContract)
-    - [MsgExecuteContractResponse](#cosmwasm.wasm.v1beta1.MsgExecuteContractResponse)
-    - [MsgInstantiateContract](#cosmwasm.wasm.v1beta1.MsgInstantiateContract)
-    - [MsgInstantiateContractResponse](#cosmwasm.wasm.v1beta1.MsgInstantiateContractResponse)
-    - [MsgMigrateContract](#cosmwasm.wasm.v1beta1.MsgMigrateContract)
-    - [MsgMigrateContractResponse](#cosmwasm.wasm.v1beta1.MsgMigrateContractResponse)
-    - [MsgStoreCode](#cosmwasm.wasm.v1beta1.MsgStoreCode)
-    - [MsgStoreCodeResponse](#cosmwasm.wasm.v1beta1.MsgStoreCodeResponse)
-    - [MsgUpdateAdmin](#cosmwasm.wasm.v1beta1.MsgUpdateAdmin)
-    - [MsgUpdateAdminResponse](#cosmwasm.wasm.v1beta1.MsgUpdateAdminResponse)
+- [x/provider/types/query_tcase.proto](#x/provider/types/query_tcase.proto)
+    - [ListTestCasesReq](#oraichain.orai.provider.ListTestCasesReq)
+    - [ListTestCasesRes](#oraichain.orai.provider.ListTestCasesRes)
+    - [TestCaseInfoReq](#oraichain.orai.provider.TestCaseInfoReq)
+    - [TestCaseInfoRes](#oraichain.orai.provider.TestCaseInfoRes)
   
-    - [Msg](#cosmwasm.wasm.v1beta1.Msg)
+- [x/provider/types/tx.proto](#x/provider/types/tx.proto)
+    - [Msg](#oraichain.orai.provider.Msg)
   
-- [x/wasm/internal/types/types.proto](#x/wasm/internal/types/types.proto)
-    - [AbsoluteTxPosition](#cosmwasm.wasm.v1beta1.AbsoluteTxPosition)
-    - [AccessConfig](#cosmwasm.wasm.v1beta1.AccessConfig)
-    - [AccessTypeParam](#cosmwasm.wasm.v1beta1.AccessTypeParam)
-    - [CodeInfo](#cosmwasm.wasm.v1beta1.CodeInfo)
-    - [ContractCodeHistoryEntry](#cosmwasm.wasm.v1beta1.ContractCodeHistoryEntry)
-    - [ContractInfo](#cosmwasm.wasm.v1beta1.ContractInfo)
-    - [Model](#cosmwasm.wasm.v1beta1.Model)
-    - [Params](#cosmwasm.wasm.v1beta1.Params)
+- [x/provider/types/tx_dsource.proto](#x/provider/types/tx_dsource.proto)
+    - [MsgCreateAIDataSource](#oraichain.orai.provider.MsgCreateAIDataSource)
+    - [MsgCreateAIDataSourceRes](#oraichain.orai.provider.MsgCreateAIDataSourceRes)
+    - [MsgEditAIDataSource](#oraichain.orai.provider.MsgEditAIDataSource)
+    - [MsgEditAIDataSourceRes](#oraichain.orai.provider.MsgEditAIDataSourceRes)
   
-    - [AccessType](#cosmwasm.wasm.v1beta1.AccessType)
-    - [ContractCodeHistoryOperationType](#cosmwasm.wasm.v1beta1.ContractCodeHistoryOperationType)
+- [x/provider/types/tx_oscript.proto](#x/provider/types/tx_oscript.proto)
+    - [MsgCreateOracleScript](#oraichain.orai.provider.MsgCreateOracleScript)
+    - [MsgCreateOracleScriptRes](#oraichain.orai.provider.MsgCreateOracleScriptRes)
+    - [MsgEditOracleScript](#oraichain.orai.provider.MsgEditOracleScript)
+    - [MsgEditOracleScriptRes](#oraichain.orai.provider.MsgEditOracleScriptRes)
+  
+- [x/provider/types/tx_tcase.proto](#x/provider/types/tx_tcase.proto)
+    - [MsgCreateTestCase](#oraichain.orai.provider.MsgCreateTestCase)
+    - [MsgCreateTestCaseRes](#oraichain.orai.provider.MsgCreateTestCaseRes)
+    - [MsgEditTestCase](#oraichain.orai.provider.MsgEditTestCase)
+    - [MsgEditTestCaseRes](#oraichain.orai.provider.MsgEditTestCaseRes)
+  
+- [x/provider/types/types_ds.proto](#x/provider/types/types_ds.proto)
+    - [AIDataSource](#oraichain.orai.provider.AIDataSource)
+  
+- [x/provider/types/types_os.proto](#x/provider/types/types_os.proto)
+    - [OracleScript](#oraichain.orai.provider.OracleScript)
+  
+- [x/provider/types/types_tc.proto](#x/provider/types/types_tc.proto)
+    - [TestCase](#oraichain.orai.provider.TestCase)
   
 - [Scalar Value Types](#scalar-value-types)
 
 
 
-<a name="x/wasm/internal/types/genesis.proto"></a>
+<a name="x/provider/types/genesis.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## x/wasm/internal/types/genesis.proto
+## x/provider/types/genesis.proto
 
 
 
-<a name="cosmwasm.wasm.v1beta1.Code"></a>
-
-### Code
-Code struct encompasses CodeInfo and CodeBytes
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| code_id | [uint64](#uint64) |  |  |
-| code_info | [CodeInfo](#cosmwasm.wasm.v1beta1.CodeInfo) |  |  |
-| code_bytes | [bytes](#bytes) |  |  |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.Contract"></a>
-
-### Contract
-Contract struct encompasses ContractAddress, ContractInfo, and ContractState
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| contract_address | [string](#string) |  |  |
-| contract_info | [ContractInfo](#cosmwasm.wasm.v1beta1.ContractInfo) |  |  |
-| contract_state | [Model](#cosmwasm.wasm.v1beta1.Model) | repeated |  |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.GenesisState"></a>
+<a name="oraichain.orai.provider.GenesisState"></a>
 
 ### GenesisState
-GenesisState - genesis state of x/wasm
+GenesisState defines the capability module&#39;s genesis state.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| params | [Params](#cosmwasm.wasm.v1beta1.Params) |  |  |
-| codes | [Code](#cosmwasm.wasm.v1beta1.Code) | repeated |  |
-| contracts | [Contract](#cosmwasm.wasm.v1beta1.Contract) | repeated |  |
-| sequences | [Sequence](#cosmwasm.wasm.v1beta1.Sequence) | repeated |  |
-| gen_msgs | [GenesisState.GenMsgs](#cosmwasm.wasm.v1beta1.GenesisState.GenMsgs) | repeated |  |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.GenesisState.GenMsgs"></a>
-
-### GenesisState.GenMsgs
-GenMsgs define the messages that can be executed during genesis phase in order.
-The intention is to have more human readable data that is auditable.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| store_code | [MsgStoreCode](#cosmwasm.wasm.v1beta1.MsgStoreCode) |  |  |
-| instantiate_contract | [MsgInstantiateContract](#cosmwasm.wasm.v1beta1.MsgInstantiateContract) |  |  |
-| execute_contract | [MsgExecuteContract](#cosmwasm.wasm.v1beta1.MsgExecuteContract) |  |  |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.Sequence"></a>
-
-### Sequence
-Sequence key and value of an id generation counter
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| id_key | [bytes](#bytes) |  |  |
-| value | [uint64](#uint64) |  |  |
+| AIDataSources | [AIDataSource](#oraichain.orai.provider.AIDataSource) | repeated |  |
+| OracleScripts | [OracleScript](#oraichain.orai.provider.OracleScript) | repeated |  |
+| TestCases | [TestCase](#oraichain.orai.provider.TestCase) | repeated |  |
 
 
 
@@ -175,108 +94,10 @@ Sequence key and value of an id generation counter
 
 
 
-<a name="x/wasm/internal/types/proposal.proto"></a>
+<a name="x/provider/types/query.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## x/wasm/internal/types/proposal.proto
-
-
-
-<a name="cosmwasm.wasm.v1beta1.ClearAdminProposal"></a>
-
-### ClearAdminProposal
-ClearAdminProposal gov proposal content type to clear the admin of a contract.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| title | [string](#string) |  | Title is a short summary |
-| description | [string](#string) |  | Description is a human readable text |
-| contract | [string](#string) |  | Contract is the address of the smart contract |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.InstantiateContractProposal"></a>
-
-### InstantiateContractProposal
-InstantiateContractProposal gov proposal content type to instantiate a contract.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| title | [string](#string) |  | Title is a short summary |
-| description | [string](#string) |  | Description is a human readable text |
-| run_as | [string](#string) |  | RunAs is the address that is passed to the contract&#39;s environment as sender |
-| admin | [string](#string) |  | Admin is an optional address that can execute migrations |
-| code_id | [uint64](#uint64) |  | CodeID is the reference to the stored WASM code |
-| label | [string](#string) |  | Label is optional metadata to be stored with a constract instance. |
-| init_msg | [bytes](#bytes) |  | InitMsg json encoded message to be passed to the contract on instantiation |
-| init_funds | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | InitFunds coins that are transferred to the contract on instantiation |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.MigrateContractProposal"></a>
-
-### MigrateContractProposal
-MigrateContractProposal gov proposal content type to migrate a contract.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| title | [string](#string) |  | Title is a short summary |
-| description | [string](#string) |  | Description is a human readable text |
-| run_as | [string](#string) |  | RunAs is the address that is passed to the contract&#39;s environment as sender |
-| contract | [string](#string) |  | Contract is the address of the smart contract |
-| code_id | [uint64](#uint64) |  | CodeID references the new WASM code |
-| migrate_msg | [bytes](#bytes) |  | MigrateMsg json encoded message to be passed to the contract on migration |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.StoreCodeProposal"></a>
-
-### StoreCodeProposal
-StoreCodeProposal gov proposal content type to submit WASM code to the system
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| title | [string](#string) |  | Title is a short summary |
-| description | [string](#string) |  | Description is a human readable text |
-| run_as | [string](#string) |  | RunAs is the address that is passed to the contract&#39;s environment as sender |
-| wasm_byte_code | [bytes](#bytes) |  | WASMByteCode can be raw or gzip compressed |
-| source | [string](#string) |  | Source is a valid absolute HTTPS URI to the contract&#39;s source code, optional |
-| builder | [string](#string) |  | Builder is a valid docker image name with tag, optional |
-| instantiate_permission | [AccessConfig](#cosmwasm.wasm.v1beta1.AccessConfig) |  | InstantiatePermission to apply on contract creation, optional |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.UpdateAdminProposal"></a>
-
-### UpdateAdminProposal
-UpdateAdminProposal gov proposal content type to set an admin for a contract.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| title | [string](#string) |  | Title is a short summary |
-| description | [string](#string) |  | Description is a human readable text |
-| new_admin | [string](#string) |  | NewAdmin address to be set |
-| contract | [string](#string) |  | Contract is the address of the smart contract |
-
-
-
+## x/provider/types/query.proto
 
 
  
@@ -285,518 +106,86 @@ UpdateAdminProposal gov proposal content type to set an admin for a contract.
 
  
 
- 
 
-
-
-<a name="x/wasm/internal/types/query.proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## x/wasm/internal/types/query.proto
-
-
-
-<a name="cosmwasm.wasm.v1beta1.CodeInfoResponse"></a>
-
-### CodeInfoResponse
-CodeInfoResponse contains code meta data from CodeInfo
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| code_id | [uint64](#uint64) |  | id for legacy support |
-| creator | [string](#string) |  |  |
-| data_hash | [bytes](#bytes) |  |  |
-| source | [string](#string) |  |  |
-| builder | [string](#string) |  |  |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.ContractInfoWithAddress"></a>
-
-### ContractInfoWithAddress
-ContractInfoWithAddress adds the address (key) to the ContractInfo representation
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| address | [string](#string) |  |  |
-| contract_info | [ContractInfo](#cosmwasm.wasm.v1beta1.ContractInfo) |  |  |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.QueryAllContractStateRequest"></a>
-
-### QueryAllContractStateRequest
-QueryAllContractStateRequest is the request type for the Query/AllContractState RPC method
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| address | [string](#string) |  | address is the address of the contract |
-| pagination | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  | pagination defines an optional pagination for the request. |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.QueryAllContractStateResponse"></a>
-
-### QueryAllContractStateResponse
-QueryAllContractStateResponse is the response type for the Query/AllContractState RPC method
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| models | [Model](#cosmwasm.wasm.v1beta1.Model) | repeated |  |
-| pagination | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  | pagination defines the pagination in the response. |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.QueryCodeRequest"></a>
-
-### QueryCodeRequest
-QueryCodeRequest is the request type for the Query/Code RPC method
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| code_id | [uint64](#uint64) |  | grpc-gateway_out does not support Go style CodID |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.QueryCodeResponse"></a>
-
-### QueryCodeResponse
-QueryCodeResponse is the response type for the Query/Code RPC method
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| code_info | [CodeInfoResponse](#cosmwasm.wasm.v1beta1.CodeInfoResponse) |  |  |
-| data | [bytes](#bytes) |  |  |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.QueryCodesRequest"></a>
-
-### QueryCodesRequest
-QueryCodesRequest is the request type for the Query/Codes RPC method
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| pagination | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  | pagination defines an optional pagination for the request. |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.QueryCodesResponse"></a>
-
-### QueryCodesResponse
-QueryCodesResponse is the response type for the Query/Codes RPC method
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| code_infos | [CodeInfoResponse](#cosmwasm.wasm.v1beta1.CodeInfoResponse) | repeated |  |
-| pagination | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  | pagination defines the pagination in the response. |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.QueryContractHistoryRequest"></a>
-
-### QueryContractHistoryRequest
-QueryContractHistoryRequest is the request type for the Query/ContractHistory RPC method
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| address | [string](#string) |  | address is the address of the contract to query |
-| pagination | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  | pagination defines an optional pagination for the request. |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.QueryContractHistoryResponse"></a>
-
-### QueryContractHistoryResponse
-QueryContractHistoryResponse is the response type for the Query/ContractHistory RPC method
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| entries | [ContractCodeHistoryEntry](#cosmwasm.wasm.v1beta1.ContractCodeHistoryEntry) | repeated |  |
-| pagination | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  | pagination defines the pagination in the response. |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.QueryContractInfoRequest"></a>
-
-### QueryContractInfoRequest
-QueryContractInfoRequest is the request type for the Query/ContractInfo RPC method
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| address | [string](#string) |  | address is the address of the contract to query |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.QueryContractInfoResponse"></a>
-
-### QueryContractInfoResponse
-QueryContractInfoResponse is the response type for the Query/ContractInfo RPC method
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| address | [string](#string) |  | address is the address of the contract |
-| contract_info | [ContractInfo](#cosmwasm.wasm.v1beta1.ContractInfo) |  |  |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.QueryContractsByCodeRequest"></a>
-
-### QueryContractsByCodeRequest
-QueryContractsByCodeRequest is the request type for the Query/ContractsByCode RPC method
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| code_id | [uint64](#uint64) |  | grpc-gateway_out does not support Go style CodID |
-| pagination | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  | pagination defines an optional pagination for the request. |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.QueryContractsByCodeResponse"></a>
-
-### QueryContractsByCodeResponse
-QueryContractsByCodeResponse is the response type for the Query/ContractsByCode RPC method
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| contract_infos | [ContractInfoWithAddress](#cosmwasm.wasm.v1beta1.ContractInfoWithAddress) | repeated |  |
-| pagination | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  | pagination defines the pagination in the response. |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.QueryRawContractStateRequest"></a>
-
-### QueryRawContractStateRequest
-QueryRawContractStateRequest is the request type for the Query/RawContractState RPC method
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| address | [string](#string) |  | address is the address of the contract |
-| query_data | [bytes](#bytes) |  |  |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.QueryRawContractStateResponse"></a>
-
-### QueryRawContractStateResponse
-QueryRawContractStateResponse is the response type for the Query/RawContractState RPC method
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| data | [bytes](#bytes) |  | Data contains the raw store data |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.QuerySmartContractStateRequest"></a>
-
-### QuerySmartContractStateRequest
-QuerySmartContractStateRequest is the request type for the Query/SmartContractState RPC method
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| address | [string](#string) |  | address is the address of the contract |
-| query_data | [bytes](#bytes) |  | QueryData contains the query data passed to the contract |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.QuerySmartContractStateResponse"></a>
-
-### QuerySmartContractStateResponse
-QuerySmartContractStateResponse is the response type for the Query/SmartContractState RPC method
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| data | [bytes](#bytes) |  | Data contains the json data returned from the smart contract |
-
-
-
-
-
- 
-
- 
-
- 
-
-
-<a name="cosmwasm.wasm.v1beta1.Query"></a>
+<a name="oraichain.orai.provider.Query"></a>
 
 ### Query
 Query provides defines the gRPC querier service
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| ContractInfo | [QueryContractInfoRequest](#cosmwasm.wasm.v1beta1.QueryContractInfoRequest) | [QueryContractInfoResponse](#cosmwasm.wasm.v1beta1.QueryContractInfoResponse) | ContractInfo gets the contract meta data |
-| ContractHistory | [QueryContractHistoryRequest](#cosmwasm.wasm.v1beta1.QueryContractHistoryRequest) | [QueryContractHistoryResponse](#cosmwasm.wasm.v1beta1.QueryContractHistoryResponse) | ContractHistory gets the contract code history |
-| ContractsByCode | [QueryContractsByCodeRequest](#cosmwasm.wasm.v1beta1.QueryContractsByCodeRequest) | [QueryContractsByCodeResponse](#cosmwasm.wasm.v1beta1.QueryContractsByCodeResponse) | ContractsByCode lists all smart contracts for a code id |
-| AllContractState | [QueryAllContractStateRequest](#cosmwasm.wasm.v1beta1.QueryAllContractStateRequest) | [QueryAllContractStateResponse](#cosmwasm.wasm.v1beta1.QueryAllContractStateResponse) | AllContractState gets all raw store data for a single contract |
-| RawContractState | [QueryRawContractStateRequest](#cosmwasm.wasm.v1beta1.QueryRawContractStateRequest) | [QueryRawContractStateResponse](#cosmwasm.wasm.v1beta1.QueryRawContractStateResponse) | RawContractState gets single key from the raw store data of a contract |
-| SmartContractState | [QuerySmartContractStateRequest](#cosmwasm.wasm.v1beta1.QuerySmartContractStateRequest) | [QuerySmartContractStateResponse](#cosmwasm.wasm.v1beta1.QuerySmartContractStateResponse) | SmartContractState get smart query result from the contract |
-| Code | [QueryCodeRequest](#cosmwasm.wasm.v1beta1.QueryCodeRequest) | [QueryCodeResponse](#cosmwasm.wasm.v1beta1.QueryCodeResponse) | Code gets the binary code and metadata for a singe wasm code |
-| Codes | [QueryCodesRequest](#cosmwasm.wasm.v1beta1.QueryCodesRequest) | [QueryCodesResponse](#cosmwasm.wasm.v1beta1.QueryCodesResponse) | Codes gets the metadata for all stored wasm codes |
+| DataSourceInfo | [DataSourceInfoReq](#oraichain.orai.provider.DataSourceInfoReq) | [DataSourceInfoRes](#oraichain.orai.provider.DataSourceInfoRes) | DataSourceInfo gets the data source meta data |
+| ListDataSources | [ListDataSourcesReq](#oraichain.orai.provider.ListDataSourcesReq) | [ListDataSourcesRes](#oraichain.orai.provider.ListDataSourcesRes) | ListDataSources gets the list of data sources |
+| OracleScriptInfo | [OracleScriptInfoReq](#oraichain.orai.provider.OracleScriptInfoReq) | [OracleScriptInfoRes](#oraichain.orai.provider.OracleScriptInfoRes) | OracleScriptInfo gets the oracle script meta data |
+| ListOracleScripts | [ListOracleScriptsReq](#oraichain.orai.provider.ListOracleScriptsReq) | [ListOracleScriptsRes](#oraichain.orai.provider.ListOracleScriptsRes) | ListOracleScripts gets the list of oracle scripts |
+| TestCaseInfo | [TestCaseInfoReq](#oraichain.orai.provider.TestCaseInfoReq) | [TestCaseInfoRes](#oraichain.orai.provider.TestCaseInfoRes) | TestCaseInfo gets the test case meta data |
+| ListTestCases | [ListTestCasesReq](#oraichain.orai.provider.ListTestCasesReq) | [ListTestCasesRes](#oraichain.orai.provider.ListTestCasesRes) | ListTestCases gets the list of test cases |
 
  
 
 
 
-<a name="x/wasm/internal/types/tx.proto"></a>
+<a name="x/provider/types/query_dsource.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## x/wasm/internal/types/tx.proto
+## x/provider/types/query_dsource.proto
 
 
 
-<a name="cosmwasm.wasm.v1beta1.MsgClearAdmin"></a>
+<a name="oraichain.orai.provider.DataSourceInfoReq"></a>
 
-### MsgClearAdmin
-MsgClearAdmin removes any admin stored for a smart contract
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| sender | [string](#string) |  | Sender is the that actor that signed the messages |
-| contract | [string](#string) |  | Contract is the address of the smart contract |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.MsgClearAdminResponse"></a>
-
-### MsgClearAdminResponse
-MsgClearAdminResponse returns empty data
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.MsgExecuteContract"></a>
-
-### MsgExecuteContract
-MsgExecuteContract submits the given message data to a smart contract
+### DataSourceInfoReq
+DataSourceInfoReq is the request type for the Query/DataSourceInfo RPC method
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| sender | [string](#string) |  | Sender is the that actor that signed the messages |
-| contract | [string](#string) |  | Contract is the address of the smart contract |
-| msg | [bytes](#bytes) |  | Msg json encoded message to be passed to the contract |
-| sent_funds | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | SentFunds coins that are transferred to the contract on execution |
+| name | [string](#string) |  | address is the address of the contract to query |
 
 
 
 
 
 
-<a name="cosmwasm.wasm.v1beta1.MsgExecuteContractResponse"></a>
+<a name="oraichain.orai.provider.DataSourceInfoRes"></a>
 
-### MsgExecuteContractResponse
-MsgExecuteContractResponse returns execution result data.
+### DataSourceInfoRes
+DataSourceInfoRes is the response type for the Query/DataSourceInfo RPC method
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| data | [bytes](#bytes) |  | Data contains base64-encoded bytes to returned from the contract |
+| name | [string](#string) |  |  |
+| owner | [bytes](#bytes) |  | Owner is the address who is allowed to make further changes to the data source. |
+| contract | [string](#string) |  |  |
+| description | [string](#string) |  |  |
+| fees | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 
 
 
 
 
 
-<a name="cosmwasm.wasm.v1beta1.MsgInstantiateContract"></a>
+<a name="oraichain.orai.provider.ListDataSourcesReq"></a>
 
-### MsgInstantiateContract
-MsgInstantiateContract create a new smart contract instance for the given code id.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| sender | [string](#string) |  | Sender is the that actor that signed the messages |
-| admin | [string](#string) |  | Admin is an optional address that can execute migrations |
-| code_id | [uint64](#uint64) |  | CodeID is the reference to the stored WASM code |
-| label | [string](#string) |  | Label is optional metadata to be stored with a contract instance. |
-| init_msg | [bytes](#bytes) |  | InitMsg json encoded message to be passed to the contract on instantiation |
-| init_funds | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | InitFunds coins that are transferred to the contract on instantiation |
+### ListDataSourcesReq
+ListDataSourcesReq is the request type for the Query/ListDataSources RPC method
 
 
 
 
 
 
-<a name="cosmwasm.wasm.v1beta1.MsgInstantiateContractResponse"></a>
+<a name="oraichain.orai.provider.ListDataSourcesRes"></a>
 
-### MsgInstantiateContractResponse
-MsgInstantiateContractResponse return instantiation result data
+### ListDataSourcesRes
+ListDataSourcesRes is the response type for the Query/ListDataSources RPC method
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| address | [string](#string) |  | Address is the bech32 address of the new contract instance. |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.MsgMigrateContract"></a>
-
-### MsgMigrateContract
-MsgMigrateContract runs a code upgrade/ downgrade for a smart contract
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| sender | [string](#string) |  | Sender is the that actor that signed the messages |
-| contract | [string](#string) |  | Contract is the address of the smart contract |
-| code_id | [uint64](#uint64) |  | CodeID references the new WASM code |
-| migrate_msg | [bytes](#bytes) |  | MigrateMsg json encoded message to be passed to the contract on migration |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.MsgMigrateContractResponse"></a>
-
-### MsgMigrateContractResponse
-MsgMigrateContractResponse returns contract migration result data.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| data | [bytes](#bytes) |  | Data contains same raw bytes returned as data from the wasm contract. (May be empty) |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.MsgStoreCode"></a>
-
-### MsgStoreCode
-MsgStoreCode submit Wasm code to the system
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| sender | [string](#string) |  | Sender is the that actor that signed the messages |
-| wasm_byte_code | [bytes](#bytes) |  | WASMByteCode can be raw or gzip compressed |
-| source | [string](#string) |  | Source is a valid absolute HTTPS URI to the contract&#39;s source code, optional |
-| builder | [string](#string) |  | Builder is a valid docker image name with tag, optional |
-| instantiate_permission | [AccessConfig](#cosmwasm.wasm.v1beta1.AccessConfig) |  | InstantiatePermission access control to apply on contract creation, optional |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.MsgStoreCodeResponse"></a>
-
-### MsgStoreCodeResponse
-MsgStoreCodeResponse returns store result data.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| code_id | [uint64](#uint64) |  | CodeID is the reference to the stored WASM code |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.MsgUpdateAdmin"></a>
-
-### MsgUpdateAdmin
-MsgUpdateAdmin sets a new admin for a smart contract
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| sender | [string](#string) |  | Sender is the that actor that signed the messages |
-| new_admin | [string](#string) |  | NewAdmin address to be set |
-| contract | [string](#string) |  | Contract is the address of the smart contract |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.MsgUpdateAdminResponse"></a>
-
-### MsgUpdateAdminResponse
-MsgUpdateAdminResponse returns empty data
+| AIDataSources | [AIDataSource](#oraichain.orai.provider.AIDataSource) | repeated |  |
+| count | [int64](#int64) |  |  |
 
 
 
@@ -808,162 +197,273 @@ MsgUpdateAdminResponse returns empty data
 
  
 
+ 
 
-<a name="cosmwasm.wasm.v1beta1.Msg"></a>
+
+
+<a name="x/provider/types/query_oscript.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## x/provider/types/query_oscript.proto
+
+
+
+<a name="oraichain.orai.provider.ListOracleScriptsReq"></a>
+
+### ListOracleScriptsReq
+ListOracleScriptsReq is the request type for the Query/ListOracleScripts RPC method
+
+
+
+
+
+
+<a name="oraichain.orai.provider.ListOracleScriptsRes"></a>
+
+### ListOracleScriptsRes
+ListOracleScriptsRes is the response type for the Query/ListOracleScripts RPC method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| OracleScripts | [OracleScript](#oraichain.orai.provider.OracleScript) | repeated |  |
+| count | [int64](#int64) |  |  |
+
+
+
+
+
+
+<a name="oraichain.orai.provider.OracleScriptInfoReq"></a>
+
+### OracleScriptInfoReq
+OracleScriptInfoReq is the request type for the Query/OracleScriptInfo RPC method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  | address is the address of the contract to query |
+
+
+
+
+
+
+<a name="oraichain.orai.provider.OracleScriptInfoRes"></a>
+
+### OracleScriptInfoRes
+OracleScriptInfoRes is the response type for the Query/OracleScriptInfo RPC method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  |  |
+| owner | [bytes](#bytes) |  | Owner is the address who is allowed to make further changes to the oracle script. |
+| contract | [string](#string) |  |  |
+| description | [string](#string) |  |  |
+| fees | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| d_sources | [string](#string) | repeated |  |
+| t_cases | [string](#string) | repeated |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="x/provider/types/query_tcase.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## x/provider/types/query_tcase.proto
+
+
+
+<a name="oraichain.orai.provider.ListTestCasesReq"></a>
+
+### ListTestCasesReq
+ListTestCasesReq is the request type for the Query/ListTestCases RPC method
+
+
+
+
+
+
+<a name="oraichain.orai.provider.ListTestCasesRes"></a>
+
+### ListTestCasesRes
+ListTestCasesRes is the response type for the Query/ListTestCases RPC method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| TestCases | [TestCase](#oraichain.orai.provider.TestCase) | repeated |  |
+| count | [int64](#int64) |  |  |
+
+
+
+
+
+
+<a name="oraichain.orai.provider.TestCaseInfoReq"></a>
+
+### TestCaseInfoReq
+TestCaseInfoReq is the request type for the Query/TestCaseInfo RPC method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  | address is the address of the contract to query |
+
+
+
+
+
+
+<a name="oraichain.orai.provider.TestCaseInfoRes"></a>
+
+### TestCaseInfoRes
+TestCaseInfoRes is the response type for the Query/TestCaseInfo RPC method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  |  |
+| owner | [bytes](#bytes) |  | Owner is the address who is allowed to make further changes to the test case. |
+| contract | [string](#string) |  |  |
+| description | [string](#string) |  |  |
+| fees | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="x/provider/types/tx.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## x/provider/types/tx.proto
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="oraichain.orai.provider.Msg"></a>
 
 ### Msg
-Msg defines the wasm Msg service.
+Msg defines the provider Msg service.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| StoreCode | [MsgStoreCode](#cosmwasm.wasm.v1beta1.MsgStoreCode) | [MsgStoreCodeResponse](#cosmwasm.wasm.v1beta1.MsgStoreCodeResponse) | StoreCode to submit Wasm code to the system |
-| InstantiateContract | [MsgInstantiateContract](#cosmwasm.wasm.v1beta1.MsgInstantiateContract) | [MsgInstantiateContractResponse](#cosmwasm.wasm.v1beta1.MsgInstantiateContractResponse) | Instantiate creates a new smart contract instance for the given code id. |
-| ExecuteContract | [MsgExecuteContract](#cosmwasm.wasm.v1beta1.MsgExecuteContract) | [MsgExecuteContractResponse](#cosmwasm.wasm.v1beta1.MsgExecuteContractResponse) | Execute submits the given message data to a smart contract |
-| MigrateContract | [MsgMigrateContract](#cosmwasm.wasm.v1beta1.MsgMigrateContract) | [MsgMigrateContractResponse](#cosmwasm.wasm.v1beta1.MsgMigrateContractResponse) | Migrate runs a code upgrade/ downgrade for a smart contract |
-| UpdateAdmin | [MsgUpdateAdmin](#cosmwasm.wasm.v1beta1.MsgUpdateAdmin) | [MsgUpdateAdminResponse](#cosmwasm.wasm.v1beta1.MsgUpdateAdminResponse) | UpdateAdmin sets a new admin for a smart contract |
-| ClearAdmin | [MsgClearAdmin](#cosmwasm.wasm.v1beta1.MsgClearAdmin) | [MsgClearAdminResponse](#cosmwasm.wasm.v1beta1.MsgClearAdminResponse) | ClearAdmin removes any admin stored for a smart contract |
+| CreateAIDataSource | [MsgCreateAIDataSource](#oraichain.orai.provider.MsgCreateAIDataSource) | [MsgCreateAIDataSourceRes](#oraichain.orai.provider.MsgCreateAIDataSourceRes) | Create a new data source |
+| EditAIDataSource | [MsgEditAIDataSource](#oraichain.orai.provider.MsgEditAIDataSource) | [MsgEditAIDataSourceRes](#oraichain.orai.provider.MsgEditAIDataSourceRes) | Edit an existing data source |
+| CreateOracleScript | [MsgCreateOracleScript](#oraichain.orai.provider.MsgCreateOracleScript) | [MsgCreateOracleScriptRes](#oraichain.orai.provider.MsgCreateOracleScriptRes) | Create a new oracle script |
+| EditOracleScript | [MsgEditOracleScript](#oraichain.orai.provider.MsgEditOracleScript) | [MsgEditOracleScriptRes](#oraichain.orai.provider.MsgEditOracleScriptRes) | Edit an existing oracle script |
+| CreateTestCase | [MsgCreateTestCase](#oraichain.orai.provider.MsgCreateTestCase) | [MsgCreateTestCaseRes](#oraichain.orai.provider.MsgCreateTestCaseRes) | Create a new test case |
+| EditTestCase | [MsgEditTestCase](#oraichain.orai.provider.MsgEditTestCase) | [MsgEditTestCaseRes](#oraichain.orai.provider.MsgEditTestCaseRes) | Edit an existing test case |
 
  
 
 
 
-<a name="x/wasm/internal/types/types.proto"></a>
+<a name="x/provider/types/tx_dsource.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## x/wasm/internal/types/types.proto
+## x/provider/types/tx_dsource.proto
 
 
 
-<a name="cosmwasm.wasm.v1beta1.AbsoluteTxPosition"></a>
+<a name="oraichain.orai.provider.MsgCreateAIDataSource"></a>
 
-### AbsoluteTxPosition
-AbsoluteTxPosition is a unique transaction position that allows for global ordering of transactions.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| block_height | [uint64](#uint64) |  | BlockHeight is the block the contract was created at |
-| tx_index | [uint64](#uint64) |  | TxIndex is a monotonic counter within the block (actual transaction index, or gas consumed) |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.AccessConfig"></a>
-
-### AccessConfig
-AccessConfig access control type.
+### MsgCreateAIDataSource
+MsgCreateAIDataSource submit data source metadata onto Oraichain
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| permission | [AccessType](#cosmwasm.wasm.v1beta1.AccessType) |  |  |
-| address | [string](#string) |  |  |
+| name | [string](#string) |  |  |
+| description | [string](#string) |  |  |
+| contract | [string](#string) |  |  |
+| owner | [bytes](#bytes) |  | Owner is the address who is allowed to make further changes to the data source. |
+| fees | [string](#string) |  |  |
 
 
 
 
 
 
-<a name="cosmwasm.wasm.v1beta1.AccessTypeParam"></a>
+<a name="oraichain.orai.provider.MsgCreateAIDataSourceRes"></a>
 
-### AccessTypeParam
-AccessTypeParam
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| value | [AccessType](#cosmwasm.wasm.v1beta1.AccessType) |  |  |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.CodeInfo"></a>
-
-### CodeInfo
-CodeInfo is data for the uploaded contract WASM code
+### MsgCreateAIDataSourceRes
+MsgCreateAIDataSourceRes returns store result data.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| code_hash | [bytes](#bytes) |  | CodeHash is the unique CodeID |
-| creator | [string](#string) |  | Creator address who initially stored the code |
-| source | [string](#string) |  | Source is a valid absolute HTTPS URI to the contract&#39;s source code, optional |
-| builder | [string](#string) |  | Builder is a valid docker image name with tag, optional |
-| instantiate_config | [AccessConfig](#cosmwasm.wasm.v1beta1.AccessConfig) |  | InstantiateConfig access control to apply on contract creation, optional |
+| name | [string](#string) |  |  |
+| description | [string](#string) |  |  |
+| contract | [string](#string) |  |  |
+| owner | [bytes](#bytes) |  | Owner is the address who is allowed to make further changes to the data source. |
+| fees | [string](#string) |  |  |
 
 
 
 
 
 
-<a name="cosmwasm.wasm.v1beta1.ContractCodeHistoryEntry"></a>
+<a name="oraichain.orai.provider.MsgEditAIDataSource"></a>
 
-### ContractCodeHistoryEntry
-ContractCodeHistoryEntry metadata to a contract.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| operation | [ContractCodeHistoryOperationType](#cosmwasm.wasm.v1beta1.ContractCodeHistoryOperationType) |  |  |
-| code_id | [uint64](#uint64) |  | CodeID is the reference to the stored WASM code |
-| updated | [AbsoluteTxPosition](#cosmwasm.wasm.v1beta1.AbsoluteTxPosition) |  | Updated Tx position when the operation was executed. |
-| msg | [bytes](#bytes) |  |  |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.ContractInfo"></a>
-
-### ContractInfo
-ContractInfo stores a WASM contract instance
+### MsgEditAIDataSource
+MsgEditAIDataSource edit data source metadata onto Oraichain
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| code_id | [uint64](#uint64) |  | CodeID is the reference to the stored Wasm code |
-| creator | [string](#string) |  | Creator address who initially instantiated the contract |
-| admin | [string](#string) |  | Admin is an optional address that can execute migrations |
-| label | [string](#string) |  | Label is optional metadata to be stored with a contract instance. |
-| created | [AbsoluteTxPosition](#cosmwasm.wasm.v1beta1.AbsoluteTxPosition) |  | Created Tx position when the contract was instantiated. This data should kept internal and not be exposed via query results. Just use for sorting |
+| old_name | [string](#string) |  |  |
+| new_name | [string](#string) |  |  |
+| description | [string](#string) |  |  |
+| contract | [string](#string) |  |  |
+| owner | [bytes](#bytes) |  | Owner is the address who is allowed to make further changes to the data source. |
+| fees | [string](#string) |  |  |
 
 
 
 
 
 
-<a name="cosmwasm.wasm.v1beta1.Model"></a>
+<a name="oraichain.orai.provider.MsgEditAIDataSourceRes"></a>
 
-### Model
-Model is a struct that holds a KV pair
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| key | [bytes](#bytes) |  | hex-encode key to read it better (this is often ascii) |
-| value | [bytes](#bytes) |  | base64-encode raw value |
-
-
-
-
-
-
-<a name="cosmwasm.wasm.v1beta1.Params"></a>
-
-### Params
-Params defines the set of wasm parameters.
+### MsgEditAIDataSourceRes
+MsgEditAIDataSourceRes returns edit result data.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| code_upload_access | [AccessConfig](#cosmwasm.wasm.v1beta1.AccessConfig) |  |  |
-| instantiate_default_permission | [AccessType](#cosmwasm.wasm.v1beta1.AccessType) |  |  |
-| max_wasm_code_size | [uint64](#uint64) |  |  |
+| name | [string](#string) |  |  |
+| description | [string](#string) |  |  |
+| contract | [string](#string) |  |  |
+| owner | [bytes](#bytes) |  | Owner is the address who is allowed to make further changes to the data source. |
+| fees | [string](#string) |  |  |
 
 
 
@@ -971,33 +471,303 @@ Params defines the set of wasm parameters.
 
  
 
+ 
 
-<a name="cosmwasm.wasm.v1beta1.AccessType"></a>
+ 
 
-### AccessType
-AccessType permission types
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| ACCESS_TYPE_UNSPECIFIED | 0 | AccessTypeUnspecified placeholder for empty value |
-| ACCESS_TYPE_NOBODY | 1 | AccessTypeNobody forbidden |
-| ACCESS_TYPE_ONLY_ADDRESS | 2 | AccessTypeOnlyAddress restricted to an address |
-| ACCESS_TYPE_EVERYBODY | 3 | AccessTypeEverybody unrestricted |
+ 
 
 
 
-<a name="cosmwasm.wasm.v1beta1.ContractCodeHistoryOperationType"></a>
+<a name="x/provider/types/tx_oscript.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
 
-### ContractCodeHistoryOperationType
-ContractCodeHistoryOperationType actions that caused a code change
+## x/provider/types/tx_oscript.proto
 
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| CONTRACT_CODE_HISTORY_OPERATION_TYPE_UNSPECIFIED | 0 | ContractCodeHistoryOperationTypeUnspecified placeholder for empty value |
-| CONTRACT_CODE_HISTORY_OPERATION_TYPE_INIT | 1 | ContractCodeHistoryOperationTypeInit on chain contract instantiation |
-| CONTRACT_CODE_HISTORY_OPERATION_TYPE_MIGRATE | 2 | ContractCodeHistoryOperationTypeMigrate code migration |
-| CONTRACT_CODE_HISTORY_OPERATION_TYPE_GENESIS | 3 | ContractCodeHistoryOperationTypeGenesis based on genesis data |
 
+
+<a name="oraichain.orai.provider.MsgCreateOracleScript"></a>
+
+### MsgCreateOracleScript
+MsgCreateOracleScript submit oracle script metadata onto Oraichain
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  |  |
+| description | [string](#string) |  |  |
+| contract | [string](#string) |  |  |
+| owner | [bytes](#bytes) |  | Owner is the address who is allowed to make further changes to the oracle script. |
+| fees | [string](#string) |  |  |
+| data_sources | [string](#string) | repeated |  |
+| test_cases | [string](#string) | repeated |  |
+
+
+
+
+
+
+<a name="oraichain.orai.provider.MsgCreateOracleScriptRes"></a>
+
+### MsgCreateOracleScriptRes
+MsgCreateOracleScriptRes returns store result data.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  |  |
+| description | [string](#string) |  |  |
+| contract | [string](#string) |  |  |
+| owner | [bytes](#bytes) |  | Owner is the address who is allowed to make further changes to the oracle script. |
+| fees | [string](#string) |  |  |
+| data_sources | [string](#string) | repeated |  |
+| test_cases | [string](#string) | repeated |  |
+
+
+
+
+
+
+<a name="oraichain.orai.provider.MsgEditOracleScript"></a>
+
+### MsgEditOracleScript
+MsgEditOracleScript edit oracle script metadata onto Oraichain
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| old_name | [string](#string) |  |  |
+| new_name | [string](#string) |  |  |
+| description | [string](#string) |  |  |
+| contract | [string](#string) |  |  |
+| owner | [bytes](#bytes) |  | Owner is the address who is allowed to make further changes to the oracle script. |
+| fees | [string](#string) |  |  |
+| data_sources | [string](#string) | repeated |  |
+| test_cases | [string](#string) | repeated |  |
+
+
+
+
+
+
+<a name="oraichain.orai.provider.MsgEditOracleScriptRes"></a>
+
+### MsgEditOracleScriptRes
+MsgEditOracleScriptRes returns edit result data.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  |  |
+| description | [string](#string) |  |  |
+| contract | [string](#string) |  |  |
+| owner | [bytes](#bytes) |  | Owner is the address who is allowed to make further changes to the oracle script. |
+| fees | [string](#string) |  |  |
+| data_sources | [string](#string) | repeated |  |
+| test_cases | [string](#string) | repeated |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="x/provider/types/tx_tcase.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## x/provider/types/tx_tcase.proto
+
+
+
+<a name="oraichain.orai.provider.MsgCreateTestCase"></a>
+
+### MsgCreateTestCase
+MsgCreateTestCase submit test case metadata onto Oraichain
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  |  |
+| description | [string](#string) |  |  |
+| contract | [string](#string) |  |  |
+| owner | [bytes](#bytes) |  | Owner is the address who is allowed to make further changes to the test case. |
+| fees | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="oraichain.orai.provider.MsgCreateTestCaseRes"></a>
+
+### MsgCreateTestCaseRes
+MsgCreateTestCaseRes returns store result data.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  |  |
+| description | [string](#string) |  |  |
+| contract | [string](#string) |  |  |
+| owner | [bytes](#bytes) |  | Owner is the address who is allowed to make further changes to the test case. |
+| fees | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="oraichain.orai.provider.MsgEditTestCase"></a>
+
+### MsgEditTestCase
+MsgEditTestCase edit test case metadata onto Oraichain
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| old_name | [string](#string) |  |  |
+| new_name | [string](#string) |  |  |
+| description | [string](#string) |  |  |
+| contract | [string](#string) |  |  |
+| owner | [bytes](#bytes) |  | Owner is the address who is allowed to make further changes to the test case. |
+| fees | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="oraichain.orai.provider.MsgEditTestCaseRes"></a>
+
+### MsgEditTestCaseRes
+MsgEditTestCaseRes returns edit result data.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  |  |
+| description | [string](#string) |  |  |
+| contract | [string](#string) |  |  |
+| owner | [bytes](#bytes) |  | Owner is the address who is allowed to make further changes to the test case. |
+| fees | [string](#string) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="x/provider/types/types_ds.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## x/provider/types/types_ds.proto
+
+
+
+<a name="oraichain.orai.provider.AIDataSource"></a>
+
+### AIDataSource
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  |  |
+| owner | [bytes](#bytes) |  | Owner is the address who is allowed to make further changes to the data source. |
+| description | [string](#string) |  |  |
+| fees | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="x/provider/types/types_os.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## x/provider/types/types_os.proto
+
+
+
+<a name="oraichain.orai.provider.OracleScript"></a>
+
+### OracleScript
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  |  |
+| owner | [bytes](#bytes) |  | Owner is the address who is allowed to make further changes to the data source. |
+| description | [string](#string) |  |  |
+| minimum_fees | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| d_sources | [string](#string) | repeated |  |
+| t_cases | [string](#string) | repeated |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="x/provider/types/types_tc.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## x/provider/types/types_tc.proto
+
+
+
+<a name="oraichain.orai.provider.TestCase"></a>
+
+### TestCase
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  |  |
+| owner | [bytes](#bytes) |  | Owner is the address who is allowed to make further changes to the data source. |
+| description | [string](#string) |  |  |
+| fees | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
+ 
 
  
 

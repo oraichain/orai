@@ -28,7 +28,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 type MsgCreateTestCase struct {
 	Name        string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Code        []byte `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`
+	Contract    string `protobuf:"bytes,3,opt,name=contract,proto3" json:"contract,omitempty"`
 	// Owner is the address who is allowed to make further changes to the test case.
 	Owner github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,4,opt,name=owner,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"owner,omitempty"`
 	Fees  string                                        `protobuf:"bytes,5,opt,name=fees,proto3" json:"fees,omitempty" json:"transaction_fee"`
@@ -81,11 +81,11 @@ func (m *MsgCreateTestCase) GetDescription() string {
 	return ""
 }
 
-func (m *MsgCreateTestCase) GetCode() []byte {
+func (m *MsgCreateTestCase) GetContract() string {
 	if m != nil {
-		return m.Code
+		return m.Contract
 	}
-	return nil
+	return ""
 }
 
 func (m *MsgCreateTestCase) GetOwner() github_com_cosmos_cosmos_sdk_types.AccAddress {
@@ -106,7 +106,7 @@ func (m *MsgCreateTestCase) GetFees() string {
 type MsgCreateTestCaseRes struct {
 	Name        string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Code        []byte `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`
+	Contract    string `protobuf:"bytes,3,opt,name=contract,proto3" json:"contract,omitempty"`
 	// Owner is the address who is allowed to make further changes to the test case.
 	Owner github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,4,opt,name=owner,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"owner,omitempty"`
 	Fees  string                                        `protobuf:"bytes,5,opt,name=fees,proto3" json:"fees,omitempty" json:"transaction_fee"`
@@ -159,11 +159,11 @@ func (m *MsgCreateTestCaseRes) GetDescription() string {
 	return ""
 }
 
-func (m *MsgCreateTestCaseRes) GetCode() []byte {
+func (m *MsgCreateTestCaseRes) GetContract() string {
 	if m != nil {
-		return m.Code
+		return m.Contract
 	}
-	return nil
+	return ""
 }
 
 func (m *MsgCreateTestCaseRes) GetOwner() github_com_cosmos_cosmos_sdk_types.AccAddress {
@@ -185,7 +185,7 @@ type MsgEditTestCase struct {
 	OldName     string `protobuf:"bytes,1,opt,name=old_name,json=oldName,proto3" json:"old_name,omitempty"`
 	NewName     string `protobuf:"bytes,2,opt,name=new_name,json=newName,proto3" json:"new_name,omitempty"`
 	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Code        []byte `protobuf:"bytes,4,opt,name=code,proto3" json:"code,omitempty"`
+	Contract    string `protobuf:"bytes,4,opt,name=contract,proto3" json:"contract,omitempty"`
 	// Owner is the address who is allowed to make further changes to the test case.
 	Owner github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,5,opt,name=owner,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"owner,omitempty"`
 	Fees  string                                        `protobuf:"bytes,6,opt,name=fees,proto3" json:"fees,omitempty" json:"transaction_fee"`
@@ -245,11 +245,11 @@ func (m *MsgEditTestCase) GetDescription() string {
 	return ""
 }
 
-func (m *MsgEditTestCase) GetCode() []byte {
+func (m *MsgEditTestCase) GetContract() string {
 	if m != nil {
-		return m.Code
+		return m.Contract
 	}
-	return nil
+	return ""
 }
 
 func (m *MsgEditTestCase) GetOwner() github_com_cosmos_cosmos_sdk_types.AccAddress {
@@ -270,7 +270,7 @@ func (m *MsgEditTestCase) GetFees() string {
 type MsgEditTestCaseRes struct {
 	Name        string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Code        []byte `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`
+	Contract    string `protobuf:"bytes,3,opt,name=contract,proto3" json:"contract,omitempty"`
 	// Owner is the address who is allowed to make further changes to the test case.
 	Owner github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,4,opt,name=owner,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"owner,omitempty"`
 	Fees  string                                        `protobuf:"bytes,5,opt,name=fees,proto3" json:"fees,omitempty" json:"transaction_fee"`
@@ -323,11 +323,11 @@ func (m *MsgEditTestCaseRes) GetDescription() string {
 	return ""
 }
 
-func (m *MsgEditTestCaseRes) GetCode() []byte {
+func (m *MsgEditTestCaseRes) GetContract() string {
 	if m != nil {
-		return m.Code
+		return m.Contract
 	}
-	return nil
+	return ""
 }
 
 func (m *MsgEditTestCaseRes) GetOwner() github_com_cosmos_cosmos_sdk_types.AccAddress {
@@ -354,32 +354,32 @@ func init() {
 func init() { proto.RegisterFile("x/provider/types/tx_tcase.proto", fileDescriptor_3591addf0216d660) }
 
 var fileDescriptor_3591addf0216d660 = []byte{
-	// 385 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x94, 0xbf, 0x8e, 0xda, 0x40,
-	0x10, 0xc6, 0xd9, 0x60, 0xfe, 0x64, 0x13, 0x29, 0x8a, 0x85, 0x12, 0x43, 0x61, 0x90, 0x2b, 0x14,
-	0x09, 0x5b, 0x51, 0xba, 0x74, 0x40, 0xa2, 0x54, 0x50, 0x58, 0xa9, 0xd2, 0xa0, 0x65, 0x77, 0x30,
-	0x4e, 0x60, 0xd7, 0xda, 0xd9, 0x04, 0xf2, 0x16, 0x79, 0xac, 0x94, 0x54, 0xc9, 0x5d, 0x83, 0x4e,
-	0xf0, 0x06, 0x57, 0x5c, 0x71, 0xd5, 0xc9, 0xf6, 0x1d, 0x42, 0x1c, 0x27, 0x5d, 0x71, 0x15, 0xd5,
-	0x7e, 0x9a, 0xf9, 0x46, 0xb3, 0x3f, 0x8d, 0x66, 0x68, 0x73, 0x19, 0x24, 0x5a, 0xfd, 0x8a, 0x05,
-	0xe8, 0xc0, 0xfc, 0x4e, 0x00, 0x03, 0xb3, 0x1c, 0x19, 0xce, 0x10, 0xfc, 0x44, 0x2b, 0xa3, 0xec,
-	0xb7, 0x4a, 0xb3, 0x98, 0x4f, 0x59, 0x2c, 0xfd, 0x54, 0xf9, 0x77, 0xee, 0x46, 0x2d, 0x52, 0x91,
-	0xca, 0x3c, 0x41, 0xaa, 0x72, 0xbb, 0xf7, 0x8f, 0xd0, 0xd7, 0x03, 0x8c, 0xfa, 0x1a, 0x98, 0x81,
-	0xaf, 0x80, 0xa6, 0xcf, 0x10, 0x6c, 0x9b, 0x5a, 0x92, 0xcd, 0xc1, 0x21, 0x2d, 0xd2, 0x7e, 0x1e,
-	0x66, 0xda, 0x6e, 0xd1, 0x17, 0x02, 0x90, 0xeb, 0x38, 0x31, 0xb1, 0x92, 0xce, 0xb3, 0x2c, 0xb5,
-	0x1f, 0x4a, 0xab, 0xb8, 0x12, 0xe0, 0x14, 0x5b, 0xa4, 0xfd, 0x32, 0xcc, 0xb4, 0xfd, 0x85, 0x96,
-	0xd4, 0x42, 0x82, 0x76, 0xac, 0x34, 0xd8, 0x7b, 0x7f, 0xbd, 0x6e, 0x76, 0xa2, 0xd8, 0x4c, 0x7f,
-	0x8e, 0x7d, 0xae, 0xe6, 0x01, 0x57, 0x38, 0x57, 0x78, 0xfb, 0x74, 0x50, 0xfc, 0xc8, 0xa1, 0xfc,
-	0x2e, 0xe7, 0x5d, 0x21, 0x34, 0x20, 0x86, 0x79, 0xbd, 0xed, 0x53, 0x6b, 0x02, 0x80, 0x4e, 0x29,
-	0xed, 0xdb, 0x6b, 0x5c, 0xae, 0x9b, 0x6f, 0xbe, 0xa3, 0x92, 0x1f, 0x3d, 0xa3, 0x99, 0x44, 0xc6,
-	0xd3, 0x1f, 0x8c, 0x26, 0x00, 0x5e, 0x98, 0xf9, 0xbc, 0x73, 0x42, 0x6b, 0xf7, 0xc0, 0x42, 0xc0,
-	0x53, 0x60, 0xbb, 0x22, 0xf4, 0xd5, 0x00, 0xa3, 0xcf, 0x22, 0x36, 0xbb, 0x91, 0xd5, 0x69, 0x55,
-	0xcd, 0xc4, 0x68, 0x0f, 0xad, 0xa2, 0x66, 0x62, 0x98, 0xd2, 0xd5, 0x69, 0x55, 0xc2, 0x22, 0x4f,
-	0xe5, 0x68, 0x15, 0x09, 0x8b, 0xe1, 0x11, 0xf0, 0xe2, 0xc3, 0xe0, 0xd6, 0x31, 0xf0, 0xd2, 0x13,
-	0x81, 0x97, 0x1f, 0x09, 0xfe, 0x9f, 0x50, 0xfb, 0x00, 0xfc, 0x34, 0x46, 0xda, 0xfb, 0xf4, 0x77,
-	0xe3, 0x92, 0xd5, 0xc6, 0x25, 0x17, 0x1b, 0x97, 0xfc, 0xd9, 0xba, 0x85, 0xd5, 0xd6, 0x2d, 0x9c,
-	0x6d, 0xdd, 0xc2, 0xb7, 0x77, 0x7b, 0xfd, 0x77, 0xbb, 0x9d, 0xa9, 0xe0, 0xf0, 0x16, 0x8c, 0xcb,
-	0xd9, 0x52, 0x7f, 0xb8, 0x09, 0x00, 0x00, 0xff, 0xff, 0xfd, 0x5d, 0xf4, 0x44, 0x26, 0x04, 0x00,
-	0x00,
+	// 387 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x54, 0x3d, 0xaf, 0x12, 0x41,
+	0x14, 0x65, 0x64, 0xf9, 0x70, 0x34, 0x31, 0x4e, 0x88, 0x2e, 0x14, 0x0b, 0xd9, 0x8a, 0x98, 0xb0,
+	0x1b, 0x63, 0x67, 0x07, 0x68, 0xac, 0xa0, 0xd8, 0x58, 0xd9, 0x90, 0x61, 0xe6, 0xb2, 0xac, 0xc2,
+	0xcc, 0x66, 0xee, 0x28, 0xf8, 0x2f, 0xfc, 0x59, 0x96, 0x94, 0x56, 0xa8, 0xf0, 0x0f, 0x2c, 0x2d,
+	0x8c, 0xd9, 0xdd, 0xf7, 0x08, 0xe1, 0x7d, 0xe4, 0x15, 0xaf, 0xa2, 0x9a, 0x33, 0x73, 0xce, 0xe4,
+	0xce, 0x39, 0x37, 0x77, 0x68, 0x7b, 0x1d, 0xa6, 0x46, 0x7f, 0x49, 0x24, 0x98, 0xd0, 0x7e, 0x4d,
+	0x01, 0x43, 0xbb, 0x9e, 0x58, 0xc1, 0x11, 0x82, 0xd4, 0x68, 0xab, 0xd9, 0x73, 0x6d, 0x78, 0x22,
+	0xe6, 0x3c, 0x51, 0x41, 0x86, 0x82, 0x4b, 0x75, 0xab, 0x11, 0xeb, 0x58, 0xe7, 0x9a, 0x30, 0x43,
+	0x85, 0xdc, 0xdf, 0x12, 0xfa, 0x74, 0x84, 0xf1, 0xd0, 0x00, 0xb7, 0xf0, 0x1e, 0xd0, 0x0e, 0x39,
+	0x02, 0x63, 0xd4, 0x51, 0x7c, 0x09, 0x2e, 0xe9, 0x90, 0xee, 0xc3, 0x28, 0xc7, 0xac, 0x43, 0x1f,
+	0x49, 0x40, 0x61, 0x92, 0xd4, 0x26, 0x5a, 0xb9, 0x0f, 0x72, 0xea, 0xf8, 0x88, 0xb5, 0x68, 0x5d,
+	0x68, 0x65, 0x0d, 0x17, 0xd6, 0x2d, 0xe7, 0xf4, 0x61, 0xcf, 0xde, 0xd1, 0x8a, 0x5e, 0x29, 0x30,
+	0xae, 0xd3, 0x21, 0xdd, 0xc7, 0x83, 0x97, 0x7f, 0xb7, 0xed, 0x5e, 0x9c, 0xd8, 0xf9, 0xe7, 0x69,
+	0x20, 0xf4, 0x32, 0x14, 0x1a, 0x97, 0x1a, 0x2f, 0x96, 0x1e, 0xca, 0x4f, 0x85, 0xb9, 0xa0, 0x2f,
+	0x44, 0x5f, 0x4a, 0x03, 0x88, 0x51, 0x71, 0x9f, 0x05, 0xd4, 0x99, 0x01, 0xa0, 0x5b, 0xc9, 0x0a,
+	0x0c, 0x5a, 0x7f, 0xb6, 0xed, 0x67, 0x1f, 0x51, 0xab, 0xd7, 0xbe, 0x35, 0x5c, 0x21, 0x17, 0xd9,
+	0x4b, 0x26, 0x33, 0x00, 0x3f, 0xca, 0x75, 0xfe, 0x6f, 0x42, 0x1b, 0x57, 0x0c, 0x46, 0x80, 0xe7,
+	0xe4, 0xf1, 0x1f, 0xa1, 0x4f, 0x46, 0x18, 0xbf, 0x95, 0x89, 0x3d, 0xb4, 0xb0, 0x49, 0xeb, 0x7a,
+	0x21, 0x27, 0x47, 0x16, 0x6b, 0x7a, 0x21, 0xc7, 0x99, 0xcb, 0x26, 0xad, 0x2b, 0x58, 0x15, 0x54,
+	0x61, 0xb1, 0xa6, 0x60, 0x35, 0xbe, 0x26, 0x80, 0xf2, 0xed, 0x01, 0x38, 0x37, 0x05, 0x50, 0xb9,
+	0xa7, 0x00, 0xaa, 0x77, 0x0c, 0xe0, 0x27, 0xa1, 0xec, 0x24, 0x80, 0xf3, 0x6a, 0xf1, 0xe0, 0xcd,
+	0xf7, 0x9d, 0x47, 0x36, 0x3b, 0x8f, 0xfc, 0xda, 0x79, 0xe4, 0xdb, 0xde, 0x2b, 0x6d, 0xf6, 0x5e,
+	0xe9, 0xc7, 0xde, 0x2b, 0x7d, 0x78, 0x71, 0x54, 0xff, 0x30, 0xfb, 0x39, 0x0a, 0x4f, 0xff, 0x8a,
+	0x69, 0x35, 0x1f, 0xfa, 0x57, 0xff, 0x03, 0x00, 0x00, 0xff, 0xff, 0xc3, 0x3f, 0x5d, 0x18, 0x46,
+	0x04, 0x00, 0x00,
 }
 
 func (m *MsgCreateTestCase) Marshal() (dAtA []byte, err error) {
@@ -416,10 +416,10 @@ func (m *MsgCreateTestCase) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x22
 	}
-	if len(m.Code) > 0 {
-		i -= len(m.Code)
-		copy(dAtA[i:], m.Code)
-		i = encodeVarintTxTcase(dAtA, i, uint64(len(m.Code)))
+	if len(m.Contract) > 0 {
+		i -= len(m.Contract)
+		copy(dAtA[i:], m.Contract)
+		i = encodeVarintTxTcase(dAtA, i, uint64(len(m.Contract)))
 		i--
 		dAtA[i] = 0x1a
 	}
@@ -474,10 +474,10 @@ func (m *MsgCreateTestCaseRes) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x22
 	}
-	if len(m.Code) > 0 {
-		i -= len(m.Code)
-		copy(dAtA[i:], m.Code)
-		i = encodeVarintTxTcase(dAtA, i, uint64(len(m.Code)))
+	if len(m.Contract) > 0 {
+		i -= len(m.Contract)
+		copy(dAtA[i:], m.Contract)
+		i = encodeVarintTxTcase(dAtA, i, uint64(len(m.Contract)))
 		i--
 		dAtA[i] = 0x1a
 	}
@@ -532,10 +532,10 @@ func (m *MsgEditTestCase) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x2a
 	}
-	if len(m.Code) > 0 {
-		i -= len(m.Code)
-		copy(dAtA[i:], m.Code)
-		i = encodeVarintTxTcase(dAtA, i, uint64(len(m.Code)))
+	if len(m.Contract) > 0 {
+		i -= len(m.Contract)
+		copy(dAtA[i:], m.Contract)
+		i = encodeVarintTxTcase(dAtA, i, uint64(len(m.Contract)))
 		i--
 		dAtA[i] = 0x22
 	}
@@ -597,10 +597,10 @@ func (m *MsgEditTestCaseRes) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x22
 	}
-	if len(m.Code) > 0 {
-		i -= len(m.Code)
-		copy(dAtA[i:], m.Code)
-		i = encodeVarintTxTcase(dAtA, i, uint64(len(m.Code)))
+	if len(m.Contract) > 0 {
+		i -= len(m.Contract)
+		copy(dAtA[i:], m.Contract)
+		i = encodeVarintTxTcase(dAtA, i, uint64(len(m.Contract)))
 		i--
 		dAtA[i] = 0x1a
 	}
@@ -646,7 +646,7 @@ func (m *MsgCreateTestCase) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTxTcase(uint64(l))
 	}
-	l = len(m.Code)
+	l = len(m.Contract)
 	if l > 0 {
 		n += 1 + l + sovTxTcase(uint64(l))
 	}
@@ -675,7 +675,7 @@ func (m *MsgCreateTestCaseRes) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTxTcase(uint64(l))
 	}
-	l = len(m.Code)
+	l = len(m.Contract)
 	if l > 0 {
 		n += 1 + l + sovTxTcase(uint64(l))
 	}
@@ -708,7 +708,7 @@ func (m *MsgEditTestCase) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTxTcase(uint64(l))
 	}
-	l = len(m.Code)
+	l = len(m.Contract)
 	if l > 0 {
 		n += 1 + l + sovTxTcase(uint64(l))
 	}
@@ -737,7 +737,7 @@ func (m *MsgEditTestCaseRes) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTxTcase(uint64(l))
 	}
-	l = len(m.Code)
+	l = len(m.Contract)
 	if l > 0 {
 		n += 1 + l + sovTxTcase(uint64(l))
 	}
@@ -853,9 +853,9 @@ func (m *MsgCreateTestCase) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Code", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Contract", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTxTcase
@@ -865,25 +865,23 @@ func (m *MsgCreateTestCase) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthTxTcase
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthTxTcase
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Code = append(m.Code[:0], dAtA[iNdEx:postIndex]...)
-			if m.Code == nil {
-				m.Code = []byte{}
-			}
+			m.Contract = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
@@ -1070,9 +1068,9 @@ func (m *MsgCreateTestCaseRes) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Code", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Contract", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTxTcase
@@ -1082,25 +1080,23 @@ func (m *MsgCreateTestCaseRes) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthTxTcase
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthTxTcase
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Code = append(m.Code[:0], dAtA[iNdEx:postIndex]...)
-			if m.Code == nil {
-				m.Code = []byte{}
-			}
+			m.Contract = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
@@ -1319,9 +1315,9 @@ func (m *MsgEditTestCase) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Code", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Contract", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTxTcase
@@ -1331,25 +1327,23 @@ func (m *MsgEditTestCase) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthTxTcase
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthTxTcase
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Code = append(m.Code[:0], dAtA[iNdEx:postIndex]...)
-			if m.Code == nil {
-				m.Code = []byte{}
-			}
+			m.Contract = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
@@ -1536,9 +1530,9 @@ func (m *MsgEditTestCaseRes) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Code", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Contract", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTxTcase
@@ -1548,25 +1542,23 @@ func (m *MsgEditTestCaseRes) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthTxTcase
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthTxTcase
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Code = append(m.Code[:0], dAtA[iNdEx:postIndex]...)
-			if m.Code == nil {
-				m.Code = []byte{}
-			}
+			m.Contract = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {

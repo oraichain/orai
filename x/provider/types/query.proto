@@ -21,7 +21,7 @@ service Query {
     }
     // ListDataSources gets the list of data sources
     rpc ListDataSources (ListDataSourcesReq) returns (ListDataSourcesRes) {
-        option (google.api.http).get = "/orai/provider/datasources/";
+        option (google.api.http).get = "/orai/provider/datasources";
     }
 
     // OracleScriptInfo gets the oracle script meta data
@@ -30,7 +30,7 @@ service Query {
     }
     // ListOracleScripts gets the list of oracle scripts
     rpc ListOracleScripts (ListOracleScriptsReq) returns (ListOracleScriptsRes) {
-        option (google.api.http).get = "/orai/provider/oscripts/";
+        option (google.api.http).get = "/orai/provider/oscripts";
     }
 
     // TestCaseInfo gets the test case meta data
@@ -39,6 +39,6 @@ service Query {
     }
     // ListTestCases gets the list of test cases
     rpc ListTestCases (ListTestCasesReq) returns (ListTestCasesRes) {
-        option (google.api.http).get = "/orai/provider/testcase/";
+        option (google.api.http).get = "/orai/provider/testcase";
     }
 }

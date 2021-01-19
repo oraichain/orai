@@ -28,7 +28,7 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 type MsgCreateOracleScript struct {
 	Name        string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Code        []byte `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`
+	Contract    string `protobuf:"bytes,3,opt,name=contract,proto3" json:"contract,omitempty"`
 	// Owner is the address who is allowed to make further changes to the oracle script.
 	Owner       github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,4,opt,name=owner,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"owner,omitempty"`
 	Fees        string                                        `protobuf:"bytes,5,opt,name=fees,proto3" json:"fees,omitempty" json:"transaction_fee"`
@@ -83,11 +83,11 @@ func (m *MsgCreateOracleScript) GetDescription() string {
 	return ""
 }
 
-func (m *MsgCreateOracleScript) GetCode() []byte {
+func (m *MsgCreateOracleScript) GetContract() string {
 	if m != nil {
-		return m.Code
+		return m.Contract
 	}
-	return nil
+	return ""
 }
 
 func (m *MsgCreateOracleScript) GetOwner() github_com_cosmos_cosmos_sdk_types.AccAddress {
@@ -122,7 +122,7 @@ func (m *MsgCreateOracleScript) GetTestCases() []string {
 type MsgCreateOracleScriptRes struct {
 	Name        string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Code        []byte `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`
+	Contract    string `protobuf:"bytes,3,opt,name=contract,proto3" json:"contract,omitempty"`
 	// Owner is the address who is allowed to make further changes to the oracle script.
 	Owner       github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,4,opt,name=owner,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"owner,omitempty"`
 	Fees        string                                        `protobuf:"bytes,5,opt,name=fees,proto3" json:"fees,omitempty" json:"transaction_fee"`
@@ -177,11 +177,11 @@ func (m *MsgCreateOracleScriptRes) GetDescription() string {
 	return ""
 }
 
-func (m *MsgCreateOracleScriptRes) GetCode() []byte {
+func (m *MsgCreateOracleScriptRes) GetContract() string {
 	if m != nil {
-		return m.Code
+		return m.Contract
 	}
-	return nil
+	return ""
 }
 
 func (m *MsgCreateOracleScriptRes) GetOwner() github_com_cosmos_cosmos_sdk_types.AccAddress {
@@ -217,7 +217,7 @@ type MsgEditOracleScript struct {
 	OldName     string `protobuf:"bytes,1,opt,name=old_name,json=oldName,proto3" json:"old_name,omitempty"`
 	NewName     string `protobuf:"bytes,2,opt,name=new_name,json=newName,proto3" json:"new_name,omitempty"`
 	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Code        []byte `protobuf:"bytes,4,opt,name=code,proto3" json:"code,omitempty"`
+	Contract    string `protobuf:"bytes,4,opt,name=contract,proto3" json:"contract,omitempty"`
 	// Owner is the address who is allowed to make further changes to the oracle script.
 	Owner       github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,5,opt,name=owner,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"owner,omitempty"`
 	Fees        string                                        `protobuf:"bytes,6,opt,name=fees,proto3" json:"fees,omitempty" json:"transaction_fee"`
@@ -279,11 +279,11 @@ func (m *MsgEditOracleScript) GetDescription() string {
 	return ""
 }
 
-func (m *MsgEditOracleScript) GetCode() []byte {
+func (m *MsgEditOracleScript) GetContract() string {
 	if m != nil {
-		return m.Code
+		return m.Contract
 	}
-	return nil
+	return ""
 }
 
 func (m *MsgEditOracleScript) GetOwner() github_com_cosmos_cosmos_sdk_types.AccAddress {
@@ -318,7 +318,7 @@ func (m *MsgEditOracleScript) GetTestCases() []string {
 type MsgEditOracleScriptRes struct {
 	Name        string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Description string `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
-	Code        []byte `protobuf:"bytes,3,opt,name=code,proto3" json:"code,omitempty"`
+	Contract    string `protobuf:"bytes,3,opt,name=contract,proto3" json:"contract,omitempty"`
 	// Owner is the address who is allowed to make further changes to the oracle script.
 	Owner       github_com_cosmos_cosmos_sdk_types.AccAddress `protobuf:"bytes,4,opt,name=owner,proto3,casttype=github.com/cosmos/cosmos-sdk/types.AccAddress" json:"owner,omitempty"`
 	Fees        string                                        `protobuf:"bytes,5,opt,name=fees,proto3" json:"fees,omitempty" json:"transaction_fee"`
@@ -373,11 +373,11 @@ func (m *MsgEditOracleScriptRes) GetDescription() string {
 	return ""
 }
 
-func (m *MsgEditOracleScriptRes) GetCode() []byte {
+func (m *MsgEditOracleScriptRes) GetContract() string {
 	if m != nil {
-		return m.Code
+		return m.Contract
 	}
-	return nil
+	return ""
 }
 
 func (m *MsgEditOracleScriptRes) GetOwner() github_com_cosmos_cosmos_sdk_types.AccAddress {
@@ -418,35 +418,35 @@ func init() {
 func init() { proto.RegisterFile("x/provider/types/tx_oscript.proto", fileDescriptor_44893d774fea4851) }
 
 var fileDescriptor_44893d774fea4851 = []byte{
-	// 439 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x94, 0xbf, 0x6e, 0x14, 0x31,
-	0x10, 0xc6, 0x6f, 0xf7, 0xfe, 0xc6, 0xa4, 0x5a, 0x20, 0x38, 0x91, 0xd8, 0x5c, 0xae, 0x8a, 0x90,
-	0xb2, 0x2b, 0x44, 0x47, 0x97, 0x0b, 0x88, 0x2a, 0x41, 0xda, 0x74, 0x34, 0x2b, 0xc7, 0x9e, 0x6c,
-	0x16, 0xee, 0x3c, 0x27, 0x8f, 0xc3, 0x85, 0xb7, 0xe0, 0x01, 0x40, 0xbc, 0x08, 0x0f, 0x40, 0x99,
-	0x92, 0x2a, 0x42, 0x77, 0x6f, 0x40, 0x49, 0x85, 0x6c, 0x03, 0x3a, 0xa2, 0x45, 0x48, 0x88, 0x32,
-	0xd5, 0x7e, 0xfa, 0xfc, 0x79, 0x3d, 0xf3, 0xd3, 0x68, 0xd8, 0xce, 0x45, 0x3e, 0x33, 0xf8, 0xba,
-	0x56, 0x60, 0x72, 0xfb, 0x66, 0x06, 0x94, 0xdb, 0x8b, 0x12, 0x49, 0x9a, 0x7a, 0x66, 0xb3, 0x99,
-	0x41, 0x8b, 0xc9, 0x3d, 0x34, 0xa2, 0x96, 0x67, 0xa2, 0xd6, 0x99, 0x53, 0xd9, 0xcf, 0xfc, 0xd6,
-	0x9d, 0x0a, 0x2b, 0xf4, 0x99, 0xdc, 0xa9, 0x10, 0x1f, 0xbd, 0x8b, 0xd9, 0xdd, 0x43, 0xaa, 0x0e,
-	0x0c, 0x08, 0x0b, 0xcf, 0x8d, 0x90, 0x13, 0x38, 0xf6, 0xbf, 0x4b, 0x12, 0xd6, 0xd1, 0x62, 0x0a,
-	0x3c, 0x1a, 0x46, 0xbb, 0x6b, 0x85, 0xd7, 0xc9, 0x90, 0xdd, 0x52, 0x10, 0x9e, 0xab, 0x51, 0xf3,
-	0xd8, 0x1f, 0xad, 0x5a, 0xee, 0x96, 0x44, 0x05, 0xbc, 0x3d, 0x8c, 0x76, 0xd7, 0x0b, 0xaf, 0x93,
-	0x67, 0xac, 0x8b, 0x73, 0x0d, 0x86, 0x77, 0x9c, 0x39, 0x7e, 0xf8, 0xed, 0x6a, 0x7b, 0xaf, 0xaa,
-	0xed, 0xd9, 0xf9, 0x49, 0x26, 0x71, 0x9a, 0x4b, 0xa4, 0x29, 0xd2, 0x8f, 0xcf, 0x1e, 0xa9, 0x57,
-	0xa1, 0xb5, 0x6c, 0x5f, 0xca, 0x7d, 0xa5, 0x0c, 0x10, 0x15, 0xe1, 0x7e, 0x92, 0xb1, 0xce, 0x29,
-	0x00, 0xf1, 0xae, 0x7b, 0x77, 0xbc, 0xf5, 0xf5, 0x6a, 0x7b, 0xe3, 0x25, 0xa1, 0x7e, 0x3c, 0xb2,
-	0x46, 0x68, 0x12, 0xd2, 0x55, 0x50, 0x9e, 0x02, 0x8c, 0x0a, 0x9f, 0x4b, 0x76, 0xd8, 0xba, 0x12,
-	0x56, 0x94, 0x84, 0xe7, 0x46, 0x02, 0xf1, 0xde, 0xb0, 0xed, 0xeb, 0x15, 0x56, 0x1c, 0x07, 0x2b,
-	0xb9, 0xcf, 0x98, 0x05, 0xb2, 0xa5, 0x14, 0x04, 0xc4, 0xfb, 0x3e, 0xb0, 0xe6, 0x9c, 0x03, 0x67,
-	0x8c, 0x3e, 0xc4, 0x8c, 0x37, 0xe2, 0x29, 0x80, 0x6e, 0x08, 0x39, 0x42, 0x1f, 0x63, 0x76, 0xfb,
-	0x90, 0xaa, 0xa7, 0xaa, 0xb6, 0xbf, 0x8d, 0xcf, 0x26, 0x1b, 0xe0, 0x44, 0x95, 0x2b, 0x80, 0xfa,
-	0x38, 0x51, 0x47, 0x8e, 0xd1, 0x26, 0x1b, 0x68, 0x98, 0x87, 0xa3, 0x00, 0xa8, 0xaf, 0x61, 0x7e,
-	0xd4, 0x80, 0xaf, 0xfd, 0x67, 0x7c, 0x9d, 0x26, 0x7c, 0xdd, 0xff, 0x84, 0xaf, 0xf7, 0x8f, 0xf8,
-	0xfa, 0x7f, 0xc3, 0x37, 0xb8, 0x8e, 0xef, 0x7d, 0xcc, 0x36, 0x1a, 0xf0, 0xdd, 0x8c, 0x57, 0xe0,
-	0x33, 0x7e, 0xf2, 0x69, 0x91, 0x46, 0x97, 0x8b, 0x34, 0xfa, 0xb2, 0x48, 0xa3, 0xb7, 0xcb, 0xb4,
-	0x75, 0xb9, 0x4c, 0x5b, 0x9f, 0x97, 0x69, 0xeb, 0xc5, 0x83, 0x95, 0x0e, 0x7e, 0xed, 0x3c, 0xaf,
-	0xf2, 0xeb, 0x5b, 0xf2, 0xa4, 0xe7, 0x97, 0xdd, 0xa3, 0xef, 0x01, 0x00, 0x00, 0xff, 0xff, 0xdb,
-	0xfa, 0xc3, 0xc6, 0x40, 0x05, 0x00, 0x00,
+	// 444 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xec, 0x94, 0xbf, 0x6e, 0xd4, 0x40,
+	0x10, 0xc6, 0xcf, 0xbe, 0xbf, 0x59, 0x52, 0x2d, 0x10, 0x36, 0x27, 0xe1, 0x5c, 0xae, 0x8a, 0x90,
+	0x62, 0x0b, 0xd1, 0xd1, 0xe5, 0x02, 0xa2, 0x4a, 0x90, 0x2e, 0x1d, 0x8d, 0xb5, 0xd9, 0x9d, 0x38,
+	0x86, 0xbb, 0x1d, 0x6b, 0x67, 0xc3, 0x85, 0xb7, 0xe0, 0x21, 0x40, 0xbc, 0x08, 0x05, 0x65, 0x4a,
+	0xaa, 0x08, 0xdd, 0xbd, 0x01, 0x25, 0x15, 0xf2, 0x1a, 0x22, 0x27, 0x3a, 0x40, 0x42, 0x29, 0xaf,
+	0xf2, 0xe7, 0x6f, 0x3e, 0x7b, 0x77, 0x7e, 0x1a, 0x0d, 0xdb, 0x3e, 0x4f, 0x0a, 0x8b, 0x6f, 0x73,
+	0x0d, 0x36, 0x71, 0xef, 0x0a, 0xa0, 0xc4, 0x9d, 0xa7, 0x48, 0xca, 0xe6, 0x85, 0x8b, 0x0b, 0x8b,
+	0x0e, 0xf9, 0x03, 0xb4, 0x32, 0x57, 0xa7, 0x32, 0x37, 0x71, 0xa9, 0xe2, 0xdf, 0xf9, 0xfe, 0xbd,
+	0x0c, 0x33, 0xf4, 0x99, 0xa4, 0x54, 0x55, 0x7c, 0xf8, 0x21, 0x64, 0xf7, 0x0f, 0x28, 0xdb, 0xb7,
+	0x20, 0x1d, 0xbc, 0xb4, 0x52, 0x4d, 0xe0, 0xc8, 0xff, 0x8e, 0x73, 0xd6, 0x32, 0x72, 0x0a, 0x22,
+	0x18, 0x04, 0x3b, 0x6b, 0x63, 0xaf, 0xf9, 0x80, 0xdd, 0xd1, 0x50, 0x1d, 0x97, 0xa3, 0x11, 0xa1,
+	0x2f, 0xd5, 0x2d, 0xde, 0x67, 0x3d, 0x85, 0xc6, 0x59, 0xa9, 0x9c, 0x68, 0xfa, 0xf2, 0xd5, 0x3b,
+	0x7f, 0xc1, 0xda, 0x38, 0x33, 0x60, 0x45, 0x6b, 0x10, 0xec, 0xac, 0x8f, 0x1e, 0xff, 0xb8, 0xdc,
+	0xda, 0xcd, 0x72, 0x77, 0x7a, 0x76, 0x1c, 0x2b, 0x9c, 0x26, 0x0a, 0x69, 0x8a, 0xf4, 0xeb, 0xb1,
+	0x4b, 0xfa, 0x4d, 0xd5, 0x62, 0xbc, 0xa7, 0xd4, 0x9e, 0xd6, 0x16, 0x88, 0xc6, 0xd5, 0xf7, 0x3c,
+	0x66, 0xad, 0x13, 0x00, 0x12, 0xed, 0xf2, 0x80, 0x51, 0xff, 0xfb, 0xe5, 0xd6, 0xc6, 0x6b, 0x42,
+	0xf3, 0x74, 0xe8, 0xac, 0x34, 0x24, 0x55, 0x79, 0x93, 0xf4, 0x04, 0x60, 0x38, 0xf6, 0x39, 0xbe,
+	0xcd, 0xd6, 0xb5, 0x74, 0x32, 0x25, 0x3c, 0xb3, 0x0a, 0x48, 0x74, 0x06, 0x4d, 0x7f, 0x6f, 0xe9,
+	0xe4, 0x51, 0x65, 0xf1, 0x87, 0x8c, 0x39, 0x20, 0x97, 0x2a, 0x49, 0x40, 0xa2, 0xeb, 0x03, 0x6b,
+	0xa5, 0xb3, 0x5f, 0x1a, 0xc3, 0x4f, 0x21, 0x13, 0x4b, 0x31, 0x8d, 0x81, 0x56, 0xa4, 0xea, 0xa4,
+	0x3e, 0x87, 0xec, 0xee, 0x01, 0x65, 0xcf, 0x75, 0xee, 0xae, 0x8d, 0xd3, 0x26, 0xeb, 0xe1, 0x44,
+	0xa7, 0x35, 0x50, 0x5d, 0x9c, 0xe8, 0xc3, 0x92, 0xd5, 0x26, 0xeb, 0x19, 0x98, 0x55, 0xa5, 0x0a,
+	0x54, 0xd7, 0xc0, 0xec, 0x70, 0x09, 0xc6, 0xe6, 0xdf, 0x31, 0xb6, 0xfe, 0x84, 0xb1, 0x7d, 0x4b,
+	0x18, 0x3b, 0xff, 0x89, 0xb1, 0xfb, 0x2f, 0x8c, 0xbd, 0x9b, 0x18, 0x3f, 0x86, 0x6c, 0x63, 0x09,
+	0xc6, 0xd5, 0xb8, 0x5d, 0xe7, 0x34, 0x7a, 0xf6, 0x65, 0x1e, 0x05, 0x17, 0xf3, 0x28, 0xf8, 0x36,
+	0x8f, 0x82, 0xf7, 0x8b, 0xa8, 0x71, 0xb1, 0x88, 0x1a, 0x5f, 0x17, 0x51, 0xe3, 0xd5, 0xa3, 0x5a,
+	0x07, 0x57, 0x3b, 0xd1, 0xab, 0xe4, 0xe6, 0x16, 0x3d, 0xee, 0xf8, 0x65, 0xf8, 0xe4, 0x67, 0x00,
+	0x00, 0x00, 0xff, 0xff, 0x70, 0xb7, 0x65, 0xc5, 0x60, 0x05, 0x00, 0x00,
 }
 
 func (m *MsgCreateOracleScript) Marshal() (dAtA []byte, err error) {
@@ -501,10 +501,10 @@ func (m *MsgCreateOracleScript) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x22
 	}
-	if len(m.Code) > 0 {
-		i -= len(m.Code)
-		copy(dAtA[i:], m.Code)
-		i = encodeVarintTxOscript(dAtA, i, uint64(len(m.Code)))
+	if len(m.Contract) > 0 {
+		i -= len(m.Contract)
+		copy(dAtA[i:], m.Contract)
+		i = encodeVarintTxOscript(dAtA, i, uint64(len(m.Contract)))
 		i--
 		dAtA[i] = 0x1a
 	}
@@ -577,10 +577,10 @@ func (m *MsgCreateOracleScriptRes) MarshalToSizedBuffer(dAtA []byte) (int, error
 		i--
 		dAtA[i] = 0x22
 	}
-	if len(m.Code) > 0 {
-		i -= len(m.Code)
-		copy(dAtA[i:], m.Code)
-		i = encodeVarintTxOscript(dAtA, i, uint64(len(m.Code)))
+	if len(m.Contract) > 0 {
+		i -= len(m.Contract)
+		copy(dAtA[i:], m.Contract)
+		i = encodeVarintTxOscript(dAtA, i, uint64(len(m.Contract)))
 		i--
 		dAtA[i] = 0x1a
 	}
@@ -653,10 +653,10 @@ func (m *MsgEditOracleScript) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x2a
 	}
-	if len(m.Code) > 0 {
-		i -= len(m.Code)
-		copy(dAtA[i:], m.Code)
-		i = encodeVarintTxOscript(dAtA, i, uint64(len(m.Code)))
+	if len(m.Contract) > 0 {
+		i -= len(m.Contract)
+		copy(dAtA[i:], m.Contract)
+		i = encodeVarintTxOscript(dAtA, i, uint64(len(m.Contract)))
 		i--
 		dAtA[i] = 0x22
 	}
@@ -736,10 +736,10 @@ func (m *MsgEditOracleScriptRes) MarshalToSizedBuffer(dAtA []byte) (int, error) 
 		i--
 		dAtA[i] = 0x22
 	}
-	if len(m.Code) > 0 {
-		i -= len(m.Code)
-		copy(dAtA[i:], m.Code)
-		i = encodeVarintTxOscript(dAtA, i, uint64(len(m.Code)))
+	if len(m.Contract) > 0 {
+		i -= len(m.Contract)
+		copy(dAtA[i:], m.Contract)
+		i = encodeVarintTxOscript(dAtA, i, uint64(len(m.Contract)))
 		i--
 		dAtA[i] = 0x1a
 	}
@@ -785,7 +785,7 @@ func (m *MsgCreateOracleScript) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTxOscript(uint64(l))
 	}
-	l = len(m.Code)
+	l = len(m.Contract)
 	if l > 0 {
 		n += 1 + l + sovTxOscript(uint64(l))
 	}
@@ -826,7 +826,7 @@ func (m *MsgCreateOracleScriptRes) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTxOscript(uint64(l))
 	}
-	l = len(m.Code)
+	l = len(m.Contract)
 	if l > 0 {
 		n += 1 + l + sovTxOscript(uint64(l))
 	}
@@ -871,7 +871,7 @@ func (m *MsgEditOracleScript) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTxOscript(uint64(l))
 	}
-	l = len(m.Code)
+	l = len(m.Contract)
 	if l > 0 {
 		n += 1 + l + sovTxOscript(uint64(l))
 	}
@@ -912,7 +912,7 @@ func (m *MsgEditOracleScriptRes) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovTxOscript(uint64(l))
 	}
-	l = len(m.Code)
+	l = len(m.Contract)
 	if l > 0 {
 		n += 1 + l + sovTxOscript(uint64(l))
 	}
@@ -1040,9 +1040,9 @@ func (m *MsgCreateOracleScript) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Code", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Contract", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTxOscript
@@ -1052,25 +1052,23 @@ func (m *MsgCreateOracleScript) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthTxOscript
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthTxOscript
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Code = append(m.Code[:0], dAtA[iNdEx:postIndex]...)
-			if m.Code == nil {
-				m.Code = []byte{}
-			}
+			m.Contract = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
@@ -1321,9 +1319,9 @@ func (m *MsgCreateOracleScriptRes) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Code", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Contract", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTxOscript
@@ -1333,25 +1331,23 @@ func (m *MsgCreateOracleScriptRes) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthTxOscript
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthTxOscript
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Code = append(m.Code[:0], dAtA[iNdEx:postIndex]...)
-			if m.Code == nil {
-				m.Code = []byte{}
-			}
+			m.Contract = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
@@ -1634,9 +1630,9 @@ func (m *MsgEditOracleScript) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Code", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Contract", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTxOscript
@@ -1646,25 +1642,23 @@ func (m *MsgEditOracleScript) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthTxOscript
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthTxOscript
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Code = append(m.Code[:0], dAtA[iNdEx:postIndex]...)
-			if m.Code == nil {
-				m.Code = []byte{}
-			}
+			m.Contract = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
@@ -1915,9 +1909,9 @@ func (m *MsgEditOracleScriptRes) Unmarshal(dAtA []byte) error {
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Code", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field Contract", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowTxOscript
@@ -1927,25 +1921,23 @@ func (m *MsgEditOracleScriptRes) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= int(b&0x7F) << shift
+				stringLen |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthTxOscript
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex < 0 {
 				return ErrInvalidLengthTxOscript
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Code = append(m.Code[:0], dAtA[iNdEx:postIndex]...)
-			if m.Code == nil {
-				m.Code = []byte{}
-			}
+			m.Contract = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {

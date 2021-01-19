@@ -22,7 +22,7 @@ message OracleScriptInfoRes {
     string name = 1;
     // Owner is the address who is allowed to make further changes to the oracle script.
     bytes owner = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-    string code = 3;
+    string contract = 3;
     string description = 4;
     repeated cosmos.base.v1beta1.Coin fees = 5 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "json:\"fees\""];
     repeated string d_sources = 6 [(gogoproto.moretags) = "json:\"data_sources\""];

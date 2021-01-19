@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"io/ioutil"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -29,16 +29,15 @@ func GetTxCmd() *cobra.Command {
 // GetCmdCreateAIDataSource is the CLI command for sending a SetAIDataSource transaction
 func GetCmdCreateAIDataSource() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-datasource [name] [code-path] [description]",
+		Use:   "set-datasource [name] [contract] [description]",
 		Short: "Set a new data source into the system",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx, err := client.GetClientTxContext(cmd)
+			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 
-			execBytes, err := ioutil.ReadFile(args[1])
 			if err != nil {
 				return err
 			}
@@ -46,13 +45,43 @@ func GetCmdCreateAIDataSource() *cobra.Command {
 			// collect transaction fee from the user
 			fees := viper.GetString(flags.FlagFees)
 
-			msg := types.NewMsgCreateAIDataSource(args[0], execBytes, cliCtx.GetFromAddress(), fees, args[2])
-			// err = msg.ValidateBasic()
-			// if err != nil {
-			// 	return err
-			// }
+			msg := types.NewMsgCreateAIDataSource(args[0], args[1], clientCtx.GetFromAddress(), fees, args[2])
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
 
-			return tx.GenerateOrBroadcastTxCLI(cliCtx, cmd.Flags(), &msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+// GetCmdCreateAIDataSource is the CLI command for sending a SetAIDataSource transaction
+func GetCmdCreateOracleScript() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "set-oscript [name] [contract] [description]",
+		Short: "Set a new oracle script into the system",
+		Args:  cobra.ExactArgs(4),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			// should find better way
+			dSources := strings.Split(args[2], ",")
+			tCases := strings.Split(args[3], ",")
+
+			// collect transaction fee from the user
+			fees := viper.GetString(flags.FlagFees)
+
+			msg := types.NewMsgCreateOracleScript(args[0], args[1], clientCtx.GetFromAddress(), fees, dSources, tCases)
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
 	flags.AddTxFlagsToCmd(cmd)

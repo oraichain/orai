@@ -12,13 +12,12 @@ func (msg *MsgCreateAIDataSource) Route() string {
 
 // Type should return the action
 func (msg *MsgCreateAIDataSource) Type() string {
-	return "set_datasource"
+	return EventTypeSetDataSource
 }
 
 // GetSignBytes encodes the message for signing
 func (msg *MsgCreateAIDataSource) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
-
 }
 
 // ValidateBasic runs stateless checks on the message
@@ -26,11 +25,11 @@ func (msg *MsgCreateAIDataSource) ValidateBasic() error {
 	// if msg.Owner.Empty() {
 	// 	return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	// }
-	if len(msg.Name) == 0 || len(msg.Code) == 0 {
-		return sdkerrors.Wrap(ErrEmpty, "Name and/or Code cannot be empty")
+	if len(msg.Name) == 0 || len(msg.Contract) == 0 {
+		return sdkerrors.Wrap(ErrEmpty, "Name and/or Contract cannot be empty")
 	}
-	if len(msg.Code) > 1*1024*1024 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "The size of the source code is too large!\n")
+	if len(msg.Contract) > MaximumContractLength {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "The length of the contract address is too large!\n")
 	}
 	return checkFees(msg.Fees)
 }
@@ -51,7 +50,7 @@ func (msg *MsgEditAIDataSource) Route() string {
 
 // Type should return the action
 func (msg *MsgEditAIDataSource) Type() string {
-	return "edit_datasource"
+	return EventTypeEditDataSource
 }
 
 // GetSignBytes encodes the message for signing
@@ -65,11 +64,11 @@ func (msg *MsgEditAIDataSource) ValidateBasic() error {
 	// if msg.Owner.Empty() {
 	// 	return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	// }
-	if len(msg.OldName) == 0 || len(msg.Code) == 0 || len(msg.NewName) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Name and/or Code cannot be empty")
+	if len(msg.OldName) == 0 || len(msg.Contract) == 0 || len(msg.NewName) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Name and/or Contract cannot be empty")
 	}
-	if len(msg.Code) > 1*1024*1024 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "The size of the source code is too large!\n")
+	if len(msg.Contract) > MaximumContractLength {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "The length of the contract address is too large!\n")
 	}
 	return checkFees(msg.Fees)
 }
