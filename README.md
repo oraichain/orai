@@ -1,4 +1,4 @@
-# Installation
+## Installation
 
 ```bash
 docker-compose up -d && docker-compose exec orai ash
@@ -12,7 +12,7 @@ ln -s $PWD/build/wasmd /usr/bin/wasmd
 ./docker/run_wasmd.sh
 ```
 
-# Build smart contract and interact with it
+## Build smart contract and interact with it
 
 ```bash
 # go to rust-optimizer container
@@ -47,4 +47,16 @@ wasmd query wasm contract-state smart $CONTRACT '{"get_count":{}}'
 # step 5: migrate contract to a new code
 # TODO: this is for oracle aggregation only in the future with latest version of wasmvm
 
+```
+
+
+## Build protobuf and do lint check
+```bash
+docker-compose exec protoc ash
+
+# check protobuf lint
+buf check lint --error-format=json
+
+# build protobuf templates
+./scripts/protocgen.sh
 ```
