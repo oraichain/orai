@@ -4,11 +4,9 @@ import (
 	"context"
 	"strings"
 
-	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/oraichain/orai/x/provider/types"
-	abci "github.com/tendermint/tendermint/abci/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -18,21 +16,15 @@ type Querier struct {
 	keeper *Keeper
 }
 
-// this line is used by starport scaffolding # 1
-func NewQuerier(keeper *Keeper) Querier {
-	return Querier{keeper: keeper}
+// NewQuerier return querier implementation
+func NewQuerier(keeper *Keeper) *Querier {
+	return &Querier{keeper: keeper}
 }
 
-var _ types.QueryServer = Querier{}
-
-func NewLegacyQuerier(k *Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown %s query endpoint: %s", types.ModuleName, path[0])
-	}
-}
+var _ types.QueryServer = &Querier{}
 
 // DataSourceInfo implements the Query/DataSourceInfo gRPC method
-func (k Querier) DataSourceInfo(goCtx context.Context, req *types.DataSourceInfoReq) (*types.DataSourceInfoRes, error) {
+func (k *Querier) DataSourceInfo(goCtx context.Context, req *types.DataSourceInfoReq) (*types.DataSourceInfoRes, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -56,7 +48,7 @@ func (k Querier) DataSourceInfo(goCtx context.Context, req *types.DataSourceInfo
 	}, nil
 }
 
-func (k Querier) ListDataSources(goCtx context.Context, req *types.ListDataSourcesReq) (*types.ListDataSourcesRes, error) {
+func (k *Querier) ListDataSources(goCtx context.Context, req *types.ListDataSourcesReq) (*types.ListDataSourcesRes, error) {
 
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
@@ -91,7 +83,7 @@ func (k Querier) ListDataSources(goCtx context.Context, req *types.ListDataSourc
 
 }
 
-func (k Querier) OracleScriptInfo(goCtx context.Context, req *types.OracleScriptInfoReq) (*types.OracleScriptInfoRes, error) {
+func (k *Querier) OracleScriptInfo(goCtx context.Context, req *types.OracleScriptInfoReq) (*types.OracleScriptInfoRes, error) {
 
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
@@ -118,7 +110,7 @@ func (k Querier) OracleScriptInfo(goCtx context.Context, req *types.OracleScript
 	}, nil
 }
 
-func (k Querier) ListOracleScripts(goCtx context.Context, req *types.ListOracleScriptsReq) (*types.ListOracleScriptsRes, error) {
+func (k *Querier) ListOracleScripts(goCtx context.Context, req *types.ListOracleScriptsReq) (*types.ListOracleScriptsRes, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -152,7 +144,7 @@ func (k Querier) ListOracleScripts(goCtx context.Context, req *types.ListOracleS
 	}, nil
 }
 
-func (k Querier) ListTestCases(goCtx context.Context, req *types.ListTestCasesReq) (*types.ListTestCasesRes, error) {
+func (k *Querier) ListTestCases(goCtx context.Context, req *types.ListTestCasesReq) (*types.ListTestCasesRes, error) {
 
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
@@ -188,7 +180,7 @@ func (k Querier) ListTestCases(goCtx context.Context, req *types.ListTestCasesRe
 
 }
 
-func (k Querier) TestCaseInfo(goCtx context.Context, req *types.TestCaseInfoReq) (*types.TestCaseInfoRes, error) {
+func (k *Querier) TestCaseInfo(goCtx context.Context, req *types.TestCaseInfoReq) (*types.TestCaseInfoRes, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -213,7 +205,7 @@ func (k Querier) TestCaseInfo(goCtx context.Context, req *types.TestCaseInfoReq)
 	}, nil
 }
 
-func (k Querier) QueryMinFees(goCtx context.Context, req *types.MinFeesReq) (*types.MinFeesRes, error) {
+func (k *Querier) QueryMinFees(goCtx context.Context, req *types.MinFeesReq) (*types.MinFeesRes, error) {
 
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
