@@ -11,6 +11,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 )
 
+const (
+	flagPage  = "page"
+	flagLimit = "limit"
+)
+
 func GetQueryCmd() *cobra.Command {
 	queryCmd := &cobra.Command{
 		Use:                        types.ModuleName,
@@ -69,8 +74,8 @@ func GetCmdQueryDataSource() *cobra.Command {
 
 // GetCmdQueryDataSources queries a Queryall data source names
 func GetCmdQueryDataSources() *cobra.Command {
-	return &cobra.Command{
-		Use:   "dnames",
+	cmd := &cobra.Command{
+		Use:   "dnames [name] --page [1] --limit [5]",
 		Short: "query all AI data source names",
 		// Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -79,10 +84,29 @@ func GetCmdQueryDataSources() *cobra.Command {
 				return err
 			}
 
+			name := ""
+			if len(args) > 0 {
+				name = args[0]
+			}
+
+			page, err := cmd.Flags().GetInt64(flagPage)
+			if err != nil {
+				return err
+			}
+
+			limit, err := cmd.Flags().GetInt64(flagLimit)
+			if err != nil {
+				return err
+			}
+
 			queryClient := types.NewQueryClient(clientCtx)
 			res, err := queryClient.ListDataSources(
 				context.Background(),
-				&types.ListDataSourcesReq{},
+				&types.ListDataSourcesReq{
+					Name:  name,
+					Page:  page,
+					Limit: limit,
+				},
 			)
 			if err != nil {
 				return err
@@ -91,6 +115,11 @@ func GetCmdQueryDataSources() *cobra.Command {
 			return clientCtx.PrintProto(res)
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	cmd.Flags().Int64(flagPage, types.DefaultQueryPage, "from page")
+	cmd.Flags().Int64(flagLimit, types.DefaultQueryLimit, "limit number")
+	return cmd
 }
 
 // GetCmdQueryOracleScript queries information about a oScript
@@ -128,7 +157,7 @@ func GetCmdQueryOracleScript() *cobra.Command {
 
 // GetCmdQueryOracleScripts queries a list of all oscript names
 func GetCmdQueryOracleScripts() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "onames",
 		Short: "query all oscript names",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -137,10 +166,29 @@ func GetCmdQueryOracleScripts() *cobra.Command {
 				return err
 			}
 
+			name := ""
+			if len(args) > 0 {
+				name = args[0]
+			}
+
+			page, err := cmd.Flags().GetInt64(flagPage)
+			if err != nil {
+				return err
+			}
+
+			limit, err := cmd.Flags().GetInt64(flagLimit)
+			if err != nil {
+				return err
+			}
+
 			queryClient := types.NewQueryClient(clientCtx)
 			res, err := queryClient.ListOracleScripts(
 				context.Background(),
-				&types.ListOracleScriptsReq{},
+				&types.ListOracleScriptsReq{
+					Name:  name,
+					Page:  page,
+					Limit: limit,
+				},
 			)
 			if err != nil {
 				return err
@@ -149,6 +197,11 @@ func GetCmdQueryOracleScripts() *cobra.Command {
 			return clientCtx.PrintProto(res)
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	cmd.Flags().Int64(flagPage, types.DefaultQueryPage, "from page")
+	cmd.Flags().Int64(flagLimit, types.DefaultQueryLimit, "limit number")
+	return cmd
 }
 
 // GetCmdQueryTestCase queries information about an AI request test case
@@ -186,7 +239,7 @@ func GetCmdQueryTestCase() *cobra.Command {
 
 // GetCmdQueryTestCases queries a list of all test case names
 func GetCmdQueryTestCases() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "tcnames",
 		Short: "query all AI request test case names",
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -195,10 +248,29 @@ func GetCmdQueryTestCases() *cobra.Command {
 				return err
 			}
 
+			name := ""
+			if len(args) > 0 {
+				name = args[0]
+			}
+
+			page, err := cmd.Flags().GetInt64(flagPage)
+			if err != nil {
+				return err
+			}
+
+			limit, err := cmd.Flags().GetInt64(flagLimit)
+			if err != nil {
+				return err
+			}
+
 			queryClient := types.NewQueryClient(clientCtx)
 			res, err := queryClient.ListTestCases(
 				context.Background(),
-				&types.ListTestCasesReq{},
+				&types.ListTestCasesReq{
+					Name:  name,
+					Page:  page,
+					Limit: limit,
+				},
 			)
 			if err != nil {
 				return err
@@ -207,4 +279,9 @@ func GetCmdQueryTestCases() *cobra.Command {
 			return clientCtx.PrintProto(res)
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	cmd.Flags().Int64(flagPage, types.DefaultQueryPage, "from page")
+	cmd.Flags().Int64(flagLimit, types.DefaultQueryLimit, "limit number")
+	return cmd
 }

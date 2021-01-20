@@ -40,4 +40,9 @@ service Query {
     rpc ListTestCases (ListTestCasesReq) returns (ListTestCasesRes) {
         option (google.api.http).get = "/orai/provider/testcase";
     }
+
+    // QueryMinFees gets the min fees of oracle script
+    rpc QueryMinFees (MinFeesReq) returns (MinFeesRes) {
+        option (google.api.http).get = "/orai/provider/minfees";
+    }
 }

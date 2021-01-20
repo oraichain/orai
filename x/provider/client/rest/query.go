@@ -101,7 +101,7 @@ func queryOracleScriptsHandlerFn(clientCtx client.Context) http.HandlerFunc {
 		}
 
 		// create params bytes
-		params := types.QueryOracleScriptsRequest{Name: name, Limit: limit, Page: page}
+		params := types.ListOracleScriptsReq{Name: name, Limit: int64(limit), Page: int64(page)}
 		bz, err := clientCtx.LegacyAmino.MarshalJSON(params)
 		if rest.CheckBadRequestError(w, err) {
 			return
@@ -168,7 +168,7 @@ func queryDataSourcesHandlerFn(clientCtx client.Context) http.HandlerFunc {
 		}
 
 		// create params bytes
-		params := types.QueryDataSourcesRequest{Name: name, Limit: limit, Page: page}
+		params := types.ListDataSourcesReq{Name: name, Limit: int64(limit), Page: int64(page)}
 		bz, err := clientCtx.LegacyAmino.MarshalJSON(params)
 		if rest.CheckBadRequestError(w, err) {
 			return
@@ -234,7 +234,7 @@ func queryTestCasesHandlerFn(clientCtx client.Context) http.HandlerFunc {
 		}
 
 		// create params bytes
-		params := types.QueryTestCasesRequest{Name: name, Limit: limit, Page: page}
+		params := types.ListTestCasesReq{Name: name, Limit: int64(limit), Page: int64(page)}
 		bz, err := clientCtx.LegacyAmino.MarshalJSON(params)
 		if rest.CheckBadRequestError(w, err) {
 			return

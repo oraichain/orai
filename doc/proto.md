@@ -18,6 +18,8 @@
 - [x/provider/types/query_oscript.proto](#x/provider/types/query_oscript.proto)
     - [ListOracleScriptsReq](#oraichain.orai.provider.ListOracleScriptsReq)
     - [ListOracleScriptsRes](#oraichain.orai.provider.ListOracleScriptsRes)
+    - [MinFeesReq](#oraichain.orai.provider.MinFeesReq)
+    - [MinFeesRes](#oraichain.orai.provider.MinFeesRes)
     - [OracleScriptInfoReq](#oraichain.orai.provider.OracleScriptInfoReq)
     - [OracleScriptInfoRes](#oraichain.orai.provider.OracleScriptInfoRes)
   
@@ -120,6 +122,7 @@ Query provides defines the gRPC querier service
 | ListOracleScripts | [ListOracleScriptsReq](#oraichain.orai.provider.ListOracleScriptsReq) | [ListOracleScriptsRes](#oraichain.orai.provider.ListOracleScriptsRes) | ListOracleScripts gets the list of oracle scripts |
 | TestCaseInfo | [TestCaseInfoReq](#oraichain.orai.provider.TestCaseInfoReq) | [TestCaseInfoRes](#oraichain.orai.provider.TestCaseInfoRes) | TestCaseInfo gets the test case meta data |
 | ListTestCases | [ListTestCasesReq](#oraichain.orai.provider.ListTestCasesReq) | [ListTestCasesRes](#oraichain.orai.provider.ListTestCasesRes) | ListTestCases gets the list of test cases |
+| QueryMinFees | [MinFeesReq](#oraichain.orai.provider.MinFeesReq) | [MinFeesRes](#oraichain.orai.provider.MinFeesRes) | QueryMinFees gets the min fees of oracle script |
 
  
 
@@ -172,6 +175,13 @@ DataSourceInfoRes is the response type for the Query/DataSourceInfo RPC method
 ListDataSourcesReq is the request type for the Query/ListDataSources RPC method
 
 
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  |  |
+| page | [int64](#int64) |  |  |
+| limit | [int64](#int64) |  |  |
+
+
 
 
 
@@ -214,6 +224,13 @@ ListDataSourcesRes is the response type for the Query/ListDataSources RPC method
 ListOracleScriptsReq is the request type for the Query/ListOracleScripts RPC method
 
 
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  |  |
+| page | [int64](#int64) |  |  |
+| limit | [int64](#int64) |  |  |
+
+
 
 
 
@@ -228,6 +245,37 @@ ListOracleScriptsRes is the response type for the Query/ListOracleScripts RPC me
 | ----- | ---- | ----- | ----------- |
 | OracleScripts | [OracleScript](#oraichain.orai.provider.OracleScript) | repeated |  |
 | count | [int64](#int64) |  |  |
+
+
+
+
+
+
+<a name="oraichain.orai.provider.MinFeesReq"></a>
+
+### MinFeesReq
+ListOracleScriptsReq is the request type for the Query/ListOracleScripts RPC method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| OracleScriptName | [string](#string) |  |  |
+| ValNum | [int64](#int64) |  |  |
+
+
+
+
+
+
+<a name="oraichain.orai.provider.MinFeesRes"></a>
+
+### MinFeesRes
+ListOracleScriptsRes is the response type for the Query/ListOracleScripts RPC method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| minFees | [string](#string) |  |  |
 
 
 
@@ -290,6 +338,13 @@ OracleScriptInfoRes is the response type for the Query/OracleScriptInfo RPC meth
 
 ### ListTestCasesReq
 ListTestCasesReq is the request type for the Query/ListTestCases RPC method
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  |  |
+| page | [int64](#int64) |  |  |
+| limit | [int64](#int64) |  |  |
 
 
 
