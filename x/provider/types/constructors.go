@@ -21,6 +21,7 @@ func NewAIDataSource(
 
 // verify interface at compile time
 var _ sdk.Msg = &MsgCreateAIDataSource{}
+var _ sdk.Msg = &MsgEditAIDataSource{}
 
 // NewMsgCreateAIDataSource is a constructor function for MsgCreateAIDataSource
 func NewMsgCreateAIDataSource(name string, contract string, owner sdk.AccAddress, fees string, des string) *MsgCreateAIDataSource {
@@ -33,8 +34,17 @@ func NewMsgCreateAIDataSource(name string, contract string, owner sdk.AccAddress
 	}
 }
 
-// verify interface at compile time
-var _ sdk.Msg = &OracleScript{}
+// NewMsgEditAIDataSource is a constructor function for MsgEditAIDataSource
+func NewMsgEditAIDataSource(oldName, newName string, contract string, owner sdk.AccAddress, fees string, des string) *MsgEditAIDataSource {
+	return &MsgEditAIDataSource{
+		OldName:     oldName,
+		NewName:     newName,
+		Description: des,
+		Contract:    contract,
+		Owner:       owner,
+		Fees:        fees,
+	}
+}
 
 // NewOracleScript is the constructor of the oScript struct
 func NewOracleScript(
@@ -56,6 +66,7 @@ func NewOracleScript(
 }
 
 var _ sdk.Msg = &MsgCreateOracleScript{}
+var _ sdk.Msg = &MsgEditOracleScript{}
 
 // NewMsgCreateOracleScript is a constructor function for MsgCreateOracleScript
 func NewMsgCreateOracleScript(name string, contract string, owner sdk.AccAddress, des string, dSources, tCases []string) *MsgCreateOracleScript {
@@ -66,6 +77,62 @@ func NewMsgCreateOracleScript(name string, contract string, owner sdk.AccAddress
 		Description: des,
 		DataSources: dSources,
 		TestCases:   tCases,
+	}
+}
+
+// NewMsgEditOracleScript is a constructor function for MsgEditOracleScript
+func NewMsgEditOracleScript(oldName, newName string, contract string, owner sdk.AccAddress, fees string, des string, dSources, tCases []string) *MsgEditOracleScript {
+	return &MsgEditOracleScript{
+		OldName:     oldName,
+		NewName:     newName,
+		Contract:    contract,
+		Owner:       owner,
+		Fees:        fees,
+		Description: des,
+		DataSources: dSources,
+		TestCases:   tCases,
+	}
+}
+
+// NewTestCase is the constructor of the testcase struct
+func NewTestCase(
+	name string,
+	owner sdk.AccAddress,
+	fees sdk.Coins,
+	des string,
+) TestCase {
+	return TestCase{
+		Name:        name,
+		Owner:       owner,
+		Fees:        fees,
+		Description: des,
+	}
+}
+
+// verify interface at compile time
+var _ sdk.Msg = &MsgCreateTestCase{}
+var _ sdk.Msg = &MsgEditTestCase{}
+
+// NewMsgCreateTestCase is a constructor function for MsgCreateTestCase
+func NewMsgCreateTestCase(name string, contract string, owner sdk.AccAddress, fees string, des string) *MsgCreateTestCase {
+	return &MsgCreateTestCase{
+		Name:        name,
+		Description: des,
+		Contract:    contract,
+		Owner:       owner,
+		Fees:        fees,
+	}
+}
+
+// NewMsgEditTestCase is a constructor function for MsgEditTestCase
+func NewMsgEditTestCase(oldName, newName string, contract string, owner sdk.AccAddress, fees string, des string) *MsgEditTestCase {
+	return &MsgEditTestCase{
+		OldName:     oldName,
+		NewName:     newName,
+		Description: des,
+		Contract:    contract,
+		Owner:       owner,
+		Fees:        fees,
 	}
 }
 

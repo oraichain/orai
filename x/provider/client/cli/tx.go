@@ -1,14 +1,17 @@
 package cli
 
 import (
-	"strings"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/oraichain/orai/x/provider/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+)
+
+const (
+	flagDataSources = "ds"
+	flagTestCases   = "tc"
 )
 
 // GetTxCmd returns the transaction commands for this module
@@ -21,24 +24,24 @@ func GetTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 	txCmd.AddCommand(
-		GetCmdCreateAIDataSource(),
-		GetCmdCreateOracleScript(),
+		GetCmdSetAIDataSource(),
+		GetCmdSetOracleScript(),
+		GetCmdSetTestCase(),
+		GetCmdEditOracleScript(),
+		GetCmdEditAIDataSource(),
+		GetCmdEditTestCase(),
 	)
 	return txCmd
 }
 
-// GetCmdCreateAIDataSource is the CLI command for sending a SetAIDataSource transaction
-func GetCmdCreateAIDataSource() *cobra.Command {
+// GetCmdSetAIDataSource is the CLI command for sending a SetAIDataSource transaction
+func GetCmdSetAIDataSource() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "set-datasource [name] [contract] [description]",
 		Short: "Set a new data source into the system",
 		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
-			if err != nil {
-				return err
-			}
-
 			if err != nil {
 				return err
 			}
@@ -58,11 +61,80 @@ func GetCmdCreateAIDataSource() *cobra.Command {
 	return cmd
 }
 
-// GetCmdCreateAIDataSource is the CLI command for sending a SetAIDataSource transaction
-func GetCmdCreateOracleScript() *cobra.Command {
+// GetCmdSetOracleScript is the CLI command for sending a SetOracleScript transaction
+func GetCmdSetOracleScript() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-oscript [name] [contract] [description]",
-		Short: "Set a new oracle script into the system",
+		Use:   "set-oscript [name] [contract] [description] (--ds [datasource list]) (--tc [testcase list])",
+		Short: "Set a new oscript into the system",
+		Args:  cobra.MinimumNArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+
+			if err != nil {
+				return err
+			}
+
+			// get testcases and datasources
+			dSources, err := cmd.Flags().GetStringSlice(flagDataSources)
+			if err != nil {
+				return err
+			}
+
+			tCases, err := cmd.Flags().GetStringSlice(flagTestCases)
+			if err != nil {
+				return err
+			}
+
+			// collect transaction fee from the user
+			fees := viper.GetString(flags.FlagFees)
+
+			msg := types.NewMsgCreateOracleScript(args[0], args[1], clientCtx.GetFromAddress(), fees, dSources, tCases)
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+
+		},
+	}
+
+	cmd.Flags().StringSlice(flagDataSources, make([]string, 0), "identifiers of the data sources")
+	cmd.Flags().StringSlice(flagTestCases, make([]string, 0), "identifiers of the test cases")
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+// GetCmdSetTestCase is the CLI command for sending a SetTestCase transaction
+func GetCmdSetTestCase() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "set-testcase [name] [contract] [description]",
+		Short: "Set a new ai request test case into the system",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			// collect transaction fee from the user
+			fees := viper.GetString(flags.FlagFees)
+
+			msg := types.NewMsgCreateTestCase(args[0], args[1], clientCtx.GetFromAddress(), fees, args[2])
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+// GetCmdEditAIDataSource is the CLI command for sending a EditAIDataSource transaction
+func GetCmdEditAIDataSource() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "edit-datasource [old-name] [new-name] [contract] [description]",
+		Short: "Edit an existing data source in the system",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -70,14 +142,78 @@ func GetCmdCreateOracleScript() *cobra.Command {
 				return err
 			}
 
-			// should find better way
-			dSources := strings.Split(args[2], ",")
-			tCases := strings.Split(args[3], ",")
+			// collect transaction fee from the user
+			fees := viper.GetString(flags.FlagFees)
+
+			msg := types.NewMsgEditAIDataSource(args[0], args[1], args[2], clientCtx.GetFromAddress(), fees, args[3])
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+// GetCmdEditOracleScript is the CLI command for sending a EditOracleScript transaction
+func GetCmdEditOracleScript() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "edit-oscript [old-name] [new-name] [contract] [description] (--ds [datasource list]) (--tc [testcase list])",
+		Short: "Edit an existing oscript in the system",
+		Args:  cobra.MinimumNArgs(4),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			// get testcases and datasources
+			dSources, err := cmd.Flags().GetStringSlice(flagDataSources)
+			if err != nil {
+				return err
+			}
+
+			tCases, err := cmd.Flags().GetStringSlice(flagTestCases)
+			if err != nil {
+				return err
+			}
 
 			// collect transaction fee from the user
 			fees := viper.GetString(flags.FlagFees)
 
-			msg := types.NewMsgCreateOracleScript(args[0], args[1], clientCtx.GetFromAddress(), fees, dSources, tCases)
+			msg := types.NewMsgEditOracleScript(args[0], args[1], args[2], clientCtx.GetFromAddress(), fees, args[3], dSources, tCases)
+			if err := msg.ValidateBasic(); err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	cmd.Flags().StringSlice(flagDataSources, make([]string, 0), "identifiers of the data sources")
+	cmd.Flags().StringSlice(flagTestCases, make([]string, 0), "identifiers of the test cases")
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// GetCmdEditTestCase is the CLI command for sending a EditTestCase transaction
+func GetCmdEditTestCase() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "set-testcase [name] [contract] [description]",
+		Short: "Set a new ai request test case into the system",
+		Args:  cobra.ExactArgs(4),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			// collect transaction fee from the user
+			fees := viper.GetString(flags.FlagFees)
+
+			msg := types.NewMsgEditTestCase(args[0], args[1], args[2], clientCtx.GetFromAddress(), fees, args[3])
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
