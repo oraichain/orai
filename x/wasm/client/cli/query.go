@@ -10,12 +10,12 @@ import (
 	"io/ioutil"
 	"strconv"
 
-	"github.com/oraichain/orai/x/wasm/internal/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gogo/protobuf/proto"
+	"github.com/oraichain/orai/x/wasm/internal/types"
 	"github.com/spf13/cobra"
 	flag "github.com/spf13/pflag"
 )

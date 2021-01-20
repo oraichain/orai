@@ -73,11 +73,12 @@ var _ sdk.Msg = &MsgCreateOracleScript{}
 var _ sdk.Msg = &MsgEditOracleScript{}
 
 // NewMsgCreateOracleScript is a constructor function for MsgCreateOracleScript
-func NewMsgCreateOracleScript(name string, contract string, owner sdk.AccAddress, des string, dSources, tCases []string) *MsgCreateOracleScript {
+func NewMsgCreateOracleScript(name string, contract string, owner sdk.AccAddress, fees string, des string, dSources, tCases []string) *MsgCreateOracleScript {
 	return &MsgCreateOracleScript{
 		Name:        name,
 		Contract:    contract,
 		Owner:       owner,
+		Fees:        fees,
 		Description: des,
 		DataSources: dSources,
 		TestCases:   tCases,

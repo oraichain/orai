@@ -26,11 +26,13 @@ func (msg *MsgCreateTestCase) ValidateBasic() error {
 	if msg.Owner.Empty() {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	}
-	if len(msg.Name) == 0 || len(msg.Contract) == 0 {
+	if len(msg.Name) == 0 {
 		return sdkerrors.Wrap(ErrEmpty, "Name or/and contract address cannot be empty")
 	}
-	if len(msg.Contract) > MaximumContractLength {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "The length of the contract address is too large!\n")
+	// verify contract address
+	_, err := sdk.AccAddressFromBech32(msg.Contract)
+	if err != nil {
+		return err
 	}
 	return checkFees(msg.Fees)
 }
@@ -65,11 +67,13 @@ func (msg MsgEditTestCase) ValidateBasic() error {
 	// if msg.Owner.Empty() {
 	// 	return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	// }
-	if len(msg.OldName) == 0 || len(msg.Contract) == 0 || len(msg.NewName) == 0 {
+	if len(msg.OldName) == 0 || len(msg.NewName) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Name and/or Contract cannot be empty")
 	}
-	if len(msg.Contract) > MaximumContractLength {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "The length of the contract address is too large!\n")
+	// verify contract address
+	_, err := sdk.AccAddressFromBech32(msg.Contract)
+	if err != nil {
+		return err
 	}
 	return checkFees(msg.Fees)
 }

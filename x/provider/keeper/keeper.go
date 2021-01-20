@@ -3,26 +3,28 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/tendermint/tendermint/libs/log"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/oraichain/orai/x/provider/types"
+	"github.com/oraichain/orai/x/wasm"
+	"github.com/tendermint/tendermint/libs/log"
 )
 
 // always clone keeper to make it immutable
 type (
 	Keeper struct {
-		cdc      codec.Marshaler
-		storeKey sdk.StoreKey
+		cdc        codec.Marshaler
+		storeKey   sdk.StoreKey
+		wasmKeeper wasm.Keeper
 	}
 )
 
-func NewKeeper(cdc codec.Marshaler, storeKey sdk.StoreKey) *Keeper {
+func NewKeeper(cdc codec.Marshaler, storeKey sdk.StoreKey, wasmKeeper wasm.Keeper) *Keeper {
 	return &Keeper{
-		cdc:      cdc,
-		storeKey: storeKey,
+		cdc:        cdc,
+		storeKey:   storeKey,
+		wasmKeeper: wasmKeeper,
 	}
 }
 

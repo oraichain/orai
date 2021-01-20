@@ -23,6 +23,7 @@ type createOracleScriptReq struct {
 	BaseReq     rest.BaseReq `json:"base_req"`
 	Name        string       `json:"name"`
 	Contract    string       `json:"contract"`
+	Fees        string       `json:"fees"`
 	Description string       `json:"description"`
 	DataSources []string     `json:"data_sources"`
 	TestCases   []string     `json:"test_cases"`
@@ -33,6 +34,7 @@ type editOracleScriptReq struct {
 	OldName     string       `json:"old_name"`
 	NewName     string       `json:"new_name"`
 	Contract    string       `json:"contract"`
+	Fees        string       `json:"fees"`
 	Description string       `json:"description"`
 	DataSources []string     `json:"data_sources"`
 	TestCases   []string     `json:"test_cases"`
@@ -78,30 +80,30 @@ func registerTxRoutes(clientCtx client.Context, r *mux.Router) {
 		setOracleScriptHandlerFn(clientCtx),
 	).Methods("POST")
 
-	// r.HandleFunc(
-	// 	fmt.Sprintf("/%s/oscript", storeName),
-	// 	editOracleScriptHandlerFn(clientCtx),
-	// ).Methods("PATCH")
+	r.HandleFunc(
+		fmt.Sprintf("/%s/oscript", storeName),
+		editOracleScriptHandlerFn(clientCtx),
+	).Methods("PATCH")
 
 	r.HandleFunc(
 		fmt.Sprintf("/%s/datasource", storeName),
 		setDataSourceHandlerFn(clientCtx),
 	).Methods("POST")
 
-	// r.HandleFunc(
-	// 	fmt.Sprintf("/%s/datasource", storeName),
-	// 	editDataSourceHandlerFn(clientCtx),
-	// ).Methods("PATCH")
+	r.HandleFunc(
+		fmt.Sprintf("/%s/datasource", storeName),
+		editDataSourceHandlerFn(clientCtx),
+	).Methods("PATCH")
 
-	// r.HandleFunc(
-	// 	fmt.Sprintf("/%s/testcase", storeName),
-	// 	setTestCaseHandlerFn(clientCtx),
-	// ).Methods("POST")
+	r.HandleFunc(
+		fmt.Sprintf("/%s/testcase", storeName),
+		setTestCaseHandlerFn(clientCtx),
+	).Methods("POST")
 
-	// r.HandleFunc(
-	// 	fmt.Sprintf("/%s/testcase", storeName),
-	// 	editTestCaseHandlerFn(clientCtx),
-	// ).Methods("PATCH")
+	r.HandleFunc(
+		fmt.Sprintf("/%s/testcase", storeName),
+		editTestCaseHandlerFn(clientCtx),
+	).Methods("PATCH")
 }
 
 func setOracleScriptHandlerFn(clientCtx client.Context) http.HandlerFunc {
@@ -127,7 +129,7 @@ func setOracleScriptHandlerFn(clientCtx client.Context) http.HandlerFunc {
 		}
 
 		// create the message
-		msg := types.NewMsgCreateOracleScript(req.Name, req.Contract, addr, req.Description, req.DataSources, req.TestCases)
+		msg := types.NewMsgCreateOracleScript(req.Name, req.Contract, addr, req.Fees, req.Description, req.DataSources, req.TestCases)
 		err = msg.ValidateBasic()
 		if err != nil {
 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
@@ -138,46 +140,39 @@ func setOracleScriptHandlerFn(clientCtx client.Context) http.HandlerFunc {
 	}
 }
 
-// func editOracleScriptHandlerFn(clientCtx client.Context) http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		var req editOracleScriptReq
+func editOracleScriptHandlerFn(clientCtx client.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req editOracleScriptReq
 
-// 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
-// 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
-// 			return
-// 		}
+		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
+			return
+		}
 
-// 		baseReq := req.BaseReq.Sanitize()
+		baseReq := req.BaseReq.Sanitize()
 
-// 		if !baseReq.ValidateBasic(w) {
-// 			return
-// 		}
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
 
-// 		// collect valid address from the request address string
-// 		addr, err := sdk.AccAddressFromBech32(baseReq.From)
-// 		if err != nil {
-// 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-// 			return
-// 		}
+		// collect valid address from the request address string
+		addr, err := sdk.AccAddressFromBech32(baseReq.From)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
-// 		// collect the byte code of the source code based on the path
-// 		execBytes, err := ioutil.ReadFile(req.Contract)
-// 		if err != nil {
-// 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-// 			return
-// 		}
+		// create the message
+		msg := types.NewMsgEditOracleScript(req.OldName, req.NewName, req.Contract, addr, req.Fees, req.Description, req.DataSources, req.TestCases)
+		err = msg.ValidateBasic()
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
-// 		// create the message
-// 		msg := types.NewMsgEditOracleScript(req.OldName, req.NewName, execBytes, addr, req.Description, req.DataSources, req.TestCases)
-// 		err = msg.ValidateBasic()
-// 		if err != nil {
-// 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-// 			return
-// 		}
-
-// 		utils.WriteGenerateStdTxResponse(w, clientCtx, baseReq, []sdk.Msg{msg})
-// 	}
-// }
+		tx.WriteGeneratedTxResponse(clientCtx, w, baseReq, msg)
+	}
+}
 
 func setDataSourceHandlerFn(clientCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -213,124 +208,104 @@ func setDataSourceHandlerFn(clientCtx client.Context) http.HandlerFunc {
 	}
 }
 
-// func editDataSourceHandlerFn(clientCtx client.Context) http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		var req editDataSourceReq
+func editDataSourceHandlerFn(clientCtx client.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req editDataSourceReq
 
-// 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
-// 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
-// 			return
-// 		}
+		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
+			return
+		}
 
-// 		baseReq := req.BaseReq.Sanitize()
+		baseReq := req.BaseReq.Sanitize()
 
-// 		if !baseReq.ValidateBasic(w) {
-// 			return
-// 		}
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
 
-// 		// collect valid address from the request address string
-// 		addr, err := sdk.AccAddressFromBech32(baseReq.From)
-// 		if err != nil {
-// 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-// 			return
-// 		}
+		// collect valid address from the request address string
+		addr, err := sdk.AccAddressFromBech32(baseReq.From)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
-// 		// collect the byte code of the source code based on the path
-// 		execBytes, err := ioutil.ReadFile(req.Contract)
-// 		if err != nil {
-// 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-// 			return
-// 		}
+		// create the message
+		msg := types.NewMsgEditAIDataSource(req.OldName, req.NewName, req.Contract, addr, req.Fees, req.Description)
+		err = msg.ValidateBasic()
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
-// 		// create the message
-// 		msg := types.NewMsgEditAIDataSource(req.OldName, req.NewName, execBytes, addr, req.Fees, req.Description)
-// 		err = msg.ValidateBasic()
-// 		if err != nil {
-// 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-// 			return
-// 		}
+		tx.WriteGeneratedTxResponse(clientCtx, w, baseReq, msg)
+	}
+}
 
-// 		utils.WriteGenerateStdTxResponse(w, clientCtx, baseReq, []sdk.Msg{msg})
-// 	}
-// }
+func setTestCaseHandlerFn(clientCtx client.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req createTestCaseReq
 
-// func setTestCaseHandlerFn(clientCtx client.Context) http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		var req createTestCaseReq
+		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
+			return
+		}
 
-// 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
-// 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
-// 			return
-// 		}
+		baseReq := req.BaseReq.Sanitize()
 
-// 		baseReq := req.BaseReq.Sanitize()
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
 
-// 		if !baseReq.ValidateBasic(w) {
-// 			return
-// 		}
+		// collect valid address from the request address string
+		addr, err := sdk.AccAddressFromBech32(baseReq.From)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "invalid account address owner")
+			return
+		}
 
-// 		// collect valid address from the request address string
-// 		addr, err := sdk.AccAddressFromBech32(baseReq.From)
-// 		if err != nil {
-// 			rest.WriteErrorResponse(w, http.StatusBadRequest, "invalid account address owner")
-// 			return
-// 		}
+		// create the message
+		msg := types.NewMsgCreateTestCase(req.Name, req.Contract, addr, req.Fees, req.Description)
+		err = msg.ValidateBasic()
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
-// 		execBytes, err := getFileBytes(req.Contract)
-// 		if err != nil {
-// 			rest.WriteErrorResponse(w, http.StatusBadRequest, fmt.Sprintln("cannot read file from the given file path"+err.Error()))
-// 			return
-// 		}
+		tx.WriteGeneratedTxResponse(clientCtx, w, baseReq, msg)
+	}
+}
 
-// 		// create the message
-// 		msg := types.NewMsgCreateTestCase(req.Name, execBytes, addr, req.Fees, req.Description)
-// 		err = msg.ValidateBasic()
-// 		if err != nil {
-// 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-// 			return
-// 		}
+func editTestCaseHandlerFn(clientCtx client.Context) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req editTestCaseReq
 
-// 		utils.WriteGenerateStdTxResponse(w, clientCtx, baseReq, []sdk.Msg{msg})
-// 	}
-// }
+		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
+			return
+		}
 
-// func editTestCaseHandlerFn(clientCtx client.Context) http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		var req editTestCaseReq
+		baseReq := req.BaseReq.Sanitize()
 
-// 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
-// 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
-// 			return
-// 		}
+		if !baseReq.ValidateBasic(w) {
+			return
+		}
 
-// 		baseReq := req.BaseReq.Sanitize()
+		// collect valid address from the request address string
+		addr, err := sdk.AccAddressFromBech32(baseReq.From)
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
-// 		if !baseReq.ValidateBasic(w) {
-// 			return
-// 		}
+		// create the message
+		msg := types.NewMsgEditTestCase(req.OldName, req.NewName, req.Contract, addr, req.Fees, req.Description)
+		err = msg.ValidateBasic()
+		if err != nil {
+			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+			return
+		}
 
-// 		// collect valid address from the request address string
-// 		addr, err := sdk.AccAddressFromBech32(baseReq.From)
-// 		if err != nil {
-// 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-// 			return
-// 		}
-
-// 		// collect the byte code of the source code based on the path
-// 		execBytes, err := ioutil.ReadFile(req.Contract)
-// 		if err != nil {
-// 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-// 			return
-// 		}
-
-// 		// create the message
-// 		msg := types.NewMsgEditTestCase(req.OldName, req.NewName, execBytes, addr, req.Fees, req.Description)
-// 		err = msg.ValidateBasic()
-// 		if err != nil {
-// 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-// 			return
-// 		}
-
-// 		utils.WriteGenerateStdTxResponse(w, clientCtx, baseReq, []sdk.Msg{msg})
-// 	}
-// }
+		tx.WriteGeneratedTxResponse(clientCtx, w, baseReq, msg)
+	}
+}
