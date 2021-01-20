@@ -28,4 +28,6 @@ const (
 
 	// Attribute for test case
 	AttributeTestCaseName = "test_case_name"
+
+	AttributeContractAddress = "contract_address"
 )

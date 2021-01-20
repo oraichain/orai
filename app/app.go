@@ -425,7 +425,7 @@ func NewWasmApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		evidence.NewAppModule(app.evidenceKeeper),
 		ibc.NewAppModule(app.ibcKeeper),
 		params.NewAppModule(app.paramsKeeper),
-		provider.NewAppModule(appCodec, app.providerKeeper),
+		provider.NewAppModule(appCodec, &app.providerKeeper),
 		transferModule,
 	)
 

@@ -2,9 +2,10 @@ package wasm
 
 import (
 	"fmt"
+
+	"github.com/gogo/protobuf/proto"
 	"github.com/oraichain/orai/x/wasm/internal/keeper"
 	"github.com/oraichain/orai/x/wasm/internal/types"
-	"github.com/gogo/protobuf/proto"
 	abci "github.com/tendermint/tendermint/abci/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"

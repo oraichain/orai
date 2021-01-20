@@ -13,7 +13,7 @@ import (
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
-func NewQuerier(keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
+func NewQuerier(keeper *Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
 
 		switch path[0] {
@@ -52,7 +52,7 @@ func NewQuerier(keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier 
 }
 
 // queryOracleScript queries a oScript given its name
-func queryOracleScript(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+func queryOracleScript(ctx sdk.Context, req abci.RequestQuery, keeper *Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 
 	var params types.QueryOracleScriptRequest
 
@@ -79,7 +79,7 @@ func queryOracleScript(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, le
 }
 
 // queryOracleScript queries a list of oracle scripts
-func queryOracleScripts(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+func queryOracleScripts(ctx sdk.Context, req abci.RequestQuery, keeper *Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 
 	var params types.QueryOracleScriptsRequest
 
@@ -122,7 +122,7 @@ func queryOracleScripts(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, l
 }
 
 // queryDataSource queries a complete Whois struct returned to the user in []byte
-func queryDataSource(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+func queryDataSource(ctx sdk.Context, req abci.RequestQuery, keeper *Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 
 	var params types.QueryDataSourceRequest
 	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
@@ -144,7 +144,7 @@ func queryDataSource(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, lega
 }
 
 // queryDataSources queries a list of data sources
-func queryDataSources(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+func queryDataSources(ctx sdk.Context, req abci.RequestQuery, keeper *Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	var params types.QueryDataSourcesRequest
 
 	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
@@ -187,7 +187,7 @@ func queryDataSources(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, leg
 }
 
 // queryOracleScriptNames returns all the oScript names in the store
-func queryOracleScriptNames(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+func queryOracleScriptNames(ctx sdk.Context, keeper *Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	var namesList types.QueryResOracleScriptNames
 
 	iterator := keeper.GetAllOracleScriptNames(ctx)
@@ -205,7 +205,7 @@ func queryOracleScriptNames(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *co
 }
 
 // queryDataSourceNames returns all the data source names in the store
-func queryDataSourceNames(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+func queryDataSourceNames(ctx sdk.Context, keeper *Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	var namesList types.QueryResAIDataSourceNames
 
 	iterator := keeper.GetAllAIDataSourceNames(ctx)
@@ -223,7 +223,7 @@ func queryDataSourceNames(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *code
 }
 
 // queryTestCase queries an AI request test case
-func queryTestCase(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+func queryTestCase(ctx sdk.Context, req abci.RequestQuery, keeper *Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	var params types.QueryTestCaseRequest
 	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
@@ -246,7 +246,7 @@ func queryTestCase(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, legacy
 }
 
 // queryTestCases queries a list of test cases
-func queryTestCases(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+func queryTestCases(ctx sdk.Context, req abci.RequestQuery, keeper *Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	var params types.QueryTestCasesRequest
 
 	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
@@ -288,7 +288,7 @@ func queryTestCases(ctx sdk.Context, req abci.RequestQuery, keeper Keeper, legac
 }
 
 // queryTestCaseNames returns all the test case names in the store
-func queryTestCaseNames(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+func queryTestCaseNames(ctx sdk.Context, keeper *Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	var testCaseNames types.QueryResTestCaseNames
 
 	iterator := keeper.GetAllTestCaseNames(ctx)
@@ -305,7 +305,7 @@ func queryTestCaseNames(ctx sdk.Context, keeper Keeper, legacyQuerierCdc *codec.
 	return res, nil
 }
 
-func queryMinFees(ctx sdk.Context, req abci.RequestQuery, k Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+func queryMinFees(ctx sdk.Context, req abci.RequestQuery, k *Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 
 	var params types.MinFeesRequest
 

@@ -11,6 +11,7 @@ import (
 	"github.com/oraichain/orai/x/provider/types"
 )
 
+// always clone keeper to make it immutable
 type (
 	Keeper struct {
 		cdc      codec.Marshaler
@@ -88,14 +89,11 @@ func (k Keeper) GetPaginatedAIDataSourceNames(ctx sdk.Context, page, limit uint)
 }
 
 // GetAIDataSource returns the data source object given the name of the data source
-func (k Keeper) GetAIDataSource(ctx sdk.Context, name string) (types.AIDataSource, error) {
+func (k Keeper) GetAIDataSource(ctx sdk.Context, name string) (*types.AIDataSource, error) {
 	store := ctx.KVStore(k.storeKey)
-	var aiDataSource types.AIDataSource
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get(types.DataSourceStoreKey(name)), &aiDataSource)
-	if err != nil {
-		return types.AIDataSource{}, err
-	}
-	return aiDataSource, nil
+	aiDataSource := &types.AIDataSource{}
+	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get(types.DataSourceStoreKey(name)), aiDataSource)
+	return aiDataSource, err
 }
 
 // DefaultAIDataSource creates an empty Data Source struct
@@ -143,14 +141,11 @@ func (k Keeper) EditAIDataSource(ctx sdk.Context, oldName, newName string, aiDat
 // ###################################################### oracle script
 
 // GetOracleScript returns the oScript object given the name of the oScript
-func (k Keeper) GetOracleScript(ctx sdk.Context, name string) (types.OracleScript, error) {
+func (k Keeper) GetOracleScript(ctx sdk.Context, name string) (*types.OracleScript, error) {
 	store := ctx.KVStore(k.storeKey)
-	var oScript types.OracleScript
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get(types.OracleScriptStoreKey(name)), &oScript)
-	if err != nil {
-		return types.OracleScript{}, err
-	}
-	return oScript, nil
+	oScript := &types.OracleScript{}
+	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get(types.OracleScriptStoreKey(name)), oScript)
+	return oScript, err
 }
 
 // SetOracleScript allows users to set a oScript into the store
@@ -238,14 +233,11 @@ func (k Keeper) GetPaginatedTestCaseNames(ctx sdk.Context, page, limit uint) sdk
 }
 
 // GetTestCase returns the the AI test case of a given request
-func (k Keeper) GetTestCase(ctx sdk.Context, name string) (types.TestCase, error) {
+func (k Keeper) GetTestCase(ctx sdk.Context, name string) (*types.TestCase, error) {
 	store := ctx.KVStore(k.storeKey)
-	var testCase types.TestCase
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get(types.TestCaseStoreKey(name)), &testCase)
-	if err != nil {
-		return types.TestCase{}, err
-	}
-	return testCase, nil
+	testCase := &types.TestCase{}
+	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get(types.TestCaseStoreKey(name)), testCase)
+	return testCase, err
 }
 
 // GetTestCases returns list of test cases

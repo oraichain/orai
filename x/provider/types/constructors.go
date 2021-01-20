@@ -7,12 +7,14 @@ import (
 // NewAIDataSource is the constructor of the data source struct
 func NewAIDataSource(
 	name string,
+	contract string,
 	owner sdk.AccAddress,
 	fees sdk.Coins,
 	des string,
-) AIDataSource {
-	return AIDataSource{
+) *AIDataSource {
+	return &AIDataSource{
 		Name:        name,
+		Contract:    contract,
 		Owner:       owner,
 		Fees:        fees,
 		Description: des,
@@ -49,6 +51,7 @@ func NewMsgEditAIDataSource(oldName, newName string, contract string, owner sdk.
 // NewOracleScript is the constructor of the oScript struct
 func NewOracleScript(
 	name string,
+	contract string,
 	owner sdk.AccAddress,
 	des string,
 	minimumFees sdk.Coins,
@@ -57,6 +60,7 @@ func NewOracleScript(
 ) *OracleScript {
 	return &OracleScript{
 		Name:        name,
+		Contract:    contract,
 		Owner:       owner,
 		Description: des,
 		MinimumFees: minimumFees,
@@ -97,12 +101,14 @@ func NewMsgEditOracleScript(oldName, newName string, contract string, owner sdk.
 // NewTestCase is the constructor of the testcase struct
 func NewTestCase(
 	name string,
+	contract string,
 	owner sdk.AccAddress,
 	fees sdk.Coins,
 	des string,
-) TestCase {
-	return TestCase{
+) *TestCase {
+	return &TestCase{
 		Name:        name,
+		Contract:    contract,
 		Owner:       owner,
 		Fees:        fees,
 		Description: des,
