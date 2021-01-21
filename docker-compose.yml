@@ -20,13 +20,13 @@ services:
     env_file:
       - orai.dev.env
     volumes:            
-      - ./:/workspace
+      - ./:/workspace:delegated
 
   rust:
     image: cosmwasm/rust-optimizer:0.10.7
     entrypoint: tail -f /dev/null
     volumes:
-      - ./registry_cache:/usr/local/cargo/registry
+      - ./registry_cache:/usr/local/cargo/registry:delegated
       - ./smart-contracts:/code
 
   proto:
