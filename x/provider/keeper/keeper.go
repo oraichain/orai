@@ -49,7 +49,7 @@ func (k *Keeper) IsNamePresent(ctx sdk.Context, name string) bool {
 
 // GetMinimumFees collects minimum fees needed of an oracle script
 func (k *Keeper) GetMinimumFees(ctx sdk.Context, dNames, tcNames []string, valNum int) (sdk.Coins, error) {
-	var totalFees sdk.Coins
+	var totalFees sdk.Coins	
 	// we have different test cases, so we need to loop through them
 	for i := 0; i < len(tcNames); i++ {
 		// loop to run the test case
