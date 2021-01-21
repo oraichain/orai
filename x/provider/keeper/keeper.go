@@ -35,7 +35,7 @@ func (k *Keeper) Logger(ctx sdk.Context) log.Logger {
 // IsNamePresent checks if the name is present in the store or not
 func (k *Keeper) IsNamePresent(ctx sdk.Context, name string) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has([]byte(name))
+	return store.Has(types.DataSourceStoreKey(name))
 }
 
 // GetMinimumFees collects minimum fees needed of an oracle script
@@ -94,7 +94,7 @@ func (k *Keeper) getPaginatedAIDataSourceNames(ctx sdk.Context, page, limit uint
 func (k *Keeper) GetAIDataSource(ctx sdk.Context, name string) (*types.AIDataSource, error) {
 	store := ctx.KVStore(k.storeKey)
 	aiDataSource := &types.AIDataSource{}
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get(types.DataSourceStoreKey(name)), aiDataSource)
+	err := k.cdc.UnmarshalBinaryBare(store.Get(types.DataSourceStoreKey(name)), aiDataSource)
 	return aiDataSource, err
 }
 
@@ -111,7 +111,7 @@ func (k *Keeper) GetAIDataSources(ctx sdk.Context, page, limit uint) ([]types.AI
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var dSource types.AIDataSource
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(iterator.Value(), &dSource)
+		err := k.cdc.UnmarshalBinaryBare(iterator.Value(), &dSource)
 		if err != nil {
 			return []types.AIDataSource{}, err
 		}
@@ -121,23 +121,26 @@ func (k *Keeper) GetAIDataSources(ctx sdk.Context, page, limit uint) ([]types.AI
 }
 
 // SetAIDataSource allows users to set a data source into the store
-func (k Keeper) SetAIDataSource(ctx sdk.Context, name string, aiDataSource *types.AIDataSource) {
+func (k Keeper) SetAIDataSource(ctx sdk.Context, name string, aiDataSource *types.AIDataSource) error {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(aiDataSource)
-	store.Set(types.DataSourceStoreKey(name), bz)
+	bz, err := k.cdc.MarshalBinaryBare(aiDataSource)
+	if err == nil {
+		store.Set(types.DataSourceStoreKey(name), bz)
+	}
+
+	return err
 }
 
 // EditAIDataSource allows users to edit a data source in the store, just change address
-func (k Keeper) EditAIDataSource(ctx sdk.Context, oldName, newName string, aiDataSource *types.AIDataSource) {
-	key := types.DataSourceStoreKey(oldName)
+func (k Keeper) EditAIDataSource(ctx sdk.Context, oldName, newName string, aiDataSource *types.AIDataSource) error {
+
 	// if the user does not want to reuse the old name
 	if oldName != newName {
 		store := ctx.KVStore(k.storeKey)
-		byteKey := []byte(key)
-		store.Delete(byteKey)
+		store.Delete(types.DataSourceStoreKey(oldName))
 	}
-	k.SetAIDataSource(ctx, newName, aiDataSource)
+	return k.SetAIDataSource(ctx, newName, aiDataSource)
 }
 
 // ###################################################### oracle script
@@ -146,15 +149,19 @@ func (k Keeper) EditAIDataSource(ctx sdk.Context, oldName, newName string, aiDat
 func (k *Keeper) GetOracleScript(ctx sdk.Context, name string) (*types.OracleScript, error) {
 	store := ctx.KVStore(k.storeKey)
 	oScript := &types.OracleScript{}
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get(types.OracleScriptStoreKey(name)), oScript)
+	err := k.cdc.UnmarshalBinaryBare(store.Get(types.OracleScriptStoreKey(name)), oScript)
 	return oScript, err
 }
 
 // SetOracleScript allows users to set a oScript into the store
-func (k Keeper) SetOracleScript(ctx sdk.Context, name string, oScript *types.OracleScript) {
+func (k Keeper) SetOracleScript(ctx sdk.Context, name string, oScript *types.OracleScript) error {
 	store := ctx.KVStore(k.storeKey)
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(oScript)
-	store.Set(types.OracleScriptStoreKey(name), bz)
+	bz, err := k.cdc.MarshalBinaryBare(oScript)
+	if err == nil {
+		store.Set(types.OracleScriptStoreKey(name), bz)
+	}
+
+	return err
 }
 
 // GetOracleScripts returns list of oracle scripts
@@ -166,7 +173,7 @@ func (k *Keeper) GetOracleScripts(ctx sdk.Context, page, limit uint) ([]types.Or
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var oScript types.OracleScript
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(iterator.Value(), &oScript)
+		err := k.cdc.UnmarshalBinaryBare(iterator.Value(), &oScript)
 		if err != nil {
 			return []types.OracleScript{}, err
 		}
@@ -188,17 +195,15 @@ func (k *Keeper) GetPaginatedOracleScriptNames(ctx sdk.Context, page, limit uint
 }
 
 // EditOracleScript allows users to edit a oScript in the store
-func (k Keeper) EditOracleScript(ctx sdk.Context, oldName, newName string, oScript *types.OracleScript) {
+func (k Keeper) EditOracleScript(ctx sdk.Context, oldName, newName string, oScript *types.OracleScript) error {
 
-	key := types.OracleScriptStoreKey(oldName)
 	// if the user does not want to reuse the old name
 	if oldName != newName {
 		store := ctx.KVStore(k.storeKey)
-		byteKey := []byte(key)
-		store.Delete(byteKey)
+		store.Delete(types.OracleScriptStoreKey(oldName))
 
 	}
-	k.SetOracleScript(ctx, newName, oScript)
+	return k.SetOracleScript(ctx, newName, oScript)
 }
 
 // GetDNamesTcNames - an utility function for retriving data source and test case names from the oracle script
@@ -238,7 +243,7 @@ func (k *Keeper) GetPaginatedTestCaseNames(ctx sdk.Context, page, limit uint) sd
 func (k *Keeper) GetTestCase(ctx sdk.Context, name string) (*types.TestCase, error) {
 	store := ctx.KVStore(k.storeKey)
 	testCase := &types.TestCase{}
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get(types.TestCaseStoreKey(name)), testCase)
+	err := k.cdc.UnmarshalBinaryBare(store.Get(types.TestCaseStoreKey(name)), testCase)
 	return testCase, err
 }
 
@@ -250,7 +255,7 @@ func (k *Keeper) GetTestCases(ctx sdk.Context, page, limit uint) ([]types.TestCa
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var tCase types.TestCase
-		err := k.cdc.UnmarshalBinaryLengthPrefixed(iterator.Value(), &tCase)
+		err := k.cdc.UnmarshalBinaryBare(iterator.Value(), &tCase)
 		if err != nil {
 			return []types.TestCase{}, err
 		}
@@ -260,11 +265,16 @@ func (k *Keeper) GetTestCases(ctx sdk.Context, page, limit uint) ([]types.TestCa
 }
 
 // SetTestCase allows users to set a test case into the store
-func (k Keeper) SetTestCase(ctx sdk.Context, name string, testCase *types.TestCase) {
+func (k Keeper) SetTestCase(ctx sdk.Context, name string, testCase *types.TestCase) error {
 	store := ctx.KVStore(k.storeKey)
 
-	bz := k.cdc.MustMarshalBinaryLengthPrefixed(testCase)
-	store.Set(types.TestCaseStoreKey(name), bz)
+	bz, err := k.cdc.MarshalBinaryBare(testCase)
+
+	if err == nil {
+		store.Set(types.TestCaseStoreKey(name), bz)
+	}
+
+	return err
 }
 
 // DefaultTestCase creates an empty Test Case struct
@@ -273,13 +283,12 @@ func (k Keeper) DefaultTestCase() types.TestCase {
 }
 
 // EditTestCase allows users to edit a test case in the store
-func (k Keeper) EditTestCase(ctx sdk.Context, oldName, newName string, testCase *types.TestCase) {
-	key := types.TestCaseStoreKey(oldName)
+func (k Keeper) EditTestCase(ctx sdk.Context, oldName, newName string, testCase *types.TestCase) error {
+
 	// if the user does not want to reuse the old name
 	if oldName != newName {
 		store := ctx.KVStore(k.storeKey)
-		byteKey := []byte(key)
-		store.Delete(byteKey)
+		store.Delete(types.TestCaseStoreKey(oldName))
 	}
-	k.SetTestCase(ctx, newName, testCase)
+	return k.SetTestCase(ctx, newName, testCase)
 }

@@ -20,10 +20,9 @@ func NewHandler(k *Keeper) sdk.Handler {
 			res proto.Message
 			err error
 		)
-		// call smart contract here with params
+		// this is for server to broadcast, query is for client to query
 		switch msg := msg.(type) {
 		case *MsgCreateAIDataSource:
-			// res, err = msgServer.CreateAIDataSource(goCtx, msg)
 			res, err = msgServer.CreateAIDataSource(goCtx, msg)
 		case *MsgEditAIDataSource:
 			res, err = msgServer.EditAIDataSource(goCtx, msg)

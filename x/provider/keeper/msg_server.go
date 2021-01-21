@@ -22,15 +22,20 @@ var _ types.MsgServer = msgServer{}
 
 func (m msgServer) CreateAIDataSource(goCtx context.Context, msg *types.MsgCreateAIDataSource) (*types.MsgCreateAIDataSourceRes, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if m.keeper.IsNamePresent(ctx, msg.Name) {
+		return nil, sdkerrors.Wrap(types.ErrDataSourceNameExists, "Name already exists")
+	}
+
 	// we can safely parse fees to coins since we have validated it in the Msg already
 	fees, _ := sdk.ParseCoinsNormalized(msg.Fees)
 	aiDataSource := types.NewAIDataSource(msg.Name, msg.Contract, msg.Owner, fees, msg.Description)
 
-	if m.keeper.IsNamePresent(ctx, types.DataSourceStoreKeyString(msg.Name)) {
-		return nil, sdkerrors.Wrap(types.ErrDataSourceNameExists, "Name already exists")
+	err := m.keeper.SetAIDataSource(ctx, msg.Name, aiDataSource)
+	if err != nil {
+		return nil, sdkerrors.Wrap(types.ErrCannotSetDataSource, err.Error())
 	}
 
-	m.keeper.SetAIDataSource(ctx, msg.Name, aiDataSource)
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeSetDataSource,
@@ -66,7 +71,10 @@ func (m msgServer) EditAIDataSource(goCtx context.Context, msg *types.MsgEditAID
 
 	aiDataSource = types.NewAIDataSource(msg.NewName, msg.Contract, msg.Owner, fees, msg.Description)
 
-	m.keeper.EditAIDataSource(ctx, msg.OldName, msg.NewName, aiDataSource)
+	err = m.keeper.EditAIDataSource(ctx, msg.OldName, msg.NewName, aiDataSource)
+	if err != nil {
+		return nil, sdkerrors.Wrap(types.ErrCannotSetDataSource, err.Error())
+	}
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
@@ -93,13 +101,20 @@ func (m msgServer) CreateOracleScript(goCtx context.Context, msg *types.MsgCreat
 	if m.keeper.IsNamePresent(ctx, types.OracleScriptStoreKeyString(msg.Name)) {
 		return nil, sdkerrors.Wrap(types.ErrOracleScriptNameExists, "Name already exists")
 	}
+
 	// collect minimum fees required to run the oracle script (for 1 validator)
 	minimumFees, err := m.keeper.GetMinimumFees(ctx, msg.DataSources, msg.TestCases, 1)
 	if err != nil {
 		return nil, err
 	}
-	m.keeper.SetOracleScript(ctx, msg.Name, types.NewOracleScript(msg.Name, msg.Contract, msg.Owner,
-		msg.Description, minimumFees, msg.DataSources, msg.TestCases))
+
+	err = m.keeper.SetOracleScript(ctx, msg.Name,
+		types.NewOracleScript(msg.Name, msg.Contract, msg.Owner,
+			msg.Description, minimumFees, msg.DataSources, msg.TestCases))
+
+	if err != nil {
+		return nil, sdkerrors.Wrap(types.ErrCannotSetOracleScript, err.Error())
+	}
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
@@ -143,7 +158,10 @@ func (m msgServer) EditOracleScript(goCtx context.Context, msg *types.MsgEditOra
 	oScript = types.NewOracleScript(msg.NewName, msg.Contract, msg.Owner,
 		msg.Description, minimumFees, msg.DataSources, msg.TestCases)
 
-	m.keeper.EditOracleScript(ctx, msg.OldName, msg.NewName, oScript)
+	err = m.keeper.EditOracleScript(ctx, msg.OldName, msg.NewName, oScript)
+	if err != nil {
+		return nil, sdkerrors.Wrap(types.ErrCannotSetOracleScript, err.Error())
+	}
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
@@ -168,16 +186,20 @@ func (m msgServer) EditOracleScript(goCtx context.Context, msg *types.MsgEditOra
 func (m msgServer) CreateTestCase(goCtx context.Context, msg *types.MsgCreateTestCase) (*types.MsgCreateTestCaseRes, error) {
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	// we can safely parse fees to coins since we have validated it in the Msg already
-	fees, _ := sdk.ParseCoinsNormalized(msg.Fees)
-
-	testCase := types.NewTestCase(msg.Name, msg.Contract, msg.Owner, fees, msg.Description)
 
 	if m.keeper.IsNamePresent(ctx, types.TestCaseStoreKeyString(msg.Name)) {
 		return nil, sdkerrors.Wrap(types.ErrTestCaseNameExists, "Name already exists")
 	}
 
-	m.keeper.SetTestCase(ctx, msg.Name, testCase)
+	// we can safely parse fees to coins since we have validated it in the Msg already
+	fees, _ := sdk.ParseCoinsNormalized(msg.Fees)
+
+	testCase := types.NewTestCase(msg.Name, msg.Contract, msg.Owner, fees, msg.Description)
+
+	err := m.keeper.SetTestCase(ctx, msg.Name, testCase)
+	if err != nil {
+		return nil, sdkerrors.Wrap(types.ErrCannotSetTestCase, err.Error())
+	}
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
@@ -212,7 +234,10 @@ func (m msgServer) EditTestCase(goCtx context.Context, msg *types.MsgEditTestCas
 	fees, _ := sdk.ParseCoinsNormalized(msg.Fees)
 	testCase = types.NewTestCase(msg.NewName, msg.Contract, msg.Owner, fees, msg.Description)
 
-	m.keeper.EditTestCase(ctx, msg.OldName, msg.NewName, testCase)
+	err = m.keeper.EditTestCase(ctx, msg.OldName, msg.NewName, testCase)
+	if err != nil {
+		return nil, sdkerrors.Wrap(types.ErrCannotSetTestCase, err.Error())
+	}
 
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(

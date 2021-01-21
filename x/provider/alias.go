@@ -26,7 +26,6 @@ var (
 	OScriptKeyPrefix           = types.OScriptKeyPrefix
 	DataSourceKeyPrefix        = types.DataSourceKeyPrefix
 	TestCaseKeyPrefix          = types.TestCaseKeyPrefix
-	DataSourceStoreKeyString   = types.DataSourceStoreKeyString
 	TestCaseStoreKeyString     = types.TestCaseStoreKeyString
 	OracleScriptStoreKeyString = types.OracleScriptStoreKeyString
 	EventTypeSetOracleScript   = types.EventTypeSetOracleScript

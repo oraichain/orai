@@ -20,4 +20,7 @@ var (
 	ErrTestCaseNameExists     = sdkerrors.Register(ModuleName, 12, "The test case name already exists")
 	ErrPaginationInputInvalid = sdkerrors.Register(ModuleName, 13, "The page and limit inputs are invalid")
 	ErrCannotGetMinimumFees   = sdkerrors.Register(ModuleName, 14, "Cannot retrieve minimum fees")
+	ErrCannotSetOracleScript  = sdkerrors.Register(ModuleName, 15, "Cannot set the oracle script")
+	ErrCannotSetDataSource    = sdkerrors.Register(ModuleName, 16, "Cannot set the AI data source script")
+	ErrCannotSetTestCase      = sdkerrors.Register(ModuleName, 17, "Cannot set the test case")
 )
