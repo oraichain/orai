@@ -25,13 +25,11 @@ func (msg *MsgCreateAIDataSource) ValidateBasic() error {
 	// if msg.Owner.Empty() {
 	// 	return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	// }
-<<<<<<< HEAD
 	if len(msg.Name) == 0 || len(msg.Contract) == 0 {
 		return sdkerrors.Wrap(ErrEmpty, "Name and/or Contract cannot be empty")
 	}
-	if len(msg.Contract) > MaximumContractLength {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "The length of the contract address is too large!\n")
-=======
+	// if len(msg.Contract) > MaximumContractLength {
+	// 	return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "The length of the contract address is too large!\n")
 	if len(msg.Name) == 0 {
 		return sdkerrors.Wrap(ErrEmpty, "Name and/or Contract cannot be empty")
 	}
@@ -39,7 +37,6 @@ func (msg *MsgCreateAIDataSource) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Contract)
 	if err != nil {
 		return err
->>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 	}
 	return checkFees(msg.Fees)
 }
@@ -74,14 +71,12 @@ func (msg *MsgEditAIDataSource) ValidateBasic() error {
 	// if msg.Owner.Empty() {
 	// 	return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	// }
-<<<<<<< HEAD
 	if len(msg.OldName) == 0 || len(msg.Contract) == 0 || len(msg.NewName) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Name and/or Contract cannot be empty")
 	}
-	if len(msg.Contract) > MaximumContractLength {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "The length of the contract address is too large!\n")
-	}
-=======
+	// if len(msg.Contract) > MaximumContractLength {
+	// 	return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "The length of the contract address is too large!\n")
+	// }
 	if len(msg.OldName) == 0 || len(msg.NewName) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Name cannot be empty")
 	}
@@ -92,7 +87,6 @@ func (msg *MsgEditAIDataSource) ValidateBasic() error {
 		return err
 	}
 
->>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 	return checkFees(msg.Fees)
 }
 

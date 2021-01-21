@@ -11,6 +11,15 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 )
 
+// // Implements OracleScriptSet interface
+// var _ types.OracleScriptSet = &Keeper{}
+
+// // Implements AIDataSourceSet interface
+// var _ types.AIDataSourceSet = &Keeper{}
+
+// // Implements TestCaseSet interface
+// var _ types.TestCaseSet = &Keeper{}
+
 // always clone keeper to make it immutable
 type (
 	Keeper struct {

@@ -87,19 +87,14 @@ func local_request_Query_DataSourceInfo_0(ctx context.Context, marshaler runtime
 
 }
 
-<<<<<<< HEAD
-=======
 var (
 	filter_Query_ListDataSources_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
->>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 func request_Query_ListDataSources_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq ListDataSourcesReq
 	var metadata runtime.ServerMetadata
 
-<<<<<<< HEAD
-=======
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
@@ -107,7 +102,6 @@ func request_Query_ListDataSources_0(ctx context.Context, marshaler runtime.Mars
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
->>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 	msg, err := client.ListDataSources(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
@@ -117,8 +111,6 @@ func local_request_Query_ListDataSources_0(ctx context.Context, marshaler runtim
 	var protoReq ListDataSourcesReq
 	var metadata runtime.ServerMetadata
 
-<<<<<<< HEAD
-=======
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
@@ -126,7 +118,6 @@ func local_request_Query_ListDataSources_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
->>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 	msg, err := server.ListDataSources(ctx, &protoReq)
 	return msg, metadata, err
 
@@ -186,19 +177,14 @@ func local_request_Query_OracleScriptInfo_0(ctx context.Context, marshaler runti
 
 }
 
-<<<<<<< HEAD
-=======
 var (
 	filter_Query_ListOracleScripts_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
->>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 func request_Query_ListOracleScripts_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq ListOracleScriptsReq
 	var metadata runtime.ServerMetadata
 
-<<<<<<< HEAD
-=======
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
@@ -206,7 +192,6 @@ func request_Query_ListOracleScripts_0(ctx context.Context, marshaler runtime.Ma
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
->>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 	msg, err := client.ListOracleScripts(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
@@ -216,8 +201,6 @@ func local_request_Query_ListOracleScripts_0(ctx context.Context, marshaler runt
 	var protoReq ListOracleScriptsReq
 	var metadata runtime.ServerMetadata
 
-<<<<<<< HEAD
-=======
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
@@ -225,7 +208,6 @@ func local_request_Query_ListOracleScripts_0(ctx context.Context, marshaler runt
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
->>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 	msg, err := server.ListOracleScripts(ctx, &protoReq)
 	return msg, metadata, err
 
@@ -285,19 +267,14 @@ func local_request_Query_TestCaseInfo_0(ctx context.Context, marshaler runtime.M
 
 }
 
-<<<<<<< HEAD
-=======
 var (
 	filter_Query_ListTestCases_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
 
->>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 func request_Query_ListTestCases_0(ctx context.Context, marshaler runtime.Marshaler, client QueryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq ListTestCasesReq
 	var metadata runtime.ServerMetadata
 
-<<<<<<< HEAD
-=======
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
@@ -305,7 +282,6 @@ func request_Query_ListTestCases_0(ctx context.Context, marshaler runtime.Marsha
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
->>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 	msg, err := client.ListTestCases(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
@@ -315,8 +291,6 @@ func local_request_Query_ListTestCases_0(ctx context.Context, marshaler runtime.
 	var protoReq ListTestCasesReq
 	var metadata runtime.ServerMetadata
 
-<<<<<<< HEAD
-=======
 	if err := req.ParseForm(); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
@@ -324,14 +298,11 @@ func local_request_Query_ListTestCases_0(ctx context.Context, marshaler runtime.
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
->>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 	msg, err := server.ListTestCases(ctx, &protoReq)
 	return msg, metadata, err
 
 }
 
-<<<<<<< HEAD
-=======
 var (
 	filter_Query_QueryMinFees_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
 )
@@ -368,7 +339,6 @@ func local_request_Query_QueryMinFees_0(ctx context.Context, marshaler runtime.M
 
 }
 
->>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 // RegisterQueryHandlerServer registers the http handlers for service Query to "mux".
 // UnaryRPC     :call QueryServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
@@ -513,8 +483,6 @@ func RegisterQueryHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 
 	})
 
-<<<<<<< HEAD
-=======
 	mux.Handle("GET", pattern_Query_QueryMinFees_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -538,7 +506,6 @@ func RegisterQueryHandlerServer(ctx context.Context, mux *runtime.ServeMux, serv
 
 	})
 
->>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 	return nil
 }
 
@@ -700,8 +667,6 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 
 	})
 
-<<<<<<< HEAD
-=======
 	mux.Handle("GET", pattern_Query_QueryMinFees_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -722,7 +687,6 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 
 	})
 
->>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 	return nil
 }
 
@@ -738,11 +702,8 @@ var (
 	pattern_Query_TestCaseInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"orai", "provider", "testcase", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Query_ListTestCases_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"orai", "provider", "testcase"}, "", runtime.AssumeColonVerbOpt(true)))
-<<<<<<< HEAD
-=======
 
 	pattern_Query_QueryMinFees_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"orai", "provider", "minfees"}, "", runtime.AssumeColonVerbOpt(true)))
->>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 )
 
 var (
@@ -757,9 +718,6 @@ var (
 	forward_Query_TestCaseInfo_0 = runtime.ForwardResponseMessage
 
 	forward_Query_ListTestCases_0 = runtime.ForwardResponseMessage
-<<<<<<< HEAD
-=======
 
 	forward_Query_QueryMinFees_0 = runtime.ForwardResponseMessage
->>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 )

@@ -12,6 +12,4 @@ protoc \
   --grpc-gateway_out .\
   --grpc-gateway_opt logtostderr=true \
   --grpc-gateway_opt paths=Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types,Mgoogle/protobuf/empty.proto=github.com/gogo/protobuf/types,paths=source_relative \
-  --doc_out=./doc \
-  --doc_opt=markdown,proto.md \
-  $(find "${PROJECT_PROTO_DIR}" -maxdepth 4 -name '*.proto')
+  $(find "${ORAICHAIN_PROTO_DIR}" -maxdepth 4 -name '*.proto')

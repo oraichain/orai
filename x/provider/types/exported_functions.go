@@ -8,7 +8,6 @@ import (
 // OracleScriptSet is an interface for all the related properties for interacting with the Oracle Script struct for Keeper
 type OracleScriptSet interface {
 	GetDNamesTcNames(ctx sdk.Context, oScript string) ([]string, []string, error)
-	GetOScriptPath(oScriptName string) string
 	GetOracleScriptI(ctx sdk.Context, name string) (exported.OracleScriptI, error)
 	GetKeyOracleScriptRewardPercentage(ctx sdk.Context) int64
 	// GetOracleScripts(ctx sdk.Context, page, limit uint) ([]exported.OracleScriptI, error)
