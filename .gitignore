@@ -59,9 +59,14 @@ libwasmvm_muslc.a
 .vscode-server
 .gitconfig
 
-x/provider/types/*.pb.go
-x/airequest/types/*.pb.go
-x/websocket/types/*.pb.go
-x/airesult/types/*.pb.go
+x/provider/types/*.pb.*
+x/airequest/types/*.pb.*
+x/websocket/types/*.pb.*
+x/airesult/types/*.pb.*
+
+x/provider/types/*.pb.gw.*
+x/airequest/types/*.pb.gw.*
+x/websocket/types/*.pb.gw.*
+x/airesult/types/*.pb.gw.*
 
 go.sum

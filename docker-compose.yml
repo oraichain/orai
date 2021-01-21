@@ -21,7 +21,7 @@ services:
       - orai.dev.env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./vendor:/go/pkg/mod/
+      #- ./vendor:/go/pkg/mod/
       - ./:/workspace
 
   rust:

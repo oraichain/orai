@@ -85,6 +85,7 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	"github.com/oraichain/orai/x/airequest"
 	"github.com/oraichain/orai/x/wasm"
 	wasmclient "github.com/oraichain/orai/x/wasm/client"
 
@@ -173,6 +174,7 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		provider.AppModuleBasic{},
+		airequest.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -229,7 +231,9 @@ type WasmApp struct {
 	transferKeeper   ibctransferkeeper.Keeper
 	wasmKeeper       wasm.Keeper
 
-	providerKeeper provider.Keeper
+	// custom modules here
+	providerKeeper  *provider.Keeper
+	airequestKeeper airequest.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -261,7 +265,7 @@ func NewWasmApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		wasm.StoreKey, provider.StoreKey,
+		wasm.StoreKey, provider.StoreKey, airequest.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -350,8 +354,12 @@ func NewWasmApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	)
 	app.evidenceKeeper = *evidenceKeeper
 
-	app.providerKeeper = *provider.NewKeeper(
-		appCodec, keys[provider.StoreKey], app.wasmKeeper,
+	app.providerKeeper = provider.NewKeeper(
+		appCodec, keys[provider.StoreKey], app.wasmKeeper, app.getSubspace(provider.ModuleName),
+	)
+
+	app.airequestKeeper = airequest.NewKeeper(
+		appCodec, keys[airequest.StoreKey], app.wasmKeeper, app.getSubspace(airequest.ModuleName), stakingKeeper, app.providerKeeper,
 	)
 
 	// just re-use the full router - do we want to limit this more?
@@ -425,7 +433,7 @@ func NewWasmApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		evidence.NewAppModule(app.evidenceKeeper),
 		ibc.NewAppModule(app.ibcKeeper),
 		params.NewAppModule(app.paramsKeeper),
-		provider.NewAppModule(appCodec, &app.providerKeeper),
+		provider.NewAppModule(appCodec, app.providerKeeper),
 		transferModule,
 	)
 
@@ -655,6 +663,8 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
+	paramsKeeper.Subspace(provider.ModuleName)
+	paramsKeeper.Subspace(airequest.ModuleName)
 
 	return paramsKeeper
 }

@@ -6,8 +6,8 @@ import fmt "fmt"
 const DefaultIndex uint64 = 2
 
 // DefaultGenesisState - default GenesisState used by Cosmos Hub
-func DefaultGenesisState() GenesisState {
-	return GenesisState{
+func DefaultGenesisState() *GenesisState {
+	return &GenesisState{
 		AIRequests: []AIRequest{},
 		Params:     DefaultParams(),
 
@@ -15,8 +15,8 @@ func DefaultGenesisState() GenesisState {
 	}
 }
 
-// ValidateGenesis validates the provider genesis parameters
-func (gs GenesisState) ValidateGenesis() error {
+// ValidateGenesis validates the airequest genesis parameters
+func (gs *GenesisState) Validate() error {
 	for _, record := range gs.AIRequests {
 		if record.RequestID == "" {
 			return fmt.Errorf("invalid AIRequests: Value: %s. Error: Missing RequestID", record.RequestID)

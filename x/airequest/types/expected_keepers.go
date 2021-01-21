@@ -2,12 +2,11 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	auth "github.com/cosmos/cosmos-sdk/x/auth/types"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	"github.com/cosmos/cosmos-sdk/x/params"
-	staking "github.com/cosmos/cosmos-sdk/x/staking/exported"
-	supply "github.com/cosmos/cosmos-sdk/x/supply/exported"
-	provider "github.com/oraichain/orai/x/provider/exported"
-	//webSocket "github.com/oraichain/orai/x/websocket/exported"
+	params "github.com/cosmos/cosmos-sdk/x/params/types"
+	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
+	provider "github.com/oraichain/orai/x/provider/types"
 )
 
 // ParamSubspace defines the expected Subspace interfacace
@@ -36,9 +35,9 @@ type BankKeeper interface {
 	GetCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 }
 
-// SupplyKeeper defines the expected supply Keeper.
-type SupplyKeeper interface {
-	GetModuleAccount(ctx sdk.Context, name string) supply.ModuleAccountI
+// AuthKeeper defines the expected auth Keeper.
+type AuthKeeper interface {
+	GetModuleAccount(ctx sdk.Context, name string) auth.ModuleAccountI
 	SendCoinsFromModuleToModule(ctx sdk.Context, senderModule string, recipientModule string, amt sdk.Coins) error
 	SendCoinsFromModuleToAccount(ctx sdk.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error
 }
@@ -48,7 +47,7 @@ type StakingKeeper interface {
 	ValidatorByConsAddr(sdk.Context, sdk.ConsAddress) staking.ValidatorI
 	IterateBondedValidatorsByPower(ctx sdk.Context, fn func(index int64, validator staking.ValidatorI) (stop bool))
 	Validator(ctx sdk.Context, address sdk.ValAddress) staking.ValidatorI
-	MaxValidators(sdk.Context) uint16
+	MaxValidators(sdk.Context) uint32
 }
 
 // DistrKeeper defines the expected distribution keeper.
@@ -63,20 +62,10 @@ type DistrKeeper interface {
 
 // ProviderKeeper defines the expected provider keeper
 type ProviderKeeper interface {
-	DefaultAIDataSourceI() provider.AIDataSourceI
-	GetAIDataSourceI(ctx sdk.Context, name string) (provider.AIDataSourceI, error)
-	GetOracleScriptI(ctx sdk.Context, name string) (provider.OracleScriptI, error)
-	DefaultTestCaseI() provider.TestCaseI
-	GetTestCaseI(ctx sdk.Context, name string) (provider.TestCaseI, error)
+	GetAIDataSource(ctx sdk.Context, name string) (*provider.AIDataSource, error)
+	GetOracleScript(ctx sdk.Context, name string) (*provider.OracleScript, error)
+	GetTestCase(ctx sdk.Context, name string) (*provider.TestCase, error)
 	GetDNamesTcNames(ctx sdk.Context, oScript string) ([]string, []string, error)
-	GetOScriptPath(oScriptName string) string
 	GetMinimumFees(ctx sdk.Context, dNames, tcNames []string, valNum int) (sdk.Coins, error)
 	GetKeyOracleScriptRewardPercentage(ctx sdk.Context) int64
-}
-
-// WebSocketKeeper defines the expected websocket keeper
-type WebSocketKeeper interface {
-	GetReports(ctx sdk.Context, rid string) (reports []webSocket.ReportI)
-	HasReport(ctx sdk.Context, id string, val sdk.ValAddress) bool
-	GetReportsBlockHeight(ctx sdk.Context, blockHeight int64) (reports []webSocket.ReportI)
 }
