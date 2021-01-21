@@ -27,7 +27,11 @@ message TestCaseInfoRes {
 }
 
 // ListTestCasesReq is the request type for the Query/ListTestCases RPC method
-message ListTestCasesReq {}
+message ListTestCasesReq {
+    string name = 1;
+    int64 page = 2;
+    int64 limit = 3;
+}
 
 // ListTestCasesRes is the response type for the Query/ListTestCases RPC method
 message ListTestCasesRes {

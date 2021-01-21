@@ -88,7 +88,7 @@ func GetCmdSetOracleScript() *cobra.Command {
 			// collect transaction fee from the user
 			fees := viper.GetString(flags.FlagFees)
 
-			msg := types.NewMsgCreateOracleScript(args[0], args[1], clientCtx.GetFromAddress(), fees, dSources, tCases)
+			msg := types.NewMsgCreateOracleScript(args[0], args[1], clientCtx.GetFromAddress(), fees, args[2], dSources, tCases)
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}

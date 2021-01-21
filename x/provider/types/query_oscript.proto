@@ -29,10 +29,25 @@ message OracleScriptInfoRes {
 }
 
 // ListOracleScriptsReq is the request type for the Query/ListOracleScripts RPC method
-message ListOracleScriptsReq {}
+message ListOracleScriptsReq {
+    string name = 1;
+    int64 page = 2;
+    int64 limit = 3;
+}
 
 // ListOracleScriptsRes is the response type for the Query/ListOracleScripts RPC method
 message ListOracleScriptsRes {
     repeated OracleScript OracleScripts = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "OracleScripts", (gogoproto.moretags) = "json:\"oracle_scripts\""];
     int64 count = 2;
+}
+
+// ListOracleScriptsReq is the request type for the Query/ListOracleScripts RPC method
+message MinFeesReq {
+    string OracleScriptName = 1 [(gogoproto.moretags) = "json:\"oscript_name\""];        
+	int64 ValNum            = 2 [(gogoproto.moretags) = "json:\"val_num\""];     
+}
+
+// ListOracleScriptsRes is the response type for the Query/ListOracleScripts RPC method
+message MinFeesRes {
+    string minFees = 1 [(gogoproto.moretags) = "json:\"minimum_fees\""];    
 }

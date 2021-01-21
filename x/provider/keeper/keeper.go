@@ -3,41 +3,43 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/tendermint/tendermint/libs/log"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/oraichain/orai/x/provider/types"
+	"github.com/oraichain/orai/x/wasm"
+	"github.com/tendermint/tendermint/libs/log"
 )
 
 // always clone keeper to make it immutable
 type (
 	Keeper struct {
-		cdc      codec.Marshaler
-		storeKey sdk.StoreKey
+		cdc        codec.Marshaler
+		storeKey   sdk.StoreKey
+		wasmKeeper wasm.Keeper
 	}
 )
 
-func NewKeeper(cdc codec.Marshaler, storeKey sdk.StoreKey) *Keeper {
+func NewKeeper(cdc codec.Marshaler, storeKey sdk.StoreKey, wasmKeeper wasm.Keeper) *Keeper {
 	return &Keeper{
-		cdc:      cdc,
-		storeKey: storeKey,
+		cdc:        cdc,
+		storeKey:   storeKey,
+		wasmKeeper: wasmKeeper,
 	}
 }
 
-func (k Keeper) Logger(ctx sdk.Context) log.Logger {
+func (k *Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
 // IsNamePresent checks if the name is present in the store or not
-func (k Keeper) IsNamePresent(ctx sdk.Context, name string) bool {
+func (k *Keeper) IsNamePresent(ctx sdk.Context, name string) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has([]byte(name))
 }
 
 // GetMinimumFees collects minimum fees needed of an oracle script
-func (k Keeper) GetMinimumFees(ctx sdk.Context, dNames, tcNames []string, valNum int) (sdk.Coins, error) {
+func (k *Keeper) GetMinimumFees(ctx sdk.Context, dNames, tcNames []string, valNum int) (sdk.Coins, error) {
 	var totalFees sdk.Coins
 	// we have different test cases, so we need to loop through them
 	for i := 0; i < len(tcNames); i++ {
@@ -82,19 +84,19 @@ func (k Keeper) GetMinimumFees(ctx sdk.Context, dNames, tcNames []string, valNum
 // ############################################# Data source
 
 // GetAllAIDataSourceNames get an iterator of all key-value pairs in the store
-func (k Keeper) GetAllAIDataSourceNames(ctx sdk.Context) sdk.Iterator {
+func (k *Keeper) GetAllAIDataSourceNames(ctx sdk.Context) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, []byte(types.DataSourceKeyPrefix))
 }
 
-// GetPaginatedAIDataSourceNames get an iterator of paginated key-value pairs in the store
-func (k Keeper) GetPaginatedAIDataSourceNames(ctx sdk.Context, page, limit uint) sdk.Iterator {
+// getPaginatedAIDataSourceNames get an iterator of paginated key-value pairs in the store
+func (k *Keeper) getPaginatedAIDataSourceNames(ctx sdk.Context, page, limit uint) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIteratorPaginated(store, []byte(types.DataSourceKeyPrefix), page, limit)
 }
 
 // GetAIDataSource returns the data source object given the name of the data source
-func (k Keeper) GetAIDataSource(ctx sdk.Context, name string) (*types.AIDataSource, error) {
+func (k *Keeper) GetAIDataSource(ctx sdk.Context, name string) (*types.AIDataSource, error) {
 	store := ctx.KVStore(k.storeKey)
 	aiDataSource := &types.AIDataSource{}
 	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get(types.DataSourceStoreKey(name)), aiDataSource)
@@ -107,10 +109,10 @@ func (k Keeper) DefaultAIDataSource() types.AIDataSource {
 }
 
 // GetAIDataSources returns list of data sources
-func (k Keeper) GetAIDataSources(ctx sdk.Context, page, limit uint) ([]types.AIDataSource, error) {
+func (k *Keeper) GetAIDataSources(ctx sdk.Context, page, limit uint) ([]types.AIDataSource, error) {
 	var dSources []types.AIDataSource
 
-	iterator := k.GetPaginatedAIDataSourceNames(ctx, page, limit)
+	iterator := k.getPaginatedAIDataSourceNames(ctx, page, limit)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var dSource types.AIDataSource
@@ -146,7 +148,7 @@ func (k Keeper) EditAIDataSource(ctx sdk.Context, oldName, newName string, aiDat
 // ###################################################### oracle script
 
 // GetOracleScript returns the oScript object given the name of the oScript
-func (k Keeper) GetOracleScript(ctx sdk.Context, name string) (*types.OracleScript, error) {
+func (k *Keeper) GetOracleScript(ctx sdk.Context, name string) (*types.OracleScript, error) {
 	store := ctx.KVStore(k.storeKey)
 	oScript := &types.OracleScript{}
 	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get(types.OracleScriptStoreKey(name)), oScript)
@@ -161,7 +163,7 @@ func (k Keeper) SetOracleScript(ctx sdk.Context, name string, oScript *types.Ora
 }
 
 // GetOracleScripts returns list of oracle scripts
-func (k Keeper) GetOracleScripts(ctx sdk.Context, page, limit uint) ([]types.OracleScript, error) {
+func (k *Keeper) GetOracleScripts(ctx sdk.Context, page, limit uint) ([]types.OracleScript, error) {
 	var oScripts []types.OracleScript
 
 	iterator := k.GetPaginatedOracleScriptNames(ctx, page, limit)
@@ -179,13 +181,13 @@ func (k Keeper) GetOracleScripts(ctx sdk.Context, page, limit uint) ([]types.Ora
 }
 
 // GetAllOracleScriptNames get an iterator of all key-value pairs in the store
-func (k Keeper) GetAllOracleScriptNames(ctx sdk.Context) sdk.Iterator {
+func (k *Keeper) GetAllOracleScriptNames(ctx sdk.Context) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, []byte(types.OScriptKeyPrefix))
 }
 
 // GetPaginatedOracleScriptNames get an iterator of paginated key-value pairs in the store
-func (k Keeper) GetPaginatedOracleScriptNames(ctx sdk.Context, page, limit uint) sdk.Iterator {
+func (k *Keeper) GetPaginatedOracleScriptNames(ctx sdk.Context, page, limit uint) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIteratorPaginated(store, []byte(types.OScriptKeyPrefix), page, limit)
 }
@@ -205,7 +207,7 @@ func (k Keeper) EditOracleScript(ctx sdk.Context, oldName, newName string, oScri
 }
 
 // GetDNamesTcNames - an utility function for retriving data source and test case names from the oracle script
-func (k Keeper) GetDNamesTcNames(ctx sdk.Context, oScript string) ([]string, []string, error) {
+func (k *Keeper) GetDNamesTcNames(ctx sdk.Context, oScript string) ([]string, []string, error) {
 	// get data source and test case names from the oracle script
 	oracleScript, err := k.GetOracleScript(ctx, oScript)
 	if err != nil {
@@ -217,7 +219,7 @@ func (k Keeper) GetDNamesTcNames(ctx sdk.Context, oScript string) ([]string, []s
 }
 
 // GetKeyOracleScriptRewardPercentage returns the oracle script reward percentage from the provider module
-func (k Keeper) GetKeyOracleScriptRewardPercentage(ctx sdk.Context) int64 {
+func (k *Keeper) GetKeyOracleScriptRewardPercentage(ctx sdk.Context) int64 {
 	// TODO
 	//percentage := k.GetParam(ctx, types.KeyOracleScriptRewardPercentage)
 	return int64(60)
@@ -226,19 +228,19 @@ func (k Keeper) GetKeyOracleScriptRewardPercentage(ctx sdk.Context) int64 {
 // #################################################### Test case
 
 // GetAllTestCaseNames get an iterator of all key-value pairs in the store
-func (k Keeper) GetAllTestCaseNames(ctx sdk.Context) sdk.Iterator {
+func (k *Keeper) GetAllTestCaseNames(ctx sdk.Context) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, []byte(types.TestCaseKeyPrefix))
 }
 
 // GetPaginatedTestCaseNames get an iterator of paginated key-value pairs in the store
-func (k Keeper) GetPaginatedTestCaseNames(ctx sdk.Context, page, limit uint) sdk.Iterator {
+func (k *Keeper) GetPaginatedTestCaseNames(ctx sdk.Context, page, limit uint) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIteratorPaginated(store, []byte(types.TestCaseKeyPrefix), page, limit)
 }
 
 // GetTestCase returns the the AI test case of a given request
-func (k Keeper) GetTestCase(ctx sdk.Context, name string) (*types.TestCase, error) {
+func (k *Keeper) GetTestCase(ctx sdk.Context, name string) (*types.TestCase, error) {
 	store := ctx.KVStore(k.storeKey)
 	testCase := &types.TestCase{}
 	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get(types.TestCaseStoreKey(name)), testCase)
@@ -246,7 +248,7 @@ func (k Keeper) GetTestCase(ctx sdk.Context, name string) (*types.TestCase, erro
 }
 
 // GetTestCases returns list of test cases
-func (k Keeper) GetTestCases(ctx sdk.Context, page, limit uint) ([]types.TestCase, error) {
+func (k *Keeper) GetTestCases(ctx sdk.Context, page, limit uint) ([]types.TestCase, error) {
 	var tCases []types.TestCase
 
 	iterator := k.GetPaginatedTestCaseNames(ctx, page, limit)

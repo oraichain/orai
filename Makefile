@@ -89,6 +89,12 @@ else
 	go build $(GOMOD_FLAGS) $(BUILD_FLAGS) -o build/contract_tests ./cmd/contract_tests
 endif
 
+test-suite:
+	BUILD_TAGS=muslc make go-test-suite
+
+go-test-suite:
+	go test $(GOMOD_FLAGS) $(BUILD_FLAGS) -run TestQueryCurrentPlan github.com/oraichain/orai/x/provider/keeper -v
+
 install: go.sum
 	go install $(GOMOD_FLAGS) $(BUILD_FLAGS) ./cmd/oraid
 

@@ -14,10 +14,13 @@ const (
 	QuerierRoute = ModuleName
 
 	// DefaultQueryPage sets the default page query value
-	DefaultQueryPage = "1"
+	DefaultQueryPage = 1
 
 	// DefaultQueryLimit sets the default query limit value
-	DefaultQueryLimit = "5"
+	DefaultQueryLimit = 5
+
+	// DefaultValNum default validator number
+	DefaultValNum = 1
 
 	// ScriptPath is the path that stores all the script files (oracle scripts, data sources, test cases)
 	ScriptPath = ".oraifiles/"

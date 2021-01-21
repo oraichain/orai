@@ -351,7 +351,7 @@ func NewWasmApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	app.evidenceKeeper = *evidenceKeeper
 
 	app.providerKeeper = *provider.NewKeeper(
-		appCodec, keys[provider.StoreKey],
+		appCodec, keys[provider.StoreKey], app.wasmKeeper,
 	)
 
 	// just re-use the full router - do we want to limit this more?

@@ -167,6 +167,12 @@ func (m *OracleScriptInfoRes) GetTCases() []string {
 
 // ListOracleScriptsReq is the request type for the Query/ListOracleScripts RPC method
 type ListOracleScriptsReq struct {
+<<<<<<< HEAD
+=======
+	Name  string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Page  int64  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
+	Limit int64  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
+>>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 }
 
 func (m *ListOracleScriptsReq) Reset()         { *m = ListOracleScriptsReq{} }
@@ -202,6 +208,30 @@ func (m *ListOracleScriptsReq) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ListOracleScriptsReq proto.InternalMessageInfo
 
+<<<<<<< HEAD
+=======
+func (m *ListOracleScriptsReq) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *ListOracleScriptsReq) GetPage() int64 {
+	if m != nil {
+		return m.Page
+	}
+	return 0
+}
+
+func (m *ListOracleScriptsReq) GetLimit() int64 {
+	if m != nil {
+		return m.Limit
+	}
+	return 0
+}
+
+>>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 // ListOracleScriptsRes is the response type for the Query/ListOracleScripts RPC method
 type ListOracleScriptsRes struct {
 	OracleScripts []OracleScript `protobuf:"bytes,1,rep,name=OracleScripts,proto3" json:"OracleScripts" json:"oracle_scripts"`
@@ -255,11 +285,117 @@ func (m *ListOracleScriptsRes) GetCount() int64 {
 	return 0
 }
 
+<<<<<<< HEAD
+=======
+// ListOracleScriptsReq is the request type for the Query/ListOracleScripts RPC method
+type MinFeesReq struct {
+	OracleScriptName string `protobuf:"bytes,1,opt,name=OracleScriptName,proto3" json:"OracleScriptName,omitempty" json:"oscript_name"`
+	ValNum           int64  `protobuf:"varint,2,opt,name=ValNum,proto3" json:"ValNum,omitempty" json:"val_num"`
+}
+
+func (m *MinFeesReq) Reset()         { *m = MinFeesReq{} }
+func (m *MinFeesReq) String() string { return proto.CompactTextString(m) }
+func (*MinFeesReq) ProtoMessage()    {}
+func (*MinFeesReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e4abb115fe145c3e, []int{4}
+}
+func (m *MinFeesReq) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MinFeesReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MinFeesReq.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MinFeesReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MinFeesReq.Merge(m, src)
+}
+func (m *MinFeesReq) XXX_Size() int {
+	return m.Size()
+}
+func (m *MinFeesReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_MinFeesReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MinFeesReq proto.InternalMessageInfo
+
+func (m *MinFeesReq) GetOracleScriptName() string {
+	if m != nil {
+		return m.OracleScriptName
+	}
+	return ""
+}
+
+func (m *MinFeesReq) GetValNum() int64 {
+	if m != nil {
+		return m.ValNum
+	}
+	return 0
+}
+
+// ListOracleScriptsRes is the response type for the Query/ListOracleScripts RPC method
+type MinFeesRes struct {
+	MinFees string `protobuf:"bytes,1,opt,name=minFees,proto3" json:"minFees,omitempty" json:"minimum_fees"`
+}
+
+func (m *MinFeesRes) Reset()         { *m = MinFeesRes{} }
+func (m *MinFeesRes) String() string { return proto.CompactTextString(m) }
+func (*MinFeesRes) ProtoMessage()    {}
+func (*MinFeesRes) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e4abb115fe145c3e, []int{5}
+}
+func (m *MinFeesRes) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MinFeesRes) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MinFeesRes.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MinFeesRes) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MinFeesRes.Merge(m, src)
+}
+func (m *MinFeesRes) XXX_Size() int {
+	return m.Size()
+}
+func (m *MinFeesRes) XXX_DiscardUnknown() {
+	xxx_messageInfo_MinFeesRes.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MinFeesRes proto.InternalMessageInfo
+
+func (m *MinFeesRes) GetMinFees() string {
+	if m != nil {
+		return m.MinFees
+	}
+	return ""
+}
+
+>>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 func init() {
 	proto.RegisterType((*OracleScriptInfoReq)(nil), "oraichain.orai.provider.OracleScriptInfoReq")
 	proto.RegisterType((*OracleScriptInfoRes)(nil), "oraichain.orai.provider.OracleScriptInfoRes")
 	proto.RegisterType((*ListOracleScriptsReq)(nil), "oraichain.orai.provider.ListOracleScriptsReq")
 	proto.RegisterType((*ListOracleScriptsRes)(nil), "oraichain.orai.provider.ListOracleScriptsRes")
+<<<<<<< HEAD
+=======
+	proto.RegisterType((*MinFeesReq)(nil), "oraichain.orai.provider.MinFeesReq")
+	proto.RegisterType((*MinFeesRes)(nil), "oraichain.orai.provider.MinFeesRes")
+>>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 }
 
 func init() {
@@ -267,6 +403,7 @@ func init() {
 }
 
 var fileDescriptor_e4abb115fe145c3e = []byte{
+<<<<<<< HEAD
 	// 498 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x52, 0x31, 0x6f, 0xd3, 0x40,
 	0x14, 0x8e, 0x49, 0x93, 0x36, 0x17, 0x18, 0xb8, 0xa6, 0xd4, 0x64, 0xb0, 0x23, 0x0b, 0xa4, 0x80,
@@ -300,6 +437,47 @@ var fileDescriptor_e4abb115fe145c3e = []byte{
 	0xbe, 0xcf, 0x83, 0xca, 0x9b, 0x87, 0x2b, 0x99, 0x5f, 0xfb, 0xb3, 0x28, 0xfe, 0x73, 0x99, 0x07,
 	0x75, 0xbb, 0xc4, 0x8f, 0x7f, 0x07, 0x00, 0x00, 0xff, 0xff, 0xde, 0xe0, 0x47, 0xe7, 0x5c, 0x03,
 	0x00, 0x00,
+=======
+	// 599 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x53, 0xcd, 0x6e, 0xd4, 0x3c,
+	0x14, 0x9d, 0x7c, 0x69, 0xa7, 0xad, 0xfb, 0x81, 0xc0, 0x6d, 0xd5, 0xd0, 0x45, 0x32, 0x8a, 0x40,
+	0x1a, 0x2a, 0xd5, 0xd1, 0x00, 0x2b, 0x36, 0x55, 0x53, 0x04, 0x42, 0x82, 0x22, 0xb9, 0x88, 0x05,
+	0x9b, 0xc8, 0xe3, 0xb8, 0x53, 0xc3, 0xc4, 0x9e, 0xc6, 0x4e, 0xa1, 0x42, 0x6c, 0x59, 0xf3, 0x1a,
+	0xf0, 0x24, 0x5d, 0x76, 0xc9, 0x2a, 0xa0, 0xe9, 0x1b, 0xcc, 0x92, 0x15, 0x8a, 0x9d, 0x56, 0x29,
+	0x33, 0x95, 0xd8, 0x24, 0xf7, 0xe7, 0x1c, 0xdf, 0xeb, 0x73, 0xaf, 0xc1, 0xdd, 0x8f, 0xd1, 0x28,
+	0x97, 0xc7, 0x3c, 0x65, 0x79, 0xa4, 0x4f, 0x46, 0x4c, 0x45, 0x47, 0x05, 0xcb, 0x4f, 0x12, 0xa9,
+	0x68, 0xce, 0x47, 0x1a, 0x8d, 0x72, 0xa9, 0x25, 0x5c, 0x97, 0x39, 0xe1, 0xf4, 0x90, 0x70, 0x81,
+	0x2a, 0x0b, 0x5d, 0x50, 0x36, 0x56, 0x07, 0x72, 0x20, 0x0d, 0x26, 0xaa, 0x2c, 0x0b, 0xdf, 0xf0,
+	0xa9, 0x54, 0x99, 0x54, 0x51, 0x9f, 0x28, 0x16, 0x1d, 0xf7, 0xfa, 0x4c, 0x93, 0x5e, 0x44, 0x25,
+	0x17, 0x75, 0x3e, 0x98, 0x2a, 0x6a, 0xbe, 0x89, 0x54, 0x16, 0x10, 0xde, 0x07, 0x2b, 0xaf, 0x72,
+	0x42, 0x87, 0x6c, 0xdf, 0x74, 0xf1, 0x5c, 0x1c, 0x48, 0xcc, 0x8e, 0x20, 0x04, 0x73, 0x82, 0x64,
+	0xcc, 0x73, 0x3a, 0x4e, 0x77, 0x09, 0x1b, 0x3b, 0xfc, 0xe2, 0xce, 0xc2, 0xaa, 0x59, 0x58, 0xf8,
+	0x0c, 0xcc, 0xcb, 0x0f, 0x82, 0xe5, 0xde, 0x7f, 0x1d, 0xa7, 0xfb, 0x7f, 0xdc, 0xfb, 0x5d, 0x06,
+	0x5b, 0x03, 0xae, 0x0f, 0x8b, 0x3e, 0xa2, 0x32, 0x8b, 0xea, 0xae, 0xed, 0x6f, 0x4b, 0xa5, 0xef,
+	0x6d, 0x5b, 0x68, 0x87, 0xd2, 0x9d, 0x34, 0xcd, 0x99, 0x52, 0xd8, 0xf2, 0xe1, 0x06, 0x58, 0xa4,
+	0x52, 0xe8, 0x9c, 0x50, 0xed, 0xb9, 0xa6, 0xc0, 0xa5, 0x0f, 0x3b, 0x60, 0x39, 0x65, 0x56, 0x3d,
+	0x2e, 0x85, 0x37, 0x67, 0xd2, 0xcd, 0x10, 0x14, 0x60, 0xee, 0x80, 0x31, 0xe5, 0xcd, 0x77, 0xdc,
+	0xee, 0xf2, 0x83, 0x3b, 0xc8, 0x16, 0x44, 0x95, 0x5a, 0xa8, 0x56, 0x0b, 0xed, 0x4a, 0x2e, 0xe2,
+	0xed, 0xd3, 0x32, 0x68, 0x4d, 0xca, 0x60, 0xf9, 0x9d, 0x92, 0xe2, 0x71, 0x58, 0x91, 0xc2, 0xef,
+	0x3f, 0x83, 0xee, 0x3f, 0xf4, 0x5c, 0xf1, 0x15, 0x36, 0x75, 0xe0, 0x23, 0xb0, 0x94, 0x26, 0x4a,
+	0x16, 0x39, 0x65, 0xca, 0x6b, 0x77, 0xdc, 0xee, 0x52, 0xbc, 0x3e, 0x29, 0x83, 0x15, 0x7b, 0x6a,
+	0x4a, 0x34, 0xb9, 0xc8, 0x86, 0x78, 0x31, 0xdd, 0xb7, 0x26, 0x44, 0x60, 0x41, 0x27, 0x94, 0x28,
+	0xa6, 0xbc, 0x05, 0xc3, 0x59, 0x9b, 0x94, 0xc1, 0x6d, 0xcb, 0xd1, 0x4c, 0xd5, 0xb9, 0x10, 0xb7,
+	0xf5, 0xae, 0x31, 0x5e, 0x83, 0xd5, 0x17, 0x5c, 0xe9, 0xe6, 0x2c, 0xd4, 0x35, 0x43, 0xab, 0x62,
+	0x23, 0x32, 0x60, 0x66, 0x0e, 0x2e, 0x36, 0x36, 0x5c, 0x05, 0xf3, 0x43, 0x9e, 0x71, 0x2b, 0xa8,
+	0x8b, 0xad, 0x13, 0x7e, 0x73, 0x66, 0x1e, 0xab, 0xe0, 0x27, 0x70, 0xe3, 0x4a, 0xcc, 0x73, 0x8c,
+	0x9a, 0xf7, 0xd0, 0x35, 0xab, 0x8a, 0x9a, 0xe8, 0x18, 0x55, 0xca, 0x8e, 0xcb, 0xe0, 0xea, 0x19,
+	0x93, 0x32, 0x58, 0xb3, 0x17, 0x94, 0x26, 0x9c, 0xd8, 0x99, 0xa9, 0x10, 0x5f, 0xc5, 0x55, 0xbd,
+	0x52, 0x59, 0x08, 0x5d, 0x5f, 0xc0, 0x3a, 0xe1, 0x67, 0x00, 0x5e, 0x72, 0xf1, 0x94, 0x31, 0x73,
+	0xef, 0x5d, 0x70, 0xab, 0x49, 0xda, 0xbb, 0xd4, 0xa0, 0x29, 0x7e, 0xfd, 0xcc, 0x12, 0xb3, 0xca,
+	0x78, 0x8a, 0x00, 0x37, 0x41, 0xfb, 0x0d, 0x19, 0xee, 0x15, 0x99, 0xad, 0x14, 0xc3, 0x49, 0x19,
+	0xdc, 0xb4, 0xd4, 0x63, 0x32, 0x4c, 0x44, 0x91, 0x85, 0xb8, 0x46, 0x84, 0xdb, 0x8d, 0xf2, 0x0a,
+	0xf6, 0xc0, 0x42, 0x66, 0xbd, 0xe9, 0xaa, 0x19, 0x17, 0x3c, 0x2b, 0xb2, 0xc4, 0x2c, 0x14, 0xbe,
+	0xc0, 0xc5, 0x4f, 0x4e, 0xc7, 0xbe, 0x73, 0x36, 0xf6, 0x9d, 0x5f, 0x63, 0xdf, 0xf9, 0x7a, 0xee,
+	0xb7, 0xce, 0xce, 0xfd, 0xd6, 0x8f, 0x73, 0xbf, 0xf5, 0x76, 0xb3, 0xb1, 0x71, 0x97, 0xfa, 0x1a,
+	0x2b, 0xfa, 0xfb, 0x29, 0xf7, 0xdb, 0xe6, 0x09, 0x3f, 0xfc, 0x13, 0x00, 0x00, 0xff, 0xff, 0xcc,
+	0x4c, 0xb1, 0xe8, 0x5a, 0x04, 0x00, 0x00,
+>>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 }
 
 func (m *OracleScriptInfoReq) Marshal() (dAtA []byte, err error) {
@@ -435,6 +613,26 @@ func (m *ListOracleScriptsReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+<<<<<<< HEAD
+=======
+	if m.Limit != 0 {
+		i = encodeVarintQueryOscript(dAtA, i, uint64(m.Limit))
+		i--
+		dAtA[i] = 0x18
+	}
+	if m.Page != 0 {
+		i = encodeVarintQueryOscript(dAtA, i, uint64(m.Page))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.Name) > 0 {
+		i -= len(m.Name)
+		copy(dAtA[i:], m.Name)
+		i = encodeVarintQueryOscript(dAtA, i, uint64(len(m.Name)))
+		i--
+		dAtA[i] = 0xa
+	}
+>>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 	return len(dAtA) - i, nil
 }
 
@@ -480,6 +678,74 @@ func (m *ListOracleScriptsRes) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+<<<<<<< HEAD
+=======
+func (m *MinFeesReq) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MinFeesReq) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MinFeesReq) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.ValNum != 0 {
+		i = encodeVarintQueryOscript(dAtA, i, uint64(m.ValNum))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.OracleScriptName) > 0 {
+		i -= len(m.OracleScriptName)
+		copy(dAtA[i:], m.OracleScriptName)
+		i = encodeVarintQueryOscript(dAtA, i, uint64(len(m.OracleScriptName)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MinFeesRes) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MinFeesRes) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MinFeesRes) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.MinFees) > 0 {
+		i -= len(m.MinFees)
+		copy(dAtA[i:], m.MinFees)
+		i = encodeVarintQueryOscript(dAtA, i, uint64(len(m.MinFees)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+>>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 func encodeVarintQueryOscript(dAtA []byte, offset int, v uint64) int {
 	offset -= sovQueryOscript(v)
 	base := offset
@@ -553,6 +819,19 @@ func (m *ListOracleScriptsReq) Size() (n int) {
 	}
 	var l int
 	_ = l
+<<<<<<< HEAD
+=======
+	l = len(m.Name)
+	if l > 0 {
+		n += 1 + l + sovQueryOscript(uint64(l))
+	}
+	if m.Page != 0 {
+		n += 1 + sovQueryOscript(uint64(m.Page))
+	}
+	if m.Limit != 0 {
+		n += 1 + sovQueryOscript(uint64(m.Limit))
+	}
+>>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 	return n
 }
 
@@ -574,6 +853,38 @@ func (m *ListOracleScriptsRes) Size() (n int) {
 	return n
 }
 
+<<<<<<< HEAD
+=======
+func (m *MinFeesReq) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.OracleScriptName)
+	if l > 0 {
+		n += 1 + l + sovQueryOscript(uint64(l))
+	}
+	if m.ValNum != 0 {
+		n += 1 + sovQueryOscript(uint64(m.ValNum))
+	}
+	return n
+}
+
+func (m *MinFeesRes) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.MinFees)
+	if l > 0 {
+		n += 1 + l + sovQueryOscript(uint64(l))
+	}
+	return n
+}
+
+>>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 func sovQueryOscript(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
@@ -975,6 +1286,79 @@ func (m *ListOracleScriptsReq) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: ListOracleScriptsReq: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+<<<<<<< HEAD
+=======
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQueryOscript
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQueryOscript
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQueryOscript
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Name = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Page", wireType)
+			}
+			m.Page = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQueryOscript
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Page |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Limit", wireType)
+			}
+			m.Limit = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQueryOscript
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Limit |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+>>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 		default:
 			iNdEx = preIndex
 			skippy, err := skipQueryOscript(dAtA[iNdEx:])
@@ -1105,6 +1489,198 @@ func (m *ListOracleScriptsRes) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+<<<<<<< HEAD
+=======
+func (m *MinFeesReq) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQueryOscript
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MinFeesReq: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MinFeesReq: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field OracleScriptName", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQueryOscript
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQueryOscript
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQueryOscript
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.OracleScriptName = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ValNum", wireType)
+			}
+			m.ValNum = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQueryOscript
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.ValNum |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQueryOscript(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthQueryOscript
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthQueryOscript
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MinFeesRes) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowQueryOscript
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MinFeesRes: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MinFeesRes: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MinFees", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowQueryOscript
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthQueryOscript
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthQueryOscript
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.MinFees = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipQueryOscript(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthQueryOscript
+			}
+			if (iNdEx + skippy) < 0 {
+				return ErrInvalidLengthQueryOscript
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+>>>>>>> 59e687a529c4f597ee6c64b6ec8370f0da512597
 func skipQueryOscript(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
