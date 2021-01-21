@@ -19,6 +19,9 @@ const (
 	// DefaultQueryLimit sets the default query limit value
 	DefaultQueryLimit = 5
 
+	// DefaultValNum default validator number
+	DefaultValNum = 1
+
 	// ScriptPath is the path that stores all the script files (oracle scripts, data sources, test cases)
 	ScriptPath = ".oraifiles/"
 

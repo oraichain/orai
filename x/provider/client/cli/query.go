@@ -12,8 +12,9 @@ import (
 )
 
 const (
-	flagPage  = "page"
-	flagLimit = "limit"
+	flagPage   = "page"
+	flagLimit  = "limit"
+	flagValNum = "val_num"
 )
 
 func GetQueryCmd() *cobra.Command {
@@ -33,6 +34,7 @@ func GetQueryCmd() *cobra.Command {
 		GetCmdQueryOracleScripts(),
 		GetCmdQueryTestCase(),
 		GetCmdQueryTestCases(),
+		GetCmdQueryMinFees(),
 	)
 	return queryCmd
 }
@@ -61,6 +63,7 @@ func GetCmdQueryDataSource() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			fmt.Printf("res :%v", res)
 			if len(res.Name) == 0 {
 				return fmt.Errorf("data source not found")
 			}
@@ -283,5 +286,43 @@ func GetCmdQueryTestCases() *cobra.Command {
 	flags.AddQueryFlagsToCmd(cmd)
 	cmd.Flags().Int64(flagPage, types.DefaultQueryPage, "from page")
 	cmd.Flags().Int64(flagLimit, types.DefaultQueryLimit, "limit number")
+	return cmd
+}
+
+// GetCmdQueryMinFees queries a list of all test case names
+func GetCmdQueryMinFees() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "minfees [name] --val_num [1]",
+		Short: "query the min fees",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			valNum, err := cmd.Flags().GetInt64(flagValNum)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			res, err := queryClient.QueryMinFees(
+				context.Background(),
+				&types.MinFeesReq{
+					OracleScriptName: args[0],
+					ValNum:           valNum,
+				},
+			)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	cmd.Flags().Int64(flagValNum, types.DefaultValNum, "val num")
 	return cmd
 }
