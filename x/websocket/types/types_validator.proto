@@ -1,0 +1,13 @@
+syntax = "proto3";
+package oraichain.orai.websocket;
+import "gogoproto/gogo.proto";
+option go_package = "github.com/oraichain/orai/x/websocket/types";
+
+message Validator {
+  option (gogoproto.goproto_stringer) = true;  
+  // Address is the address who is the original validator to store information of those that execute the oScript
+  bytes address = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.ValAddress"];
+  int64 votingPower = 2;
+  string status = 3;
+  
+}

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ORAICHAIN_PROTO_DIR=${1:-x/provider/types/}
+PROTO_DIR=${PROTO_DIR:-x/provider/types/}
 COSMOS_SDK_DIR=${COSMOS_SDK_DIR:-$(go list -f "{{ .Dir }}" -m github.com/cosmos/cosmos-sdk)}
 
 # Generate Go types from protobuf
@@ -12,4 +12,4 @@ protoc \
   --grpc-gateway_out .\
   --grpc-gateway_opt logtostderr=true \
   --grpc-gateway_opt paths=Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types,Mgoogle/protobuf/empty.proto=github.com/gogo/protobuf/types,paths=source_relative \
-  $(find "${ORAICHAIN_PROTO_DIR}" -maxdepth 4 -name '*.proto')
+  $(find "${PROTO_DIR}" -maxdepth 4 -name '*.proto')

@@ -3,11 +3,11 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	"github.com/cosmos/cosmos-sdk/x/params"
-	staking "github.com/cosmos/cosmos-sdk/x/staking/exported"
-	supply "github.com/cosmos/cosmos-sdk/x/supply/exported"
+	params "github.com/cosmos/cosmos-sdk/x/params/types"
+	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
+	supply "github.com/cosmos/cosmos-sdk/x/supply/types"
 	provider "github.com/oraichain/orai/x/provider/exported"
-	//webSocket "github.com/oraichain/orai/x/websocket/exported"
+	webSocket "github.com/oraichain/orai/x/websocket/exported"
 )
 
 // ParamSubspace defines the expected Subspace interfacace

@@ -58,5 +58,5 @@ docker-compose exec protoc ash
 make proto-lint
 
 # build protobuf templates
-make proto-gen
+PROTO_DIR=x/websocket/types/ make proto-gen
 ```

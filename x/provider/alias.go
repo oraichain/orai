@@ -20,23 +20,21 @@ var (
 	NewMsgCreateOracleScript = types.NewMsgCreateOracleScript
 	NewMsgCreateAIDataSource = types.NewMsgCreateAIDataSource
 	//NewMsgSetAIRequest       = types.NewMsgSetAIRequest
-	ModuleCdc                  = types.ModuleCdc
-	RegisterCodec              = types.RegisterCodec
-	NewGenesisState            = types.NewGenesisState
-	OScriptKeyPrefix           = types.OScriptKeyPrefix
-	DataSourceKeyPrefix        = types.DataSourceKeyPrefix
-	TestCaseKeyPrefix          = types.TestCaseKeyPrefix
-	TestCaseStoreKeyString     = types.TestCaseStoreKeyString
-	OracleScriptStoreKeyString = types.OracleScriptStoreKeyString
-	EventTypeSetOracleScript   = types.EventTypeSetOracleScript
-	EventTypeEditOracleScript  = types.EventTypeEditOracleScript
-	EventTypeSetDataSource     = types.EventTypeSetDataSource
-	EventTypeEditDataSource    = types.EventTypeEditDataSource
-	EventTypeCreateTestCase    = types.EventTypeCreateTestCase
-	EventTypeEditTestCase      = types.EventTypeEditTestCase
-	AttributeDataSourceName    = types.AttributeDataSourceName
-	AttributeOracleScriptName  = types.AttributeOracleScriptName
-	AttributeTestCaseName      = types.AttributeTestCaseName
+	ModuleCdc                 = types.ModuleCdc
+	RegisterCodec             = types.RegisterCodec
+	NewGenesisState           = types.NewGenesisState
+	OScriptKeyPrefix          = types.OScriptKeyPrefix
+	DataSourceKeyPrefix       = types.DataSourceKeyPrefix
+	TestCaseKeyPrefix         = types.TestCaseKeyPrefix
+	EventTypeSetOracleScript  = types.EventTypeSetOracleScript
+	EventTypeEditOracleScript = types.EventTypeEditOracleScript
+	EventTypeSetDataSource    = types.EventTypeSetDataSource
+	EventTypeEditDataSource   = types.EventTypeEditDataSource
+	EventTypeCreateTestCase   = types.EventTypeCreateTestCase
+	EventTypeEditTestCase     = types.EventTypeEditTestCase
+	AttributeDataSourceName   = types.AttributeDataSourceName
+	AttributeOracleScriptName = types.AttributeOracleScriptName
+	AttributeTestCaseName     = types.AttributeTestCaseName
 )
 
 type (
