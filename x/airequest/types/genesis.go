@@ -1,24 +1,9 @@
 package types
 
-import (
-	"fmt"
-)
+import fmt "fmt"
 
-// GenesisState - all provider state that must be provided at genesis
-type GenesisState struct {
-	AIRequests []AIRequest `json:"ai_requests"`
-	Params     Params      `json:"params"`
-	// TODO: Fill out what is needed by the module for genesis
-}
-
-// NewGenesisState creates a new GenesisState object
-func NewGenesisState(aiRequests []AIRequest, params Params) GenesisState {
-	return GenesisState{
-		// TODO: Fill out according to your genesis state
-		AIRequests: aiRequests,
-		Params:     params,
-	}
-}
+// DefaultIndex is the default capability global index
+const DefaultIndex uint64 = 2
 
 // DefaultGenesisState - default GenesisState used by Cosmos Hub
 func DefaultGenesisState() GenesisState {
@@ -31,8 +16,8 @@ func DefaultGenesisState() GenesisState {
 }
 
 // ValidateGenesis validates the provider genesis parameters
-func ValidateGenesis(data GenesisState) error {
-	for _, record := range data.AIRequests {
+func (gs GenesisState) ValidateGenesis() error {
+	for _, record := range gs.AIRequests {
 		if record.RequestID == "" {
 			return fmt.Errorf("invalid AIRequests: Value: %s. Error: Missing RequestID", record.RequestID)
 		}

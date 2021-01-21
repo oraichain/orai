@@ -1,0 +1,591 @@
+{
+    "genesis_time": "2020-12-26T18:19:43.498740152Z",
+    "chain_id": "Oraichain",
+    "consensus_params": {
+        "block": {
+            "max_bytes": "1000000",
+            "max_gas": "5000000",
+            "time_iota_ms": "1000"
+        },
+        "evidence": {
+            "max_age_num_blocks": "100000",
+            "max_age_duration": "172800000000000"
+        },
+        "validator": {
+            "pub_key_types": [
+                "secp256k1"
+            ]
+        }
+    },
+    "app_hash": "",
+    "app_state": {
+        "supply": {
+            "supply": []
+        },
+        "bank": {
+            "send_enabled": true
+        },
+        "staking": {
+            "params": {
+                "unbonding_time": "1814400000000000",
+                "max_validators": 100,
+                "max_entries": 7,
+                "historical_entries": 1000,
+                "bond_denom": "orai"
+            },
+            "last_total_power": "0",
+            "last_validator_powers": null,
+            "validators": null,
+            "delegations": null,
+            "unbonding_delegations": null,
+            "redelegations": null,
+            "exported": false
+        },
+        "airesult": {
+            "ai_results": [],
+            "params": {
+                "expiration_count": "10"
+            }
+        },
+        "auth": {
+            "params": {
+                "max_memo_characters": "256",
+                "tx_sig_limit": "7",
+                "tx_size_cost_per_byte": "5",
+                "sig_verify_cost_ed25519": "590",
+                "sig_verify_cost_secp256k1": "1000"
+            },
+            "accounts": [
+                {
+                    "type": "cosmos-sdk/Account",
+                    "value": {
+                        "address": "orai1x0rgl00uwa6r20x8xxr446qhegtllmhy2j392n",
+                        "coins": [
+                            {
+                                "denom": "orai",
+                                "amount": "9000000000000000"
+                            }
+                        ],
+                        "public_key": null,
+                        "account_number": "0",
+                        "sequence": "0"
+                    }
+                },
+                {
+                    "type": "cosmos-sdk/Account",
+                    "value": {
+                        "address": "orai1km7a432wtjkahzrj0u9l5war4kdtd20wzy8svr",
+                        "coins": [
+                            {
+                                "denom": "orai",
+                                "amount": "9000000000000000"
+                            }
+                        ],
+                        "public_key": null,
+                        "account_number": "0",
+                        "sequence": "0"
+                    }
+                },
+                {
+                    "type": "cosmos-sdk/Account",
+                    "value": {
+                        "address": "orai1pu9qqke50krgj970hmwmzj6s6ke4gzw4zge7ll",
+                        "coins": [
+                            {
+                                "denom": "orai",
+                                "amount": "9000000000000000"
+                            }
+                        ],
+                        "public_key": null,
+                        "account_number": "0",
+                        "sequence": "0"
+                    }
+                },
+                {
+                    "type": "cosmos-sdk/Account",
+                    "value": {
+                        "address": "orai19ntk34cs0m29n20h8g6m5kp4ph2w07vrd3vlvz",
+                        "coins": [
+                            {
+                                "denom": "orai",
+                                "amount": "9000000000000000"
+                            }
+                        ],
+                        "public_key": null,
+                        "account_number": "0",
+                        "sequence": "0"
+                    }
+                },
+                {
+                    "type": "cosmos-sdk/Account",
+                    "value": {
+                        "address": "orai16xf04ttqsuv03yqucre67jp0rsmd0y4h94tfdz",
+                        "coins": [
+                            {
+                                "denom": "orai",
+                                "amount": "9000000000000000"
+                            }
+                        ],
+                        "public_key": null,
+                        "account_number": "0",
+                        "sequence": "0"
+                    }
+                },
+                {
+                    "type": "cosmos-sdk/Account",
+                    "value": {
+                        "address": "orai1h750ufcl2xpweu50z246azzkatsslpyr96yprk",
+                        "coins": [
+                            {
+                                "denom": "orai",
+                                "amount": "9000000000000000"
+                            }
+                        ],
+                        "public_key": null,
+                        "account_number": "0",
+                        "sequence": "0"
+                    }
+                },
+                {
+                    "type": "cosmos-sdk/Account",
+                    "value": {
+                        "address": "orai1em243k08m86038m0kf6rzut6ljjd0yqjxmnnm8",
+                        "coins": [
+                            {
+                                "denom": "orai",
+                                "amount": "9000000000000000"
+                            }
+                        ],
+                        "public_key": null,
+                        "account_number": "0",
+                        "sequence": "0"
+                    }
+                }
+            ]
+        },
+        "genutil": {
+            "gentxs": [
+                {
+                    "type": "cosmos-sdk/StdTx",
+                    "value": {
+                        "msg": [
+                            {
+                                "type": "cosmos-sdk/MsgCreateValidator",
+                                "value": {
+                                    "description": {
+                                        "moniker": "node2_moniker",
+                                        "identity": "",
+                                        "website": "",
+                                        "security_contact": "",
+                                        "details": ""
+                                    },
+                                    "commission": {
+                                        "rate": "0.100000000000000000",
+                                        "max_rate": "0.200000000000000000",
+                                        "max_change_rate": "0.010000000000000000"
+                                    },
+                                    "min_self_delegation": "100",
+                                    "delegator_address": "orai1x0rgl00uwa6r20x8xxr446qhegtllmhy2j392n",
+                                    "validator_address": "oraivaloper1x0rgl00uwa6r20x8xxr446qhegtllmhyrc2vp5",
+                                    "pubkey": "oraivalconspub1addwnpepq0w4a3h9z2s3unpfalf9tagts0yxz3f3fgtnqc0j8r6lnwn4s0jzk3ca8v9",
+                                    "value": {
+                                        "denom": "orai",
+                                        "amount": "900000000000"
+                                    }
+                                }
+                            }
+                        ],
+                        "fee": {
+                            "amount": [],
+                            "gas": "200000"
+                        },
+                        "signatures": [
+                            {
+                                "pub_key": {
+                                    "type": "tendermint/PubKeySecp256k1",
+                                    "value": "AvyUw4PBUhoDSETPANqg6GEb2T+xlYp0DX2kMCGTSwT2"
+                                },
+                                "signature": "8jl8gey6QIEe4MO7KvaK0tI009Oy0/4ORPsTJU/ntGIOw3Na7qch3wmoj7p7GX1E0adzh+FYCKiQ7tc2/UsO/w=="
+                            }
+                        ],
+                        "memo": "25e3dd0839fa44a89735b38b7b749acdfac8438e@164.90.180.95:26656"
+                    }
+                },
+                {
+                    "type": "cosmos-sdk/StdTx",
+                    "value": {
+                        "msg": [
+                            {
+                                "type": "cosmos-sdk/MsgCreateValidator",
+                                "value": {
+                                    "description": {
+                                        "moniker": "node4_monkier",
+                                        "identity": "",
+                                        "website": "",
+                                        "security_contact": "",
+                                        "details": ""
+                                    },
+                                    "commission": {
+                                        "rate": "0.100000000000000000",
+                                        "max_rate": "0.200000000000000000",
+                                        "max_change_rate": "0.010000000000000000"
+                                    },
+                                    "min_self_delegation": "100",
+                                    "delegator_address": "orai1pu9qqke50krgj970hmwmzj6s6ke4gzw4zge7ll",
+                                    "validator_address": "oraivaloper1pu9qqke50krgj970hmwmzj6s6ke4gzw4tzzh5c",
+                                    "pubkey": "oraivalconspub1addwnpepqg9fh66utu7xgknht93rsl3whseqw4kqsnma49ftwavwnej9adk5xdf6gmm",
+                                    "value": {
+                                        "denom": "orai",
+                                        "amount": "900000000000"
+                                    }
+                                }
+                            }
+                        ],
+                        "fee": {
+                            "amount": [],
+                            "gas": "200000"
+                        },
+                        "signatures": [
+                            {
+                                "pub_key": {
+                                    "type": "tendermint/PubKeySecp256k1",
+                                    "value": "A7H6yf1gp5/qlRYmX41qIVXLPTrXNMUqBqeiRpE9GZrl"
+                                },
+                                "signature": "j+H1YltBhuA17YgzfUDUQjk0t24niEaw8qQWe+2dmUthLtnPydORNx3cJJev/lhJnXaqbOKT+euFNVtwZ1GloQ=="
+                            }
+                        ],
+                        "memo": "db13b4e2d1fd922640904590d6c9b5ae698de85c@165.232.118.44:26656"
+                    }
+                },
+                {
+                    "type": "cosmos-sdk/StdTx",
+                    "value": {
+                        "msg": [
+                            {
+                                "type": "cosmos-sdk/MsgCreateValidator",
+                                "value": {
+                                    "description": {
+                                        "moniker": "node5_moniker",
+                                        "identity": "",
+                                        "website": "",
+                                        "security_contact": "",
+                                        "details": ""
+                                    },
+                                    "commission": {
+                                        "rate": "0.100000000000000000",
+                                        "max_rate": "0.200000000000000000",
+                                        "max_change_rate": "0.010000000000000000"
+                                    },
+                                    "min_self_delegation": "100",
+                                    "delegator_address": "orai19ntk34cs0m29n20h8g6m5kp4ph2w07vrd3vlvz",
+                                    "validator_address": "oraivaloper19ntk34cs0m29n20h8g6m5kp4ph2w07vrymhk89",
+                                    "pubkey": "oraivalconspub1addwnpepqtw2u544sdj7l5shz2nex4zp3hg6eedndy25yhjkxswetrymumsfkkr60kh",
+                                    "value": {
+                                        "denom": "orai",
+                                        "amount": "900000000000"
+                                    }
+                                }
+                            }
+                        ],
+                        "fee": {
+                            "amount": [],
+                            "gas": "200000"
+                        },
+                        "signatures": [
+                            {
+                                "pub_key": {
+                                    "type": "tendermint/PubKeySecp256k1",
+                                    "value": "A7TpahUGsEc6H4cBrgqh8137RTGJ288rUR6o8XCsayfj"
+                                },
+                                "signature": "dpFGkQNmj525GB7vWO3orG6dhG+U1ZdKvgue9ZWxbw8zmppdoKYsPLvHqFErBTUhURmQHk08Qn5T4GXshKdR2g=="
+                            }
+                        ],
+                        "memo": "b46c45fdbb59ef0509d93e89e574b2080a146b14@178.128.61.252:26656"
+                    }
+                },
+                {
+                    "type": "cosmos-sdk/StdTx",
+                    "value": {
+                        "msg": [
+                            {
+                                "type": "cosmos-sdk/MsgCreateValidator",
+                                "value": {
+                                    "description": {
+                                        "moniker": "node6_moniker",
+                                        "identity": "",
+                                        "website": "",
+                                        "security_contact": "",
+                                        "details": ""
+                                    },
+                                    "commission": {
+                                        "rate": "0.100000000000000000",
+                                        "max_rate": "0.200000000000000000",
+                                        "max_change_rate": "0.010000000000000000"
+                                    },
+                                    "min_self_delegation": "100",
+                                    "delegator_address": "orai16xf04ttqsuv03yqucre67jp0rsmd0y4h94tfdz",
+                                    "validator_address": "oraivaloper16xf04ttqsuv03yqucre67jp0rsmd0y4hvlsqx9",
+                                    "pubkey": "oraivalconspub1addwnpepqdw3v2f5lnum36kw90mfkzffavlc5skvsd3trpxf2s2pvemzmjkwk9zkhdg",
+                                    "value": {
+                                        "denom": "orai",
+                                        "amount": "900000000000"
+                                    }
+                                }
+                            }
+                        ],
+                        "fee": {
+                            "amount": [],
+                            "gas": "200000"
+                        },
+                        "signatures": [
+                            {
+                                "pub_key": {
+                                    "type": "tendermint/PubKeySecp256k1",
+                                    "value": "AxzjY1ZExJ0Q3RFmIXL92YDEiFzbEIsyvWEMkpJa049I"
+                                },
+                                "signature": "A9rVIbdbwR5bW2YjTGOf2tL4vAeo4Yp5Uisml/8qE49OgBiR1qp8F94ppmIwGtVctlxeGuQ7w9cufNN9pPtSRQ=="
+                            }
+                        ],
+                        "memo": "2a8c59cfdeccd2ed30471b90f626da09adcf3342@178.128.57.195:26656"
+                    }
+                },
+                {
+                    "type": "cosmos-sdk/StdTx",
+                    "value": {
+                        "msg": [
+                            {
+                                "type": "cosmos-sdk/MsgCreateValidator",
+                                "value": {
+                                    "description": {
+                                        "moniker": "node1_moniker",
+                                        "identity": "",
+                                        "website": "",
+                                        "security_contact": "",
+                                        "details": ""
+                                    },
+                                    "commission": {
+                                        "rate": "0.100000000000000000",
+                                        "max_rate": "0.200000000000000000",
+                                        "max_change_rate": "0.010000000000000000"
+                                    },
+                                    "min_self_delegation": "100",
+                                    "delegator_address": "orai1h750ufcl2xpweu50z246azzkatsslpyr96yprk",
+                                    "validator_address": "oraivaloper1h750ufcl2xpweu50z246azzkatsslpyrvslgg3",
+                                    "pubkey": "oraivalconspub1addwnpepqfxm4h9mf39k4rlcrpzh60xfgx4psck0l0kyftwkfddu4mg59ltuj6ksa7h",
+                                    "value": {
+                                        "denom": "orai",
+                                        "amount": "900000000000"
+                                    }
+                                }
+                            }
+                        ],
+                        "fee": {
+                            "amount": [],
+                            "gas": "200000"
+                        },
+                        "signatures": [
+                            {
+                                "pub_key": {
+                                    "type": "tendermint/PubKeySecp256k1",
+                                    "value": "A1QFSM5xSpUSH4S0HcT3lyLIB58izyYb8p/R/UmKW42L"
+                                },
+                                "signature": "7sZnKO/mPDl4puDS/WpFDrrEJiHr8W/xxfjQAtNg1vY77c3RVHlFtuQZC+n5wYk07n4BOLOA1hGBHab23heubw=="
+                            }
+                        ],
+                        "memo": "b495da1980d3cd7c3686044e800412af53ae4be4@159.89.206.139:26656"
+                    }
+                },
+                {
+                    "type": "cosmos-sdk/StdTx",
+                    "value": {
+                        "msg": [
+                            {
+                                "type": "cosmos-sdk/MsgCreateValidator",
+                                "value": {
+                                    "description": {
+                                        "moniker": "node3_moniker",
+                                        "identity": "",
+                                        "website": "",
+                                        "security_contact": "",
+                                        "details": ""
+                                    },
+                                    "commission": {
+                                        "rate": "0.100000000000000000",
+                                        "max_rate": "0.200000000000000000",
+                                        "max_change_rate": "0.010000000000000000"
+                                    },
+                                    "min_self_delegation": "100",
+                                    "delegator_address": "orai1km7a432wtjkahzrj0u9l5war4kdtd20wzy8svr",
+                                    "validator_address": "oraivaloper1km7a432wtjkahzrj0u9l5war4kdtd20wtwue8y",
+                                    "pubkey": "oraivalconspub1addwnpepqv39rdaknteql4c9xzzw83hpuckweq8tdy85k6hwqgpdr3v4urlfurpx9ax",
+                                    "value": {
+                                        "denom": "orai",
+                                        "amount": "900000000000"
+                                    }
+                                }
+                            }
+                        ],
+                        "fee": {
+                            "amount": [],
+                            "gas": "200000"
+                        },
+                        "signatures": [
+                            {
+                                "pub_key": {
+                                    "type": "tendermint/PubKeySecp256k1",
+                                    "value": "Au2fjMngAgirv0W2+GtmYozDN5MImCtDXYWZEQN4OOzj"
+                                },
+                                "signature": "bXzhssxzMLBUda+zG4roE7NPPPegFovVxt8cR6jcMzA4tOS0CRjjqtOotQPqo8Tuy6ptPdV0yYR5TxSOw6oLig=="
+                            }
+                        ],
+                        "memo": "e07a89a185c538820258b977b01b44a806dfcece@157.230.22.169:26656"
+                    }
+                },
+                {
+                    "type": "cosmos-sdk/StdTx",
+                    "value": {
+                        "msg": [
+                            {
+                                "type": "cosmos-sdk/MsgCreateValidator",
+                                "value": {
+                                    "description": {
+                                        "moniker": "node7_moniker",
+                                        "identity": "",
+                                        "website": "",
+                                        "security_contact": "",
+                                        "details": ""
+                                    },
+                                    "commission": {
+                                        "rate": "0.100000000000000000",
+                                        "max_rate": "0.200000000000000000",
+                                        "max_change_rate": "0.010000000000000000"
+                                    },
+                                    "min_self_delegation": "100",
+                                    "delegator_address": "orai1em243k08m86038m0kf6rzut6ljjd0yqjxmnnm8",
+                                    "validator_address": "oraivaloper1em243k08m86038m0kf6rzut6ljjd0yqj03g6sq",
+                                    "pubkey": "oraivalconspub1addwnpepqdgxejkwwjfgnclhd24tzhq9m0q34uh77hyll7awqq6fznt7ns0w6zyn9mv",
+                                    "value": {
+                                        "denom": "orai",
+                                        "amount": "900000000000"
+                                    }
+                                }
+                            }
+                        ],
+                        "fee": {
+                            "amount": [],
+                            "gas": "200000"
+                        },
+                        "signatures": [
+                            {
+                                "pub_key": {
+                                    "type": "tendermint/PubKeySecp256k1",
+                                    "value": "A3vbMrSr+3Z7XmA7ItsafC+UNb6BuvYTI0CQ81khDgaW"
+                                },
+                                "signature": "Twn1v59QKefYC/H9F5i+nqQe+usnAD9DJgh5HkZqy0VzS4X5ITfGHREnopqkr4yhNWn6Y4jKx70mMvbzoulcPA=="
+                            }
+                        ],
+                        "memo": "addb91a1dbc48ffb7ddba30964ae649343179822@178.128.220.155:26656"
+                    }
+                }
+            ]
+        },
+        "distribution": {
+            "params": {
+                "community_tax": "0.020000000000000000",
+                "base_proposer_reward": "0.100000000000000000",
+                "bonus_proposer_reward": "0.100000000000000000",
+                "withdraw_addr_enabled": true
+            },
+            "fee_pool": {
+                "community_pool": []
+            },
+            "delegator_withdraw_infos": [],
+            "previous_proposer": "",
+            "outstanding_rewards": [],
+            "validator_accumulated_commissions": [],
+            "validator_historical_rewards": [],
+            "validator_current_rewards": [],
+            "delegator_starting_infos": [],
+            "validator_slash_events": []
+        },
+        "mint": {
+            "minter": {
+                "inflation": "0.130000000000000000",
+                "annual_provisions": "0.000000000000000000"
+            },
+            "params": {
+                "mint_denom": "orai",
+                "inflation_rate_change": "0.130000000000000000",
+                "inflation_max": "0.200000000000000000",
+                "inflation_min": "0.070000000000000000",
+                "goal_bonded": "0.670000000000000000",
+                "blocks_per_year": "6311200"
+            }
+        },
+        "airequest": {
+            "ai_requests": [],
+            "params": {
+                "maximum_request_bytes": "1048576"
+            }
+        },
+        "evidence": {
+            "params": {
+                "max_evidence_age": "120000000000"
+            },
+            "evidence": []
+        },
+        "provider": {
+            "oracle_scripts": [],
+            "datasources": [],
+            "test_cases": [],
+            "params": {
+                "oscript_reward_percentage": "70",
+                "maximum_code_bytes": "1024"
+            }
+        },
+        "crisis": {
+            "constant_fee": {
+                "denom": "orai",
+                "amount": "10000000"
+            }
+        },
+        "websocket": {
+            "validator_report": [],
+            "validator_reporter": []
+        },
+        "gov": {
+            "starting_proposal_id": "1",
+            "deposits": null,
+            "votes": null,
+            "proposals": null,
+            "deposit_params": {
+                "min_deposit": [
+                    {
+                        "denom": "orai",
+                        "amount": "10000000"
+                    }
+                ],
+                "max_deposit_period": "172800000000000"
+            },
+            "voting_params": {
+                "voting_period": "172800000000000"
+            },
+            "tally_params": {
+                "quorum": "0.334000000000000000",
+                "threshold": "0.500000000000000000",
+                "veto": "0.334000000000000000"
+            }
+        },
+        "slashing": {
+            "params": {
+                "signed_blocks_window": "30000",
+                "min_signed_per_window": "0.050000000000000000",
+                "downtime_jail_duration": "600000000000",
+                "slash_fraction_double_sign": "0.050000000000000000",
+                "slash_fraction_downtime": "0.000100000000000000"
+            },
+            "signing_infos": {},
+            "missed_blocks": {}
+        }
+    }
+}

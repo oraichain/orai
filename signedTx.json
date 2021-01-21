@@ -1,0 +1,42 @@
+{
+  "type": "cosmos-sdk/StdTx",
+  "value": {
+    "msg": [
+      {
+        "type": "airequest/SetClassificationRequest",
+        "value": {
+          "image_hash": "QmR27t4rQ8J46T77za9BmguVMapJTWU4ASbBDXSFwFNmGK",
+          "image_name": "photo_2020-11-12_11-38-52.jpg",
+          "msg_set_ai_request": {
+            "request_id": "1kBUpU3zD6CYD06Y0Db4tsO3qdK",
+            "oscript_name": "oscript_classification",
+            "creator": "orai18xc2v6uw7ph5q337awxmq43k5394gssvlx9q8e",
+            "validator_count": "1",
+            "transaction_fee": "45000orai",
+            "request_input": "''",
+            "expected_output": "Samoyed"
+          }
+        }
+      }
+    ],
+    "fee": {
+      "amount": [
+        {
+          "denom": "orai",
+          "amount": "45000"
+        }
+      ],
+      "gas": "200000"
+    },
+    "signatures": [
+      {
+        "pub_key": {
+          "type": "tendermint/PubKeySecp256k1",
+          "value": "A8hw76NbYPest4zgerKQYvmElGgkDBdY+bUAnJX9a14B"
+        },
+        "signature": "3X/8zqCTxMRx7Cc6CpZrrpKsUlNLERf5X5Ix+4o7dMU7PZi+M0k+hhlRrPKYbRo9nVjcpXhW+9jtWToLvSWVyw=="
+      }
+    ],
+    "memo": ""
+  }
+}

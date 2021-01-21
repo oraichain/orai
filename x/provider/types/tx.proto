@@ -1,0 +1,25 @@
+syntax = "proto3";
+package oraichain.orai.provider;
+import "x/provider/types/tx_dsource.proto";
+import "x/provider/types/tx_oscript.proto";
+import "x/provider/types/tx_tcase.proto";
+option go_package = "github.com/oraichain/orai/x/provider/types";
+//import "x/provider/types/types_ds.proto";
+
+// Msg defines the provider Msg service.
+service Msg {
+  // Create a new data source
+  rpc CreateAIDataSource(MsgCreateAIDataSource) returns (MsgCreateAIDataSourceRes);
+  // Edit an existing data source
+  rpc EditAIDataSource(MsgEditAIDataSource) returns (MsgEditAIDataSourceRes);
+
+  // Create a new oracle script
+  rpc CreateOracleScript(MsgCreateOracleScript) returns (MsgCreateOracleScriptRes);
+  // Edit an existing oracle script
+  rpc EditOracleScript(MsgEditOracleScript) returns (MsgEditOracleScriptRes);
+
+  // Create a new test case
+  rpc CreateTestCase(MsgCreateTestCase) returns (MsgCreateTestCaseRes);
+  // Edit an existing test case
+  rpc EditTestCase(MsgEditTestCase) returns (MsgEditTestCaseRes);
+}

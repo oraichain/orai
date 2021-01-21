@@ -1,0 +1,13 @@
+syntax = "proto3";
+package oraichain.orai.airequest;
+
+import "x/airequest/types/types_ai_request.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/oraichain/orai/x/airequest/types";
+
+// GenesisState defines the capability module's genesis state.
+message GenesisState {
+    repeated AIRequest ai_requests = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "AIRequests", (gogoproto.moretags) = "json:\"ai_requests\""];
+    Params params = 2 [(gogoproto.nullable) = false];
+}

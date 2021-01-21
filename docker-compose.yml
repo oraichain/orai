@@ -1,49 +1,13 @@
 version: '3.3'
 services:
-  # rust:
-  #   image: rust:alpine
-  #   tty: true
-  #   working_dir: /cosmwasm-examples
-  #   volumes:
-  #     - ./cosmwasm-examples:/cosmwasm-examples
-  #     - ./registry_cache:/usr/local/cargo/registry
-  #   # apk add libc-dev, rustup default stable, rustup target add wasm32-unknown-unknown --toolchain stable
-  #   # RUSTFLAGS='-C link-arg=-s' cargo wasm
-
-  # wasmd:
-  #   image: cosmwasm/wasmd
-  #   tty: true
-  #   working_dir: /wasmd
-  #   volumes:
-  #     - ./wasmd:/wasmd
-  #     - ./cosmwasm-examples:/cosmwasm-examples
-  #   # /opt/setup_wasmd.sh, /opt/run_wasmd.sh
-  #   command: tail -f /dev/null
-  #   ports:
-  #     - 26657:26657
-  #   environment:
-  #     - HOME=/wasmd
-
-  # golang:
-  #   image: orai/godev
-  #   working_dir: /workspace
-  #   tty: true
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - ./dockersdk/:/workspace
-
-  # monitor:
-  #   image: orai/monitor
-  #   working_dir: /workspace
-  #   tty: true
-  #   # apk add build-base && pip install cffi pipenv
-  #   volumes:
-  #     - ../panic_cosmos:/workspace
-
   orai:
-    image: orai/orai:alpine
+    image: orai/orai:alpine-wasm
     working_dir: /workspace
     tty: true
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
     ports:
       - 1317:1317
       - 40000:40000
@@ -53,43 +17,21 @@ services:
       - 'seccomp:unconfined'
     cap_add:
       - SYS_PTRACE
-    env_file: 
-      - orai.env
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./:/workspace
-      - ./fn.sh:/usr/local/bin/fn
-    command: 
-      - bash -c "apt-get install expect && ./fn.sh init && ./fn.sh createValidator && ./fn.sh start"
-
-  orai_2:
-    image: orai/orai:alpine-prod
-    working_dir: /workspace
-    tty: true
-    ports:
-      - 1317:1317
-      - 26656:26656
-      - 26657:26657
-    cap_add:
-      - SYS_PTRACE
+    env_file:
+      - orai.dev.env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./:/workspace
 
-  orai_3:
-    image: orai/orai
-    working_dir: /workspace
-    tty: true
-    ports:
-      - 1317:1317
-      - 40000:40000
-    security_opt:
-      - 'seccomp:unconfined'
-    cap_add:
-      - SYS_PTRACE
-    env_file: 
-      - orai.env
+  rust:
+    image: cosmwasm/rust-optimizer:0.10.7
+    entrypoint: tail -f /dev/null
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./:/workspace
-      - ./fn.sh:/usr/local/bin/fn
+      - ./registry_cache:/usr/local/cargo/registry
+      - ./smart-contracts:/code
+
+  proto:
+    image: cosmwasm/prototools-docker
+    tty: true
+    volumes:
+      - ./:/work

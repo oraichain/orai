@@ -1,12 +1,25 @@
-FROM golang:1.13-alpine3.12
+# docker build . -t cosmwasm/wasmd:latest
+# docker run --rm -it cosmwasm/wasmd:latest /bin/sh
+FROM golang:1.15-alpine3.12 AS go-builder
+
+# this comes from standard alpine nightly file
+#  https://github.com/rust-lang/docker-rust-nightly/blob/master/alpine3.12/Dockerfile
+# with some changes to support our toolchain, etc
+RUN set -eux; apk add --no-cache ca-certificates build-base;
+
+RUN apk add git
+# NOTE: add these to run with LEDGER_ENABLED=true
+# RUN apk add libusb-dev linux-headers
+
 WORKDIR /workspace
-COPY . /workspace
+COPY . /workspace/
 
-# install essential tools
-RUN apk add curl bash ncurses jq bc make git expect
+# See https://github.com/CosmWasm/wasmvm/releases
+ADD https://github.com/CosmWasm/wasmvm/releases/download/v0.13.0/libwasmvm_muslc.a /lib/libwasmvm_muslc.a
+RUN sha256sum /lib/libwasmvm_muslc.a | grep 39dc389cc6b556280cbeaebeda2b62cf884993137b83f90d1398ac47d09d3900
 
-# install go command
-RUN make all
-
-# remove redundant things
-RUN rm -r /workspace/*
+# # force it to use static lib (from above) not standard libgo_cosmwasm.so file
+# RUN LEDGER_ENABLED=false BUILD_TAGS=muslc make build
+# # we also (temporarily?) build the testnet binaries here
+# RUN LEDGER_ENABLED=false BUILD_TAGS=muslc make build-coral
+# RUN LEDGER_ENABLED=false BUILD_TAGS=muslc make build-gaiaflex

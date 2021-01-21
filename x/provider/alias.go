@@ -29,9 +29,6 @@ var (
 	DataSourceStoreKeyString   = types.DataSourceStoreKeyString
 	TestCaseStoreKeyString     = types.TestCaseStoreKeyString
 	OracleScriptStoreKeyString = types.OracleScriptStoreKeyString
-	DataSourceStoreFileString  = types.DataSourceStoreFileString
-	TestCaseStoreFileString    = types.TestCaseStoreFileString
-	OracleScriptFileString     = types.OracleScriptFileString
 	EventTypeSetOracleScript   = types.EventTypeSetOracleScript
 	EventTypeEditOracleScript  = types.EventTypeEditOracleScript
 	EventTypeSetDataSource     = types.EventTypeSetDataSource
@@ -41,9 +38,6 @@ var (
 	AttributeDataSourceName    = types.AttributeDataSourceName
 	AttributeOracleScriptName  = types.AttributeOracleScriptName
 	AttributeTestCaseName      = types.AttributeTestCaseName
-	DataSourceFileSuffix       = types.DataSourceFileSuffix
-	TestCaseFileSuffix         = types.TestCaseFileSuffix
-	OScriptFileSuffix          = types.OScriptFileSuffix
 )
 
 type (
@@ -55,10 +49,8 @@ type (
 	MsgCreateTestCase     = types.MsgCreateTestCase
 	MsgEditTestCase       = types.MsgEditTestCase
 	//MsgSetAIRequest       = types.MsgSetAIRequest
-	QueryResOracleScript = types.QueryResOracleScript
-	QueryResAIDataSource = types.QueryResAIDataSource
-	OracleScript         = types.OracleScript
-	AIDataSource         = types.AIDataSource
+	OracleScript = types.OracleScript
+	AIDataSource = types.AIDataSource
 	//AIRequest             = types.AIRequest
 	TestCase     = types.TestCase
 	GenesisState = types.GenesisState

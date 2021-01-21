@@ -21,7 +21,7 @@ const (
 type QueryResOracleScript struct {
 	Name        string         `json:"name"`
 	Owner       sdk.AccAddress `json:"owner"`
-	Code        string         `json:"code"`
+	Contract    string         `json:"contract"`
 	Description string         `json:"description"`
 	MinimumFees sdk.Coins      `json:"minimum_fees"`
 	DSources    []string       `json:"data_sources"`
@@ -29,11 +29,11 @@ type QueryResOracleScript struct {
 }
 
 // NewQueryResOracleScript is the constructor for the query oracle script request
-func NewQueryResOracleScript(name string, owner sdk.AccAddress, code string, des string, minFees sdk.Coins, ds []string, tc []string) QueryResOracleScript {
+func NewQueryResOracleScript(name string, owner sdk.AccAddress, contract string, des string, minFees sdk.Coins, ds []string, tc []string) QueryResOracleScript {
 	return QueryResOracleScript{
 		Name:        name,
 		Owner:       owner,
-		Code:        code,
+		Contract:    contract,
 		Description: des,
 		MinimumFees: minFees,
 		DSources:    ds,
@@ -44,7 +44,7 @@ func NewQueryResOracleScript(name string, owner sdk.AccAddress, code string, des
 func (qrs QueryResOracleScript) String() string {
 	return strings.TrimSpace(fmt.Sprintf(`Name: %s
 Owner: %s
-Code: %s Description: %s Minimum Fees: %s Data Sources: %s Test Cases: %s`, qrs.Name, string(qrs.Owner[:]), qrs.Code, qrs.Description, qrs.MinimumFees.String(), qrs.DSources, qrs.TCases))
+Contract: %s Description: %s Minimum Fees: %s Data Sources: %s Test Cases: %s`, qrs.Name, string(qrs.Owner[:]), qrs.Contract, qrs.Description, qrs.MinimumFees.String(), qrs.DSources, qrs.TCases))
 }
 
 // QueryResOracleScriptNames Queries Result Payload for a names query

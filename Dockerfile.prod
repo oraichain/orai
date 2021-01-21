@@ -1,31 +1,48 @@
-FROM golang:1.13-alpine3.12 AS build
-WORKDIR /workspace
-COPY . /workspace
+# docker build . -t cosmwasm/wasmd:latest
+# docker run --rm -it cosmwasm/wasmd:latest /bin/sh
+FROM golang:1.15-alpine3.12 AS go-builder
 
-# install essential tools
-RUN apk add make git upx
+# this comes from standard alpine nightly file
+#  https://github.com/rust-lang/docker-rust-nightly/blob/master/alpine3.12/Dockerfile
+# with some changes to support our toolchain, etc
+RUN set -eux; apk add --no-cache ca-certificates build-base;
 
-# install go command
-RUN make all
+RUN apk add git
+# NOTE: add these to run with LEDGER_ENABLED=true
+# RUN apk add libusb-dev linux-headers
 
-# make size smaller
-RUN go get github.com/pwaller/goupx
-RUN for file in /go/bin/*; do goupx "$file";done
+WORKDIR /code
+COPY . /code/
 
-# remove redundant things
-RUN rm /go/bin/goupx
-# RUN rm -r /workspace/*
+# See https://github.com/CosmWasm/wasmvm/releases
+ADD https://github.com/CosmWasm/wasmvm/releases/download/v0.13.0/libwasmvm_muslc.a /lib/libwasmvm_muslc.a
+RUN sha256sum /lib/libwasmvm_muslc.a | grep 39dc389cc6b556280cbeaebeda2b62cf884993137b83f90d1398ac47d09d3900
 
-FROM alpine:latest AS base
-WORKDIR /workspace
+# force it to use static lib (from above) not standard libgo_cosmwasm.so file
+RUN LEDGER_ENABLED=false BUILD_TAGS=muslc make build
+# we also (temporarily?) build the testnet binaries here
+RUN LEDGER_ENABLED=false BUILD_TAGS=muslc make build-coral
+RUN LEDGER_ENABLED=false BUILD_TAGS=muslc make build-gaiaflex
+
+# --------------------------------------------------------
+FROM alpine:3.12
+
+COPY --from=go-builder /code/build/wasmd /usr/bin/wasmd
+
+# testnet
+COPY --from=go-builder /code/build/corald /usr/bin/corald
+COPY --from=go-builder /code/build/gaiaflexd /usr/bin/gaiaflexd
+
+COPY docker/* /opt/
+RUN chmod +x /opt/*.sh
+
+WORKDIR /opt
+
+# rest server
 EXPOSE 1317
+# tendermint p2p
+EXPOSE 26656
+# tendermint rpc
+EXPOSE 26657
 
-COPY fn.sh /usr/local/bin/fn
-
-# install essential tools
-RUN apk add curl bash ncurses jq expect nano
-
-# copy build files
-COPY --from=build /go/bin/ /usr/local/bin
-
-ENTRYPOINT fn init && fn start
+CMD ["/usr/bin/wasmd", "version"]

@@ -6,7 +6,7 @@ order: 1
 
 ## OracleScript
 
-When an individual requests data from the Oraichain's oracle, he calls one of the existing Oracle Scripts on Oraichain. An Oracle Script is a file which will collect data from different AI Data Sources or Oracle Scripts before using test cases given by the user to test those data. If they satisfy the requirements of the test cases, the script will trigger an aggregation phase, and then the aggregated data is stored on the Oraichain for future usage and verification.
+When an individual requests data from the Oraichain's oracle, he calls one of the existing Oracle Scripts on Oraichain. An Oracle Script is a smart contract which will collect data from different AI Data Sources or Oracle Scripts before using test cases given by the user to test those data. If they satisfy the requirements of the test cases, the script will trigger an aggregation phase, and then the aggregated data is stored on the Oraichain for future usage and verification.
 
 ```go
 type OracleScript struct {
@@ -19,7 +19,7 @@ type OracleScript struct {
 }
 ```
 
-Note that DSources and TCases are the list of Data Source and Test Case unique identifiers respectively, and they will be mapped to the actual content of the Oracle Script. When creating / editing an Oracle Script, these identifiers will be read from the Oracle Script file before storing them on-chain.
+Note that DSources and TCases are the list of Data Source and Test Case unique identifiers respectively, and they will be mapped to the actual content of the Oracle Script. When creating / editing an Oracle Script, these identifiers will be read from the Oracle Script smart contract before storing them on-chain.
 
 ## AIDataSource
 
@@ -46,4 +46,4 @@ type TestCase struct {
 }
 ```
 
-If you notice, the actual source code is only stored off-chain, because its size can be large. We should only keep the stored data small only to minimize the gas fee and execution time for the nodes.
+If you notice, the actual source code is smart contract code stored on blockchain, and should keep its size as small as possible. We should only keep the stored data small only to minimize the gas fee and execution time for the nodes.

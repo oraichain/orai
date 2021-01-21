@@ -13,7 +13,7 @@ All messages relating to the provider module have been specified carefully in th
 If one of the below conditions occurs, the message will not be accepted by the network:
 
 - Oracle Script name is empty or the name has been taken.
-- Oracle script source code is empty.
+- Oracle script smart contract address is empty.
 - AI Data Sources and Test Cases cannot be found.
 - Fees provided by the user is lower than the required fees of the Oracle Script.
 - The fee type is invalid.
@@ -25,9 +25,9 @@ If one of the below conditions occurs, the message will not be accepted by the n
 If one of the below conditions occurs, the message will not be accepted by the network:
 
 - Cannot find the Oracle Script given its unique identifier.
-- Oracle Script old name or source code or new name is empty.
+- Oracle Script old name or address or new name is empty.
 - Wrong owner of the Oracle Script.
-- AI Data Sources and Test Cases of the new Oracle Script source code cannot be found.
+- AI Data Sources and Test Cases of the new Oracle Script address cannot be found.
 - Fees provided by the user is lower than the required fees of the Oracle Script.
 - The fee type is invalid.
 
@@ -38,7 +38,7 @@ If one of the below conditions occurs, the message will not be accepted by the n
 If one of the below conditions occurs, the message will not be accepted by the network:
 
 - AI Data Source name is empty or the name has been taken.
-- AI Data Source source code is empty.
+- AI Data Source smart contract address is empty.
 - The fee type is invalid.
 
 ## MsgEditAIDataSource
@@ -46,7 +46,7 @@ If one of the below conditions occurs, the message will not be accepted by the n
 [MsgEditAIDataSource](https://docs.orai.io/docs/WhitePaper/ProtocolMessages#msgeditaidatasource)
 
 - Cannot find the AI Data Source given its unique identifier.
-- AI Data Source old name or source code or new name is empty.
+- AI Data Source old name or address or new name is empty.
 - Wrong owner of the AI Data Source.
 - The fee type is invalid.
 
@@ -55,7 +55,7 @@ If one of the below conditions occurs, the message will not be accepted by the n
 [MsgCreateTestCase](https://docs.orai.io/docs/WhitePaper/ProtocolMessages#msgcreatetestcase)
 
 - Test Case name is empty or the name has been taken.
-- Test Case source code is empty.
+- Test Case address is empty.
 - The fee type is invalid.
 
 ## MsgEditTestCase
@@ -63,6 +63,6 @@ If one of the below conditions occurs, the message will not be accepted by the n
 [MsgEditTestCase](https://docs.orai.io/docs/WhitePaper/ProtocolMessages#msgedittestcase)
 
 - Cannot find the Test Case given its unique identifier.
-- Test Case old name or source code or new name is empty.
+- Test Case old name or address or new name is empty.
 - Wrong owner of the Test Case.
 - The fee type is invalid.

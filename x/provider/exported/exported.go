@@ -8,11 +8,8 @@ import (
 
 // ProviderI is the generic Provider interface that applies for all types of providers
 type ProviderI interface {
-	SetName(newName string) error
 	GetName() string
-	SetDescription(newDescription string) error
 	GetDescription() string
-	SetOwner(newOwner sdk.AccAddress) error
 	GetOwner() sdk.AccAddress
 }
 

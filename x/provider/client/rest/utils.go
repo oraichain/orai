@@ -7,7 +7,7 @@ import (
 	"net/url"
 )
 
-// getFileBytes try to parse the user path input and collect the raw bytes of the file.
+// getFileBytes try to parse the user path input and collect the raw bytes of the smart contract address.
 func getFileBytes(path string) ([]byte, error) {
 	// placeholder for the source code in bytes
 	var execBytes []byte

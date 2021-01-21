@@ -1,72 +1,76 @@
 package keeper
 
 import (
-	"encoding/base64"
-	"strconv"
-	"strings"
+	// this line is used by starport scaffolding # 1
 
-	abci "github.com/tendermint/tendermint/abci/types"
+	"strings"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/oraichain/orai/x/provider/types"
+
+	abci "github.com/tendermint/tendermint/abci/types"
 )
 
-// NewQuerier creates a new querier for provider clients.
-func NewQuerier(keeper Keeper) sdk.Querier {
+func NewQuerier(keeper *Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
+
 		switch path[0] {
-		// TODO: Put the modules query routes
+		// this line is used by starport scaffolding # 2
 		case types.QueryOracleScript:
-			return queryOracleScript(ctx, path[1:], keeper)
+			return queryOracleScript(ctx, req, keeper, legacyQuerierCdc)
 		case types.QueryOracleScripts:
-			return queryOracleScripts(ctx, keeper, req)
+			return queryOracleScripts(ctx, req, keeper, legacyQuerierCdc)
 		case types.QueryDataSource:
-			return queryDataSource(ctx, path[1:], keeper)
+			return queryDataSource(ctx, req, keeper, legacyQuerierCdc)
 		case types.QueryDataSources:
-			return queryDataSources(ctx, keeper, req)
+			return queryDataSources(ctx, req, keeper, legacyQuerierCdc)
 		case types.QueryOracleScriptNames:
-			return queryOracleScriptNames(ctx, keeper)
+			return queryOracleScriptNames(ctx, keeper, legacyQuerierCdc)
 		case types.QueryDataSourceNames:
-			return queryDataSourceNames(ctx, keeper)
+			return queryDataSourceNames(ctx, keeper, legacyQuerierCdc)
 		// case types.QueryAIRequest:
 		// 	return queryAIRequest(ctx, path[1:], keeper)
 		case types.QueryTestCase:
-			return queryTestCase(ctx, path[1:], keeper)
+			return queryTestCase(ctx, req, keeper, legacyQuerierCdc)
 		case types.QueryTestCases:
-			return queryTestCases(ctx, keeper, req)
+			return queryTestCases(ctx, req, keeper, legacyQuerierCdc)
 		// case types.QueryAIRequestIDs:
 		// 	return queryAIRequestIDs(ctx, keeper)
 		case types.QueryTestCaseNames:
-			return queryTestCaseNames(ctx, keeper)
+			return queryTestCaseNames(ctx, keeper, legacyQuerierCdc)
 		// case types.QueryFullRequest:
 		// 	return queryFullRequestByID(ctx, path[1:], keeper)
 		case types.QueryMinFees:
-			return queryMinFees(ctx, path[1:], keeper, req)
+			return queryMinFees(ctx, req, keeper, legacyQuerierCdc)
 		default:
-			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown provider query")
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unknown %s query endpoint: %s", types.ModuleName, path[0])
 		}
+
 	}
 }
 
 // queryOracleScript queries a oScript given its name
-func queryOracleScript(ctx sdk.Context, path []string, keeper Keeper) ([]byte, error) {
-	// tsao cho nay lai lay path[0] ?
-	oScript, err := keeper.GetOracleScript(ctx, path[0])
+func queryOracleScript(ctx sdk.Context, req abci.RequestQuery, keeper *Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+
+	var params types.QueryOracleScriptRequest
+
+	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
+	}
+
+	// need check Name ?
+	oScript, err := keeper.GetOracleScript(ctx, params.Name)
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrOracleScriptNotFound, err.Error())
 	}
 
-	// get code of the oScript
-	code, err := keeper.GetOracleScriptFile(oScript.GetName())
-	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
-	}
+	result := types.NewQueryResOracleScript(oScript.GetName(), oScript.GetOwner(),
+		oScript.GetContract(), oScript.GetDescription(),
+		oScript.GetMinimumFees(), oScript.DSources, oScript.TCases)
 
-	executable := base64.StdEncoding.EncodeToString(code)
-
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResOracleScript(oScript.GetName(), oScript.GetOwner(), executable, oScript.GetDescription(), oScript.GetMinimumFees(), oScript.DSources, oScript.TCases))
+	res, err := codec.MarshalJSONIndent(legacyQuerierCdc, result)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -75,25 +79,18 @@ func queryOracleScript(ctx sdk.Context, path []string, keeper Keeper) ([]byte, e
 }
 
 // queryOracleScript queries a list of oracle scripts
-func queryOracleScripts(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]byte, error) {
-	// tsao cho nay lai lay path[0] ?
+func queryOracleScripts(ctx sdk.Context, req abci.RequestQuery, keeper *Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+
+	var params types.QueryOracleScriptsRequest
+
+	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
+	}
 
 	var queryResOScripts []types.QueryResOracleScript
 
-	// parse limit and offset from the query message data
-	pagiSlice := strings.Split(string(req.GetData()[:]), "-")
-	page, err := strconv.Atoi(pagiSlice[0])
-	if err != nil {
-		return []byte{}, sdkerrors.Wrap(types.ErrPaginationInputInvalid, err.Error())
-	}
-	limit, err := strconv.Atoi(pagiSlice[1])
-	if err != nil {
-		return []byte{}, sdkerrors.Wrap(types.ErrPaginationInputInvalid, err.Error())
-	}
-	name := pagiSlice[2]
-
 	// collect all the oracle scripts based on the pagination parameters
-	oScripts, err := keeper.GetOracleScripts(ctx, uint(page), uint(limit))
+	oScripts, err := keeper.GetOracleScripts(ctx, uint(params.Page), uint(params.Limit))
 	if err != nil {
 		return []byte{}, sdkerrors.Wrap(types.ErrOracleScriptNotFound, err.Error())
 	}
@@ -107,19 +104,16 @@ func queryOracleScripts(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) (
 
 	// get code of the each oScript
 	for _, oScript := range oScripts {
-		if name == "" || strings.Contains(oScript.Name, name) {
-			code, err := keeper.GetOracleScriptFile(oScript.GetName())
-			if err != nil {
-				return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
-			}
-			executable := base64.StdEncoding.EncodeToString(code)
+		if params.Name == "" || strings.Contains(oScript.Name, params.Name) {
 			// create a new queryResOracleScript
-			queryResOScripts = append(queryResOScripts, types.NewQueryResOracleScript(oScript.GetName(), oScript.GetOwner(), executable, oScript.GetDescription(), oScript.GetMinimumFees(), oScript.DSources, oScript.TCases))
+			oScriptRes := types.NewQueryResOracleScript(oScript.GetName(), oScript.GetOwner(), oScript.GetContract(),
+				oScript.GetDescription(), oScript.GetMinimumFees(), oScript.DSources, oScript.TCases)
+			queryResOScripts = append(queryResOScripts, oScriptRes)
 		}
 	}
 
 	// return the query to the command
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResOracleScripts(queryResOScripts, count))
+	res, err := codec.MarshalJSONIndent(legacyQuerierCdc, types.NewQueryResOracleScripts(queryResOScripts, count))
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -128,21 +122,20 @@ func queryOracleScripts(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) (
 }
 
 // queryDataSource queries a complete Whois struct returned to the user in []byte
-func queryDataSource(ctx sdk.Context, path []string, keeper Keeper) ([]byte, error) {
-	aiDataSource, err := keeper.GetAIDataSource(ctx, path[0])
+func queryDataSource(ctx sdk.Context, req abci.RequestQuery, keeper *Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+
+	var params types.QueryDataSourceRequest
+	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
+	}
+
+	aiDataSource, err := keeper.GetAIDataSource(ctx, params.Name)
 	if err != nil {
 		return []byte{}, sdkerrors.Wrap(types.ErrDataSourceNotFound, err.Error())
 	}
 
-	// get code of the data source
-	code, err := keeper.GetAIDataSourceFile(aiDataSource.GetName())
-	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
-	}
-
-	executable := base64.StdEncoding.EncodeToString(code)
-
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResAIDataSource(aiDataSource.GetName(), aiDataSource.GetOwner(), executable, aiDataSource.GetDescription(), aiDataSource.Fees))
+	aiDataSourceRes := types.NewQueryResAIDataSource(aiDataSource.GetName(), aiDataSource.GetOwner(), aiDataSource.GetContract(), aiDataSource.GetDescription(), aiDataSource.Fees)
+	res, err := codec.MarshalJSONIndent(legacyQuerierCdc, aiDataSourceRes)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -151,28 +144,19 @@ func queryDataSource(ctx sdk.Context, path []string, keeper Keeper) ([]byte, err
 }
 
 // queryDataSources queries a list of data sources
-func queryDataSources(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]byte, error) {
-	// tsao cho nay lai lay path[0] ?
+func queryDataSources(ctx sdk.Context, req abci.RequestQuery, keeper *Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+	var params types.QueryDataSourcesRequest
+
+	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
+	}
 
 	var queryResAIDSources []types.QueryResAIDataSource
 
-	// parse limit and offset from the query message data
-	pagiSlice := strings.Split(string(req.GetData()[:]), "-")
-	page, err := strconv.Atoi(pagiSlice[0])
-	if err != nil {
-		return []byte{}, sdkerrors.Wrap(types.ErrPaginationInputInvalid, err.Error())
-	}
-	limit, err := strconv.Atoi(pagiSlice[1])
-	if err != nil {
-		return []byte{}, sdkerrors.Wrap(types.ErrPaginationInputInvalid, err.Error())
-	}
-
-	dSources, err := keeper.GetAIDataSources(ctx, uint(page), uint(limit))
+	dSources, err := keeper.GetAIDataSources(ctx, uint(params.Page), uint(params.Limit))
 	if err != nil {
 		return []byte{}, sdkerrors.Wrap(types.ErrDataSourceNotFound, err.Error())
 	}
-
-	name := pagiSlice[2]
 
 	// get the total number of data sources
 	count := 0
@@ -183,20 +167,18 @@ func queryDataSources(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]
 
 	// get code of the each dSource
 	for _, dSource := range dSources {
-		if name == "" || strings.Contains(dSource.Name, name) {
-			code, err := keeper.GetAIDataSourceFile(dSource.GetName())
-			if err != nil {
-				return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
-			}
-			executable := base64.StdEncoding.EncodeToString(code)
+		if params.Name == "" || strings.Contains(dSource.Name, params.Name) {
 
 			// create a new queryResOracleScript
-			queryResAIDSources = append(queryResAIDSources, types.NewQueryResAIDataSource(dSource.GetName(), dSource.GetOwner(), executable, dSource.GetDescription(), dSource.Fees))
+			queryResAIDSource := types.NewQueryResAIDataSource(dSource.GetName(), dSource.GetOwner(), dSource.GetContract(),
+				dSource.GetDescription(), dSource.Fees)
+
+			queryResAIDSources = append(queryResAIDSources, queryResAIDSource)
 		}
 	}
 
 	// return the query to the command
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResAIDataSources(queryResAIDSources, count))
+	res, err := codec.MarshalJSONIndent(legacyQuerierCdc, types.NewQueryResAIDataSources(queryResAIDSources, count))
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -205,7 +187,7 @@ func queryDataSources(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]
 }
 
 // queryOracleScriptNames returns all the oScript names in the store
-func queryOracleScriptNames(ctx sdk.Context, keeper Keeper) ([]byte, error) {
+func queryOracleScriptNames(ctx sdk.Context, keeper *Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	var namesList types.QueryResOracleScriptNames
 
 	iterator := keeper.GetAllOracleScriptNames(ctx)
@@ -214,7 +196,7 @@ func queryOracleScriptNames(ctx sdk.Context, keeper Keeper) ([]byte, error) {
 		namesList = append(namesList, string(iterator.Key()))
 	}
 
-	res, err := codec.MarshalJSONIndent(keeper.cdc, namesList)
+	res, err := codec.MarshalJSONIndent(legacyQuerierCdc, namesList)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -223,7 +205,7 @@ func queryOracleScriptNames(ctx sdk.Context, keeper Keeper) ([]byte, error) {
 }
 
 // queryDataSourceNames returns all the data source names in the store
-func queryDataSourceNames(ctx sdk.Context, keeper Keeper) ([]byte, error) {
+func queryDataSourceNames(ctx sdk.Context, keeper *Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	var namesList types.QueryResAIDataSourceNames
 
 	iterator := keeper.GetAllAIDataSourceNames(ctx)
@@ -232,7 +214,7 @@ func queryDataSourceNames(ctx sdk.Context, keeper Keeper) ([]byte, error) {
 		namesList = append(namesList, string(iterator.Key()))
 	}
 
-	res, err := codec.MarshalJSONIndent(keeper.cdc, namesList)
+	res, err := codec.MarshalJSONIndent(legacyQuerierCdc, namesList)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -241,22 +223,21 @@ func queryDataSourceNames(ctx sdk.Context, keeper Keeper) ([]byte, error) {
 }
 
 // queryTestCase queries an AI request test case
-func queryTestCase(ctx sdk.Context, path []string, keeper Keeper) ([]byte, error) {
-	// tsao cho nay lai lay path[0] ?
-	testCase, err := keeper.GetTestCase(ctx, path[0])
+func queryTestCase(ctx sdk.Context, req abci.RequestQuery, keeper *Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+	var params types.QueryTestCaseRequest
+	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
+	}
+
+	testCase, err := keeper.GetTestCase(ctx, params.Name)
 	if err != nil {
 		return []byte{}, sdkerrors.Wrap(types.ErrTestCaseNotFound, err.Error())
 	}
 
-	// get code of the test case
-	code, err := keeper.GetTestCaseFile(testCase.GetName())
-	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
-	}
+	res, err := codec.MarshalJSONIndent(legacyQuerierCdc,
+		types.NewQueryResTestCase(testCase.GetName(), testCase.GetOwner(), testCase.GetContract(),
+			testCase.GetDescription(), testCase.Fees))
 
-	executable := base64.StdEncoding.EncodeToString(code)
-
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResTestCase(testCase.GetName(), testCase.GetOwner(), executable, testCase.GetDescription(), testCase.Fees))
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -265,25 +246,16 @@ func queryTestCase(ctx sdk.Context, path []string, keeper Keeper) ([]byte, error
 }
 
 // queryTestCases queries a list of test cases
-func queryTestCases(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]byte, error) {
-	// tsao cho nay lai lay path[0] ?
+func queryTestCases(ctx sdk.Context, req abci.RequestQuery, keeper *Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+	var params types.QueryTestCasesRequest
+
+	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
+	}
 
 	var queryResTestCases []types.QueryResTestCase
 
-	// parse limit and offset from the query message data
-	pagiSlice := strings.Split(string(req.GetData()[:]), "-")
-	page, err := strconv.Atoi(pagiSlice[0])
-	if err != nil {
-		return []byte{}, sdkerrors.Wrap(types.ErrPaginationInputInvalid, err.Error())
-	}
-	limit, err := strconv.Atoi(pagiSlice[1])
-	if err != nil {
-		return []byte{}, sdkerrors.Wrap(types.ErrPaginationInputInvalid, err.Error())
-	}
-
-	name := pagiSlice[2]
-
-	tCases, err := keeper.GetTestCases(ctx, uint(page), uint(limit))
+	tCases, err := keeper.GetTestCases(ctx, uint(params.Page), uint(params.Limit))
 	if err != nil {
 		return []byte{}, sdkerrors.Wrap(types.ErrTestCaseNotFound, err.Error())
 	}
@@ -297,20 +269,17 @@ func queryTestCases(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]by
 
 	// get code of the each tCase
 	for _, tCase := range tCases {
-		if name == "" || strings.Contains(tCase.Name, name) {
-			code, err := keeper.GetTestCaseFile(tCase.GetName())
-			if err != nil {
-				return nil, sdkerrors.Wrap(types.ErrCodeNotFound, err.Error())
-			}
-			executable := base64.StdEncoding.EncodeToString(code)
+		if params.Name == "" || strings.Contains(tCase.Name, params.Name) {
 
 			// create a new queryResOracleScript
-			queryResTestCases = append(queryResTestCases, types.NewQueryResTestCase(tCase.GetDescription(), tCase.GetOwner(), executable, tCase.GetDescription(), tCase.Fees))
+			queryResTestCases = append(queryResTestCases,
+				types.NewQueryResTestCase(tCase.GetDescription(), tCase.GetOwner(), tCase.GetContract(),
+					tCase.GetDescription(), tCase.Fees))
 		}
 	}
 
 	// return the query to the command
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResTestCases(queryResTestCases, count))
+	res, err := codec.MarshalJSONIndent(legacyQuerierCdc, types.NewQueryResTestCases(queryResTestCases, count))
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -319,7 +288,7 @@ func queryTestCases(ctx sdk.Context, keeper Keeper, req abci.RequestQuery) ([]by
 }
 
 // queryTestCaseNames returns all the test case names in the store
-func queryTestCaseNames(ctx sdk.Context, keeper Keeper) ([]byte, error) {
+func queryTestCaseNames(ctx sdk.Context, keeper *Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
 	var testCaseNames types.QueryResTestCaseNames
 
 	iterator := keeper.GetAllTestCaseNames(ctx)
@@ -328,7 +297,7 @@ func queryTestCaseNames(ctx sdk.Context, keeper Keeper) ([]byte, error) {
 		testCaseNames = append(testCaseNames, string(iterator.Key()))
 	}
 
-	res, err := codec.MarshalJSONIndent(keeper.cdc, testCaseNames)
+	res, err := codec.MarshalJSONIndent(legacyQuerierCdc, testCaseNames)
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
@@ -336,36 +305,33 @@ func queryTestCaseNames(ctx sdk.Context, keeper Keeper) ([]byte, error) {
 	return res, nil
 }
 
-func queryMinFees(ctx sdk.Context, path []string, k Keeper, req abci.RequestQuery) ([]byte, error) {
-	if len(path) != 1 {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "error")
+func queryMinFees(ctx sdk.Context, req abci.RequestQuery, k *Keeper, legacyQuerierCdc *codec.LegacyAmino) ([]byte, error) {
+
+	var params types.MinFeesRequest
+
+	if err := legacyQuerierCdc.UnmarshalJSON(req.Data, &params); err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 	}
 
 	// number of validator
-	valNum := string(req.GetData()[:])
-	valNumInt, err := strconv.Atoi(valNum)
-	if err != nil {
-		return []byte{}, sdkerrors.Wrap(types.ErrPaginationInputInvalid, err.Error())
-	}
 
 	// id of the request
-	oScriptName := path[0]
-	_, err = k.GetOracleScript(ctx, oScriptName)
+	_, err := k.GetOracleScript(ctx, params.OracleScriptName)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrOracleScriptNotFound, err.Error())
 	}
 	// get data source and test case names from the oracle script
-	aiDataSources, testCases, err := k.GetDNamesTcNames(ctx, oScriptName)
+	aiDataSources, testCases, err := k.GetDNamesTcNames(ctx, params.OracleScriptName)
 	if err != nil {
 		return nil, err
 	}
 
-	minimumFees, err := k.GetMinimumFees(ctx, aiDataSources, testCases, valNumInt)
+	minimumFees, err := k.GetMinimumFees(ctx, aiDataSources, testCases, params.ValNum)
 	if err != nil {
 		return nil, err
 	}
 
-	res, err := codec.MarshalJSONIndent(k.cdc, types.NewQueryResMinFees(minimumFees.AmountOf(types.Denom).String()))
+	res, err := codec.MarshalJSONIndent(legacyQuerierCdc, types.NewQueryResMinFees(minimumFees.AmountOf(types.Denom).String()))
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
 	}
