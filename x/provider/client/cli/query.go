@@ -63,7 +63,7 @@ func GetCmdQueryDataSource() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("res :%v", res)
+
 			if len(res.Name) == 0 {
 				return fmt.Errorf("data source not found")
 			}

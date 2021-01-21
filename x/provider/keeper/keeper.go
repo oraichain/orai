@@ -40,9 +40,9 @@ func (k *Keeper) Logger(ctx sdk.Context) log.Logger {
 }
 
 // IsNamePresent checks if the name is present in the store or not
-func (k *Keeper) IsNamePresent(ctx sdk.Context, name string) bool {
+func (k *Keeper) isKeyPresent(ctx sdk.Context, key []byte) bool {
 	store := ctx.KVStore(k.storeKey)
-	return store.Has(types.DataSourceStoreKey(name))
+	return store.Has(key)
 }
 
 // GetMinimumFees collects minimum fees needed of an oracle script

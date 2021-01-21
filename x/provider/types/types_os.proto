@@ -12,6 +12,6 @@ message OracleScript {
   bytes owner = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
   string description = 4;
   repeated cosmos.base.v1beta1.Coin minimum_fees = 5 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "json:\"minimum_fees\""];
-  repeated string d_sources = 6 [(gogoproto.moretags) = "json:\"data_sources\"", (gogoproto.customname) = "DSources"];;
-  repeated string t_cases = 7 [(gogoproto.moretags) = "json:\"test_cases\"", (gogoproto.customname) = "TCases"];;
+  repeated string d_sources = 6 [(gogoproto.moretags) = "json:\"data_sources\"", (gogoproto.customname) = "DSources"];
+  repeated string t_cases = 7 [(gogoproto.moretags) = "json:\"test_cases\"", (gogoproto.customname) = "TCases"];
 }

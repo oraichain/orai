@@ -30,8 +30,32 @@ const (
 
 	// Denom is the denominator of the currency
 	Denom = "orai"
+
+	// DataSourceKeyPrefix sets a prefix for data source key
+	DataSourceKeyPrefix = "d"
+
+	// TestCaseKeyPrefix sets a prefix for test case key
+	TestCaseKeyPrefix = "tc"
+
+	// OScriptKeyPrefix sets a prefix for oScript key
+	OScriptKeyPrefix = "o"
 )
 
 func KeyPrefix(p string) []byte {
 	return []byte(p)
+}
+
+// TestCaseStoreKey returns the key to retrieve a specfic test case from the store.
+func TestCaseStoreKey(name string) []byte {
+	return []byte(TestCaseKeyPrefix + name)
+}
+
+// OracleScriptStoreKey returns the key to retrieve a specfic oScript from the store.
+func OracleScriptStoreKey(name string) []byte {
+	return []byte(OScriptKeyPrefix + name)
+}
+
+// DataSourceStoreKey returns the key to retrieve a specfic data source from the store.
+func DataSourceStoreKey(name string) []byte {
+	return []byte(DataSourceKeyPrefix + name)
 }
