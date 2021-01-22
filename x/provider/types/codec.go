@@ -3,13 +3,23 @@ package types
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
+	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
+	// govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
-	// this line is used by starport scaffolding # 1
+	// "github.com/oraichain/orai/x/provider/exported"
 )
 
+// RegisterCodec registers concrete types on codec
 func RegisterCodec(cdc *codec.LegacyAmino) {
-	// this line is used by starport scaffolding # 2
+	// TODO: Register the modules msgs
+	cdc.RegisterConcrete(MsgCreateOracleScript{}, "provider/CreateOracleScript", nil)
+	cdc.RegisterConcrete(MsgEditOracleScript{}, "provider/EditOracleScript", nil)
+	cdc.RegisterConcrete(MsgCreateAIDataSource{}, "provider/CreateAIDataSource", nil)
+	cdc.RegisterConcrete(MsgEditAIDataSource{}, "provider/EditAIDataSource", nil)	
+	cdc.RegisterConcrete(MsgCreateTestCase{}, "provider/SetTestCase", nil)
+	cdc.RegisterConcrete(MsgEditTestCase{}, "provider/EditTestCase", nil)
+
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
@@ -18,29 +28,18 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations(
 		(*sdk.Msg)(nil),
 		&MsgCreateAIDataSource{},
-	)
-
-	registry.RegisterImplementations(
-		(*sdk.Msg)(nil),
 		&MsgCreateOracleScript{},
-	)
-	registry.RegisterImplementations(
-		(*sdk.Msg)(nil),
 		&MsgCreateTestCase{},
-	)
-	registry.RegisterImplementations(
-		(*sdk.Msg)(nil),
 		&MsgEditAIDataSource{},
-	)
-	registry.RegisterImplementations(
-		(*sdk.Msg)(nil),
 		&MsgEditOracleScript{},
-	)
-
-	registry.RegisterImplementations(
-		(*sdk.Msg)(nil),
 		&MsgEditTestCase{},
 	)
+
+	// registry.RegisterImplementations(
+	// 	(*govtypes.Content)(nil),
+	// 	&AIDataSource{},
+	// 	&TestCase{},
+	// )
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }
@@ -49,3 +48,9 @@ var (
 	amino     = codec.NewLegacyAmino()
 	ModuleCdc = codec.NewAminoCodec(amino)
 )
+
+func init() {
+	// RegisterCodec(amino)
+	cryptocodec.RegisterCrypto(amino)
+	amino.Seal()
+}

@@ -4,14 +4,6 @@ import (
 	"fmt"
 )
 
-// GenesisState - all provider state that must be provided at genesis
-type GenesisState struct {
-	Reports   []Report   `json:"validator_report"`
-	Reporters []Reporter `json:"validator_reporter"`
-	//Params     Params      `json:"params"`
-	// TODO: Fill out what is needed by the module for genesis
-}
-
 // NewGenesisState creates a new GenesisState object
 func NewGenesisState(reports []Report, reporters []Reporter) GenesisState {
 	return GenesisState{

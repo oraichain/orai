@@ -38,8 +38,8 @@ func (AppModuleBasic) Name() string {
 	return ModuleName
 }
 
-// RegisterCodec registers the websocket module's types for the given codec.
-func (AppModuleBasic) RegisterCodec(cdc *codec.Codec) {
+// RegisterLegacyAminoCodec registers the websocket module's types for the given codec.
+func (AppModuleBasic) RegisterLegacyAminoCodec(amino *codec.LegacyAmino) {
 	RegisterCodec(cdc)
 }
 

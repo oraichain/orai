@@ -6,17 +6,6 @@ import (
 	"github.com/oraichain/orai/x/websocket/exported"
 )
 
-// MsgCreateReport defines message for creating a report by a reporter of a validator
-type MsgCreateReport struct {
-	RequestID         string                       `json:"request_id"`
-	DataSourceResults []exported.DataSourceResultI `json:"data_source_results"`
-	TestCaseResults   []exported.TestCaseResultI   `json:"test_case_results"`
-	Reporter          Reporter                     `json:"reporter"`
-	Fees              sdk.Coins                    `json:"report_fee"`
-	AggregatedResult  []byte                       `json:"aggregated_result"`
-	ResultStatus      string                       `json:"result_status"`
-}
-
 // NewMsgCreateReport is a constructor function for MsgCreateReport
 func NewMsgCreateReport(
 	requestID string,
@@ -26,8 +15,8 @@ func NewMsgCreateReport(
 	fees sdk.Coins,
 	aggregatedResult []byte,
 	status string,
-) MsgCreateReport {
-	return MsgCreateReport{
+) *MsgCreateReport {
+	return &MsgCreateReport{
 		RequestID:         requestID,
 		DataSourceResults: dataSourceResults,
 		TestCaseResults:   testCaseResults,
@@ -39,13 +28,13 @@ func NewMsgCreateReport(
 }
 
 // Route should return the name of the module
-func (msg MsgCreateReport) Route() string { return RouterKey }
+func (msg *MsgCreateReport) Route() string { return RouterKey }
 
 // Type should return the action
-func (msg MsgCreateReport) Type() string { return "create_report" }
+func (msg *MsgCreateReport) Type() string { return "create_report" }
 
 // ValidateBasic runs stateless checks on the message
-func (msg MsgCreateReport) ValidateBasic() error {
+func (msg *MsgCreateReport) ValidateBasic() error {
 	if msg.Reporter.Address.Empty() || len(msg.Reporter.Name) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Reporter.String())
 	} else if len(msg.RequestID) == 0 || msg.Reporter.Validator.Empty() {
@@ -64,11 +53,11 @@ func (msg MsgCreateReport) ValidateBasic() error {
 }
 
 // GetSignBytes encodes the message for signing
-func (msg MsgCreateReport) GetSignBytes() []byte {
+func (msg *MsgCreateReport) GetSignBytes() []byte {
 	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(msg))
 }
 
 // GetSigners defines whose signature is required
-func (msg MsgCreateReport) GetSigners() []sdk.AccAddress {
+func (msg *MsgCreateReport) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Reporter.Address}
 }

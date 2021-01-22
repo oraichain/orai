@@ -1,0 +1,15 @@
+syntax = "proto3";
+package oraichain.orai.websocket;
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/oraichain/orai/x/websocket/types";
+
+// Reporter is the one who send reports from the validator back to Oraichain created by a validator
+message Reporter {
+  option (gogoproto.goproto_stringer) = true;  
+  bytes address = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress", (gogoproto.moretags) = "json:\"reporter_address\""];  
+  string name = 2 [(gogoproto.moretags) = "json:\"reporter_name\""];
+  bytes validator = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.ValAddress", (gogoproto.moretags) = "json:\"reporter_validator\""];
+}
+
+
