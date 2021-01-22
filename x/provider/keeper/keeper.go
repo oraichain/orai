@@ -6,19 +6,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	params "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/oraichain/orai/x/provider/types"
 	"github.com/oraichain/orai/x/wasm"
 	"github.com/tendermint/tendermint/libs/log"
 )
-
-// // Implements OracleScriptSet interface
-// var _ types.OracleScriptSet = &Keeper{}
-
-// // Implements AIDataSourceSet interface
-// var _ types.AIDataSourceSet = &Keeper{}
-
-// // Implements TestCaseSet interface
-// var _ types.TestCaseSet = &Keeper{}
 
 // always clone keeper to make it immutable
 type (
@@ -26,14 +18,20 @@ type (
 		cdc        codec.Marshaler
 		storeKey   sdk.StoreKey
 		wasmKeeper wasm.Keeper
+		paramSpace params.Subspace
 	}
 )
 
-func NewKeeper(cdc codec.Marshaler, storeKey sdk.StoreKey, wasmKeeper wasm.Keeper) *Keeper {
+func NewKeeper(cdc codec.Marshaler, storeKey sdk.StoreKey, wasmKeeper wasm.Keeper, providerSubspace params.Subspace) *Keeper {
+	if !providerSubspace.HasKeyTable() {
+		// register parameters of the provider module into the param space
+		providerSubspace = providerSubspace.WithKeyTable(types.ParamKeyTable())
+	}
 	return &Keeper{
 		cdc:        cdc,
 		storeKey:   storeKey,
 		wasmKeeper: wasmKeeper,
+		paramSpace: providerSubspace,
 	}
 }
 
@@ -113,8 +111,8 @@ func (k *Keeper) GetAIDataSource(ctx sdk.Context, name string) (*types.AIDataSou
 }
 
 // DefaultAIDataSource creates an empty Data Source struct
-func (k Keeper) DefaultAIDataSource() types.AIDataSource {
-	return types.AIDataSource{}
+func (k Keeper) DefaultAIDataSource() *types.AIDataSource {
+	return &types.AIDataSource{}
 }
 
 // GetAIDataSources returns list of data sources
@@ -292,8 +290,8 @@ func (k Keeper) SetTestCase(ctx sdk.Context, name string, testCase *types.TestCa
 }
 
 // DefaultTestCase creates an empty Test Case struct
-func (k Keeper) DefaultTestCase() types.TestCase {
-	return types.TestCase{}
+func (k Keeper) DefaultTestCase() *types.TestCase {
+	return &types.TestCase{}
 }
 
 // EditTestCase allows users to edit a test case in the store

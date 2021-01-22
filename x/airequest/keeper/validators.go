@@ -8,7 +8,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/cosmos/cosmos-sdk/x/staking/exported"
+	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/oraichain/orai/packages/rng"
 	"github.com/oraichain/orai/x/airequest/types"
 )
@@ -19,7 +19,7 @@ func (k Keeper) RandomValidators(ctx sdk.Context, size int, nonce []byte) ([]sdk
 	totalPowers := int64(0)
 	// count the total current validator
 	k.stakingKeeper.IterateBondedValidatorsByPower(ctx,
-		func(idx int64, val exported.ValidatorI) (stop bool) {
+		func(idx int64, val staking.ValidatorI) (stop bool) {
 			// the highest staked validator has the highest freq appearance in the list. When random => higher chance of getting picked
 			maxValidatorSize++
 			totalPowers += val.GetConsensusPower()
@@ -68,7 +68,7 @@ func (k Keeper) createValSamplingList(ctx sdk.Context, maxValidatorSize int) (va
 	var prevVotingP int64
 	specialIndex := 0 // this index stores the first validator that has equal index to the next val
 	k.stakingKeeper.IterateBondedValidatorsByPower(ctx,
-		func(idx int64, val exported.ValidatorI) (stop bool) {
+		func(idx int64, val staking.ValidatorI) (stop bool) {
 			// store the prev voting power validator
 			prevVotingP = curVotingP
 			// collect the new voting power

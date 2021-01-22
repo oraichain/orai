@@ -19,8 +19,10 @@ services:
       - SYS_PTRACE
     env_file:
       - orai.dev.env
-    volumes:            
-      - ./:/workspace:delegated
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      #- ./vendor:/go/pkg/mod/
+      - ./:/workspace
 
   rust:
     image: cosmwasm/rust-optimizer:0.10.7

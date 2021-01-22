@@ -11,7 +11,7 @@ func DefaultGenesisState() *GenesisState {
 		OracleScripts: []OracleScript{},
 		AIDataSources: []AIDataSource{},
 		TestCases:     []TestCase{},
-		// Params:        DefaultParams(),
+		Params:        DefaultParams(),
 
 		// TODO: Fill out according to your genesis state, these values will be initialized but empty
 	}

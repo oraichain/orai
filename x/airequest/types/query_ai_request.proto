@@ -13,6 +13,7 @@ option go_package = "github.com/oraichain/orai/x/airequest/types";
 // QueryAIRequestReq is the request type for the Query/QueryAIRequest RPC method
 message QueryAIRequestReq {
     // address is the address of the contract to query
+    option (gogoproto.goproto_stringer) = true;
     string request_id = 1;
 }
 

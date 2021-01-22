@@ -6,13 +6,14 @@ require (
 	github.com/CosmWasm/wasmvm v0.13.0
 	github.com/cosmos/cosmos-sdk v0.40.0
 	github.com/cosmos/iavl v0.15.3
-	github.com/cosmtrek/air v1.12.5-0.20200905080724-b538c70423fb // indirect
 	github.com/dvsekhvalnov/jose2go v0.0.0-20200901110807-248326c1351b
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.4.3
+	github.com/google/go-cmp v0.5.4 // indirect
 	github.com/google/gofuzz v1.2.0
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
+	github.com/oasisprotocol/oasis-core/go v0.0.0-20200730171716-3be2b460b3ac
 	github.com/pkg/errors v0.9.1
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/zerolog v1.20.0
@@ -27,7 +28,6 @@ require (
 	golang.org/x/net v0.0.0-20201209123823-ac852fbbde11 // indirect
 	golang.org/x/sys v0.0.0-20201211090839-8ad439b19e0f // indirect
 	golang.org/x/text v0.3.4 // indirect
-	golang.org/x/tools/gopls v0.6.3 // indirect
 	google.golang.org/genproto v0.0.0-20201214200347-8c77b98c765d
 	google.golang.org/grpc v1.34.0
 	gopkg.in/yaml.v2 v2.4.0

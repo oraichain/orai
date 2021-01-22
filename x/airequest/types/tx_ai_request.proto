@@ -22,7 +22,7 @@ message MsgSetAIRequest {
 // MsgSetAIRequestRes returns store result data.
 message MsgSetAIRequestRes{
   option (gogoproto.goproto_stringer) = true;
-  string request_id = 1;
+  string request_id = 1 [(gogoproto.customname) = "RequestID"];
   string oracle_script_name = 2 [ (gogoproto.moretags) = "json:\"oscript_name\""];
   // Owner is the address who is allowed to make further changes to the data source.
   bytes creator = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress",  (gogoproto.moretags) = "json:\"request_creator\""];
