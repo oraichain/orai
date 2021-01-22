@@ -9,7 +9,7 @@ import (
 func (msg *MsgSetAIRequest) Route() string { return RouterKey }
 
 // Type should return the action
-func (msg *MsgSetAIRequest) Type() string { return "set_ai_request" }
+func (msg *MsgSetAIRequest) Type() string { return EventTypeSetAIRequest }
 
 // ValidateBasic runs stateless checks on the message
 func (msg *MsgSetAIRequest) ValidateBasic() error {

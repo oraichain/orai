@@ -3,18 +3,15 @@ package websocket
 import (
 	"context"
 	"errors"
-	"fmt"
 	"strconv"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/codec"
 	keyring "github.com/cosmos/cosmos-sdk/crypto/keys"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/docker/docker/client"
-	"github.com/oraichain/orai/x/websocket"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/tendermint/tendermint/libs/log"
 	httpclient "github.com/tendermint/tendermint/rpc/client/http"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
@@ -33,7 +30,7 @@ func runImpl(cdc codec.Marshaler, c *Context, l *Logger) error {
 	defer cxl()
 
 	// start listening to the events from the 26657 port after creating the container successfully
-	err = c.client.Start()
+	err := c.client.Start()
 	if err != nil {
 		return err
 	}
@@ -46,19 +43,9 @@ func runImpl(cdc codec.Marshaler, c *Context, l *Logger) error {
 		select {
 		case ev := <-eventChan:
 			l.Info("%v\n", ev.Data.(tmtypes.EventDataTx).TxResult)
-			go handleTransaction(c, l, ev.Data.(tmtypes.EventDataTx).TxResult)		
+			go handleTransaction(c, l, ev.Data.(tmtypes.EventDataTx).TxResult)
 		}
 	}
-}
-
-func registerFlags(cmd *cobra.Command) *cobra.Command {
-	cmd.Flags().String(flags.FlagChainID, "", "chain ID of Oraichain network")
-	cmd.Flags().String(flags.FlagNode, "tcp://localhost:26657", "RPC url to Oraichain node")
-
-	viper.BindPFlag(flags.FlagChainID, cmd.Flags().Lookup(flags.FlagChainID))
-	viper.BindPFlag(flags.FlagNode, cmd.Flags().Lookup(flags.FlagNode))
-
-	return RegisterWebSocketFlags(cmd)
 }
 
 func RegisterWebSocketFlags(cmd *cobra.Command) *cobra.Command {
@@ -79,7 +66,7 @@ func RegisterWebSocketFlags(cmd *cobra.Command) *cobra.Command {
 	return cmd
 }
 
-func runCmd(c *Context) *cobra.Command {
+func runCmd(cdc codec.Marshaler, c *Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "run",
 		Aliases: []string{"r"},
@@ -111,11 +98,11 @@ func runCmd(c *Context) *cobra.Command {
 			feesStr, err := cmd.Flags().GetString(flags.FlagFees) // 5000orai
 			if err != nil {
 				feesStr = defaultFees
-				c.fees, _ = sdk.ParseCoins(defaultFees)
+				c.fees, _ = sdk.ParseCoinsNormalized(defaultFees)
 			} else {
-				fees, err := sdk.ParseCoins(feesStr)
+				fees, err := sdk.ParseCoinsNormalized(feesStr)
 				if err != nil {
-					fees, _ = sdk.ParseCoins(defaultFees)
+					fees, _ = sdk.ParseCoinsNormalized(defaultFees)
 				}
 				c.fees = fees
 			}
@@ -144,15 +131,7 @@ func runCmd(c *Context) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			allowLevel, err := log.AllowLevel(cfg.LogLevel)
-			if err != nil {
-				return err
-			}
-			l := NewLogger(allowLevel)
-			// c.executor, err = executor.NewExecutor(cfg.Executor)
-			// if err != nil {
-			// 	return err
-			// }
+
 			l.Info(":star: Creating the daemon listening to node: %s", cfg.NodeURI)
 			c.client, err = httpclient.New(cfg.NodeURI, "/websocket")
 			if err != nil {
@@ -168,10 +147,10 @@ func runCmd(c *Context) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			return runImpl(c, l)
+			return runImpl(cdc, c, l)
 		},
 	}
 
-	return registerFlags(cmd)
+	return RegisterWebSocketFlags(cmd)
 
 }

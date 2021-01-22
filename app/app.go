@@ -362,7 +362,7 @@ func NewWasmApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	)
 
 	app.airequestKeeper = airequest.NewKeeper(
-		appCodec, keys[airequest.StoreKey], &app.wasmKeeper, app.getSubspace(airequest.ModuleName), &app.stakingKeeper, app.providerKeeper,
+		appCodec, keys[airequest.StoreKey], &app.wasmKeeper, app.getSubspace(airequest.ModuleName), app.stakingKeeper, app.providerKeeper,
 	)
 
 	app.websocketKeeper = websocket.NewKeeper(
@@ -442,7 +442,7 @@ func NewWasmApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		params.NewAppModule(app.paramsKeeper),
 		provider.NewAppModule(appCodec, app.providerKeeper),
 		airequest.NewAppModule(appCodec, app.airequestKeeper),
-		websocket.NewAppModule(appCodec, app.websocketKeeper, app.stakingKeeper),
+		websocket.NewAppModule(appCodec, app.websocketKeeper, &app.stakingKeeper),
 		transferModule,
 	)
 

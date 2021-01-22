@@ -6,11 +6,13 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	aiRequest "github.com/oraichain/orai/x/airequest"
+	artypes "github.com/oraichain/orai/x/airequest/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto/tmhash"
-	tmtypes "github.com/tendermint/tendermint/types"
+	"github.com/tendermint/tendermint/libs/log"
 )
 
-func handleTransaction(c *Context, l *Logger, tx tmtypes.TxResult) {
+func handleTransaction(c *Context, l log.Logger, tx *abci.TxResult) {
 	l.Debug(":eyes: Inspecting incoming transaction: %X", tmhash.Sum(tx.Tx))
 	if tx.Result.Code != 0 {
 		l.Debug(":alien: Skipping transaction with non-zero code: %d", tx.Result.Code)
@@ -34,21 +36,13 @@ func handleTransaction(c *Context, l *Logger, tx tmtypes.TxResult) {
 
 		msg, isProvider := verifyProviderMessageType(messageType, log)
 
-		if messageType == (aiRequest.MsgSetAIRequest{}).Type() {
+		if messageType == artypes.EventTypeSetAIRequest {
 			handleAIRequestLog(c, l, log)
 		} else if isProvider {
 			handleProviderMsgLog(c, l, log, msg)
 		} else {
 			l.Debug(":ghost: Skipping non-{request/packet} type: %s", messageType)
-		} /*else if messageType == (ibc.MsgPacket{}).Type() {
-			// Try to get request id from packet. If not then return error.
-			_, err := GetEventValue(log, types.EventTypeRequest, types.AttributeKeyID)
-			if err != nil {
-				l.Debug(":ghost: Skipping non-request packet")
-				return
-			}
-			go handleRequestLog(c, l, log)
-		} */
+		}
 	}
 }
 
