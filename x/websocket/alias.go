@@ -27,4 +27,9 @@ var (
 type (
 	Keeper       = keeper.Keeper
 	GenesisState = types.GenesisState
+	Report       = types.Report
+
+	MsgCreateReport   = types.MsgCreateReport
+	MsgAddReporter    = types.MsgAddReporter
+	MsgRemoveReporter = types.MsgRemoveReporter
 )

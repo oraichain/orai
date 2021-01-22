@@ -6,7 +6,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	params "github.com/cosmos/cosmos-sdk/x/params/types"
+	staking "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/oraichain/orai/x/airequest/types"
+	"github.com/oraichain/orai/x/provider"
 	"github.com/oraichain/orai/x/wasm"
 	"github.com/tendermint/tendermint/libs/log"
 )
@@ -16,20 +18,20 @@ type (
 	Keeper struct {
 		cdc            codec.Marshaler
 		storeKey       sdk.StoreKey
-		wasmKeeper     wasm.Keeper
+		wasmKeeper     *wasm.Keeper
 		paramSpace     params.Subspace
-		stakingKeeper  types.StakingKeeper
-		ProviderKeeper types.ProviderKeeper
+		stakingKeeper  staking.Keeper
+		ProviderKeeper *provider.Keeper
 	}
 )
 
 // NewKeeper creates a airequest keeper
-func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper wasm.Keeper, aiRequestSubspace params.Subspace, stakingKeeper types.StakingKeeper, providerKeeper types.ProviderKeeper) Keeper {
+func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, aiRequestSubspace params.Subspace, stakingKeeper staking.Keeper, providerKeeper *provider.Keeper) *Keeper {
 	if !aiRequestSubspace.HasKeyTable() {
 		// register parameters of the airequest module into the param space
 		aiRequestSubspace = aiRequestSubspace.WithKeyTable(types.ParamKeyTable())
 	}
-	return Keeper{
+	return &Keeper{
 		storeKey:       key,
 		cdc:            cdc,
 		wasmKeeper:     wasmKeeper,

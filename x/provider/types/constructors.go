@@ -144,8 +144,8 @@ func NewMsgEditTestCase(oldName, newName string, contract string, owner sdk.AccA
 }
 
 // NewGenesisState creates a new GenesisState object
-func NewGenesisState(oScripts []OracleScript, aiDataSources []AIDataSource, testCases []TestCase) GenesisState {
-	return GenesisState{
+func NewGenesisState(oScripts []OracleScript, aiDataSources []AIDataSource, testCases []TestCase) *GenesisState {
+	return &GenesisState{
 		// TODO: Fill out according to your genesis state
 		OracleScripts: oScripts,
 		AIDataSources: aiDataSources,

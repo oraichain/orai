@@ -4,26 +4,9 @@ import (
 	"fmt"
 )
 
-// GenesisState - all provider state that must be provided at genesis
-type GenesisState struct {
-	Reports   []Report   `json:"validator_report"`
-	Reporters []Reporter `json:"validator_reporter"`
-	//Params     Params      `json:"params"`
-	// TODO: Fill out what is needed by the module for genesis
-}
-
-// NewGenesisState creates a new GenesisState object
-func NewGenesisState(reports []Report, reporters []Reporter) GenesisState {
-	return GenesisState{
-		// TODO: Fill out according to your genesis state
-		Reports:   reports,
-		Reporters: reporters,
-	}
-}
-
 // DefaultGenesisState - default GenesisState used by Cosmos Hub
-func DefaultGenesisState() GenesisState {
-	return GenesisState{
+func DefaultGenesisState() *GenesisState {
+	return &GenesisState{
 		Reports:   []Report{},
 		Reporters: []Reporter{},
 
@@ -31,16 +14,16 @@ func DefaultGenesisState() GenesisState {
 	}
 }
 
-// ValidateGenesis validates the provider genesis parameters
-func ValidateGenesis(data GenesisState) error {
-	for _, record := range data.Reports {
+// Validate validates the provider genesis parameters
+func (gs *GenesisState) Validate() error {
+	for _, record := range gs.Reports {
 		if record.RequestID == "" {
 			return fmt.Errorf("invalid Report: Value: %s. Error: Missing RequestID", record.RequestID)
 		}
 		if record.BlockHeight <= int64(0) {
 			return fmt.Errorf("invalid Report: BlockHeight: %d. Error: Invalid block height", record.BlockHeight)
 		}
-		if record.Reporter.isEmpty() {
+		if record.Reporter.Address.Empty() {
 			return fmt.Errorf("invalid AIRequests: Reporter: %s. Error: Missing Reporter information", record.Reporter)
 		}
 		// if record.Fees.Empty() {
@@ -48,7 +31,7 @@ func ValidateGenesis(data GenesisState) error {
 		// }
 	}
 
-	for _, record := range data.Reporters {
+	for _, record := range gs.Reporters {
 		if record.Name == "" {
 			return fmt.Errorf("invalid Report: Name: %s. Error: Missing reporter name", record.Name)
 		}

@@ -1,0 +1,31 @@
+syntax = "proto3";
+package oraichain.orai.websocket;
+import "cosmos/base/v1beta1/coin.proto";
+import "x/websocket/types/types_dsource_result.proto";
+import "x/websocket/types/types_tcase_result.proto";
+import "x/websocket/types/types_reporter.proto";
+
+import "gogoproto/gogo.proto";
+option go_package = "github.com/oraichain/orai/x/websocket/types";
+
+// MsgCreateReport defines message for creating a report by a reporter of a validator
+message MsgCreateReport {
+    string requestID = 1 [(gogoproto.moretags) = "json:\"request_id\""];
+    repeated DataSourceResult DataSourceResults = 2 [(gogoproto.moretags) = "json:\"data_source_result\"", (gogoproto.customname) = "DataSourceResults"];	  
+    repeated TestCaseResult TestCaseResults = 3 [(gogoproto.moretags) = "json:\"test_case_results\"", (gogoproto.customname) = "TestCaseResults"];	  
+    Reporter reporter = 4 [(gogoproto.moretags) = "json:\"reporter\""];
+    repeated cosmos.base.v1beta1.Coin fees = 5 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "json:\"report_fee\""];
+    bytes aggregatedResult = 6 [(gogoproto.moretags) = "json:\"aggregated_result\""];
+    string resultStatus = 7 [(gogoproto.moretags) = "json:\"result_status\""];
+}
+
+// MsgAddReporterRes returns added reporter data.
+message MsgCreateReportRes {
+    string requestID = 1 [(gogoproto.moretags) = "json:\"request_id\""];
+    repeated DataSourceResult DataSourceResults = 2 [(gogoproto.moretags) = "json:\"data_source_result\"", (gogoproto.customname) = "DataSourceResults"];	  
+    repeated TestCaseResult TestCaseResults = 3 [(gogoproto.moretags) = "json:\"test_case_results\"", (gogoproto.customname) = "TestCaseResults"];	  
+    Reporter reporter = 4 [(gogoproto.moretags) = "json:\"reporter\""];
+    repeated cosmos.base.v1beta1.Coin fees = 5 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "json:\"report_fee\""];
+    bytes aggregatedResult = 6 [(gogoproto.moretags) = "json:\"aggregated_result\""];
+    string resultStatus = 7 [(gogoproto.moretags) = "json:\"result_status\""];
+}

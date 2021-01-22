@@ -1,19 +1,18 @@
 package keeper
 
 import (
-	"github.com/oraichain/orai/x/websocket/exported"
 	"github.com/oraichain/orai/x/websocket/types"
 )
 
 // DefaultValResultI returns the default ai data source object
-func (k Keeper) DefaultValResultI() exported.ValResultI {
+func (k Keeper) DefaultValResultI() types.ValResult {
 	return k.DefaultValResult()
 }
 
 // DefaultValResult is a default constructor for the validator result
 func (k Keeper) DefaultValResult() types.ValResult {
 	return types.ValResult{
-		Validator: types.Validator{},
+		Validator: &types.Validator{},
 		Result:    []byte{},
 	}
 }
@@ -24,6 +23,10 @@ func (k Keeper) GetKeyResultSuccess() string {
 }
 
 // NewValResult is a wrapper function of the websocket module that allow others to initiate a new valresult entity through the keeper
-func (k Keeper) NewValResult(val exported.ValidatorI, result []byte, status string) exported.ValResultI {
-	return types.NewValResult(val, result, status)
+func (k Keeper) NewValResult(val *types.Validator, result []byte, status string) *types.ValResult {
+	return &types.ValResult{
+		Validator:    val,
+		Result:       result,
+		ResultStatus: status,
+	}
 }

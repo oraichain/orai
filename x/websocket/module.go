@@ -2,17 +2,20 @@ package websocket
 
 import (
 	"encoding/json"
+	"fmt"
 
-	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/cosmos/cosmos-sdk/x/staking"
+	"github.com/cosmos/cosmos-sdk/client"
+	params "github.com/cosmos/cosmos-sdk/x/params/types"
+	staking "github.com/cosmos/cosmos-sdk/x/staking/keeper"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 
 	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"
+	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/oraichain/orai/x/websocket/client/cli"
@@ -25,53 +28,64 @@ import (
 var (
 	_ module.AppModule      = AppModule{}
 	_ module.AppModuleBasic = AppModuleBasic{}
-
-	InSignals  = make(chan bool)
-	OutSignals = make(chan bool)
 )
 
-// AppModuleBasic defines the basic application module used by the websocket module.
-type AppModuleBasic struct{}
+// AppModuleBasic defines the basic application module used by the wasm module.
+type AppModuleBasic struct {
+	cdc codec.Marshaler
+}
 
-// Name returns the websocket module's name.
+func NewAppModuleBasic(cdc codec.Marshaler) AppModuleBasic {
+	return AppModuleBasic{cdc: cdc}
+}
+
+// Name returns the capability module's name.
 func (AppModuleBasic) Name() string {
-	return ModuleName
+	return types.ModuleName
 }
 
-// RegisterCodec registers the websocket module's types for the given codec.
-func (AppModuleBasic) RegisterCodec(cdc *codec.Codec) {
-	RegisterCodec(cdc)
+func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
+	types.RegisterCodec(cdc)
 }
 
-// DefaultGenesis returns default genesis state as raw bytes for the websocket
-// module.
-func (AppModuleBasic) DefaultGenesis() json.RawMessage {
-	return ModuleCdc.MustMarshalJSON(types.DefaultGenesisState())
+// RegisterInterfaces registers the module's interface types
+func (a AppModuleBasic) RegisterInterfaces(reg cdctypes.InterfaceRegistry) {
+	types.RegisterInterfaces(reg)
 }
 
-// ValidateGenesis performs genesis state validation for the websocket module.
-func (AppModuleBasic) ValidateGenesis(bz json.RawMessage) error {
-	var data types.GenesisState
-	err := types.ModuleCdc.UnmarshalJSON(bz, &data)
-	if err != nil {
-		return err
+// DefaultGenesis returns the capability module's default genesis state.
+func (AppModuleBasic) DefaultGenesis(cdc codec.JSONMarshaler) json.RawMessage {
+	return cdc.MustMarshalJSON(types.DefaultGenesisState())
+}
+
+// ValidateGenesis performs genesis state validation for the capability module.
+func (AppModuleBasic) ValidateGenesis(cdc codec.JSONMarshaler, config client.TxEncodingConfig, bz json.RawMessage) error {
+	var genState types.GenesisState
+	if err := cdc.UnmarshalJSON(bz, &genState); err != nil {
+		return fmt.Errorf("failed to unmarshal %s genesis state: %w", types.ModuleName, err)
 	}
-	return types.ValidateGenesis(data)
+
+	return genState.Validate()
 }
 
-// RegisterRESTRoutes registers the REST routes for the websocket module.
-func (AppModuleBasic) RegisterRESTRoutes(ctx context.CLIContext, rtr *mux.Router) {
-	rest.RegisterRoutes(ctx, rtr, InSignals, OutSignals)	
+// RegisterRESTRoutes registers the capability module's REST service handlers.
+func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
+	rest.RegisterRoutes(clientCtx, rtr)
 }
 
-// GetTxCmd returns the root tx command for the websocket module.
-func (AppModuleBasic) GetTxCmd(cdc *codec.Codec) *cobra.Command {
-	return cli.GetTxCmd(cdc)
+// RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the module.
+func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, serveMux *runtime.ServeMux) {
+
 }
 
-// GetQueryCmd returns no root query command for the websocket module.
-func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
-	return cli.GetQueryCmd(StoreKey, cdc)
+// GetTxCmd returns the capability module's root tx command.
+func (a AppModuleBasic) GetTxCmd() *cobra.Command {
+	return cli.GetTxCmd()
+}
+
+// GetQueryCmd returns the capability module's root query command.
+func (AppModuleBasic) GetQueryCmd() *cobra.Command {
+	return cli.GetQueryCmd()
 }
 
 //____________________________________________________________________________
@@ -79,89 +93,74 @@ func (AppModuleBasic) GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 // AppModule implements an application module for the websocket module.
 type AppModule struct {
 	AppModuleBasic
-	keeper keeper.Keeper
+	keeper *keeper.Keeper
 	// TODO: Add keepers that your application depends on
-	stakingKeeper staking.Keeper
+	stakingKeeper *staking.Keeper
 	params        params.Subspace
+	querier       *keeper.Querier
 }
 
 // NewAppModule creates a new AppModule object
-func NewAppModule(k keeper.Keeper, s staking.Keeper, params params.Subspace /*TODO: Add Keepers that your application depends on*/) AppModule {
+func NewAppModule(cdc codec.Marshaler, keeper *Keeper, stakingKeeper *staking.Keeper) AppModule {
 	return AppModule{
-		AppModuleBasic: AppModuleBasic{},
-		keeper:         k,
-		stakingKeeper:  s,
-		params:         params,
-		// TODO: Add keepers that your application depends on
+		AppModuleBasic: NewAppModuleBasic(cdc),
+		keeper:         keeper,
+		stakingKeeper:  stakingKeeper,
+		querier:        NewQuerier(keeper),
 	}
 }
 
-// Name returns the websocket module's name.
-func (AppModule) Name() string {
-	return types.ModuleName
+// Name returns the capability module's name.
+func (am AppModule) Name() string {
+	return am.AppModuleBasic.Name()
 }
 
-// RegisterInvariants registers the websocket module invariants.
+// Route returns the capability module's message routing key.
+func (am AppModule) Route() sdk.Route {
+	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper))
+}
+
+// QuerierRoute returns the capability module's query routing key.
+func (AppModule) QuerierRoute() string { return types.QuerierRoute }
+
+// LegacyQuerierHandler returns the capability module's Querier.
+func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
+	return keeper.NewLegacyQuerier(am.keeper, legacyQuerierCdc)
+}
+
+// RegisterServices registers a GRPC query service to respond to the
+// module-specific GRPC queries.
+func (am AppModule) RegisterServices(cfg module.Configurator) {
+	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
+	types.RegisterQueryServer(cfg.QueryServer(), am.querier)
+}
+
+// RegisterInvariants registers the capability module's invariants.
 func (am AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {}
 
-// Route returns the message routing key for the websocket module.
-func (AppModule) Route() string {
-	return types.RouterKey
-}
-
-// NewHandler returns an sdk.Handler for the websocket module.
-func (am AppModule) NewHandler() sdk.Handler {
-	return NewHandler(am.keeper)
-}
-
-// QuerierRoute returns the websocket module's querier route name.
-func (AppModule) QuerierRoute() string {
-	return types.QuerierRoute
-}
-
-// NewQuerierHandler returns the websocket module sdk.Querier.
-func (am AppModule) NewQuerierHandler() sdk.Querier {
-	return NewQuerier(am.keeper)
-}
-
-// InitGenesis performs genesis initialization for the nameservice module. It returns
+// InitGenesis performs the capability module's genesis initialization It returns
 // no validator updates.
-func (am AppModule) InitGenesis(ctx sdk.Context, data json.RawMessage) []abci.ValidatorUpdate {
-	var genesisState GenesisState
-	types.ModuleCdc.MustUnmarshalJSON(data, &genesisState)
-	InitGenesis(ctx, am.keeper, genesisState)
+func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONMarshaler, gs json.RawMessage) []abci.ValidatorUpdate {
+	var genState types.GenesisState
+	// Initialize global index to index in genesis state
+	cdc.MustUnmarshalJSON(gs, &genState)
+
+	InitGenesis(ctx, am.keeper, &genState)
+
 	return []abci.ValidatorUpdate{}
 }
 
-// ExportGenesis returns the exported genesis state as raw bytes for the websocket
-// module.
-func (am AppModule) ExportGenesis(ctx sdk.Context) json.RawMessage {
-	gs := ExportGenesis(ctx, am.keeper)
-	return types.ModuleCdc.MustMarshalJSON(gs)
+// ExportGenesis returns the capability module's exported genesis state as raw JSON bytes.
+func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json.RawMessage {
+	genState := ExportGenesis(ctx, am.keeper)
+	return cdc.MustMarshalJSON(genState)
 }
 
-// BeginBlock returns the begin blocker for the websocket module.
-func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
-	// Run the begin blocker custom function to execute tasks when a new block starts
-	BeginBlocker(ctx, req, am.keeper)
-}
+// BeginBlock executes all ABCI BeginBlock logic respective to the capability module.
+func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
 
-// EndBlock returns the end blocker for the websocket module. It returns no validator
-// updates.
-func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	// Run the end blocker custom function to execute tasks when end block
-	EndBlocker(ctx, am.keeper)
+// EndBlock executes all ABCI EndBlock logic respective to the capability module. It
+// returns no validator updates.
+func (am AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
 	return []abci.ValidatorUpdate{}
-}
-
-// BeginBlocker check for infraction evidence or downtime of validators
-// on every begin block
-func BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock, k Keeper) {
-	// 	TODO: fill out if your application requires beginblock, if not you can delete this function
-	//k.DirectAllocateTokens(ctx, req.GetLastCommitInfo().Votes)
-}
-
-// EndBlocker called every block, process inflation, update validator set.
-func EndBlocker(ctx sdk.Context, k Keeper) {
-	// 	TODO: fill out if your application requires endblock, if not you can delete this function
 }

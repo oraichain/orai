@@ -1,4 +1,4 @@
-package wasm
+package websocket
 
 import (
 	"encoding/json"
@@ -10,6 +10,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
+	"github.com/oraichain/orai/x/wasm"
 )
 
 type Request struct {
@@ -59,7 +60,7 @@ func (oracleQueryPlugin OracleQueryPlugin) Custom(ctx sdk.Context, query json.Ra
 
 }
 
-func CreateQueryPlugins(bank bankkeeper.ViewKeeper, staking stakingkeeper.Keeper) *QueryPlugins {
+func CreateQueryPlugins(bank bankkeeper.ViewKeeper, staking stakingkeeper.Keeper) *wasm.QueryPlugins {
 
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 	oracleQueryPlugin := OracleQueryPlugin{
@@ -68,7 +69,7 @@ func CreateQueryPlugins(bank bankkeeper.ViewKeeper, staking stakingkeeper.Keeper
 		staking: staking,
 	}
 
-	return &QueryPlugins{
+	return &wasm.QueryPlugins{
 		Custom: oracleQueryPlugin.Custom,
 	}
 }

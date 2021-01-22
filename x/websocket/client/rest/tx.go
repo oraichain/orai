@@ -6,11 +6,10 @@ import (
 	// "bytes"
 	// "net/http"
 
-	"github.com/gorilla/mux"
-
-	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
+	"github.com/gorilla/mux"
 	// "github.com/cosmos/cosmos-sdk/types/rest"
 	// "github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 )
@@ -46,5 +45,5 @@ type setIPFSImage struct {
 	Size string `json:"Size"`
 }
 
-func registerTxRoutes(cliCtx context.CLIContext, r *mux.Router) {
+func registerTxRoutes(cliCtx client.Context, r *mux.Router) {
 }
