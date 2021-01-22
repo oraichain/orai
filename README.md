@@ -49,6 +49,18 @@ oraid query wasm contract-state smart $CONTRACT '{"get_count":{}}'
 
 ```
 
+## Some basic commands to test with the node
+
+```bash
+
+oraid tx provider set-datasource bitcoin_price $CONTRACT "test bitcoin price" --from duc --chain-id testing -y
+
+oraid tx provider set-testcase bitcoin_price_testcase $CONTRACT "test bitcoin price testcase" --from duc --chain-id testing -y
+
+curl -X POST -i http://localhost:1317/provider/datasource -d '{"name":"abc"}'
+
+```
+
 
 ## Build protobuf and do lint check
 ```bash

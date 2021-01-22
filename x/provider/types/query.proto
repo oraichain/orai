@@ -16,33 +16,33 @@ service Query {
 
     // DataSourceInfo gets the data source meta data
     rpc DataSourceInfo (DataSourceInfoReq) returns (DataSourceInfoRes) {
-        option (google.api.http).get = "/orai/provider/datasource/{name}";
+        option (google.api.http).get = "/provider/datasource/{name}";
     }
     // ListDataSources gets the list of data sources
     rpc ListDataSources (ListDataSourcesReq) returns (ListDataSourcesRes) {
-        option (google.api.http).get = "/orai/provider/datasources";
+        option (google.api.http).get = "/provider/datasources";
     }
 
     // OracleScriptInfo gets the oracle script meta data
     rpc OracleScriptInfo (OracleScriptInfoReq) returns (OracleScriptInfoRes) {
-        option (google.api.http).get = "/orai/provider/oscript/{name}";
+        option (google.api.http).get = "/provider/oscript/{name}";
     }
     // ListOracleScripts gets the list of oracle scripts
     rpc ListOracleScripts (ListOracleScriptsReq) returns (ListOracleScriptsRes) {
-        option (google.api.http).get = "/orai/provider/oscripts";
+        option (google.api.http).get = "/provider/oscripts";
     }
 
     // TestCaseInfo gets the test case meta data
     rpc TestCaseInfo (TestCaseInfoReq) returns (TestCaseInfoRes) {
-        option (google.api.http).get = "/orai/provider/testcase/{name}";
+        option (google.api.http).get = "/provider/testcase/{name}";
     }
     // ListTestCases gets the list of test cases
     rpc ListTestCases (ListTestCasesReq) returns (ListTestCasesRes) {
-        option (google.api.http).get = "/orai/provider/testcase";
+        option (google.api.http).get = "/provider/testcases";
     }
 
     // QueryMinFees gets the min fees of oracle script
     rpc QueryMinFees (MinFeesReq) returns (MinFeesRes) {
-        option (google.api.http).get = "/orai/provider/minfees";
+        option (google.api.http).get = "/provider/minfees";
     }
 }

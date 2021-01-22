@@ -691,19 +691,19 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 }
 
 var (
-	pattern_Query_DataSourceInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"orai", "provider", "datasource", "name"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_DataSourceInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"provider", "datasource", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_ListDataSources_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"orai", "provider", "datasources"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_ListDataSources_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"provider", "datasources"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_OracleScriptInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"orai", "provider", "oscript", "name"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_OracleScriptInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"provider", "oscript", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_ListOracleScripts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"orai", "provider", "oscripts"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_ListOracleScripts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"provider", "oscripts"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_TestCaseInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"orai", "provider", "testcase", "name"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_TestCaseInfo_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"provider", "testcase", "name"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_ListTestCases_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"orai", "provider", "testcase"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_ListTestCases_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"provider", "testcases"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Query_QueryMinFees_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"orai", "provider", "minfees"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Query_QueryMinFees_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"provider", "minfees"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

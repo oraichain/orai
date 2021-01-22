@@ -4,8 +4,15 @@ go 1.15
 
 require (
 	github.com/CosmWasm/wasmvm v0.13.0
+	github.com/Microsoft/go-winio v0.4.16 // indirect
+	github.com/containerd/containerd v1.4.3 // indirect
 	github.com/cosmos/cosmos-sdk v0.40.0
+	github.com/cosmos/go-bip39 v1.0.0
 	github.com/cosmos/iavl v0.15.3
+	github.com/docker/distribution v2.7.1+incompatible // indirect
+	github.com/docker/docker v20.10.2+incompatible
+	github.com/docker/go-connections v0.4.0 // indirect
+	github.com/docker/go-units v0.4.0 // indirect
 	github.com/dvsekhvalnov/jose2go v0.0.0-20200901110807-248326c1351b
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.4.3
@@ -13,7 +20,10 @@ require (
 	github.com/google/gofuzz v1.2.0
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
+	github.com/kyokomi/emoji v2.2.4+incompatible
 	github.com/oasisprotocol/oasis-core/go v0.0.0-20200730171716-3be2b460b3ac
+	github.com/opencontainers/go-digest v1.0.0 // indirect
+	github.com/opencontainers/image-spec v1.0.1 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/zerolog v1.20.0

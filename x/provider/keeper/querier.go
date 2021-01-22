@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -58,6 +59,8 @@ func (k *Querier) ListDataSources(goCtx context.Context, req *types.ListDataSour
 	var queryResAIDSources []types.AIDataSource
 
 	dSources, err := k.keeper.GetAIDataSources(ctx, uint(req.Page), uint(req.Limit))
+	fmt.Println("list of data sources: ", dSources)
+	fmt.Printf("name, page and limit and page size: %v\n", req)
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrDataSourceNotFound, err.Error())
 	}
