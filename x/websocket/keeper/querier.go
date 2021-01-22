@@ -1,18 +1,15 @@
 package keeper
 
-import (
-	abci "github.com/tendermint/tendermint/abci/types"
+import "github.com/oraichain/orai/x/websocket/types"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-)
-
-// NewQuerier creates a new querier for provider clients.
-func NewQuerier(keeper Keeper) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
-		switch path[0] {
-		default:
-			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown provider query")
-		}
-	}
+// Querier is used as Keeper will have duplicate methods if used directly, and gRPC names take precedence over keeper
+type Querier struct {
+	keeper *Keeper
 }
+
+// NewQuerier return querier implementation
+func NewQuerier(keeper *Keeper) *Querier {
+	return &Querier{keeper: keeper}
+}
+
+var _ types.QueryServer = &Querier{}

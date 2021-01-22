@@ -35,9 +35,9 @@ func handleTransaction(c *Context, l *Logger, tx tmtypes.TxResult) {
 		msg, isProvider := verifyProviderMessageType(messageType, log)
 
 		if messageType == (aiRequest.MsgSetAIRequest{}).Type() {
-			go handleAIRequestLog(c, l, log)
+			handleAIRequestLog(c, l, log)
 		} else if isProvider {
-			go handleProviderMsgLog(c, l, log, msg)
+			handleProviderMsgLog(c, l, log, msg)
 		} else {
 			l.Debug(":ghost: Skipping non-{request/packet} type: %s", messageType)
 		} /*else if messageType == (ibc.MsgPacket{}).Type() {

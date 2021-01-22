@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	sdkCtx "github.com/cosmos/cosmos-sdk/client/context"
+	sdkCtx "github.com/cosmos/cosmos-sdk/client"
 	ckeys "github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/crypto/keys"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -15,13 +15,10 @@ import (
 	"github.com/oraichain/orai/x/websocket/types"
 )
 
-var (
-	cdc = app.MakeCodec()
-)
-
 // SubmitReport creates a new MsgCreateReport and submits it to the Oraichain to create a new report
 func SubmitReport(c *Context, l *Logger, key keys.Info, msgReport types.MsgCreateReport) {
-	cliCtx := sdkCtx.CLIContext{Client: c.client, TrustNode: true, Codec: cdc}
+	
+	cliCtx := sdkCtx.Context{Client: c.client, TrustNode: true, Codec: cdc}
 	txHash := ""
 	if err := msgReport.ValidateBasic(); err != nil {
 		l.Error(":exploding_head: Failed to validate basic with error: %s", err.Error())

@@ -26,33 +26,11 @@ const (
 	EventChannelCapacity = 5000
 )
 
-func runImpl(c *Context, l *Logger) error {
+func runImpl(cdc codec.Marshaler, c *Context, l *Logger) error {
 	l.Info(":rocket: Starting WebSocket subscriber")
 
 	ctx, cxl := context.WithTimeout(context.Background(), 100*time.Second)
 	defer cxl()
-
-	// before starting, we initiate the python container
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-	if err != nil {
-		l.Error(":skull: Failed to create new context and client for the python container: %s", err.Error())
-	}
-	// check if the container exist or not. if not then we create new
-	isExist, err := CheckExistsContainer(cli, "python")
-	if err != nil {
-		l.Error(":skull: Cannot check if the container exists or not: %s", err.Error())
-	}
-	if !isExist {
-		l.Info(":question_mark: container not exist yet")
-		// create a new go routine to create the new container
-		go func() {
-			ctxContainer := context.Background()
-			err = CreateContainer(ctxContainer, cli)
-			if err != nil {
-				l.Error(":skull: Failed to create new python container for provider module: %s", err.Error())
-			}
-		}()
-	}
 
 	// start listening to the events from the 26657 port after creating the container successfully
 	err = c.client.Start()
@@ -68,10 +46,7 @@ func runImpl(c *Context, l *Logger) error {
 		select {
 		case ev := <-eventChan:
 			l.Info("%v\n", ev.Data.(tmtypes.EventDataTx).TxResult)
-			go handleTransaction(c, l, ev.Data.(tmtypes.EventDataTx).TxResult)
-		case sig := <-websocket.OutSignals:
-			fmt.Println("received signal, send back to rest", sig)
-			websocket.InSignals <- sig
+			go handleTransaction(c, l, ev.Data.(tmtypes.EventDataTx).TxResult)		
 		}
 	}
 }

@@ -17,12 +17,12 @@ type (
 	Keeper struct {
 		cdc        codec.Marshaler
 		storeKey   sdk.StoreKey
-		wasmKeeper wasm.Keeper
+		wasmKeeper *wasm.Keeper
 		paramSpace params.Subspace
 	}
 )
 
-func NewKeeper(cdc codec.Marshaler, storeKey sdk.StoreKey, wasmKeeper wasm.Keeper, providerSubspace params.Subspace) *Keeper {
+func NewKeeper(cdc codec.Marshaler, storeKey sdk.StoreKey, wasmKeeper *wasm.Keeper, providerSubspace params.Subspace) *Keeper {
 	if !providerSubspace.HasKeyTable() {
 		// register parameters of the provider module into the param space
 		providerSubspace = providerSubspace.WithKeyTable(types.ParamKeyTable())

@@ -1,0 +1,14 @@
+syntax = "proto3";
+package oraichain.orai.websocket;
+// this line is used by starport scaffolding # 1
+
+option go_package = "github.com/oraichain/orai/x/websocket/types";
+
+// this line is used by starport scaffolding # 3
+
+
+// Query provides defines the gRPC querier service
+service Query {
+
+
+}

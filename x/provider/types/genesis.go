@@ -19,7 +19,7 @@ func DefaultGenesisState() *GenesisState {
 
 // Validate performs basic genesis state validation returning an error upon any
 // failure.
-func (gs GenesisState) Validate() error {
+func (gs *GenesisState) Validate() error {
 	for _, record := range gs.OracleScripts {
 		if record.Name == "" {
 			return fmt.Errorf("invalid OracleScripts: Value: %s. Error: Missing Name", record.Name)

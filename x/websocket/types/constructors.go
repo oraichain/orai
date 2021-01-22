@@ -7,6 +7,28 @@ var _ sdk.Msg = &MsgCreateReport{}
 var _ sdk.Msg = &MsgAddReporter{}
 var _ sdk.Msg = &MsgRemoveReporter{}
 
+func NewReport(
+	requestID string,
+	dataSourceResults []*DataSourceResult,
+	testCaseResults []*TestCaseResult,
+	blockHeight int64,
+	fees sdk.Coins,
+	aggregatedResult []byte,
+	reporter *Reporter,
+	status string,
+) *Report {
+	return &Report{
+		RequestID:         requestID,
+		Reporter:          reporter,
+		DataSourceResults: dataSourceResults,
+		TestCaseResults:   testCaseResults,
+		BlockHeight:       blockHeight,
+		Fees:              fees,
+		AggregatedResult:  aggregatedResult,
+		ResultStatus:      status,
+	}
+}
+
 // NewMsgCreateReport is a constructor function for MsgCreateReport
 func NewMsgCreateReport(
 	requestID string,

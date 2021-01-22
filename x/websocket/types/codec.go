@@ -5,7 +5,7 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/msgservice"
+	// "github.com/cosmos/cosmos-sdk/types/msgservice"
 )
 
 // RegisterCodec registers concrete types on codec
@@ -13,7 +13,7 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	// TODO: Register the modules msgs
 	cdc.RegisterConcrete(MsgCreateReport{}, "websocket/AddReport", nil)
 	cdc.RegisterConcrete(MsgAddReporter{}, "websocket/AddReporter", nil)
-	cdc.RegisterConcrete(MsgRemoveReporter{}, "websocket/RemoveReporter", nil)	
+	cdc.RegisterConcrete(MsgRemoveReporter{}, "websocket/RemoveReporter", nil)
 
 	// cdc.RegisterConcrete(&Report{}, "websocket/Report", nil)
 	// cdc.RegisterConcrete(&Reporter{}, "websocket/Reporter", nil)

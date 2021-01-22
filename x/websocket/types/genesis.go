@@ -5,8 +5,8 @@ import (
 )
 
 // DefaultGenesisState - default GenesisState used by Cosmos Hub
-func DefaultGenesisState() GenesisState {
-	return GenesisState{
+func DefaultGenesisState() *GenesisState {
+	return &GenesisState{
 		Reports:   []Report{},
 		Reporters: []Reporter{},
 
@@ -14,9 +14,9 @@ func DefaultGenesisState() GenesisState {
 	}
 }
 
-// ValidateGenesis validates the provider genesis parameters
-func ValidateGenesis(data GenesisState) error {
-	for _, record := range data.Reports {
+// Validate validates the provider genesis parameters
+func (gs *GenesisState) Validate() error {
+	for _, record := range gs.Reports {
 		if record.RequestID == "" {
 			return fmt.Errorf("invalid Report: Value: %s. Error: Missing RequestID", record.RequestID)
 		}
@@ -31,7 +31,7 @@ func ValidateGenesis(data GenesisState) error {
 		// }
 	}
 
-	for _, record := range data.Reporters {
+	for _, record := range gs.Reporters {
 		if record.Name == "" {
 			return fmt.Errorf("invalid Report: Name: %s. Error: Missing reporter name", record.Name)
 		}

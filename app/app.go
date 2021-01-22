@@ -88,6 +88,7 @@ import (
 	"github.com/oraichain/orai/x/airequest"
 	"github.com/oraichain/orai/x/wasm"
 	wasmclient "github.com/oraichain/orai/x/wasm/client"
+	"github.com/oraichain/orai/x/websocket"
 
 	"github.com/oraichain/orai/x/provider"
 
@@ -175,6 +176,7 @@ var (
 		vesting.AppModuleBasic{},
 		provider.AppModuleBasic{},
 		airequest.AppModuleBasic{},
+		websocket.AppModuleBasic{}, // listen and run smart contract
 	)
 
 	// module account permissions
@@ -233,7 +235,8 @@ type WasmApp struct {
 
 	// custom modules here
 	providerKeeper  *provider.Keeper
-	airequestKeeper airequest.Keeper
+	airequestKeeper *airequest.Keeper
+	websocketKeeper *websocket.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -265,7 +268,7 @@ func NewWasmApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		wasm.StoreKey, provider.StoreKey, airequest.StoreKey,
+		wasm.StoreKey, provider.StoreKey, airequest.StoreKey, websocket.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -355,11 +358,15 @@ func NewWasmApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 	app.evidenceKeeper = *evidenceKeeper
 
 	app.providerKeeper = provider.NewKeeper(
-		appCodec, keys[provider.StoreKey], app.wasmKeeper, app.getSubspace(provider.ModuleName),
+		appCodec, keys[provider.StoreKey], &app.wasmKeeper, app.getSubspace(provider.ModuleName),
 	)
 
 	app.airequestKeeper = airequest.NewKeeper(
-		appCodec, keys[airequest.StoreKey], app.wasmKeeper, app.getSubspace(airequest.ModuleName), stakingKeeper, app.providerKeeper,
+		appCodec, keys[airequest.StoreKey], &app.wasmKeeper, app.getSubspace(airequest.ModuleName), &app.stakingKeeper, app.providerKeeper,
+	)
+
+	app.websocketKeeper = websocket.NewKeeper(
+		appCodec, keys[websocket.StoreKey], app.stakingKeeper,
 	)
 
 	// just re-use the full router - do we want to limit this more?
@@ -387,7 +394,7 @@ func NewWasmApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		wasmConfig,
 		supportedFeatures,
 		nil,
-		wasm.CreateQueryPlugins(app.bankKeeper, app.stakingKeeper),
+		websocket.CreateQueryPlugins(app.bankKeeper, app.stakingKeeper),
 	)
 
 	// The gov proposal types can be individually enabled
@@ -434,6 +441,8 @@ func NewWasmApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		ibc.NewAppModule(app.ibcKeeper),
 		params.NewAppModule(app.paramsKeeper),
 		provider.NewAppModule(appCodec, app.providerKeeper),
+		airequest.NewAppModule(appCodec, app.airequestKeeper),
+		websocket.NewAppModule(appCodec, app.websocketKeeper, app.stakingKeeper),
 		transferModule,
 	)
 
@@ -458,7 +467,7 @@ func NewWasmApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest b
 		capabilitytypes.ModuleName, authtypes.ModuleName, banktypes.ModuleName, distrtypes.ModuleName, stakingtypes.ModuleName,
 		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
 		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
-		wasm.ModuleName, provider.ModuleName,
+		wasm.ModuleName, provider.ModuleName, airequest.ModuleName, websocket.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
