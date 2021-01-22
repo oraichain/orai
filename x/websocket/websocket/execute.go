@@ -6,19 +6,18 @@ import (
 
 	sdkCtx "github.com/cosmos/cosmos-sdk/client"
 	ckeys "github.com/cosmos/cosmos-sdk/client/keys"
-	"github.com/cosmos/cosmos-sdk/crypto/keys"
+	keys "github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/auth/client/utils"
+	utils "github.com/cosmos/cosmos-sdk/x/auth/client"
+	auth "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	"github.com/oraichain/orai/app"
 	"github.com/oraichain/orai/x/websocket/types"
 )
 
 // SubmitReport creates a new MsgCreateReport and submits it to the Oraichain to create a new report
 func SubmitReport(c *Context, l *Logger, key keys.Info, msgReport types.MsgCreateReport) {
-	
-	cliCtx := sdkCtx.Context{Client: c.client, TrustNode: true, Codec: cdc}
+
+	cliCtx := sdkCtx.Context{Client: c.client}
 	txHash := ""
 	if err := msgReport.ValidateBasic(); err != nil {
 		l.Error(":exploding_head: Failed to validate basic with error: %s", err.Error())
@@ -27,7 +26,7 @@ func SubmitReport(c *Context, l *Logger, key keys.Info, msgReport types.MsgCreat
 
 	for try := uint64(1); try <= c.maxTry; try++ {
 		l.Info(":e-mail: Try to broadcast report transaction(%d/%d)", try, c.maxTry)
-		acc, err := auth.NewAccountRetriever(cliCtx).GetAccount(key.GetAddress())
+		acc, err := auth.GetAccount(cliCtx).GetAccount(key.GetAddress())
 		if err != nil {
 			l.Info(":warning: Failed to retreive account with error: %s", err.Error())
 			time.Sleep(c.rpcPollInterval)

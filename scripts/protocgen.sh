@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PROTO_DIR=${PROTO_DIR:-x/provider/types/}
+PROTO_DIR=${1:-x/provider/types/}
 COSMOS_SDK_DIR=${COSMOS_SDK_DIR:-$(go list -f "{{ .Dir }}" -m github.com/cosmos/cosmos-sdk)}
 
 # Generate Go types from protobuf

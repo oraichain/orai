@@ -101,7 +101,7 @@ func (k Keeper) GetAllReports(ctx sdk.Context) (reports []types.Report) {
 }
 
 // ValidateReport validates if the report is valid to get rewards
-func (k Keeper) ValidateReport(ctx sdk.Context, reporter types.Reporter, req airequest.AIRequest) error {
+func (k Keeper) ValidateReport(ctx sdk.Context, reporter *types.Reporter, req *airequest.AIRequest) error {
 	// Check if the validator is in the requested list of validators
 	if !containsVal(req.GetValidators(), reporter.GetValidator()) {
 		return sdkerrors.Wrap(types.ErrValidatorNotFound, fmt.Sprintln("failed to find the requested validator"))

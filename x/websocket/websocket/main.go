@@ -1,7 +1,7 @@
 package websocket
 
 import (
-	"github.com/cosmos/cosmos-sdk/crypto/keys"
+	keys "github.com/cosmos/cosmos-sdk/crypto/keyring"
 )
 
 const (

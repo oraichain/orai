@@ -8,8 +8,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	aiRequest "github.com/oraichain/orai/x/airequest"
 	"github.com/oraichain/orai/x/provider"
-	"github.com/oraichain/orai/x/websocket/exported"
-	"github.com/oraichain/orai/x/websocket/types"
+
+	// "github.com/oraichain/orai/x/websocket/websocket"
+	websocket "github.com/oraichain/orai/x/websocket/types"
 )
 
 // GetEventAIRequest returns the event AI request in the given log.
@@ -98,9 +99,9 @@ func handleAIRequestLog(c *Context, l *Logger, log sdk.ABCIMessageLog) {
 
 		var finalResultStr string
 		// create data source results to store in the report
-		var dataSourceResultsTest []exported.DataSourceResultI
-		var dataSourceResults []exported.DataSourceResultI
-		var testCaseResults []exported.TestCaseResultI
+		var dataSourceResultsTest []websocket.DataSourceResult
+		var dataSourceResults []websocket.DataSourceResult
+		var testCaseResults []websocket.TestCaseResult
 
 		// we have different test cases, so we need to loop through them
 		for i := range testCases {

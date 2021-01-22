@@ -3,9 +3,8 @@ package websocket
 import (
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/crypto/keys"
+	keys "github.com/cosmos/cosmos-sdk/crypto/keyring"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/oraichain/orai/packages/filecache"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 )
 
@@ -18,7 +17,6 @@ type Context struct {
 	gasAdj           float64
 	fees             sdk.Coins
 	keys             chan keys.Info
-	fileCache        filecache.Cache
 	broadcastTimeout time.Duration
 	maxTry           uint64
 	rpcPollInterval  time.Duration

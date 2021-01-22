@@ -33,12 +33,12 @@ func (k msgServer) CreateAIRequest(goCtx context.Context, msg *types.MsgSetAIReq
 	// we can safely parse fees to coins since we have validated it in the Msg already
 	fees, _ := sdk.ParseCoinsNormalized(msg.Fees)
 	// Compute the fee allocated for oracle module to distribute to active validators.
-	rewardRatio := sdk.NewDecWithPrec(k.keeper.ProviderKeeper.GetKeyOracleScriptRewardPercentage(ctx), 2)
+	rewardRatio := sdk.NewDecWithPrec(k.keeper.providerKeeper.GetKeyOracleScriptRewardPercentage(ctx), 2)
 	// We need to calculate the final 70% fee given by the user because the remaining 30% must be reserved for the proposer and validators.
 	providedCoins, _ := sdk.NewDecCoinsFromCoins(fees...).MulDecTruncate(rewardRatio).TruncateDecimal()
 
 	// get data source and test case names from the oracle script
-	aiDataSources, testCases, err := k.keeper.ProviderKeeper.GetDNamesTcNames(ctx, msg.OracleScriptName)
+	aiDataSources, testCases, err := k.keeper.providerKeeper.GetDNamesTcNames(ctx, msg.OracleScriptName)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (k msgServer) CreateAIRequest(goCtx context.Context, msg *types.MsgSetAIReq
 		return nil, err
 	}
 
-	finalFees, err := k.keeper.ProviderKeeper.GetMinimumFees(ctx, aiDataSources, testCases, len(validators))
+	finalFees, err := k.keeper.providerKeeper.GetMinimumFees(ctx, aiDataSources, testCases, len(validators))
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Error getting minimum fees from oracle script")
 	}
@@ -99,7 +99,7 @@ func (k msgServer) getDSourcesTCases(ctx sdk.Context, dSources, tCases []string)
 
 	// collect data source objects
 	for _, dSource := range dSources {
-		dSourceObj, err := k.keeper.ProviderKeeper.GetAIDataSource(ctx, dSource)
+		dSourceObj, err := k.keeper.providerKeeper.GetAIDataSource(ctx, dSource)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -108,7 +108,7 @@ func (k msgServer) getDSourcesTCases(ctx sdk.Context, dSources, tCases []string)
 
 	// collect test case objects
 	for _, tCase := range tCases {
-		tCaseObj, err := k.keeper.ProviderKeeper.GetTestCase(ctx, tCase)
+		tCaseObj, err := k.keeper.providerKeeper.GetTestCase(ctx, tCase)
 		if err != nil {
 			return nil, nil, err
 		}

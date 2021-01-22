@@ -36,11 +36,6 @@ func NewParams(expirationPercentage, totalReports uint64) Params {
 	}
 }
 
-// String implements the stringer interface for Params.
-func (p Params) String() string {
-	return fmt.Sprintf(`params:  MaximumRequestBytes: %d`, p.MaximumRequestBytes)
-}
-
 // ParamSetPairs - Implements params.ParamSet
 func (p *Params) ParamSetPairs() params.ParamSetPairs {
 	return params.ParamSetPairs{

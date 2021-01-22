@@ -29,7 +29,7 @@ func (k *Querier) QueryAIRequest(goCtx context.Context, req *types.QueryAIReques
 	}
 
 	if req.GetRequestId() == "" {
-		return nil, status.Error(codes.InvalidArgument, "data source name query cannot be empty")
+		return nil, status.Error(codes.InvalidArgument, "ai request id query cannot be empty")
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)

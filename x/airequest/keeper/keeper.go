@@ -21,7 +21,7 @@ type (
 		wasmKeeper     *wasm.Keeper
 		paramSpace     params.Subspace
 		stakingKeeper  staking.Keeper
-		ProviderKeeper *provider.Keeper
+		providerKeeper *provider.Keeper
 	}
 )
 
@@ -37,7 +37,7 @@ func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, a
 		wasmKeeper:     wasmKeeper,
 		paramSpace:     aiRequestSubspace,
 		stakingKeeper:  stakingKeeper,
-		ProviderKeeper: providerKeeper,
+		providerKeeper: providerKeeper,
 	}
 }
 

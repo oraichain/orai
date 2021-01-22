@@ -23,6 +23,6 @@ message AIRequest {
 
 // Params defines the set of wasm parameters.
 message Params {
-    option (gogoproto.goproto_stringer) = false;
+    option (gogoproto.goproto_stringer) = true;
     uint64 maximum_request_bytes = 1;
 }

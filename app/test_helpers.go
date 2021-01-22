@@ -3,20 +3,20 @@ package app
 import (
 	"testing"
 
-	"github.com/oraichain/orai/x/wasm"
 	"github.com/cosmos/cosmos-sdk/codec"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	ibctransferkeeper "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/keeper"
 	ibckeeper "github.com/cosmos/cosmos-sdk/x/ibc/core/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
+	"github.com/oraichain/orai/x/wasm"
 )
 
 type TestSupport struct {
 	t   *testing.T
-	app *WasmApp
+	app *OraichainApp
 }
 
-func NewTestSupport(t *testing.T, app *WasmApp) *TestSupport {
+func NewTestSupport(t *testing.T, app *OraichainApp) *TestSupport {
 	return &TestSupport{t: t, app: app}
 }
 

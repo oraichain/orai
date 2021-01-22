@@ -4,14 +4,9 @@ import (
 	"github.com/oraichain/orai/x/websocket/types"
 )
 
-// DefaultValResultI returns the default ai data source object
-func (k Keeper) DefaultValResultI() types.ValResult {
-	return k.DefaultValResult()
-}
-
 // DefaultValResult is a default constructor for the validator result
-func (k Keeper) DefaultValResult() types.ValResult {
-	return types.ValResult{
+func (k Keeper) DefaultValResult() *types.ValResult {
+	return &types.ValResult{
 		Validator: &types.Validator{},
 		Result:    []byte{},
 	}

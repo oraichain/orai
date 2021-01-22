@@ -15,8 +15,8 @@ func DefaultGenesisState() *GenesisState {
 	}
 }
 
-// ValidateGenesis validates the provider genesis parameters
-func (gs GenesisState) ValidateGenesis() error {
+// Validate validates the provider genesis parameters
+func (gs GenesisState) Validate() error {
 	for _, record := range gs.AIRequestResults {
 		if record.RequestID == "" {
 			return fmt.Errorf("invalid AIRequestResults: Value: %s. Error: Missing RequestID", record.RequestID)
