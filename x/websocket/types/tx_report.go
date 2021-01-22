@@ -3,29 +3,7 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/oraichain/orai/x/websocket/exported"
 )
-
-// NewMsgCreateReport is a constructor function for MsgCreateReport
-func NewMsgCreateReport(
-	requestID string,
-	dataSourceResults []exported.DataSourceResultI,
-	testCaseResults []exported.TestCaseResultI,
-	reporter Reporter,
-	fees sdk.Coins,
-	aggregatedResult []byte,
-	status string,
-) *MsgCreateReport {
-	return &MsgCreateReport{
-		RequestID:         requestID,
-		DataSourceResults: dataSourceResults,
-		TestCaseResults:   testCaseResults,
-		Reporter:          reporter,
-		Fees:              fees,
-		AggregatedResult:  aggregatedResult,
-		ResultStatus:      status,
-	}
-}
 
 // Route should return the name of the module
 func (msg *MsgCreateReport) Route() string { return RouterKey }
@@ -44,7 +22,7 @@ func (msg *MsgCreateReport) ValidateBasic() error {
 	} else if msg.ResultStatus != ResultSuccess && msg.ResultStatus != ResultFailure {
 		return sdkerrors.Wrap(ErrMsgReportInvalid, "result status of the report is not valid")
 	} else {
-		_, err := sdk.ParseCoins(msg.Fees.String())
+		_, err := sdk.ParseCoinsNormalized(msg.Fees.String())
 		if err != nil {
 			return sdkerrors.Wrap(ErrReportFeeTypeInvalid, err.Error())
 		}

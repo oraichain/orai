@@ -5,16 +5,6 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-
-// NewMsgAddReporter is a constructor function for MsgAddReporter
-func NewMsgAddReporter(validator sdk.ValAddress, reporter sdk.AccAddress, adder sdk.AccAddress) *MsgAddReporter {
-	return &MsgAddReporter{
-		Adder:     adder,
-		Validator: validator,
-		Reporter:  reporter,
-	}
-}
-
 // Route should return the name of the module
 func (msg *MsgAddReporter) Route() string { return RouterKey }
 
@@ -37,17 +27,6 @@ func (msg *MsgAddReporter) GetSignBytes() []byte {
 // GetSigners defines whose signature is required
 func (msg *MsgAddReporter) GetSigners() []sdk.AccAddress {
 	return []sdk.AccAddress{msg.Adder}
-}
-
-
-
-// NewMsgRemoveReporter is a constructor function for MsgRemoveReporter
-func NewMsgRemoveReporter(validator sdk.ValAddress, reporter sdk.AccAddress, remover sdk.AccAddress) MsgRemoveReporter {
-	return MsgRemoveReporter{
-		Remover:   remover,
-		Validator: validator,
-		Reporter:  reporter,
-	}
 }
 
 // Route should return the name of the module

@@ -4,15 +4,6 @@ import (
 	"fmt"
 )
 
-// NewGenesisState creates a new GenesisState object
-func NewGenesisState(reports []Report, reporters []Reporter) GenesisState {
-	return GenesisState{
-		// TODO: Fill out according to your genesis state
-		Reports:   reports,
-		Reporters: reporters,
-	}
-}
-
 // DefaultGenesisState - default GenesisState used by Cosmos Hub
 func DefaultGenesisState() GenesisState {
 	return GenesisState{
@@ -32,7 +23,7 @@ func ValidateGenesis(data GenesisState) error {
 		if record.BlockHeight <= int64(0) {
 			return fmt.Errorf("invalid Report: BlockHeight: %d. Error: Invalid block height", record.BlockHeight)
 		}
-		if record.Reporter.isEmpty() {
+		if record.Reporter.Address.Empty() {
 			return fmt.Errorf("invalid AIRequests: Reporter: %s. Error: Missing Reporter information", record.Reporter)
 		}
 		// if record.Fees.Empty() {
