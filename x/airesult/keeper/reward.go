@@ -18,7 +18,7 @@ func (k Keeper) SetReward(ctx sdk.Context, blockHeight int64, rew *types.Reward)
 func (k Keeper) GetReward(ctx sdk.Context, blockHeight int64) (*types.Reward, error) {
 	store := ctx.KVStore(k.storeKey)
 	var reward types.Reward
-	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get(types.RewardStoreKey(blockHeight)), &reward)
+	err := k.cdc.UnmarshalBinaryBare(store.Get(types.RewardStoreKey(blockHeight)), &reward)
 	if err != nil {
 		return &types.Reward{
 			BlockHeight: int64(-1),
