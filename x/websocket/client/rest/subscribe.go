@@ -23,10 +23,6 @@ func registerSubscribe(cliCtx client.Context) {
 		panic(err)
 	}
 
-	if err = client.Start(); err != nil {
-		panic(err)
-	}
-
 	// Initialize a new error group
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

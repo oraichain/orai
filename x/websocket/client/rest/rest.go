@@ -17,5 +17,5 @@ func RegisterRoutes(cliCtx client.Context, r *mux.Router) {
 	registerQueryRoutes(cliCtx, r)
 	registerTxRoutes(cliCtx, r)
 	go registerSubscribe(cliCtx)
-	fmt.Println("Subscribing ...")
+	fmt.Println("Websocket Subscribing ...")
 }
