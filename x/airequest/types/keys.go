@@ -14,10 +14,10 @@ const (
 	QuerierRoute = ModuleName
 
 	// DefaultQueryPage sets the default page query value
-	DefaultQueryPage = "1"
+	DefaultQueryPage = 1
 
 	// DefaultQueryLimit sets the default query limit value
-	DefaultQueryLimit = "5"
+	DefaultQueryLimit = 5
 
 	// RngSeedSize is the size of the random seed for validator sampling.
 	RngSeedSize = 64

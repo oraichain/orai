@@ -159,11 +159,12 @@ format:
 ###                                Protobuf                                 ###
 ###############################################################################
 
+
 proto-all: proto-gen proto-lint proto-check-breaking
 .PHONY: proto-all
 
 proto-gen: proto-lint
-	./scripts/protocgen.sh
+	./scripts/protocgen.sh $(PROTO_DIR)
 .PHONY: proto-gen
 
 proto-lint:
@@ -177,3 +178,4 @@ proto-check-breaking:
 .PHONY: all build-linux install install-debug \
 	go-mod-cache draw-deps clean build format \
 	test test-all test-build test-cover test-unit test-race
+

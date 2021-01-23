@@ -1,7 +1,28 @@
 #!/bin/sh
 #set -o errexit -o nounset -o pipefail
 
-PASSWORD=${PASSWORD:-12345678}
+pass="$1"
+if [ ! -z $pass ] 
+then   
+  # 3 times send passphrase
+  expect << EOF
+    set timeout $timeout
+    spawn $0
+    expect {
+        "*passphrase:" { send -- "$pass\r" }
+    }
+    expect {
+        "*passphrase:" { send -- "$pass\r" }
+    }
+    expect {
+        "*passphrase:" { send -- "$pass\r" }
+    }
+    expect eof
+EOF
+
+  exit 0
+fi 
+
 STAKE=${STAKE_TOKEN:-ustake}
 FEE=${FEE_TOKEN:-ucosm}
 CHAIN_ID=${CHAIN_ID:-testing}
@@ -14,10 +35,10 @@ oraid init --chain-id "$CHAIN_ID" "$MONIKER"
 # staking/governance token is hardcoded in config, change this
 sed -i "s/\"stake\"/\"$STAKE\"/" "$HOME"/.oraid/config/genesis.json
 
-(echo "$PASSWORD"; echo "$PASSWORD") | oraid keys add $USER
+oraid keys add $USER
 
 # hardcode the validator account for this instance
-echo "$PASSWORD" | oraid add-genesis-account $USER "1000000000$STAKE,1000000000$FEE"
+oraid add-genesis-account $USER "1000000000$STAKE,1000000000$FEE"
 
 # (optionally) add a few more genesis accounts
 for addr in "$@"; do
@@ -49,9 +70,8 @@ fi
 
 # submit a genesis validator tx
 ## Workraround for https://github.com/cosmos/cosmos-sdk/issues/8251
-(echo "$PASSWORD"; echo "$PASSWORD"; echo "$PASSWORD") | oraid gentx $USER "250000000$STAKE" --chain-id="$CHAIN_ID" --amount="250000000$STAKE"
-## should be:
-# (echo "$PASSWORD"; echo "$PASSWORD"; echo "$PASSWORD") | oraid gentx validator "250000000$STAKE" --chain-id="$CHAIN_ID"
+oraid gentx $USER "250000000$STAKE" --chain-id="$CHAIN_ID" --amount="250000000$STAKE"
+
 oraid collect-gentxs
 
 

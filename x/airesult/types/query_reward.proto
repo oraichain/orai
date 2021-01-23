@@ -5,7 +5,7 @@ package oraichain.orai.airesult;
 // this line is used by starport scaffolding # 3
 
 import "gogoproto/gogo.proto";
-import "cosmos/base/v1beta1/coin.proto";
+// import "cosmos/base/v1beta1/coin.proto";
 import "x/airesult/types/types_reward.proto";
 option go_package = "github.com/oraichain/orai/x/airesult/types";
 

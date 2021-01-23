@@ -2,14 +2,13 @@
 
 ```bash
 docker-compose up -d && docker-compose exec orai ash
-# cp $PWD/libwasmvm_muslc.a /lib/libwasmvm_muslc.a
-wget https://github.com/CosmWasm/wasmvm/releases/download/v0.13.0/libwasmvm_muslc.a -O /lib/libwasmvm_muslc.a
+# wget https://github.com/CosmWasm/wasmvm/releases/download/v0.13.0/libwasmvm_muslc.a -O /lib/libwasmvm_muslc.a
 make build
 ln -s $PWD/build/oraid /usr/bin/oraid
 
 # setup blockchain and run
-./docker/setup_oraid.sh
-./docker/run_oraid.sh
+./scripts/setup_oraid.sh 12345678
+./scripts/run_oraid.sh
 ```
 
 ## Build smart contract and interact with it

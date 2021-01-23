@@ -4,7 +4,7 @@ import "strconv"
 
 const (
 	// ModuleName is the name of the module
-	ModuleName = "airequest"
+	ModuleName = "airesult"
 
 	// StoreKey to be used when creating the KVStore
 	StoreKey = ModuleName
@@ -16,16 +16,10 @@ const (
 	QuerierRoute = ModuleName
 
 	// DefaultQueryPage sets the default page query value
-	DefaultQueryPage = "1"
+	DefaultQueryPage = 1
 
 	// DefaultQueryLimit sets the default query limit value
-	DefaultQueryLimit = "5"
-
-	// RngSeedSize is the size of the random seed for validator sampling.
-	RngSeedSize = 64
-
-	// NumSeedRemoval is the number of bytes an old seed is removed to generate a new one
-	NumSeedRemoval = 1
+	DefaultQueryLimit = 5
 
 	// MemStoreKey defines the in-memory store key
 	MemStoreKey = "mem_capability"
@@ -56,11 +50,6 @@ var (
 // ResultStoreKey returns the key to retrieve a specfic result from the store.
 func ResultStoreKey(id string) []byte {
 	return []byte(ResultKeyPrefix + id)
-}
-
-// ResultStoreKeyString returns the key to retrieve a specfic result from the store.
-func ResultStoreKeyString(id string) string {
-	return ResultKeyPrefix + id
 }
 
 // RewardStoreKey returns the key to retrieve a specfic reward from the store.
