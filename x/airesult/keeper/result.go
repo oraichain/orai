@@ -31,10 +31,29 @@ func (k Keeper) ResolveResult(ctx sdk.Context, req *airequest.AIRequest, rep *we
 			// if already has result then we add more results
 			result, _ := k.GetResult(ctx, req.GetRequestID())
 			result.Results = append(result.Results, *k.webSocketKeeper.NewValResult(validator, rep.GetAggregatedResult(), rep.GetResultStatus()))
+
+			// validate param
+			totalReportsParam := k.GetTotalReportsParam(ctx)
+			if k.GetTotalReportsParam(ctx) <= int64(0) {
+				totalReportsParam = int64(70)
+			}
 			// check if there are enough results from the validators or not
-			if len(req.GetValidators()) == len(result.Results) {
+			ratio := sdk.NewDecWithPrec(totalReportsParam, 2)
+
+			// the number of reports that the user requires
+			reportLengths := sdk.NewDec(int64(len(req.GetValidators())))
+
+			// the threshold that the length of the result must pass
+			threshold := reportLengths.Mul(ratio)
+
+			// the actual result length
+			resultLengths := sdk.NewDec(int64(len(result.Results)))
+
+			// if the result length is GTE the threshold then the result is valid, and considered finished
+			if resultLengths.GTE(threshold) {
 				result.Status = types.RequestStatusFinished
 			}
+			// store the result
 			k.SetResult(ctx, req.GetRequestID(), result)
 		}
 	}

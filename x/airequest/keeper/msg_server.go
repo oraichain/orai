@@ -33,7 +33,7 @@ func (k msgServer) CreateAIRequest(goCtx context.Context, msg *types.MsgSetAIReq
 	// we can safely parse fees to coins since we have validated it in the Msg already
 	fees, _ := sdk.ParseCoinsNormalized(msg.Fees)
 	// Compute the fee allocated for oracle module to distribute to active validators.
-	rewardRatio := sdk.NewDecWithPrec(k.keeper.providerKeeper.GetKeyOracleScriptRewardPercentage(ctx), 2)
+	rewardRatio := sdk.NewDecWithPrec(k.keeper.providerKeeper.GetOracleScriptRewardPercentageParam(ctx), 2)
 	// We need to calculate the final 70% fee given by the user because the remaining 30% must be reserved for the proposer and validators.
 	providedCoins, _ := sdk.NewDecCoinsFromCoins(fees...).MulDecTruncate(rewardRatio).TruncateDecimal()
 

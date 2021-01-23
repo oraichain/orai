@@ -230,11 +230,11 @@ func (k *Keeper) GetDNamesTcNames(ctx sdk.Context, oScript string) ([]string, []
 	return aiDataSources, testCases, nil
 }
 
-// GetKeyOracleScriptRewardPercentage returns the oracle script reward percentage from the provider module
-func (k *Keeper) GetKeyOracleScriptRewardPercentage(ctx sdk.Context) int64 {
+// GetOracleScriptRewardPercentageParam returns the oracle script reward percentage from the provider module
+func (k *Keeper) GetOracleScriptRewardPercentageParam(ctx sdk.Context) int64 {
 	// TODO
-	//percentage := k.GetParam(ctx, types.KeyOracleScriptRewardPercentage)
-	return int64(60)
+	percentage := k.GetParam(ctx, types.KeyOracleScriptRewardPercentage)
+	return int64(percentage)
 }
 
 // #################################################### Test case

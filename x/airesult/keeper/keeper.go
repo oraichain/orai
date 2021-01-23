@@ -61,3 +61,17 @@ func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, s
 func (k *Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
+
+// GetExpirationCountParam returns the expiration count from param
+func (k *Keeper) GetExpirationCountParam(ctx sdk.Context) int64 {
+	// TODO
+	percentage := k.GetParam(ctx, types.KeyExpirationCount)
+	return int64(percentage)
+}
+
+// GetTotalReportsParam returns the total reports from param
+func (k *Keeper) GetTotalReportsParam(ctx sdk.Context) int64 {
+	// TODO
+	percentage := k.GetParam(ctx, types.KeyTotalReports)
+	return int64(percentage)
+}
