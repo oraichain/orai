@@ -17,6 +17,18 @@ then
     expect {
         "*passphrase:" { send -- "$pass\r" }
     }
+    expect {
+        "*passphrase:" { send -- "$pass\r" }
+    }
+    expect {
+        "*passphrase:" { send -- "$pass\r" }
+    }
+    expect {
+        "*passphrase:" { send -- "$pass\r" }
+    }
+    expect {
+        "*passphrase:" { send -- "$pass\r" }
+    }
     expect eof
 EOF
 
