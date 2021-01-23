@@ -373,7 +373,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	)
 
 	app.airesultKeeper = airesult.NewKeeper(
-		appCodec, keys[airesult.StoreKey], &app.wasmKeeper, app.getSubspace(airesult.ModuleName), app.stakingKeeper, app.providerKeeper, app.bankKeeper, app.distrKeeper, app.accountKeeper, *app.websocketKeeper, *app.airequestKeeper, banktypes.ModuleName,
+		appCodec, keys[airesult.StoreKey], &app.wasmKeeper, app.getSubspace(airesult.ModuleName), app.stakingKeeper, app.providerKeeper, app.bankKeeper, app.distrKeeper, app.accountKeeper, *app.websocketKeeper, *app.airequestKeeper, authtypes.FeeCollectorName,
 	)
 
 	// just re-use the full router - do we want to limit this more?

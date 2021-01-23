@@ -6,4 +6,4 @@ if test -n "$1"; then
 fi
 
 mkdir -p /root/log
-oraid start --rpc.laddr tcp://0.0.0.0:26657 --log_level error
+oraid start --rpc.laddr tcp://0.0.0.0:26657
