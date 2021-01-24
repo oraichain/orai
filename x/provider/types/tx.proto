@@ -14,15 +14,15 @@ service Msg {
     option (google.api.http) = {
       // The `parent` captures the parent resource name, such as "shelves/1".
       post: "/provider/datasource"
-      body: "name"
+      body: "name",
     };
   };
   // Edit an existing data source
   rpc EditAIDataSource(MsgEditAIDataSource) returns (MsgEditAIDataSourceRes) {
     option (google.api.http) = {
       // The `parent` captures the parent resource name, such as "shelves/1".
-      post: "/v1/books"
-      body: "old_name"
+      patch: "/provider/datasource"
+      body: "*"
     };
   };
 
@@ -30,16 +30,16 @@ service Msg {
   rpc CreateOracleScript(MsgCreateOracleScript) returns (MsgCreateOracleScriptRes) {
     option (google.api.http) = {
       // The `parent` captures the parent resource name, such as "shelves/1".
-      post: "/v1/books"
-      body: "name"
+      post: "/provider/oscript"
+      body: "*"
     };
   };
   // Edit an existing oracle script
   rpc EditOracleScript(MsgEditOracleScript) returns (MsgEditOracleScriptRes) {
     option (google.api.http) = {
       // The `parent` captures the parent resource name, such as "shelves/1".
-      post: "/v1/books"
-      body: "old_name"
+      patch: "/provider/oscript"
+      body: "*"
     };
   };
 
@@ -47,16 +47,16 @@ service Msg {
   rpc CreateTestCase(MsgCreateTestCase) returns (MsgCreateTestCaseRes) {
     option (google.api.http) = {
       // The `parent` captures the parent resource name, such as "shelves/1".
-      post: "/v1/books"
-      body: "name"
+      post: "/provider/testcase"
+      body: "*"
     };
   };
   // Edit an existing test case
   rpc EditTestCase(MsgEditTestCase) returns (MsgEditTestCaseRes) {
     option (google.api.http) = {
       // The `parent` captures the parent resource name, such as "shelves/1".
-      post: "/v1/books"
-      body: "old_name"
+      patch: "/provider/testcase"
+      body: "*"
     };
   };
 }

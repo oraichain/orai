@@ -16,5 +16,5 @@ const (
 func RegisterRoutes(clientCtx client.Context, r *mux.Router) {
 	// this line is used by starport scaffolding # 2
 	//registerQueryRoutes(clientCtx, r)
-	//registerTxRoutes(clientCtx, r)
+	// registerTxRoutes(clientCtx, r)
 }

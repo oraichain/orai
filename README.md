@@ -56,6 +56,8 @@ oraid tx provider set-datasource bitcoin_price $CONTRACT "test bitcoin price" --
 
 oraid tx provider set-testcase bitcoin_price_testcase $CONTRACT "test bitcoin price testcase" --from duc --chain-id testing -y
 
+oraid tx provider set-oscript oscript_btc $CONTRACT "test bitcoin price oracle script" --ds bitcoin_price --tc bitcoin_price_testcase --from duc --chain-id testing -y
+
 curl -X POST -i http://localhost:1317/provider/datasource -d '{"name":"abc"}'
 
 ```

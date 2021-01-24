@@ -78,8 +78,8 @@ func GetCmdQueryDataSource() *cobra.Command {
 // GetCmdQueryDataSources queries a Queryall data source names
 func GetCmdQueryDataSources() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "dnames [name] --page [1] --limit [5]",
-		Short: "query all AI data source names",
+		Use:   "dsources [name] --page [1] --limit [5]",
+		Short: "query all AI data sources",
 		// Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
@@ -161,8 +161,8 @@ func GetCmdQueryOracleScript() *cobra.Command {
 // GetCmdQueryOracleScripts queries a list of all oscript names
 func GetCmdQueryOracleScripts() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "onames",
-		Short: "query all oscript names",
+		Use:   "oscripts",
+		Short: "query all oscripts",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -243,8 +243,8 @@ func GetCmdQueryTestCase() *cobra.Command {
 // GetCmdQueryTestCases queries a list of all test case names
 func GetCmdQueryTestCases() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "tcnames",
-		Short: "query all AI request test case names",
+		Use:   "tcases",
+		Short: "query all AI request test cases",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {

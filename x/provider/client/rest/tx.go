@@ -6,7 +6,6 @@ import (
 	// "bytes"
 	// "net/http"
 
-	"fmt"
 	"net/http"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -75,35 +74,35 @@ type editTestCaseReq struct {
 }
 
 func registerTxRoutes(clientCtx client.Context, r *mux.Router) {
-	r.HandleFunc(
-		fmt.Sprintf("/%s/oscript", storeName),
-		setOracleScriptHandlerFn(clientCtx),
-	).Methods("POST")
+	// r.HandleFunc(
+	// 	fmt.Sprintf("/%s/oscript", storeName),
+	// 	setOracleScriptHandlerFn(clientCtx),
+	// ).Methods("POST")
 
-	r.HandleFunc(
-		fmt.Sprintf("/%s/oscript", storeName),
-		editOracleScriptHandlerFn(clientCtx),
-	).Methods("PATCH")
+	// r.HandleFunc(
+	// 	fmt.Sprintf("/%s/oscript", storeName),
+	// 	editOracleScriptHandlerFn(clientCtx),
+	// ).Methods("PATCH")
 
-	r.HandleFunc(
-		fmt.Sprintf("/%s/datasource", storeName),
-		setDataSourceHandlerFn(clientCtx),
-	).Methods("POST")
+	// r.HandleFunc(
+	// 	fmt.Sprintf("/%s/datasource", storeName),
+	// 	setDataSourceHandlerFn(clientCtx),
+	// ).Methods("POST")
 
-	r.HandleFunc(
-		fmt.Sprintf("/%s/datasource", storeName),
-		editDataSourceHandlerFn(clientCtx),
-	).Methods("PATCH")
+	// r.HandleFunc(
+	// 	fmt.Sprintf("/%s/datasource", storeName),
+	// 	editDataSourceHandlerFn(clientCtx),
+	// ).Methods("PATCH")
 
-	r.HandleFunc(
-		fmt.Sprintf("/%s/testcase", storeName),
-		setTestCaseHandlerFn(clientCtx),
-	).Methods("POST")
+	// r.HandleFunc(
+	// 	fmt.Sprintf("/%s/testcase", storeName),
+	// 	setTestCaseHandlerFn(clientCtx),
+	// ).Methods("POST")
 
-	r.HandleFunc(
-		fmt.Sprintf("/%s/testcase", storeName),
-		editTestCaseHandlerFn(clientCtx),
-	).Methods("PATCH")
+	// r.HandleFunc(
+	// 	fmt.Sprintf("/%s/testcase", storeName),
+	// 	editTestCaseHandlerFn(clientCtx),
+	// ).Methods("PATCH")
 }
 
 func setOracleScriptHandlerFn(clientCtx client.Context) http.HandlerFunc {

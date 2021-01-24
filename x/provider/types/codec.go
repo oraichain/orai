@@ -3,20 +3,20 @@ package types
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
-	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"	
+	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/msgservice"	
+	"github.com/cosmos/cosmos-sdk/types/msgservice"
 )
 
 // RegisterCodec registers concrete types on codec
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	// TODO: Register the modules msgs
-	cdc.RegisterConcrete(MsgCreateOracleScript{}, "provider/CreateOracleScript", nil)
-	cdc.RegisterConcrete(MsgEditOracleScript{}, "provider/EditOracleScript", nil)
-	cdc.RegisterConcrete(MsgCreateAIDataSource{}, "provider/CreateAIDataSource", nil)
-	cdc.RegisterConcrete(MsgEditAIDataSource{}, "provider/EditAIDataSource", nil)	
-	cdc.RegisterConcrete(MsgCreateTestCase{}, "provider/SetTestCase", nil)
-	cdc.RegisterConcrete(MsgEditTestCase{}, "provider/EditTestCase", nil)
+	// cdc.RegisterConcrete(MsgCreateOracleScript{}, "provider/CreateOracleScript", nil)
+	// cdc.RegisterConcrete(MsgEditOracleScript{}, "provider/EditOracleScript", nil)
+	// cdc.RegisterConcrete(MsgCreateAIDataSource{}, "provider/CreateAIDataSource", nil)
+	// cdc.RegisterConcrete(MsgEditAIDataSource{}, "provider/EditAIDataSource", nil)
+	// cdc.RegisterConcrete(MsgCreateTestCase{}, "provider/SetTestCase", nil)
+	// cdc.RegisterConcrete(MsgEditTestCase{}, "provider/EditTestCase", nil)
 
 }
 

@@ -74,17 +74,31 @@ func GetCmdQueryAIRequest() *cobra.Command {
 // GetCmdAIRequestIDs queries a Queryall ai request ids
 func GetCmdAIRequestIDs() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "aireqs",
+		Use:   "aireqs --page [1] --limit [1]",
 		Short: "query all AI request IDs",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err
 			}
+
+			page, err := cmd.Flags().GetInt64(flagPage)
+			if err != nil {
+				return err
+			}
+
+			limit, err := cmd.Flags().GetInt64(flagLimit)
+			if err != nil {
+				return err
+			}
+
 			queryClient := types.NewQueryClient(clientCtx)
 			res, err := queryClient.QueryAIRequestIDs(
 				context.Background(),
-				&types.QueryAIRequestIDsReq{},
+				&types.QueryAIRequestIDsReq{
+					Page:  page,
+					Limit: limit,
+				},
 			)
 			if err != nil {
 				return err
@@ -95,5 +109,7 @@ func GetCmdAIRequestIDs() *cobra.Command {
 	}
 
 	flags.AddQueryFlagsToCmd(cmd)
+	cmd.Flags().Int64(flagPage, types.DefaultQueryPage, "from page")
+	cmd.Flags().Int64(flagLimit, types.DefaultQueryLimit, "limit number")
 	return cmd
 }

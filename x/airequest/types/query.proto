@@ -14,10 +14,10 @@ service Query {
 
     // QueryAIRequest gets the ai request meta data
     rpc QueryAIRequest (QueryAIRequestReq) returns (QueryAIRequestRes) {
-        option (google.api.http).get = "/orai/provider/aireq/{request_id}";
+        option (google.api.http).get = "/airequest/aireq/{request_id}";
     }
     // QueryAIRequestIDs gets the list of ai requests
     rpc QueryAIRequestIDs (QueryAIRequestIDsReq) returns (QueryAIRequestIDsRes) {
-        option (google.api.http).get = "/orai/provider/aireqs";
+        option (google.api.http).get = "/airequest/aireqs";
     }
 }

@@ -44,14 +44,16 @@ func (k *Querier) QueryAIRequest(goCtx context.Context, req *types.QueryAIReques
 // QueryAIRequestIDs implements the Query/QueryAIRequestIDs gRPC method
 func (k *Querier) QueryAIRequestIDs(goCtx context.Context, req *types.QueryAIRequestIDsReq) (*types.QueryAIRequestIDsRes, error) {
 
-	var requestIDs *types.QueryAIRequestIDsRes
+	var requestIDs []string
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	iterator := k.keeper.GetAllAIRequestIDs(ctx)
+	iterator := k.keeper.GetPaginatedAIRequests(ctx, uint(req.Page), uint(req.Limit))
 
 	for ; iterator.Valid(); iterator.Next() {
-		requestIDs.RequestIds = append(requestIDs.RequestIds, string(iterator.Key()))
+		requestIDs = append(requestIDs, string(iterator.Key()))
 	}
 
-	return requestIDs, nil
+	return &types.QueryAIRequestIDsRes{
+		RequestIds: requestIDs,
+	}, nil
 }

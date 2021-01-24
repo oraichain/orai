@@ -25,6 +25,13 @@ var _ types.MsgServer = msgServer{}
 
 func (k msgServer) CreateAIRequest(goCtx context.Context, msg *types.MsgSetAIRequest) (*types.MsgSetAIRequestRes, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// validate if the oracle script exists or not
+	_, err := k.keeper.providerKeeper.GetOracleScript(ctx, msg.OracleScriptName)
+	if err != nil {
+		return nil, sdkerrors.Wrap(types.ErrOScriptNotFound, err.Error())
+	}
+
 	validators, err := k.keeper.RandomValidators(ctx, int(msg.ValidatorCount), []byte(msg.RequestID))
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrCannotRandomValidators, err.Error())

@@ -34,7 +34,11 @@ message QueryAIRequestRes {
 }
 
 // QueryAIRequestIDsReq is the request type for the Query/QueryAIRequestIDs RPC method
-message QueryAIRequestIDsReq {}
+message QueryAIRequestIDsReq {
+  option (gogoproto.goproto_stringer) = true;
+  int64 page = 1;
+  int64 limit = 2;
+}
 
 // QueryAIRequestIDsRes is the response type for the Query/QueryAIRequestIDs RPC method
 message QueryAIRequestIDsRes {

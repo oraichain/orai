@@ -18,4 +18,5 @@ var (
 	ErrNeedMoreFees           = sdkerrors.Register(ModuleName, 9, "Total fee is higher than the fee given")
 	ErrRequestInvalid         = sdkerrors.Register(ModuleName, 10, "The transaction fee is invalid")
 	ErrRequestFeesInvalid     = sdkerrors.Register(ModuleName, 11, "The request fee is invalid")
+	ErrOScriptNotFound        = sdkerrors.Register(ModuleName, 12, "The oracle script is not found")
 )
