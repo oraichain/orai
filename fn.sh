@@ -76,6 +76,19 @@ printHelp () {
   exit ${1:-0}
 }
 
+requirePass(){
+  if [ -z "$PASS" ]
+  then 
+    echo "Enter passphrase: "  
+    read PASS  
+  fi 
+}
+
+helloFn() {  
+  requirePass
+  echo "passphrase: $PASS"
+}
+
 getKey() {
     expect << EOF
     set timeout 3
