@@ -3,7 +3,7 @@
 ```bash
 docker-compose up -d && docker-compose exec orai ash
 # wget https://github.com/CosmWasm/wasmvm/releases/download/v0.13.0/libwasmvm_muslc.a -O /lib/libwasmvm_muslc.a
-make build
+make build GOMOD_FLAGS=
 ln -s $PWD/build/oraid /usr/bin/oraid
 
 # setup blockchain and run
@@ -71,5 +71,5 @@ docker-compose exec protoc ash
 make proto-lint
 
 # build protobuf templates
-PROTO_DIR=x/websocket/types/ make proto-gen
+make proto-gen PROTO_DIR=x/websocket/types/
 ```
