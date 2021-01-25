@@ -8,7 +8,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	artypes "github.com/oraichain/orai/x/airequest/types"
 	providerTypes "github.com/oraichain/orai/x/provider/types"
-	"github.com/oraichain/orai/x/websocket/keeper"
 	"github.com/oraichain/orai/x/websocket/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto/tmhash"
@@ -24,24 +23,16 @@ const (
 )
 
 type Subscriber struct {
-	keeper *keeper.Keeper
 	log    log.Logger
 	config *types.WebSocketConfig
 }
 
 // NewQuerier return querier implementation
-func NewSubscriber(keeper *keeper.Keeper, log log.Logger, config *types.WebSocketConfig) *Subscriber {
+func NewSubscriber(log log.Logger, config *types.WebSocketConfig) *Subscriber {
 	return &Subscriber{
-		keeper: keeper,
 		log:    log,
 		config: config,
 	}
-}
-
-// RegisterSubscribes register all sbuscribe
-func RegisterSubscribes(cliCtx client.Context, subscriber *Subscriber) {
-	go subscriber.registerWebSocketSubscribe(&cliCtx)
-	fmt.Printf("Websocket Subscribing config: %v ...\n", subscriber.config)
 }
 
 func getAttributeMap(attrs []sdk.Attribute) map[string]string {
@@ -52,8 +43,14 @@ func getAttributeMap(attrs []sdk.Attribute) map[string]string {
 	return ret
 }
 
+// RegisterSubscribes register all sbuscribe
+func RegisterSubscribes(cliCtx client.Context, subscriber *Subscriber) {
+	go subscriber.subscribe(&cliCtx)
+	fmt.Printf("Websocket Subscribing config: %v ...\n", subscriber.config)
+}
+
 // Implementation
-func (subscriber *Subscriber) handleTransaction(cliCtx *client.Context, tx *abci.TxResult) {
+func (subscriber *Subscriber) handleTransaction(cliCtx *client.Context, queryClient types.QueryClient, tx *abci.TxResult) {
 	fmt.Printf(":eyes: Inspecting incoming transaction: %X\n", tmhash.Sum(tx.Tx))
 	if tx.Result.Code != 0 {
 		subscriber.log.Debug(":alien: Skipping transaction with non-zero code: %d", tx.Result.Code)
@@ -66,34 +63,15 @@ func (subscriber *Subscriber) handleTransaction(cliCtx *client.Context, tx *abci
 		return
 	}
 
-	queryClient := types.NewQueryClient(cliCtx)
-
 	for _, log := range logs {
 		for _, ev := range log.Events {
 			// process with each event type
 			attrMap := getAttributeMap(ev.GetAttributes())
 			switch ev.Type {
 			case providerTypes.EventTypeSetDataSource:
-				contractAddr, _ := sdk.AccAddressFromBech32(attrMap[providerTypes.AttributeContractAddress])
-				query := &types.QueryContract{
-					Contract: contractAddr,
-					Request: &types.Request{
-						Fetch: &types.Fetch{
-							Url: "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd",
-						},
-					},
-				}
-
-				response, _ := queryClient.OracleInfo(
-					context.Background(),
-					query,
-				)
-
-				// only get json back, or can process in smart contract
-				fmt.Printf("contract address: %v, response: %s\n", attrMap[providerTypes.AttributeContractAddress], string(response.Data))
-
+				subscriber.handleDataSourceLog(cliCtx, queryClient, attrMap)
 			case artypes.EventTypeSetAIRequest:
-				subscriber.handleAIRequestLog(cliCtx, attrMap)
+				subscriber.handleAIRequestLog(cliCtx, queryClient, attrMap)
 			default:
 				subscriber.log.Debug(":ghost: Skipping non-{request/packet} type: %s", ev.Type)
 			}
@@ -101,7 +79,7 @@ func (subscriber *Subscriber) handleTransaction(cliCtx *client.Context, tx *abci
 	}
 }
 
-func (subscriber *Subscriber) registerWebSocketSubscribe(cliCtx *client.Context) {
+func (subscriber *Subscriber) subscribe(cliCtx *client.Context) {
 
 	// Instantiate and start tendermint RPC client
 	client, err := cliCtx.GetNode()
@@ -117,11 +95,13 @@ func (subscriber *Subscriber) registerWebSocketSubscribe(cliCtx *client.Context)
 		panic(err)
 	}
 
+	queryClient := types.NewQueryClient(cliCtx)
+
 	for {
 		select {
 		case ev := <-eventChan:
 			txResult := ev.Data.(tmtypes.EventDataTx).TxResult
-			subscriber.handleTransaction(cliCtx, &txResult)
+			subscriber.handleTransaction(cliCtx, queryClient, &txResult)
 		}
 	}
 }

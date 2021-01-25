@@ -3,10 +3,15 @@ package subscribe
 import (
 	"fmt"
 
-	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	aiRequest "github.com/oraichain/orai/x/airequest"
-	// "github.com/oraichain/orai/x/websocket/websocket"
+
+	"time"
+
+	"github.com/cosmos/cosmos-sdk/client"
+	utils "github.com/cosmos/cosmos-sdk/x/auth/client"
+
+	"github.com/oraichain/orai/x/websocket/types"
 )
 
 // GetEventAIRequest returns the event AI request in the given log.
@@ -48,7 +53,54 @@ func GetEventAIRequest(log sdk.ABCIMessageLog) (*aiRequest.AIRequest, error) {
 	return nil, nil
 }
 
-func (subscriber *Subscriber) handleAIRequestLog(cliCtx *client.Context, attrMap map[string]string) {
+// SubmitReport creates a new MsgCreateReport and submits it to the Oraichain to create a new report
+func (subscriber *Subscriber) submitReport(cliCtx *client.Context, config *types.WebSocketConfig, msgReport *types.MsgCreateReport) {
+
+	txHash := ""
+	if err := msgReport.ValidateBasic(); err != nil {
+		subscriber.log.Error(":exploding_head: Failed to validate basic with error: %s", err.Error())
+		return
+	}
+
+	for try := uint64(1); try <= config.MaxTry; try++ {
+		subscriber.log.Info(":e-mail: Try to broadcast report transaction(%d/%d)", try, config.MaxTry)
+
+		txBldr := cliCtx.TxConfig.NewTxBuilder()
+		txBldr.SetMemo("websocket")
+
+		bytes, err := cliCtx.JSONMarshaler.MarshalJSON(msgReport)
+
+		res, err := cliCtx.BroadcastTxSync(bytes)
+		subscriber.log.Info(":star: response: %v", res)
+		if err == nil {
+			txHash = res.TxHash
+			break
+		}
+		subscriber.log.Info(":warning: Failed to broadcast tx with error: %s", err.Error())
+		time.Sleep(config.RPCPollInterval)
+	}
+	if txHash == "" {
+		subscriber.log.Error(":exploding_head: Cannot try to broadcast more than %d try", config.MaxTry)
+		return
+	}
+	for start := time.Now(); time.Since(start) < config.BroadcastTimeout; {
+		time.Sleep(config.RPCPollInterval)
+		txRes, err := utils.QueryTx(*cliCtx, txHash)
+		if err != nil {
+			subscriber.log.Debug(":warning: Failed to query tx with error: %s", err.Error())
+			continue
+		}
+		if txRes.Code != 0 {
+			subscriber.log.Error(":exploding_head: Tx returned nonzero code %d with log %s, tx hash: %s", txRes.Code, txRes.RawLog, txRes.TxHash)
+			return
+		}
+		subscriber.log.Info(":smiling_face_with_sunglasses: Successfully broadcast tx with hash: %s", txHash)
+		return
+	}
+	subscriber.log.Info(":question_mark: Cannot get transaction response from hash: %s transaction might be included in the next few blocks or check your node's health.", txHash)
+}
+
+func (subscriber *Subscriber) handleAIRequestLog(cliCtx *client.Context, queryClient types.QueryClient, attrMap map[string]string) {
 	fmt.Println(":delivery_truck: Processing incoming request event before checking validators")
 
 	// // Skip if not related to this validator
@@ -171,6 +223,6 @@ func (subscriber *Subscriber) handleAIRequestLog(cliCtx *client.Context, attrMap
 	// }
 
 	// // TODO: check aggregated result value of the oracle script to verify if it fails or success
-	// SubmitReport(c, key, msgReport)
+	// subscriber.submitReport(c, key, msgReport)
 
 }
