@@ -1,19 +1,21 @@
-package websocket
+package subscribe
 
 import (
+	context "context"
 	"fmt"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	aiRequest "github.com/oraichain/orai/x/airequest"
 	artypes "github.com/oraichain/orai/x/airequest/types"
+	"github.com/oraichain/orai/x/websocket/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto/tmhash"
 	"github.com/tendermint/tendermint/libs/log"
 )
 
-func handleTransaction(c *Context, l log.Logger, tx *abci.TxResult) {
-	l.Debug(":eyes: Inspecting incoming transaction: %X", tmhash.Sum(tx.Tx))
+func handleTransaction(ctx context.Context, l log.Logger, config *types.WebSocketConfig, tx *abci.TxResult) {
+	fmt.Printf(":eyes: Inspecting incoming transaction: %X\n", tmhash.Sum(tx.Tx))
 	if tx.Result.Code != 0 {
 		l.Debug(":alien: Skipping transaction with non-zero code: %d", tx.Result.Code)
 		return
@@ -32,14 +34,10 @@ func handleTransaction(c *Context, l log.Logger, tx *abci.TxResult) {
 			continue
 		}
 
-		l.Info(":star: message type: %s", messageType)
-
-		msg, isProvider := verifyProviderMessageType(messageType, log)
+		fmt.Printf(":star: message type: %s\n", messageType)
 
 		if messageType == artypes.EventTypeSetAIRequest {
-			handleAIRequestLog(c, l, log)
-		} else if isProvider {
-			handleProviderMsgLog(c, l, log, msg)
+			handleAIRequestLog(ctx, log)
 		} else {
 			l.Debug(":ghost: Skipping non-{request/packet} type: %s", messageType)
 		}

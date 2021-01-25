@@ -29,6 +29,39 @@ func NewReport(
 	}
 }
 
+// NewReporter is the constructor of the Reporter struct
+func NewReporter(addr sdk.AccAddress, name string, valAddr sdk.ValAddress) *Reporter {
+	return &Reporter{
+		Address:   addr,
+		Name:      name,
+		Validator: valAddr,
+	}
+}
+
+// NewDataSourceResult is the constructor of the data source result struct
+func NewDataSourceResult(
+	name string,
+	result []byte,
+	status string,
+) *DataSourceResult {
+	return &DataSourceResult{
+		Name:   name,
+		Result: result,
+		Status: status,
+	}
+}
+
+// NewTestCaseResult is the constructor of the test case result struct
+func NewTestCaseResult(
+	name string,
+	dataSourceResults []*DataSourceResult,
+) *TestCaseResult {
+	return &TestCaseResult{
+		Name:              name,
+		DataSourceResults: dataSourceResults,
+	}
+}
+
 // NewMsgCreateReport is a constructor function for MsgCreateReport
 func NewMsgCreateReport(
 	requestID string,
