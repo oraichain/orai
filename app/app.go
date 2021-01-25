@@ -90,7 +90,6 @@ import (
 	"github.com/oraichain/orai/x/wasm"
 	wasmclient "github.com/oraichain/orai/x/wasm/client"
 	"github.com/oraichain/orai/x/websocket"
-	"github.com/oraichain/orai/x/websocket/subscribe"
 
 	"github.com/oraichain/orai/x/provider"
 
@@ -241,6 +240,8 @@ type OraichainApp struct {
 	airequestKeeper *airequest.Keeper
 	websocketKeeper *websocket.Keeper
 	airesultKeeper  *airesult.Keeper
+
+	websocketSubscriber *websocket.Subscriber
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -420,8 +421,9 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		panic("error while reading websocket config: " + err.Error())
 	}
 	app.websocketKeeper = websocket.NewKeeper(
-		appCodec, keys[websocket.StoreKey], &app.wasmKeeper, app.stakingKeeper, websocketConfig,
+		appCodec, keys[websocket.StoreKey], &app.wasmKeeper, app.stakingKeeper,
 	)
+	app.websocketSubscriber = websocket.NewSubscriber(app.websocketKeeper, app.Logger(), &websocketConfig)
 
 	app.airesultKeeper = airesult.NewKeeper(
 		appCodec, keys[airesult.StoreKey],
@@ -646,7 +648,7 @@ func (app *OraichainApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
 	// custom register for specific AppModule
-	subscribe.RegisterSubscribes(clientCtx, app.Logger(), app.websocketKeeper.GetConfig())
+	websocket.RegisterSubscribes(clientCtx, app.websocketSubscriber)
 
 	// register swagger API from root so that other applications can override easily
 	if apiConfig.Swagger {

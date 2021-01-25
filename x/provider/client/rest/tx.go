@@ -6,72 +6,66 @@ import (
 	// "bytes"
 	// "net/http"
 
-	"net/http"
-
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/tx"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/types/rest"
 	"github.com/gorilla/mux"
-	"github.com/oraichain/orai/x/provider/types"
 	// "github.com/cosmos/cosmos-sdk/types/rest"
 	// "github.com/cosmos/cosmos-sdk/x/auth/client/utils"
 )
 
-type createOracleScriptReq struct {
-	BaseReq     rest.BaseReq `json:"base_req"`
-	Name        string       `json:"name"`
-	Contract    string       `json:"contract"`
-	Fees        string       `json:"fees"`
-	Description string       `json:"description"`
-	DataSources []string     `json:"data_sources"`
-	TestCases   []string     `json:"test_cases"`
-}
+// type createOracleScriptReq struct {
+// 	BaseReq     rest.BaseReq `json:"base_req"`
+// 	Name        string       `json:"name"`
+// 	Contract    string       `json:"contract"`
+// 	Fees        string       `json:"fees"`
+// 	Description string       `json:"description"`
+// 	DataSources []string     `json:"data_sources"`
+// 	TestCases   []string     `json:"test_cases"`
+// }
 
-type editOracleScriptReq struct {
-	BaseReq     rest.BaseReq `json:"base_req"`
-	OldName     string       `json:"old_name"`
-	NewName     string       `json:"new_name"`
-	Contract    string       `json:"contract"`
-	Fees        string       `json:"fees"`
-	Description string       `json:"description"`
-	DataSources []string     `json:"data_sources"`
-	TestCases   []string     `json:"test_cases"`
-}
+// type editOracleScriptReq struct {
+// 	BaseReq     rest.BaseReq `json:"base_req"`
+// 	OldName     string       `json:"old_name"`
+// 	NewName     string       `json:"new_name"`
+// 	Contract    string       `json:"contract"`
+// 	Fees        string       `json:"fees"`
+// 	Description string       `json:"description"`
+// 	DataSources []string     `json:"data_sources"`
+// 	TestCases   []string     `json:"test_cases"`
+// }
 
-type createDataSourceReq struct {
-	BaseReq     rest.BaseReq `json:"base_req"`
-	Name        string       `json:"name"`
-	Contract    string       `json:"contract"`
-	Fees        string       `json:"fees"`
-	Description string       `json:"description"`
-}
+// type createDataSourceReq struct {
+// 	BaseReq     rest.BaseReq `json:"base_req"`
+// 	Name        string       `json:"name"`
+// 	Contract    string       `json:"contract"`
+// 	Fees        string       `json:"fees"`
+// 	Description string       `json:"description"`
+// }
 
-type editDataSourceReq struct {
-	BaseReq     rest.BaseReq `json:"base_req"`
-	OldName     string       `json:"old_name"`
-	NewName     string       `json:"new_name"`
-	Contract    string       `json:"contract"`
-	Fees        string       `json:"fees"`
-	Description string       `json:"description"`
-}
+// type editDataSourceReq struct {
+// 	BaseReq     rest.BaseReq `json:"base_req"`
+// 	OldName     string       `json:"old_name"`
+// 	NewName     string       `json:"new_name"`
+// 	Contract    string       `json:"contract"`
+// 	Fees        string       `json:"fees"`
+// 	Description string       `json:"description"`
+// }
 
-type createTestCaseReq struct {
-	BaseReq     rest.BaseReq `json:"base_req"`
-	Name        string       `json:"name"`
-	Contract    string       `json:"contract"`
-	Fees        string       `json:"fees"`
-	Description string       `json:"description"`
-}
+// type createTestCaseReq struct {
+// 	BaseReq     rest.BaseReq `json:"base_req"`
+// 	Name        string       `json:"name"`
+// 	Contract    string       `json:"contract"`
+// 	Fees        string       `json:"fees"`
+// 	Description string       `json:"description"`
+// }
 
-type editTestCaseReq struct {
-	BaseReq     rest.BaseReq `json:"base_req"`
-	OldName     string       `json:"old_name"`
-	NewName     string       `json:"new_name"`
-	Contract    string       `json:"contract"`
-	Fees        string       `json:"fees"`
-	Description string       `json:"description"`
-}
+// type editTestCaseReq struct {
+// 	BaseReq     rest.BaseReq `json:"base_req"`
+// 	OldName     string       `json:"old_name"`
+// 	NewName     string       `json:"new_name"`
+// 	Contract    string       `json:"contract"`
+// 	Fees        string       `json:"fees"`
+// 	Description string       `json:"description"`
+// }
 
 func registerTxRoutes(clientCtx client.Context, r *mux.Router) {
 	// r.HandleFunc(
@@ -105,206 +99,206 @@ func registerTxRoutes(clientCtx client.Context, r *mux.Router) {
 	// ).Methods("PATCH")
 }
 
-func setOracleScriptHandlerFn(clientCtx client.Context) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var req createOracleScriptReq
+// func setOracleScriptHandlerFn(clientCtx client.Context) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		var req createOracleScriptReq
 
-		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
-			return
-		}
+// 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
+// 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
+// 			return
+// 		}
 
-		baseReq := req.BaseReq.Sanitize()
+// 		baseReq := req.BaseReq.Sanitize()
 
-		if !baseReq.ValidateBasic(w) {
-			return
-		}
+// 		if !baseReq.ValidateBasic(w) {
+// 			return
+// 		}
 
-		// collect valid address from the request address string
-		addr, err := sdk.AccAddressFromBech32(baseReq.From)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "invalid account address owner")
-			return
-		}
+// 		// collect valid address from the request address string
+// 		addr, err := sdk.AccAddressFromBech32(baseReq.From)
+// 		if err != nil {
+// 			rest.WriteErrorResponse(w, http.StatusBadRequest, "invalid account address owner")
+// 			return
+// 		}
 
-		// create the message
-		msg := types.NewMsgCreateOracleScript(req.Name, req.Contract, addr, req.Fees, req.Description, req.DataSources, req.TestCases)
-		err = msg.ValidateBasic()
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+// 		// create the message
+// 		msg := types.NewMsgCreateOracleScript(req.Name, req.Contract, addr, req.Fees, req.Description, req.DataSources, req.TestCases)
+// 		err = msg.ValidateBasic()
+// 		if err != nil {
+// 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 			return
+// 		}
 
-		tx.WriteGeneratedTxResponse(clientCtx, w, baseReq, msg)
-	}
-}
+// 		tx.WriteGeneratedTxResponse(clientCtx, w, baseReq, msg)
+// 	}
+// }
 
-func editOracleScriptHandlerFn(clientCtx client.Context) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var req editOracleScriptReq
+// func editOracleScriptHandlerFn(clientCtx client.Context) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		var req editOracleScriptReq
 
-		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
-			return
-		}
+// 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
+// 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
+// 			return
+// 		}
 
-		baseReq := req.BaseReq.Sanitize()
+// 		baseReq := req.BaseReq.Sanitize()
 
-		if !baseReq.ValidateBasic(w) {
-			return
-		}
+// 		if !baseReq.ValidateBasic(w) {
+// 			return
+// 		}
 
-		// collect valid address from the request address string
-		addr, err := sdk.AccAddressFromBech32(baseReq.From)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+// 		// collect valid address from the request address string
+// 		addr, err := sdk.AccAddressFromBech32(baseReq.From)
+// 		if err != nil {
+// 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 			return
+// 		}
 
-		// create the message
-		msg := types.NewMsgEditOracleScript(req.OldName, req.NewName, req.Contract, addr, req.Fees, req.Description, req.DataSources, req.TestCases)
-		err = msg.ValidateBasic()
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+// 		// create the message
+// 		msg := types.NewMsgEditOracleScript(req.OldName, req.NewName, req.Contract, addr, req.Fees, req.Description, req.DataSources, req.TestCases)
+// 		err = msg.ValidateBasic()
+// 		if err != nil {
+// 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 			return
+// 		}
 
-		tx.WriteGeneratedTxResponse(clientCtx, w, baseReq, msg)
-	}
-}
+// 		tx.WriteGeneratedTxResponse(clientCtx, w, baseReq, msg)
+// 	}
+// }
 
-func setDataSourceHandlerFn(clientCtx client.Context) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var req createDataSourceReq
+// func setDataSourceHandlerFn(clientCtx client.Context) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		var req createDataSourceReq
 
-		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
-			return
-		}
+// 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
+// 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
+// 			return
+// 		}
 
-		baseReq := req.BaseReq.Sanitize()
+// 		baseReq := req.BaseReq.Sanitize()
 
-		if !baseReq.ValidateBasic(w) {
-			return
-		}
+// 		if !baseReq.ValidateBasic(w) {
+// 			return
+// 		}
 
-		// collect valid address from the request address string
-		addr, err := sdk.AccAddressFromBech32(baseReq.From)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "invalid account address owner")
-			return
-		}
+// 		// collect valid address from the request address string
+// 		addr, err := sdk.AccAddressFromBech32(baseReq.From)
+// 		if err != nil {
+// 			rest.WriteErrorResponse(w, http.StatusBadRequest, "invalid account address owner")
+// 			return
+// 		}
 
-		// create the message
-		msg := types.NewMsgCreateAIDataSource(req.Name, req.Contract, addr, req.Fees, req.Description)
-		err = msg.ValidateBasic()
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+// 		// create the message
+// 		msg := types.NewMsgCreateAIDataSource(req.Name, req.Contract, addr, req.Fees, req.Description)
+// 		err = msg.ValidateBasic()
+// 		if err != nil {
+// 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 			return
+// 		}
 
-		tx.WriteGeneratedTxResponse(clientCtx, w, baseReq, msg)
-	}
-}
+// 		tx.WriteGeneratedTxResponse(clientCtx, w, baseReq, msg)
+// 	}
+// }
 
-func editDataSourceHandlerFn(clientCtx client.Context) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var req editDataSourceReq
+// func editDataSourceHandlerFn(clientCtx client.Context) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		var req editDataSourceReq
 
-		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
-			return
-		}
+// 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
+// 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
+// 			return
+// 		}
 
-		baseReq := req.BaseReq.Sanitize()
+// 		baseReq := req.BaseReq.Sanitize()
 
-		if !baseReq.ValidateBasic(w) {
-			return
-		}
+// 		if !baseReq.ValidateBasic(w) {
+// 			return
+// 		}
 
-		// collect valid address from the request address string
-		addr, err := sdk.AccAddressFromBech32(baseReq.From)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+// 		// collect valid address from the request address string
+// 		addr, err := sdk.AccAddressFromBech32(baseReq.From)
+// 		if err != nil {
+// 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 			return
+// 		}
 
-		// create the message
-		msg := types.NewMsgEditAIDataSource(req.OldName, req.NewName, req.Contract, addr, req.Fees, req.Description)
-		err = msg.ValidateBasic()
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+// 		// create the message
+// 		msg := types.NewMsgEditAIDataSource(req.OldName, req.NewName, req.Contract, addr, req.Fees, req.Description)
+// 		err = msg.ValidateBasic()
+// 		if err != nil {
+// 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 			return
+// 		}
 
-		tx.WriteGeneratedTxResponse(clientCtx, w, baseReq, msg)
-	}
-}
+// 		tx.WriteGeneratedTxResponse(clientCtx, w, baseReq, msg)
+// 	}
+// }
 
-func setTestCaseHandlerFn(clientCtx client.Context) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var req createTestCaseReq
+// func setTestCaseHandlerFn(clientCtx client.Context) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		var req createTestCaseReq
 
-		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
-			return
-		}
+// 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
+// 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
+// 			return
+// 		}
 
-		baseReq := req.BaseReq.Sanitize()
+// 		baseReq := req.BaseReq.Sanitize()
 
-		if !baseReq.ValidateBasic(w) {
-			return
-		}
+// 		if !baseReq.ValidateBasic(w) {
+// 			return
+// 		}
 
-		// collect valid address from the request address string
-		addr, err := sdk.AccAddressFromBech32(baseReq.From)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "invalid account address owner")
-			return
-		}
+// 		// collect valid address from the request address string
+// 		addr, err := sdk.AccAddressFromBech32(baseReq.From)
+// 		if err != nil {
+// 			rest.WriteErrorResponse(w, http.StatusBadRequest, "invalid account address owner")
+// 			return
+// 		}
 
-		// create the message
-		msg := types.NewMsgCreateTestCase(req.Name, req.Contract, addr, req.Fees, req.Description)
-		err = msg.ValidateBasic()
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+// 		// create the message
+// 		msg := types.NewMsgCreateTestCase(req.Name, req.Contract, addr, req.Fees, req.Description)
+// 		err = msg.ValidateBasic()
+// 		if err != nil {
+// 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 			return
+// 		}
 
-		tx.WriteGeneratedTxResponse(clientCtx, w, baseReq, msg)
-	}
-}
+// 		tx.WriteGeneratedTxResponse(clientCtx, w, baseReq, msg)
+// 	}
+// }
 
-func editTestCaseHandlerFn(clientCtx client.Context) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var req editTestCaseReq
+// func editTestCaseHandlerFn(clientCtx client.Context) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		var req editTestCaseReq
 
-		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
-			return
-		}
+// 		if !rest.ReadRESTReq(w, r, clientCtx.LegacyAmino, &req) {
+// 			rest.WriteErrorResponse(w, http.StatusBadRequest, "failed to parse request")
+// 			return
+// 		}
 
-		baseReq := req.BaseReq.Sanitize()
+// 		baseReq := req.BaseReq.Sanitize()
 
-		if !baseReq.ValidateBasic(w) {
-			return
-		}
+// 		if !baseReq.ValidateBasic(w) {
+// 			return
+// 		}
 
-		// collect valid address from the request address string
-		addr, err := sdk.AccAddressFromBech32(baseReq.From)
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+// 		// collect valid address from the request address string
+// 		addr, err := sdk.AccAddressFromBech32(baseReq.From)
+// 		if err != nil {
+// 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 			return
+// 		}
 
-		// create the message
-		msg := types.NewMsgEditTestCase(req.OldName, req.NewName, req.Contract, addr, req.Fees, req.Description)
-		err = msg.ValidateBasic()
-		if err != nil {
-			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
-			return
-		}
+// 		// create the message
+// 		msg := types.NewMsgEditTestCase(req.OldName, req.NewName, req.Contract, addr, req.Fees, req.Description)
+// 		err = msg.ValidateBasic()
+// 		if err != nil {
+// 			rest.WriteErrorResponse(w, http.StatusBadRequest, err.Error())
+// 			return
+// 		}
 
-		tx.WriteGeneratedTxResponse(clientCtx, w, baseReq, msg)
-	}
-}
+// 		tx.WriteGeneratedTxResponse(clientCtx, w, baseReq, msg)
+// 	}
+// }

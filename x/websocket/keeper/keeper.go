@@ -14,40 +14,28 @@ import (
 
 // Keeper of the provider store
 type Keeper struct {
-	storeKey        sdk.StoreKey
-	cdc             codec.Marshaler
-	stakingKeeper   stakingkeeper.Keeper
-	wasmKeeper      *wasm.Keeper
-	websocketConfig types.WebSocketConfig
+	storeKey      sdk.StoreKey
+	cdc           codec.Marshaler
+	stakingKeeper stakingkeeper.Keeper
+	wasmKeeper    *wasm.Keeper
 	//paramSpace       params.Subspace
 }
 
 // NewKeeper creates a provider keeper
-func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, s stakingkeeper.Keeper, config types.WebSocketConfig) *Keeper {
+func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, s stakingkeeper.Keeper) *Keeper {
 	// if !aiRequestSubspace.HasKeyTable() {
 	// 	// register parameters of the provider module into the param space
 	// 	aiRequestSubspace = aiRequestSubspace.WithKeyTable(types.ParamKeyTable())
 	// }
 	return &Keeper{
-		storeKey:        key,
-		cdc:             cdc,
-		wasmKeeper:      wasmKeeper,
-		stakingKeeper:   s,
-		websocketConfig: config,
+		storeKey:      key,
+		cdc:           cdc,
+		wasmKeeper:    wasmKeeper,
+		stakingKeeper: s,
 	}
 }
 
 // Logger returns a module-specific logger.
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
-}
-
-func (k *Keeper) GetConfig() *types.WebSocketConfig {
-	return &k.websocketConfig
-}
-
-//IsNamePresent checks if the name is present in the store or not
-func (k Keeper) IsNamePresent(ctx sdk.Context, name string) bool {
-	store := ctx.KVStore(k.storeKey)
-	return store.Has([]byte(name))
 }

@@ -11,16 +11,8 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/oraichain/orai/x/wasm"
+	"github.com/oraichain/orai/x/websocket/types"
 )
-
-type Request struct {
-	Fetch struct {
-		Method        string `json:"method,omitempty"`
-		Authorization string `json:"authorization,omitempty"`
-		Body          string `json:"body,omitempty"`
-		Url           string `json:"url"`
-	} `json:"fetch"`
-}
 
 type OracleQueryPlugin struct {
 	client  *http.Client
@@ -29,14 +21,17 @@ type OracleQueryPlugin struct {
 }
 
 func (oracleQueryPlugin OracleQueryPlugin) Custom(ctx sdk.Context, query json.RawMessage) ([]byte, error) {
-	var request Request
-	json.Unmarshal(query, &request)
+	var request types.Request
+
+	// also support proto
+	err := ModuleCdc.UnmarshalJSON(query, &request)
+	if err != nil {
+		return nil, err
+	}
 
 	if request.Fetch.Method == "" {
 		request.Fetch.Method = "GET"
 	}
-
-	// fmt.Printf("Request :%v\n", request.Fetch)
 
 	r := strings.NewReader(request.Fetch.Body)
 	req, err := http.NewRequest(request.Fetch.Method, request.Fetch.Url, r)
@@ -50,14 +45,13 @@ func (oracleQueryPlugin OracleQueryPlugin) Custom(ctx sdk.Context, query json.Ra
 	resp, err := oracleQueryPlugin.client.Do(req)
 
 	if err != nil {
-		return json.Marshal(map[string]string{"error": err.Error()})
+		return ModuleCdc.LegacyAmino.MarshalJSON(map[string]string{"error": err.Error()})
 	}
 
 	defer resp.Body.Close()
 	contents, _ := ioutil.ReadAll(resp.Body)
 
-	return json.Marshal(contents)
-
+	return ModuleCdc.LegacyAmino.MarshalJSON(contents)
 }
 
 func CreateQueryPlugins(bank bankkeeper.ViewKeeper, staking stakingkeeper.Keeper) *wasm.QueryPlugins {

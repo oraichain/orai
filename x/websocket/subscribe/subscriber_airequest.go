@@ -1,9 +1,9 @@
 package subscribe
 
 import (
-	context "context"
 	"fmt"
 
+	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	aiRequest "github.com/oraichain/orai/x/airequest"
 	// "github.com/oraichain/orai/x/websocket/websocket"
@@ -48,7 +48,7 @@ func GetEventAIRequest(log sdk.ABCIMessageLog) (*aiRequest.AIRequest, error) {
 	return nil, nil
 }
 
-func handleAIRequestLog(ctx context.Context, log sdk.ABCIMessageLog) {
+func (subscriber *Subscriber) handleAIRequestLog(cliCtx *client.Context, attrMap map[string]string) {
 	fmt.Println(":delivery_truck: Processing incoming request event before checking validators")
 
 	// // Skip if not related to this validator

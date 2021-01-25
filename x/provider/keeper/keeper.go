@@ -39,7 +39,7 @@ func (k *Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-// IsNamePresent checks if the name is present in the store or not
+// isKeyPresent checks if the name is present in the store or not
 func (k *Keeper) isKeyPresent(ctx sdk.Context, key []byte) bool {
 	store := ctx.KVStore(k.storeKey)
 	return store.Has(key)
