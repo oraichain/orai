@@ -1,8 +1,6 @@
 package rest
 
 import (
-	"fmt"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/gorilla/mux"
 )
@@ -16,6 +14,4 @@ const (
 func RegisterRoutes(cliCtx client.Context, r *mux.Router) {
 	registerQueryRoutes(cliCtx, r)
 	registerTxRoutes(cliCtx, r)
-	go registerSubscribe(cliCtx)
-	fmt.Println("Websocket Subscribing ...")
 }

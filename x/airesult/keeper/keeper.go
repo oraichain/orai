@@ -27,17 +27,17 @@ type (
 		paramSpace       params.Subspace
 		stakingKeeper    staking.Keeper
 		providerKeeper   *provider.Keeper
+		webSocketKeeper  *websocket.Keeper
+		aiRequestKeeper  *airequest.Keeper
 		bankKeeper       bank.Keeper
 		distrKeeper      distr.Keeper
 		authKeeper       auth.AccountKeeper
-		webSocketKeeper  websocket.Keeper
-		aiRequestKeeper  airequest.Keeper
 		feeCollectorName string
 	}
 )
 
 // NewKeeper creates a airequest keeper
-func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, subspace params.Subspace, stakingKeeper staking.Keeper, providerKeeper *provider.Keeper, bankKeeper bank.Keeper, distrKeeper distr.Keeper, authKeeper auth.AccountKeeper, webSocketKeeper websocket.Keeper, aiRequestKeeper airequest.Keeper, feeCollectorName string) *Keeper {
+func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, subspace params.Subspace, stakingKeeper staking.Keeper, providerKeeper *provider.Keeper, bankKeeper bank.Keeper, distrKeeper distr.Keeper, authKeeper auth.AccountKeeper, webSocketKeeper *websocket.Keeper, aiRequestKeeper *airequest.Keeper, feeCollectorName string) *Keeper {
 	if !subspace.HasKeyTable() {
 		// register parameters of the airequest module into the param space
 		subspace = subspace.WithKeyTable(types.ParamKeyTable())

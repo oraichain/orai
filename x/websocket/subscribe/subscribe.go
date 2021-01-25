@@ -1,10 +1,12 @@
-package rest
+package subscribe
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/oraichain/orai/x/websocket/types"
+	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
 
@@ -15,7 +17,13 @@ const (
 	EventChannelCapacity = 5000
 )
 
-func registerSubscribe(cliCtx client.Context) {
+// RegisterSubscribes register all sbuscribe
+func RegisterSubscribes(cliCtx client.Context, log log.Logger, config *types.WebSocketConfig) {
+	go registerWebSocketSubscribe(cliCtx, log, config)
+	fmt.Printf("Websocket Subscribing config: %v ...\n", config)
+}
+
+func registerWebSocketSubscribe(cliCtx client.Context, log log.Logger, config *types.WebSocketConfig) {
 
 	// Instantiate and start tendermint RPC client
 	client, err := cliCtx.GetNode()
@@ -34,8 +42,8 @@ func registerSubscribe(cliCtx client.Context) {
 	for {
 		select {
 		case ev := <-eventChan:
-			fmt.Printf("%v\n", ev.Data.(tmtypes.EventDataTx).TxResult)
-			// go handleTransaction(c, l, ev.Data.(tmtypes.EventDataTx).TxResult)
+			txResult := ev.Data.(tmtypes.EventDataTx).TxResult
+			handleTransaction(ctx, log, config, &txResult)
 		}
 	}
 }

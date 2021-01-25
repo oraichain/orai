@@ -33,6 +33,7 @@ var (
 	NewGenesisState    = types.NewGenesisState
 	RequestKeyPrefix   = types.RequestKeyPrefix
 	ErrRequestNotFound = types.ErrRequestNotFound
+	NewAIRequest       = types.NewAIRequest
 )
 
 type (

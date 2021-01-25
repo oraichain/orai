@@ -90,6 +90,7 @@ import (
 	"github.com/oraichain/orai/x/wasm"
 	wasmclient "github.com/oraichain/orai/x/wasm/client"
 	"github.com/oraichain/orai/x/websocket"
+	"github.com/oraichain/orai/x/websocket/subscribe"
 
 	"github.com/oraichain/orai/x/provider"
 
@@ -177,7 +178,7 @@ var (
 		vesting.AppModuleBasic{},
 		provider.AppModuleBasic{},
 		airequest.AppModuleBasic{},
-		websocket.AppModuleBasic{}, // listen and run smart contract
+		websocket.AppModuleBasic{},
 		airesult.AppModuleBasic{},
 	)
 
@@ -360,22 +361,6 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	)
 	app.evidenceKeeper = *evidenceKeeper
 
-	app.providerKeeper = provider.NewKeeper(
-		appCodec, keys[provider.StoreKey], &app.wasmKeeper, app.getSubspace(provider.ModuleName),
-	)
-
-	app.airequestKeeper = airequest.NewKeeper(
-		appCodec, keys[airequest.StoreKey], &app.wasmKeeper, app.getSubspace(airequest.ModuleName), app.stakingKeeper, app.providerKeeper,
-	)
-
-	app.websocketKeeper = websocket.NewKeeper(
-		appCodec, keys[websocket.StoreKey], app.stakingKeeper,
-	)
-
-	app.airesultKeeper = airesult.NewKeeper(
-		appCodec, keys[airesult.StoreKey], &app.wasmKeeper, app.getSubspace(airesult.ModuleName), app.stakingKeeper, app.providerKeeper, app.bankKeeper, app.distrKeeper, app.accountKeeper, *app.websocketKeeper, *app.airequestKeeper, authtypes.FeeCollectorName,
-	)
-
 	// just re-use the full router - do we want to limit this more?
 	var wasmRouter = bApp.Router()
 	wasmDir := filepath.Join(homePath, "wasm")
@@ -420,6 +405,37 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		govRouter,
 	)
 	/****  Module Options ****/
+
+	app.providerKeeper = provider.NewKeeper(
+		appCodec, keys[provider.StoreKey], &app.wasmKeeper, app.getSubspace(provider.ModuleName),
+	)
+
+	app.airequestKeeper = airequest.NewKeeper(
+		appCodec, keys[airequest.StoreKey], &app.wasmKeeper, app.getSubspace(airequest.ModuleName), app.stakingKeeper, app.providerKeeper,
+	)
+
+	// create websocket module with configuration from extended flags
+	websocketConfig, err := websocket.ReadWebSocketConfig(appOpts)
+	if err != nil {
+		panic("error while reading websocket config: " + err.Error())
+	}
+	app.websocketKeeper = websocket.NewKeeper(
+		appCodec, keys[websocket.StoreKey], &app.wasmKeeper, app.stakingKeeper, websocketConfig,
+	)
+
+	app.airesultKeeper = airesult.NewKeeper(
+		appCodec, keys[airesult.StoreKey],
+		&app.wasmKeeper,
+		app.getSubspace(airesult.ModuleName),
+		app.stakingKeeper,
+		app.providerKeeper,
+		app.bankKeeper,
+		app.distrKeeper,
+		app.accountKeeper,
+		app.websocketKeeper,
+		app.airequestKeeper,
+		authtypes.FeeCollectorName,
+	)
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
 	// we prefer to be more strict in what arguments the modules expect.
@@ -628,6 +644,9 @@ func (app *OraichainApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.
 	// Register legacy and grpc-gateway routes for all modules.
 	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
+
+	// custom register for specific AppModule
+	subscribe.RegisterSubscribes(clientCtx, app.Logger(), app.websocketKeeper.GetConfig())
 
 	// register swagger API from root so that other applications can override easily
 	if apiConfig.Swagger {
