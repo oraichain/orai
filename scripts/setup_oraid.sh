@@ -35,8 +35,6 @@ EOF
   exit 0
 fi 
 
-STAKE=${STAKE_TOKEN:-ustake}
-FEE=${FEE_TOKEN:-ucosm}
 CHAIN_ID=${CHAIN_ID:-testing}
 USER=${USER:-tupt}
 MONIKER=${MONIKER:-node001}
@@ -45,17 +43,17 @@ rm -rf "$HOME"/.oraid
 
 oraid init --chain-id "$CHAIN_ID" "$MONIKER"
 # staking/governance token is hardcoded in config, change this
-sed -i "s/\"stake\"/\"$STAKE\"/" "$HOME"/.oraid/config/genesis.json
+# sed -i "s/\"stake\"/\"$STAKE\"/" "$HOME"/.oraid/config/genesis.json
 
 oraid keys add $USER
 
 # hardcode the validator account for this instance
-oraid add-genesis-account $USER "1000000000$STAKE,1000000000$FEE"
+oraid add-genesis-account $USER "100000000000000orai"
 
 # (optionally) add a few more genesis accounts
 for addr in "$@"; do
   echo $addr
-  oraid add-genesis-account "$addr" "1000000000$STAKE,1000000000$FEE"
+  oraid add-genesis-account "$addr" "1000000000orai"
 done
 
 # (optionally) add smart contract
@@ -67,7 +65,7 @@ if [ ! -z $LOCAL ];then
   echo "## Genesis CosmWasm instance"
   INIT='{"count":10}'
   BASE_ACCOUNT=$(oraid keys show $USER -a)
-  oraid add-wasm-genesis-message instantiate-contract 1 $INIT --run-as $USER --label=oracle --amount=100ustake --admin $BASE_ACCOUNT
+  oraid add-wasm-genesis-message instantiate-contract 1 $INIT --run-as $USER --label=oracle --amount=100orai --admin $BASE_ACCOUNT
 
   # if need execute
   CONTRACT=$(oraid add-wasm-genesis-message list-contracts | jq '.[0].contract_address' -r)
@@ -82,7 +80,7 @@ fi
 
 # submit a genesis validator tx
 ## Workraround for https://github.com/cosmos/cosmos-sdk/issues/8251
-oraid gentx $USER "250000000$STAKE" --chain-id="$CHAIN_ID" --amount="250000000$STAKE"
+oraid gentx $USER "250000000orai" --chain-id="$CHAIN_ID" --amount="250000000orai"
 
 oraid collect-gentxs
 

@@ -18,7 +18,7 @@ func TestWasmdExport(t *testing.T) {
 	db := db.NewMemDB()
 	gapp := NewOraichainApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, wasm.EnableAllProposals, EmptyAppOptions{})
 
-	genesisState := NewDefaultGenesisState()
+	genesisState := NewDefaultGenesisState(gapp.appCodec)
 	stateBytes, err := json.MarshalIndent(genesisState, "", "  ")
 	require.NoError(t, err)
 
@@ -84,7 +84,7 @@ func TestGetEnabledProposals(t *testing.T) {
 }
 
 func setGenesis(gapp *OraichainApp) error {
-	genesisState := NewDefaultGenesisState()
+	genesisState := NewDefaultGenesisState(gapp.appCodec)
 	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
 	if err != nil {
 		return err

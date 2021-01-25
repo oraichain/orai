@@ -4,27 +4,34 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	auth "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bank "github.com/cosmos/cosmos-sdk/x/bank/types"
+	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	crisis "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	evidence "github.com/cosmos/cosmos-sdk/x/evidence/types"
 	genutil "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	gov "github.com/cosmos/cosmos-sdk/x/gov/types"
+	ibctransfertypes "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/types"
+	ibchost "github.com/cosmos/cosmos-sdk/x/ibc/core/24-host"
+	ibc "github.com/cosmos/cosmos-sdk/x/ibc/core/types"
 	mint "github.com/cosmos/cosmos-sdk/x/mint/types"
 	slashing "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
 	aiRequest "github.com/oraichain/orai/x/airequest/types"
+	airesult "github.com/oraichain/orai/x/airesult/types"
 	provider "github.com/oraichain/orai/x/provider/types"
+	wasm "github.com/oraichain/orai/x/wasm"
+	websocket "github.com/oraichain/orai/x/websocket/types"
 )
 
-// GenesisState represents chain state at the start of the chain. Any initial state (account balances) are stored here.
 type GenesisState map[string]json.RawMessage
 
 // NewDefaultGenesisState generates the default state for the application.
-func NewDefaultGenesisState() GenesisState {
-	cdc := MakeEncodingConfig()
+func NewDefaultGenesisState(cdc codec.JSONMarshaler) *GenesisState {
+	genesisState := make(GenesisState)
 	denom := "orai"
 	// Get default genesis states of the modules we are to override.
 	authGenesis := auth.DefaultGenesisState()
@@ -38,6 +45,10 @@ func NewDefaultGenesisState() GenesisState {
 	authGenesis.Params.TxSizeCostPerByte = 5
 	stakingGenesis.Params.BondDenom = denom
 	stakingGenesis.Params.HistoricalEntries = 1000
+
+	// TODO: testnet figures only
+	stakingGenesis.Params.UnbondingTime = time.Hour * 2
+	stakingGenesis.Params.MaxValidators = 150
 	// maximum bonded validators
 	distrGenesis.Params.BaseProposerReward = sdk.NewDecWithPrec(10, 2)  // 5%
 	distrGenesis.Params.BonusProposerReward = sdk.NewDecWithPrec(10, 2) // 12%
@@ -51,20 +62,27 @@ func NewDefaultGenesisState() GenesisState {
 	slashingGenesis.Params.SlashFractionDoubleSign = sdk.NewDecWithPrec(5, 2) // 5%
 	slashingGenesis.Params.SlashFractionDowntime = sdk.NewDecWithPrec(1, 4)   // 0.01%
 	// Add your modules here for the genesis states
-	return GenesisState{
-		genutil.ModuleName:   cdc.Marshaler.MustMarshalJSON(genutil.DefaultGenesisState()),
-		auth.ModuleName:      cdc.Marshaler.MustMarshalJSON(authGenesis),
-		bank.ModuleName:      cdc.Marshaler.MustMarshalJSON(bank.DefaultGenesisState()),
-		staking.ModuleName:   cdc.Marshaler.MustMarshalJSON(stakingGenesis),
-		mint.ModuleName:      cdc.Marshaler.MustMarshalJSON(mintGenesis),
-		distr.ModuleName:     cdc.Marshaler.MustMarshalJSON(distrGenesis),
-		gov.ModuleName:       cdc.Marshaler.MustMarshalJSON(govGenesis),
-		crisis.ModuleName:    cdc.Marshaler.MustMarshalJSON(crisisGenesis),
-		slashing.ModuleName:  cdc.Marshaler.MustMarshalJSON(slashingGenesis),
-		evidence.ModuleName:  cdc.Marshaler.MustMarshalJSON(evidence.DefaultGenesisState()),
-		provider.ModuleName:  cdc.Marshaler.MustMarshalJSON(provider.DefaultGenesisState()),
-		aiRequest.ModuleName: cdc.Marshaler.MustMarshalJSON(aiRequest.DefaultGenesisState()),
-		// webSocket.ModuleName: webSocket.AppModuleBasic{}.DefaultGenesis(),
-		// aiResult.ModuleName:  aiResult.AppModuleBasic{}.DefaultGenesis(),
-	}
+
+	genesisState[genutil.ModuleName] = cdc.MustMarshalJSON(genutil.DefaultGenesisState())
+	genesisState[auth.ModuleName] = cdc.MustMarshalJSON(authGenesis)
+	genesisState[bank.ModuleName] = cdc.MustMarshalJSON(bank.DefaultGenesisState())
+	genesisState[staking.ModuleName] = cdc.MustMarshalJSON(stakingGenesis)
+	genesisState[mint.ModuleName] = cdc.MustMarshalJSON(mintGenesis)
+	genesisState[distr.ModuleName] = cdc.MustMarshalJSON(distrGenesis)
+	genesisState[gov.ModuleName] = cdc.MustMarshalJSON(govGenesis)
+	genesisState[crisis.ModuleName] = cdc.MustMarshalJSON(crisisGenesis)
+	genesisState[capabilitytypes.ModuleName] = cdc.MustMarshalJSON(capabilitytypes.DefaultGenesis())
+	genesisState[ibchost.ModuleName] = cdc.MustMarshalJSON(ibc.DefaultGenesisState())
+	genesisState[ibctransfertypes.ModuleName] = cdc.MustMarshalJSON(ibctransfertypes.DefaultGenesisState())
+	genesisState[slashing.ModuleName] = cdc.MustMarshalJSON(slashingGenesis)
+	genesisState[evidence.ModuleName] = cdc.MustMarshalJSON(evidence.DefaultGenesisState())
+	genesisState[provider.ModuleName] = cdc.MustMarshalJSON(provider.DefaultGenesisState())
+	genesisState[aiRequest.ModuleName] = cdc.MustMarshalJSON(aiRequest.DefaultGenesisState())
+	genesisState[websocket.ModuleName] = cdc.MustMarshalJSON(websocket.DefaultGenesisState())
+	genesisState[airesult.ModuleName] = cdc.MustMarshalJSON(airesult.DefaultGenesisState())
+	genesisState[wasm.ModuleName] = cdc.MustMarshalJSON(&wasm.GenesisState{
+		Params: wasm.DefaultParams(),
+	})
+
+	return &genesisState
 }
