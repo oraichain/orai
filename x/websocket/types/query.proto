@@ -11,7 +11,19 @@ option go_package = "github.com/oraichain/orai/x/websocket/types";
 // Query provides defines the gRPC querier service
 service Query {
     // DataSourceInfo gets the data source meta data
-    rpc OracleInfo (QueryContract) returns (ResponseContract) {
+    rpc OracleContract (QueryOracleContract) returns (ResponseContract) {
+        
+    }
+
+    rpc DataSourceContract (QueryDataSourceContract) returns (ResponseContract) {
+        
+    }
+
+    rpc TestCaseContract (QueryTestCaseContract) returns (ResponseContract) {
+        
+    }
+
+    rpc OracleScriptContract (QueryOracleScriptContract) returns (ResponseContract) {
         
     }
 }

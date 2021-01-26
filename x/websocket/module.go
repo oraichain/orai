@@ -3,37 +3,25 @@ package websocket
 import (
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/client/tx"
 	params "github.com/cosmos/cosmos-sdk/x/params/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 
 	"github.com/gorilla/mux"
-	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
-	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/oraichain/orai/x/websocket/client/cli"
 	"github.com/oraichain/orai/x/websocket/client/rest"
 	"github.com/oraichain/orai/x/websocket/keeper"
 	"github.com/oraichain/orai/x/websocket/types"
-)
-
-const (
-	flagFromValidator    = "from-validator"
-	flagBroadcastTimeout = "broadcast-timeout"
-	flagRPCPollInterval  = "rpc-poll-interval"
-	flagMaxTry           = "max-try"
 )
 
 // Type check to ensure the interface is properly implemented
@@ -175,72 +163,4 @@ func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
 // returns no validator updates.
 func (am AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
 	return []abci.ValidatorUpdate{}
-}
-
-//____________________________________________________________________________
-
-// AddModuleInitFlags implements servertypes.ModuleInitFlags interface.
-func AddModuleInitFlags(startCmd *cobra.Command) {
-	startCmd.Flags().String(flagFromValidator, "", "Name or address of validator's private key with which to sign")
-	startCmd.Flags().String(flagBroadcastTimeout, "5m", "The time that the websocket will wait for tx commit")
-	startCmd.Flags().String(flagRPCPollInterval, "1s", "The duration of rpc poll interval")
-	startCmd.Flags().Uint64(flagMaxTry, 5, "The maximum number of tries to submit a report transaction")
-}
-
-// ReadWebSocketConfig reads the websocket specifig configuration
-func ReadWebSocketConfig(opts servertypes.AppOptions) (*types.WebSocketConfig, error) {
-	cfg := types.DefaultWebSocketConfig()
-	cfg.Txf = newFactoryApp(opts)
-	var err error
-	if v := opts.Get(flagBroadcastTimeout); v != nil {
-		if cfg.BroadcastTimeout, err = time.ParseDuration(v.(string)); err != nil {
-			return cfg, err
-		}
-	}
-	if v := opts.Get(flagRPCPollInterval); v != nil {
-		if cfg.RPCPollInterval, err = time.ParseDuration(v.(string)); err != nil {
-			return cfg, err
-		}
-	}
-	// attach contract debugging to global "trace" flag
-	if v := opts.Get(flagMaxTry); v != nil {
-		if cfg.MaxTry, err = cast.ToUint64E(v); err != nil {
-			return cfg, err
-		}
-	}
-
-	// FromValidator
-	if v := opts.Get(flagFromValidator); v != nil {
-		cfg.FromValidator = v.(string)
-	}
-
-	return cfg, nil
-}
-
-// newFactoryApp creates a new transaction Factory.
-func newFactoryApp(opts servertypes.AppOptions) tx.Factory {
-
-	f := tx.Factory{}
-
-	if v := opts.Get(flags.FlagGasAdjustment); v != nil {
-		if gasAdj, err := cast.ToFloat64E(v); err != nil {
-			f = f.WithGasAdjustment(gasAdj)
-		}
-	}
-
-	if v := opts.Get(flags.FlagGas); v != nil {
-		if gasSetting, err := flags.ParseGasSetting(v.(string)); err != nil {
-			f = f.WithGas(gasSetting.Gas)
-		}
-	}
-
-	if v := opts.Get(flags.FlagFees); v != nil {
-		f = f.WithFees(v.(string))
-	}
-
-	if v := opts.Get(flags.FlagGasPrices); v != nil {
-		f = f.WithGasPrices(v.(string))
-	}
-
-	return f
 }

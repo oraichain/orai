@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
-	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
@@ -204,8 +203,6 @@ var (
 	_ simapp.App              = (*OraichainApp)(nil)
 	_ servertypes.Application = (*OraichainApp)(nil)
 )
-
-var websocketConfig *websocket.WebSocketConfig
 
 // OraichainApp extended ABCI application
 type OraichainApp struct {
@@ -417,7 +414,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	)
 
 	app.websocketKeeper = websocket.NewKeeper(
-		appCodec, keys[websocket.StoreKey], &app.wasmKeeper, app.stakingKeeper,
+		appCodec, keys[websocket.StoreKey], &app.wasmKeeper, app.providerKeeper, app.stakingKeeper,
 	)
 
 	app.airesultKeeper = airesult.NewKeeper(
@@ -433,13 +430,6 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		app.airequestKeeper,
 		authtypes.FeeCollectorName,
 	)
-
-	// custom init
-	// create websocket module with configuration from extended flags
-	websocketConfig, err = websocket.ReadWebSocketConfig(appOpts)
-	if err != nil {
-		panic("error while reading websocket config: " + err.Error())
-	}
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
 	// we prefer to be more strict in what arguments the modules expect.
@@ -654,24 +644,6 @@ func (app *OraichainApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.
 		RegisterSwaggerAPI(clientCtx, apiSvr.Router)
 	}
 
-	// custom register for specific AppModule with keybase to send signed transaction
-	if len(websocketConfig.FromValidator) > 0 {
-
-		// create a keybase instance with os backend and current root dir context
-		keybase, err := keyring.New(sdk.KeyringServiceName(), keyring.BackendOS, clientCtx.KeyringDir, clientCtx.Input)
-		if err != nil {
-			panic(err)
-		}
-		// make sure key existed
-		_, err = keybase.Key(websocketConfig.FromValidator)
-		if err != nil {
-			panic(err)
-		}
-		// auto signing client context
-		cliCtx := clientCtx.WithKeyring(keybase)
-		websocketSubscriber := websocket.NewSubscriber(app.Logger(), websocketConfig)
-		websocket.RegisterSubscribes(cliCtx, websocketSubscriber)
-	}
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.

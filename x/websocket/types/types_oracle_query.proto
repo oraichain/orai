@@ -18,12 +18,42 @@ message Request {
   Fetch fetch = 1 [(gogoproto.moretags) = "json:\"fetch\""];  
 }
 
-message QueryContract {
+message RequestTestCase {  
+  option (gogoproto.goproto_stringer) = true;    
+  bytes dataSourceContract = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress", (gogoproto.moretags) = "json:\"dsource_contract\""];  
+  string input = 2 [(gogoproto.moretags) = "json:\"input\""];  
+  string output = 3 [(gogoproto.moretags) = "json:\"output\""];  
+}
+
+message RequestOracleScript {
+  option (gogoproto.goproto_stringer) = true;    
+  string aggregation = 1 [(gogoproto.moretags) = "json:\"aggregation\""];  
+}
+
+message QueryOracleContract {
   option (gogoproto.goproto_stringer) = true;    
   bytes contract = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress", (gogoproto.moretags) = "json:\"contract\""];  
   Request request = 2 [(gogoproto.moretags) = "json:\"request\""];  
 }
 
+message QueryTestCaseContract {
+  option (gogoproto.goproto_stringer) = true;    
+  string name = 1 [(gogoproto.moretags) = "json:\"name\""];  
+  string dataSourcName = 2 [(gogoproto.moretags) = "json:\"dsource_name\""];  
+  RequestTestCase request = 3 [(gogoproto.moretags) = "json:\"request\""];  
+}
+
+
+message QueryDataSourceContract {
+  option (gogoproto.goproto_stringer) = true;    
+  string name = 1 [(gogoproto.moretags) = "json:\"name\""];  
+}
+
+message QueryOracleScriptContract {
+  option (gogoproto.goproto_stringer) = true;    
+  string name = 1 [(gogoproto.moretags) = "json:\"name\""];    
+  RequestOracleScript request = 2 [(gogoproto.moretags) = "json:\"request\""];  
+}
 
 
 // Report stores the result of the data source when validator executes it

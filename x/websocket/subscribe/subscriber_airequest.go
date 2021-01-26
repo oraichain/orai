@@ -1,7 +1,7 @@
 package subscribe
 
 import (
-	"fmt"
+	"context"
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -10,23 +10,21 @@ import (
 
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/client"
-
 	"github.com/oraichain/orai/x/websocket/types"
 )
 
 // SubmitReport creates a new MsgCreateReport and submits it to the Oraichain to create a new report
-func (subscriber *Subscriber) submitReport(cliCtx *client.Context, msgReport *types.MsgCreateReport) {
+func (subscriber *Subscriber) submitReport(msgReport *types.MsgCreateReport) {
 
 	if err := msgReport.ValidateBasic(); err != nil {
 		subscriber.log.Error(":exploding_head: Failed to validate basic with error: %s", err.Error())
 		return
 	}
 
-	txf := subscriber.newFactory(cliCtx, "websocket")
+	txf := subscriber.newTxFactory("websocket")
 	for try := uint64(1); try <= subscriber.config.MaxTry; try++ {
 		subscriber.log.Info(":e-mail: Try to broadcast report transaction(%d/%d)", try, subscriber.config.MaxTry)
-		err := tx.BroadcastTx(*cliCtx, txf, msgReport)
+		err := tx.BroadcastTx(*subscriber.cliCtx, txf, msgReport)
 		if err == nil {
 			break
 		}
@@ -35,34 +33,34 @@ func (subscriber *Subscriber) submitReport(cliCtx *client.Context, msgReport *ty
 	}
 }
 
-func (subscriber *Subscriber) handleAIRequestLog(cliCtx *client.Context, queryClient types.QueryClient, attrMap map[string][]string) {
-	fmt.Println(":delivery_truck: Processing incoming request event before checking validators")
+func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, attrMap map[string][]string) {
+	subscriber.log.Info(":delivery_truck: Processing incoming request event before checking validators")
 
 	// Skip if not related to this validator
 	validators := attrMap[aiRequest.AttributeRequestValidator]
 	hasMe := false
 	for _, validator := range validators {
 		subscriber.log.Debug(":delivery_truck: validator: %s", validator)
-		if validator == cliCtx.GetFromAddress().String() {
+		if validator == subscriber.cliCtx.GetFromAddress().String() {
 			hasMe = true
 			break
 		}
 	}
 
 	if !hasMe {
-		fmt.Println(":next_track_button: Skip request not related to this validator")
+		subscriber.log.Info(":next_track_button: Skip request not related to this validator")
 		return
 	}
 
-	fmt.Println(":delivery_truck: Processing incoming request event")
+	subscriber.log.Info(":delivery_truck: Processing incoming request event")
 
 	requestID := attrMap[aiRequest.AttributeRequestID][0]
 
-	// oscriptName := attrMap[aiRequest.AttributeOracleScriptName][0]
+	oscriptName := attrMap[aiRequest.AttributeOracleScriptName][0]
 	creatorStr := attrMap[aiRequest.AttributeRequestCreator][0]
 	// valCountStr := attrMap[aiRequest.AttributeRequestValidatorCount][0]
-	// inputStr := attrMap[aiRequest.AttributeRequestInput][0]
-	// expectedOutputStr := attrMap[aiRequest.AttributeRequestExpectedOutput][0]
+	inputStr := attrMap[aiRequest.AttributeRequestInput][0]
+	expectedOutputStr := attrMap[aiRequest.AttributeRequestExpectedOutput][0]
 
 	creator, _ := sdk.AccAddressFromBech32(creatorStr)
 
@@ -77,17 +75,28 @@ func (subscriber *Subscriber) handleAIRequestLog(cliCtx *client.Context, queryCl
 	var testCaseResults []*types.TestCaseResult
 
 	// we have different test cases, so we need to loop through them
+	ctx := context.Background()
 	for i := range testCases {
 		//put the results from the data sources into the test case to verify if they are good enough
 		for j := range aiDataSources {
 			//// collect test case result from the script
 			// outTestCase, err := ExecPythonFile("python", getTCasePath(testCases[i]), []string{provider.DataSourceStoreKeyString(aiDataSources[j]), req.Input, req.ExpectedOutput})
-			result := "from wasm keeper"
-			// if err != nil {
-			// 	fmt.Println(":skull: failed to execute test case 1st loop: %s", err.Error())
-			// }
+			query := &types.QueryTestCaseContract{
+				Name:          testCases[i],
+				DataSourcName: aiDataSources[j],
+				Request: &types.RequestTestCase{
+					Input:  inputStr,
+					Output: expectedOutputStr,
+				},
+			}
+			outTestCase, err := queryClient.TestCaseContract(ctx, query)
 
-			fmt.Println("result after running test case: ", result)
+			if err != nil {
+				subscriber.log.Info(":skull: failed to execute test case 1st loop: %s", err.Error())
+			}
+			result := string(outTestCase.Data)
+
+			subscriber.log.Info("result after running test case: ", result)
 
 			dataSourceResult := types.NewDataSourceResult(aiDataSources[j], []byte(result), types.ResultSuccess)
 
@@ -113,11 +122,18 @@ func (subscriber *Subscriber) handleAIRequestLog(cliCtx *client.Context, queryCl
 
 		var dataSourceResult *types.DataSourceResult
 		if dataSourceResultsTest[i].GetStatus() == types.ResultSuccess {
-			// outDataSource, err = ExecPythonFile("python", getDSourcePath(dataSourceResultsTest[i].GetName()), []string{})
-			result := "excute data source contract"
 
-			//result = strings.TrimSuffix(result, "\r")
-			fmt.Println("star: result from data sources: ", result)
+			// outDataSource, err = ExecPythonFile("python", getDSourcePath(dataSourceResultsTest[i].GetName()), []string{})
+			query := &types.QueryDataSourceContract{
+				Name: dataSourceResultsTest[i].GetName(),
+			}
+			outDataSource, err := queryClient.DataSourceContract(ctx, query)
+			if err != nil {
+				subscriber.log.Error(":skull: failed to execute data source script: %s", err.Error())
+			}
+			result := string(outDataSource.Data)
+
+			subscriber.log.Info("star: result from data sources: ", result)
 			// By default, we consider returning null as failure. If any datasource does not follow this rule then it should not be used by any oracle scripts.
 			dataSourceResult = types.NewDataSourceResult(dataSourceResultsTest[i].GetName(), []byte(result), types.ResultSuccess)
 			if result == types.FailedResult || len(result) == 0 {
@@ -135,9 +151,9 @@ func (subscriber *Subscriber) handleAIRequestLog(cliCtx *client.Context, queryCl
 		dataSourceResults = append(dataSourceResults, dataSourceResult)
 	}
 	finalResultStr = strings.TrimSuffix(finalResultStr, "-")
-	fmt.Println("star: final result after trimming: ", finalResultStr)
+	subscriber.log.Info("star: final result after trimming: ", finalResultStr)
 	// Create a new MsgCreateReport with a new reporter to the Oraichain
-	reporter := types.NewReporter(creator, subscriber.config.FromValidator, sdk.ValAddress(cliCtx.FromAddress))
+	reporter := types.NewReporter(creator, subscriber.config.FromValidator, sdk.ValAddress(subscriber.cliCtx.FromAddress))
 	msgReport := types.NewMsgCreateReport(requestID, dataSourceResults, testCaseResults, reporter, sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(5000)))), []byte(finalResultStr), types.ResultSuccess)
 	if len(finalResultStr) == 0 {
 		msgReport.AggregatedResult = []byte(types.FailedResponseOs)
@@ -146,12 +162,21 @@ func (subscriber *Subscriber) handleAIRequestLog(cliCtx *client.Context, queryCl
 	} else {
 		// ExecPythonFile("python", oscriptPath, []string{"aggregation", finalResultStr})
 
-		ress := "exec oracle contract"
-		fmt.Printf("final result from oScript: %s\n", ress)
-		msgReport.AggregatedResult = []byte(ress)
+		query := &types.QueryOracleScriptContract{
+			Name: oscriptName,
+			Request: &types.RequestOracleScript{
+				Aggregation: finalResultStr,
+			},
+		}
+		outOScript, err := queryClient.OracleScriptContract(ctx, query)
+		if err != nil {
+			subscriber.log.Error(":skull: failed to aggregate results: %s", err.Error())
+		}
+		subscriber.log.Info("final result from oScript: %s", string(outOScript.Data))
+		msgReport.AggregatedResult = outOScript.Data
 	}
 
 	// TODO: check aggregated result value of the oracle script to verify if it fails or success
-	subscriber.submitReport(cliCtx, msgReport)
+	subscriber.submitReport(msgReport)
 
 }
