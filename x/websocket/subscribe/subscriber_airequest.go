@@ -144,6 +144,8 @@ func (subscriber *Subscriber) handleAIRequestLog(cliCtx *client.Context, queryCl
 		msgReport.ResultStatus = types.ResultFailure
 		// Create a new MsgCreateReport to the Oraichain
 	} else {
+		// ExecPythonFile("python", oscriptPath, []string{"aggregation", finalResultStr})
+
 		ress := "exec oracle contract"
 		fmt.Printf("final result from oScript: %s\n", ress)
 		msgReport.AggregatedResult = []byte(ress)
