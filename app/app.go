@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
+	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
@@ -204,6 +205,8 @@ var (
 	_ servertypes.Application = (*OraichainApp)(nil)
 )
 
+var websocketConfig *websocket.WebSocketConfig
+
 // OraichainApp extended ABCI application
 type OraichainApp struct {
 	*baseapp.BaseApp
@@ -240,8 +243,6 @@ type OraichainApp struct {
 	airequestKeeper *airequest.Keeper
 	websocketKeeper *websocket.Keeper
 	airesultKeeper  *airesult.Keeper
-
-	websocketSubscriber *websocket.Subscriber
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -415,15 +416,9 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		appCodec, keys[airequest.StoreKey], &app.wasmKeeper, app.getSubspace(airequest.ModuleName), app.stakingKeeper, app.providerKeeper,
 	)
 
-	// create websocket module with configuration from extended flags
-	websocketConfig, err := websocket.ReadWebSocketConfig(appOpts)
-	if err != nil {
-		panic("error while reading websocket config: " + err.Error())
-	}
 	app.websocketKeeper = websocket.NewKeeper(
 		appCodec, keys[websocket.StoreKey], &app.wasmKeeper, app.stakingKeeper,
 	)
-	app.websocketSubscriber = websocket.NewSubscriber(app.Logger(), &websocketConfig)
 
 	app.airesultKeeper = airesult.NewKeeper(
 		appCodec, keys[airesult.StoreKey],
@@ -438,6 +433,13 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		app.airequestKeeper,
 		authtypes.FeeCollectorName,
 	)
+
+	// custom init
+	// create websocket module with configuration from extended flags
+	websocketConfig, err = websocket.ReadWebSocketConfig(appOpts)
+	if err != nil {
+		panic("error while reading websocket config: " + err.Error())
+	}
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
 	// we prefer to be more strict in what arguments the modules expect.
@@ -647,12 +649,28 @@ func (app *OraichainApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.
 	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
-	// custom register for specific AppModule
-	websocket.RegisterSubscribes(clientCtx, app.websocketSubscriber)
-
 	// register swagger API from root so that other applications can override easily
 	if apiConfig.Swagger {
 		RegisterSwaggerAPI(clientCtx, apiSvr.Router)
+	}
+
+	// custom register for specific AppModule with keybase to send signed transaction
+	if len(websocketConfig.FromValidator) > 0 {
+
+		// create a keybase instance with os backend and current root dir context
+		keybase, err := keyring.New(sdk.KeyringServiceName(), keyring.BackendOS, clientCtx.KeyringDir, clientCtx.Input)
+		if err != nil {
+			panic(err)
+		}
+		// make sure key existed
+		_, err = keybase.Key(websocketConfig.FromValidator)
+		if err != nil {
+			panic(err)
+		}
+		// auto signing client context
+		cliCtx := clientCtx.WithKeyring(keybase)
+		websocketSubscriber := websocket.NewSubscriber(app.Logger(), websocketConfig)
+		websocket.RegisterSubscribes(cliCtx, websocketSubscriber)
 	}
 }
 

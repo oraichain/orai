@@ -10,8 +10,8 @@ import (
 	"github.com/oraichain/orai/x/websocket/types"
 )
 
-func (subscriber *Subscriber) handleDataSourceLog(cliCtx *client.Context, queryClient types.QueryClient, attrMap map[string]string) {
-	contractAddr, _ := sdk.AccAddressFromBech32(attrMap[providerTypes.AttributeContractAddress])
+func (subscriber *Subscriber) handleDataSourceLog(cliCtx *client.Context, queryClient types.QueryClient, attrMap map[string][]string) {
+	contractAddr, _ := sdk.AccAddressFromBech32(attrMap[providerTypes.AttributeContractAddress][0])
 	query := &types.QueryContract{
 		Contract: contractAddr,
 		Request: &types.Request{
@@ -20,6 +20,11 @@ func (subscriber *Subscriber) handleDataSourceLog(cliCtx *client.Context, queryC
 			},
 		},
 	}
+
+	ret, pub, err := cliCtx.Keyring.Sign("duc", []byte("hello"))
+	fmt.Printf("ret :%v %v %v", ret, pub, err)
+	validator := cliCtx.GetFromAddress().String()
+	fmt.Printf("validator :%v \n", validator)
 
 	response, _ := queryClient.OracleInfo(
 		context.Background(),

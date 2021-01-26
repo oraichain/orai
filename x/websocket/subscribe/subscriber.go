@@ -5,7 +5,10 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	artypes "github.com/oraichain/orai/x/airequest/types"
 	providerTypes "github.com/oraichain/orai/x/provider/types"
 	"github.com/oraichain/orai/x/websocket/types"
@@ -35,10 +38,14 @@ func NewSubscriber(log log.Logger, config *types.WebSocketConfig) *Subscriber {
 	}
 }
 
-func getAttributeMap(attrs []sdk.Attribute) map[string]string {
-	ret := make(map[string]string)
+func getAttributeMap(attrs []sdk.Attribute) map[string][]string {
+	ret := make(map[string][]string)
 	for _, attr := range attrs {
-		ret[attr.Key] = attr.Value
+		if values, ok := ret[attr.Key]; ok {
+			values = append(values, attr.Value)
+		} else {
+			ret[attr.Key] = []string{attr.Value}
+		}
 	}
 	return ret
 }
@@ -104,4 +111,23 @@ func (subscriber *Subscriber) subscribe(cliCtx *client.Context) {
 			subscriber.handleTransaction(cliCtx, queryClient, &txResult)
 		}
 	}
+}
+
+func (subscriber *Subscriber) newFactory(cliCtx *client.Context, memo string) tx.Factory {
+
+	signModeStr := cliCtx.SignModeStr
+	signMode := signing.SignMode_SIGN_MODE_UNSPECIFIED
+	switch signModeStr {
+	case flags.SignModeDirect:
+		signMode = signing.SignMode_SIGN_MODE_DIRECT
+	case flags.SignModeLegacyAminoJSON:
+		signMode = signing.SignMode_SIGN_MODE_LEGACY_AMINO_JSON
+	}
+	return subscriber.config.Txf.WithTxConfig(cliCtx.TxConfig).
+		WithAccountRetriever(cliCtx.AccountRetriever).
+		WithKeybase(cliCtx.Keyring).
+		WithChainID(cliCtx.ChainID).
+		WithSignMode(signMode).
+		WithMemo(memo)
+
 }

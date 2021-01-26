@@ -32,7 +32,7 @@ type (
 	Subscriber   = subscribe.Subscriber
 	GenesisState = types.GenesisState
 	Report       = types.Report
-
+	WebSocketConfig = types.WebSocketConfig
 	MsgCreateReport   = types.MsgCreateReport
 	MsgAddReporter    = types.MsgAddReporter
 	MsgRemoveReporter = types.MsgRemoveReporter
