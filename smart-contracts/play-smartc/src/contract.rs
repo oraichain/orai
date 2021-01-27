@@ -1,8 +1,5 @@
-
 use crate::error::ContractError;
-use crate::msg::{
-     CountResponse, HandleMsg, InitMsg, QueryMsg, SpecialQuery,
-};
+use crate::msg::{CountResponse, HandleMsg, InitMsg, QueryMsg, SpecialQuery};
 use crate::state::{config, config_read, State};
 use cosmwasm_std::{
     to_binary, Api, Binary, Env, Extern, HandleResponse, InitResponse, MessageInfo, Querier,
@@ -77,10 +74,14 @@ pub fn query<S: Storage, A: Api, Q: Querier>(
 ) -> StdResult<Binary> {
     match msg {
         QueryMsg::GetCount {} => to_binary(&query_count(deps)?),
-        QueryMsg::Fetch { url, method, authorization, body } => to_binary(&query_fetch(deps, url, method, authorization, body)?),
+        QueryMsg::Fetch {
+            url,
+            method,
+            authorization,
+            body,
+        } => to_binary(&query_fetch(deps, url, method, authorization, body)?),
     }
 }
-
 
 fn query_count<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> StdResult<CountResponse> {
     let state = config_read(&deps.storage).load()?;
@@ -94,14 +95,14 @@ fn query_fetch<S: Storage, A: Api, Q: Querier>(
     authorization: Option<String>,
     body: Option<String>,
 ) -> StdResult<String> {
-
     // create specialquery with default empty string
     let req = SpecialQuery::Fetch {
         url,
         method: method.unwrap_or(String::new()),
         authorization: authorization.unwrap_or(String::new()),
         body: body.unwrap_or(String::new()),
-    }.into();
+    }
+    .into();
 
     let response: Binary = deps.querier.custom_query(&req)?;
     Ok(String::from_utf8(response.to_vec()).unwrap())
