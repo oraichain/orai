@@ -2,65 +2,67 @@ package subscribe
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	artypes "github.com/oraichain/orai/x/airequest/types"
 	providerTypes "github.com/oraichain/orai/x/provider/types"
 	"github.com/oraichain/orai/x/websocket/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto/tmhash"
-	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"golang.org/x/sync/errgroup"
 )
 
 const (
 	// TxQuery ...
-	TxQuery = "tm.event = 'Tx'"
+	TxQuery        = "tm.event = 'Tx'"
+	SubscriberName = "txevents"
 	// EventChannelCapacity is a buffer size of channel between node and this program
 	EventChannelCapacity = 5000
 )
 
 type Subscriber struct {
-	log    log.Logger
-	config *types.WebSocketConfig
+	cliCtx *client.Context
+	config *WebSocketConfig
+	log    *Logger
 }
 
 // NewQuerier return querier implementation
-func NewSubscriber(log log.Logger, config *types.WebSocketConfig) *Subscriber {
+func NewSubscriber(cliCtx *client.Context, config *WebSocketConfig) *Subscriber {
+	log := NewLogger(config.AllowLogLevel)
 	return &Subscriber{
-		log:    log,
+		cliCtx: cliCtx,
 		config: config,
+		log:    log,
 	}
 }
 
-func getAttributeMap(attrs []sdk.Attribute) map[string]string {
-	ret := make(map[string]string)
+func getAttributeMap(attrs []sdk.Attribute) map[string][]string {
+	ret := make(map[string][]string)
 	for _, attr := range attrs {
-		ret[attr.Key] = attr.Value
+		if values, ok := ret[attr.Key]; ok {
+			values = append(values, attr.Value)
+		} else {
+			ret[attr.Key] = []string{attr.Value}
+		}
 	}
 	return ret
 }
 
-// RegisterSubscribes register all sbuscribe
-func RegisterSubscribes(cliCtx client.Context, subscriber *Subscriber) {
-	go subscriber.subscribe(&cliCtx)
-	fmt.Printf("Websocket Subscribing config: %v ...\n", subscriber.config)
-}
-
 // Implementation
-func (subscriber *Subscriber) handleTransaction(cliCtx *client.Context, queryClient types.QueryClient, tx *abci.TxResult) {
-	fmt.Printf(":eyes: Inspecting incoming transaction: %X\n", tmhash.Sum(tx.Tx))
+func (subscriber *Subscriber) handleTransaction(queryClient types.QueryClient, tx *abci.TxResult) error {
+	subscriber.log.Info(":eyes: Inspecting incoming transaction: %X", tmhash.Sum(tx.Tx))
 	if tx.Result.Code != 0 {
 		subscriber.log.Debug(":alien: Skipping transaction with non-zero code: %d", tx.Result.Code)
-		return
+		return nil
 	}
 
 	logs, err := sdk.ParseABCILogs(tx.Result.Log)
 	if err != nil {
 		subscriber.log.Error(":cold_sweat: Failed to parse transaction logs with error: %s", err.Error())
-		return
+		return err
 	}
 
 	for _, log := range logs {
@@ -69,39 +71,69 @@ func (subscriber *Subscriber) handleTransaction(cliCtx *client.Context, queryCli
 			attrMap := getAttributeMap(ev.GetAttributes())
 			switch ev.Type {
 			case providerTypes.EventTypeSetDataSource:
-				subscriber.handleDataSourceLog(cliCtx, queryClient, attrMap)
+				subscriber.handleDataSourceLog(queryClient, attrMap)
 			case artypes.EventTypeSetAIRequest:
-				subscriber.handleAIRequestLog(cliCtx, queryClient, attrMap)
+				subscriber.handleAIRequestLog(queryClient, attrMap)
 			default:
 				subscriber.log.Debug(":ghost: Skipping non-{request/packet} type: %s", ev.Type)
 			}
 		}
 	}
+
+	return nil
 }
 
-func (subscriber *Subscriber) subscribe(cliCtx *client.Context) {
+// Subscribe subscribe to event log
+func (subscriber *Subscriber) Subscribe() error {
+
+	subscriber.log.Info(":beer: Websocket Subscribing with validator: %s ...", subscriber.config.FromValidator)
 
 	// Instantiate and start tendermint RPC client
-	client, err := cliCtx.GetNode()
+	client, err := subscriber.cliCtx.GetNode()
 	if err != nil {
-		panic(err)
+		return err
+	}
+
+	if err = client.Start(); err != nil {
+		return err
 	}
 
 	// Initialize a new error group
 	goCtx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	eventChan, err := client.Subscribe(goCtx, "", TxQuery, EventChannelCapacity)
+	eventChan, err := client.Subscribe(goCtx, SubscriberName, TxQuery, EventChannelCapacity)
 	if err != nil {
-		panic(err)
+		cancel()
+		return err
 	}
 
-	queryClient := types.NewQueryClient(cliCtx)
+	defer func() {
+		cancel()
+		err = client.UnsubscribeAll(goCtx, SubscriberName)
+	}()
 
-	for {
-		select {
-		case ev := <-eventChan:
-			txResult := ev.Data.(tmtypes.EventDataTx).TxResult
-			subscriber.handleTransaction(cliCtx, queryClient, &txResult)
+	queryClient := types.NewQueryClient(subscriber.cliCtx)
+
+	g, ctx := errgroup.WithContext(goCtx)
+
+	g.Go(func() error {
+		for {
+			select {
+			case <-ctx.Done():
+				break
+			case ev := <-eventChan:
+				txResult := ev.Data.(tmtypes.EventDataTx).TxResult
+				err := subscriber.handleTransaction(queryClient, &txResult)
+				if err != nil {
+					return err
+				}
+			}
 		}
-	}
+	})
+
+	// Exit on error or context cancelation
+	return g.Wait()
+}
+
+func (subscriber *Subscriber) newTxFactory(memo string) tx.Factory {
+	return subscriber.config.Txf.WithMemo(memo)
 }

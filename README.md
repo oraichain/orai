@@ -8,7 +8,12 @@ ln -s $PWD/build/oraid /usr/bin/oraid
 
 # setup blockchain and run
 ./scripts/setup_oraid.sh 12345678
-./scripts/run_oraid.sh
+
+# start node
+oraid start --rpc.laddr tcp://0.0.0.0:26657 --log_level error
+
+# start websocket subscribe for processing event log
+oraid tx websocket subscribe --max-try 10 --from $USER --gas="auto" --gas-adjustment="1.2" --chain-id=testing -y
 ```
 
 ## Build smart contract and interact with it

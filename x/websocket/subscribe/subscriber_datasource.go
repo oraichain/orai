@@ -2,17 +2,17 @@ package subscribe
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/CosmWasm/wasmd/x/wasm"
+	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	providerTypes "github.com/oraichain/orai/x/provider/types"
 	"github.com/oraichain/orai/x/websocket/types"
 )
 
-func (subscriber *Subscriber) handleDataSourceLog(cliCtx *client.Context, queryClient types.QueryClient, attrMap map[string]string) {
-	contractAddr, _ := sdk.AccAddressFromBech32(attrMap[providerTypes.AttributeContractAddress])
-	query := &types.QueryContract{
+func (subscriber *Subscriber) handleDataSourceLog(queryClient types.QueryClient, attrMap map[string][]string) {
+	contractAddr, _ := sdk.AccAddressFromBech32(attrMap[providerTypes.AttributeContractAddress][0])
+	query := &types.QueryOracleContract{
 		Contract: contractAddr,
 		Request: &types.Request{
 			Fetch: &types.Fetch{
@@ -21,11 +21,25 @@ func (subscriber *Subscriber) handleDataSourceLog(cliCtx *client.Context, queryC
 		},
 	}
 
-	response, _ := queryClient.OracleInfo(
+	ret, pub, err := subscriber.cliCtx.Keyring.Sign("duc", []byte("hello"))
+	subscriber.log.Info("ret :%v %v %v", ret, pub, err)
+	validator := subscriber.cliCtx.GetFromAddress().String()
+	subscriber.log.Info("validator :%v", validator)
+
+	response, _ := queryClient.OracleContract(
 		context.Background(),
 		query,
 	)
 
 	// only get json back, or can process in smart contract
-	fmt.Printf("contract address: %s, response: %s\n", contractAddr.String(), string(response.Data))
+	subscriber.log.Info("contract address: %s, response: %s", contractAddr.String(), string(response.Data))
+
+	// test sign transaction to update smart contract
+	contractMsg := &wasm.MsgExecuteContract{
+		Sender:   validator,
+		Contract: contractAddr.String(),
+		Msg:      []byte(`{"increment":{}}`),
+	}
+	txf := subscriber.newTxFactory("websocket")
+	tx.BroadcastTx(*subscriber.cliCtx, txf, contractMsg)
 }

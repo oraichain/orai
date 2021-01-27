@@ -51,9 +51,9 @@ func GetCmdQueryOracleInfo() *cobra.Command {
 				return err
 			}
 
-			res, err := queryClient.OracleInfo(
+			res, err := queryClient.OracleContract(
 				context.Background(),
-				&types.QueryContract{
+				&types.QueryOracleContract{
 					Contract: contractAddr,
 					Request: &types.Request{
 						Fetch: &types.Fetch{

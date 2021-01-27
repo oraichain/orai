@@ -20,15 +20,14 @@ services:
     env_file:
       - orai.dev.env
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      #- ./vendor:/go/pkg/mod/
+      - /var/run/docker.sock:/var/run/docker.sock      
       - ./:/workspace
 
   rust:
     image: cosmwasm/rust-optimizer:0.10.7
     entrypoint: tail -f /dev/null
     volumes:
-      - ./registry_cache:/usr/local/cargo/registry:delegated
+      - .registry_cache:/usr/local/cargo/registry:delegated
       - ./smart-contracts:/code
 
   proto:

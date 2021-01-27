@@ -3,12 +3,12 @@ package keeper
 import (
 	"fmt"
 
+	"github.com/CosmWasm/wasmd/x/wasm"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	params "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/oraichain/orai/x/provider/types"
-	"github.com/oraichain/orai/x/wasm"
 	"github.com/tendermint/tendermint/libs/log"
 )
 

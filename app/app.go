@@ -87,8 +87,8 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	"github.com/oraichain/orai/x/airequest"
 	"github.com/oraichain/orai/x/airesult"
-	"github.com/oraichain/orai/x/wasm"
-	wasmclient "github.com/oraichain/orai/x/wasm/client"
+	"github.com/CosmWasm/wasmd/x/wasm"
+	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
 	"github.com/oraichain/orai/x/websocket"
 
 	"github.com/oraichain/orai/x/provider"
@@ -240,8 +240,6 @@ type OraichainApp struct {
 	airequestKeeper *airequest.Keeper
 	websocketKeeper *websocket.Keeper
 	airesultKeeper  *airesult.Keeper
-
-	websocketSubscriber *websocket.Subscriber
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -415,15 +413,9 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		appCodec, keys[airequest.StoreKey], &app.wasmKeeper, app.getSubspace(airequest.ModuleName), app.stakingKeeper, app.providerKeeper,
 	)
 
-	// create websocket module with configuration from extended flags
-	websocketConfig, err := websocket.ReadWebSocketConfig(appOpts)
-	if err != nil {
-		panic("error while reading websocket config: " + err.Error())
-	}
 	app.websocketKeeper = websocket.NewKeeper(
-		appCodec, keys[websocket.StoreKey], &app.wasmKeeper, app.stakingKeeper,
+		appCodec, keys[websocket.StoreKey], &app.wasmKeeper, app.providerKeeper, app.stakingKeeper,
 	)
-	app.websocketSubscriber = websocket.NewSubscriber(app.Logger(), &websocketConfig)
 
 	app.airesultKeeper = airesult.NewKeeper(
 		appCodec, keys[airesult.StoreKey],
@@ -647,13 +639,11 @@ func (app *OraichainApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.
 	ModuleBasics.RegisterRESTRoutes(clientCtx, apiSvr.Router)
 	ModuleBasics.RegisterGRPCGatewayRoutes(clientCtx, apiSvr.GRPCGatewayRouter)
 
-	// custom register for specific AppModule
-	websocket.RegisterSubscribes(clientCtx, app.websocketSubscriber)
-
 	// register swagger API from root so that other applications can override easily
 	if apiConfig.Swagger {
 		RegisterSwaggerAPI(clientCtx, apiSvr.Router)
 	}
+
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.

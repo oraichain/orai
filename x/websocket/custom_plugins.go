@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/CosmWasm/wasmd/x/wasm"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	"github.com/oraichain/orai/x/wasm"
 	"github.com/oraichain/orai/x/websocket/types"
 )
 

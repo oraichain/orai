@@ -3,6 +3,7 @@ package keeper
 import (
 	"fmt"
 
+	"github.com/CosmWasm/wasmd/x/wasm"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	auth "github.com/cosmos/cosmos-sdk/x/auth/keeper"
@@ -13,7 +14,6 @@ import (
 	"github.com/oraichain/orai/x/airequest"
 	"github.com/oraichain/orai/x/airesult/types"
 	"github.com/oraichain/orai/x/provider"
-	"github.com/oraichain/orai/x/wasm"
 	"github.com/oraichain/orai/x/websocket"
 	"github.com/tendermint/tendermint/libs/log"
 )
