@@ -210,9 +210,8 @@ initFn(){
 
     (echo "y"; echo "$MNEMONIC"; echo "$PASS"; echo "$PASS") | oraid keys add $USER --recover
 
-    # download genesis json file
-  
-    curl $GENESIS_URL > .oraid/config/genesis.json
+    # download genesis json file    
+    wget -O .oraid/config/genesis.json $GENESIS_URL
     
     # rm -f .oraid/config/genesis.json && wget https://raw.githubusercontent.com/oraichain/oraichain-static-files/ducphamle2-test/genesis.json -q -P .oraid/config/
 
