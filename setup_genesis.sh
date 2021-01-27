@@ -1,10 +1,30 @@
 #!/bin/sh
-# download the docker-compose & orai.env file
+#set -o errexit -o nounset -o pipefail
 
-curl -OL https://raw.githubusercontent.com/oraichain/oraichain-static-files/master/docker-compose.genesis.yml
+echo -n "Enter passphrase:"
+read -s PASSWORD
 
-curl -OL https://raw.githubusercontent.com/oraichain/oraichain-static-files/master/orai.env
+USER=${USER:-tupt}
+MONIKER=${MONIKER:-node001}
 
-curl -OL https://raw.githubusercontent.com/oraichain/oraichain-static-files/master/init_genesis.sh
+rm -rf "$PWD"/.oraid
 
-# modify the orai.env name & content
+oraid init --chain-id Oraichain "$MONIKER"
+
+(echo "$PASSWORD"; echo "$PASSWORD") | oraid keys add $USER 2>&1 | tee account.txt
+
+# hardcode the validator account for this instance
+(echo "$PASSWORD") | oraid add-genesis-account $USER "100000000000000orai"
+
+# submit a genesis validator tx
+## Workraround for https://github.com/cosmos/cosmos-sdk/issues/8251
+(echo "$PASSWORD"; echo "$PASSWORD") | oraid gentx $USER "$AMOUNT" --chain-id=Oraichain --amount="$AMOUNT" -y
+
+oraid collect-gentxs
+
+oraid validate-genesis
+
+cat $PWD/.oraid/config/genesis.json | jq .app_state.genutil.gen_txs[0] -c > "$MONIKER"_validators.txt
+
+echo "The genesis initiation process has finished ..."
+
