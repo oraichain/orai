@@ -3,8 +3,8 @@ module github.com/oraichain/orai
 go 1.15
 
 require (
-	github.com/CosmWasm/wasmd v0.14.1
-	github.com/cosmos/cosmos-sdk v0.40.1
+	github.com/CosmWasm/wasmd v0.15.0
+	github.com/cosmos/cosmos-sdk v0.41.0
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.4.3
