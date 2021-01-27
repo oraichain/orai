@@ -12,6 +12,7 @@ const (
 	QuerierRoute      = types.QuerierRoute
 	DefaultParamspace = types.DefaultParamspace
 	ScriptPath        = types.ScriptPath
+	Denom             = types.Denom
 )
 
 var (

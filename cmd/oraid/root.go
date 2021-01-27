@@ -265,7 +265,7 @@ func createOraichainAppAndExport(
 
 // initCmd returns a command that initializes all files needed for Tendermint
 // and the respective application.
-func initCmd(mbm module.BasicManager, customAppState *app.GenesisState, defaultNodeHome string) *cobra.Command {
+func initCmd(mbm module.BasicManager, customAppState app.GenesisState, defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "init [moniker]",
 		Short: "Initialize private validator, p2p, genesis, and application configuration files",

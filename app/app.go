@@ -18,6 +18,8 @@ import (
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
+	"github.com/CosmWasm/wasmd/x/wasm"
+	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
@@ -87,8 +89,6 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	"github.com/oraichain/orai/x/airequest"
 	"github.com/oraichain/orai/x/airesult"
-	"github.com/CosmWasm/wasmd/x/wasm"
-	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
 	"github.com/oraichain/orai/x/websocket"
 
 	"github.com/oraichain/orai/x/provider"
@@ -102,7 +102,7 @@ const appName = "Oraichain"
 // We pull these out so we can set them with LDFLAGS in the Makefile
 var (
 	NodeDir      = ".oraid"
-	Bech32Prefix = "orai"
+	Bech32Prefix = provider.Denom
 
 	// If EnabledSpecificProposals is "", and this is "true", then enable all x/wasm proposals.
 	// If EnabledSpecificProposals is "", and this is not "true", then disable all x/wasm proposals.

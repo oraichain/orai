@@ -36,9 +36,6 @@ const (
 
 	// ResultSuccess is the success status of a result after the test case runs
 	ResultSuccess = "success"
-
-	// Denom is the denominator of the currency
-	Denom = "orai"
 )
 
 var (

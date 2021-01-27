@@ -6,6 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	airequest "github.com/oraichain/orai/x/airequest/types"
 	"github.com/oraichain/orai/x/airesult/types"
+	"github.com/oraichain/orai/x/provider"
 	websocket "github.com/oraichain/orai/x/websocket/types"
 )
 
@@ -29,7 +30,7 @@ func (k Keeper) CollectRequestFees(ctx sdk.Context, blockHeight int64) (fees sdk
 	// collect requests from the previous block
 	requests := k.GetRequestsBlockHeight(ctx, blockHeight)
 	if len(requests) == 0 {
-		return sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(0))))
+		return sdk.NewCoins(sdk.NewCoin(provider.Denom, sdk.NewInt(int64(0))))
 	}
 	for _, request := range requests {
 		fees = fees.Add(request.GetFees()...)

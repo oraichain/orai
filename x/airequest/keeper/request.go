@@ -5,6 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/oraichain/orai/x/airequest/types"
+	"github.com/oraichain/orai/x/provider"
 )
 
 // GetAIRequest returns the information of an AI request
@@ -57,7 +58,7 @@ func (k Keeper) CollectRequestFees(ctx sdk.Context, blockHeight int64) (fees sdk
 	// collect requests from the previous block
 	requests := k.GetRequestsBlockHeight(ctx, blockHeight)
 	if len(requests) == 0 {
-		return sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(0))))
+		return sdk.NewCoins(sdk.NewCoin(provider.Denom, sdk.NewInt(int64(0))))
 	}
 	for _, request := range requests {
 		fees = fees.Add(request.Fees...)

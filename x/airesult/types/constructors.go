@@ -69,8 +69,8 @@ func DefaultReward(blockHeight int64) *Reward {
 		TestCases:     make([]provider.TestCase, 0),
 		BlockHeight:   blockHeight,
 		TotalPower:    int64(0),
-		ProviderFees:  sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(0)))),
-		ValidatorFees: sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(0)))),
+		ProviderFees:  sdk.NewCoins(sdk.NewCoin(provider.Denom, sdk.NewInt(int64(0)))),
+		ValidatorFees: sdk.NewCoins(sdk.NewCoin(provider.Denom, sdk.NewInt(int64(0)))),
 	}
 }
 

@@ -7,6 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	aiRequest "github.com/oraichain/orai/x/airequest"
+	"github.com/oraichain/orai/x/provider"
 
 	"time"
 
@@ -154,7 +155,7 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 	subscriber.log.Info("star: final result after trimming: ", finalResultStr)
 	// Create a new MsgCreateReport with a new reporter to the Oraichain
 	reporter := types.NewReporter(creator, subscriber.config.FromValidator, sdk.ValAddress(subscriber.cliCtx.FromAddress))
-	msgReport := types.NewMsgCreateReport(requestID, dataSourceResults, testCaseResults, reporter, sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(int64(5000)))), []byte(finalResultStr), types.ResultSuccess)
+	msgReport := types.NewMsgCreateReport(requestID, dataSourceResults, testCaseResults, reporter, sdk.NewCoins(sdk.NewCoin(provider.Denom, sdk.NewInt(int64(5000)))), []byte(finalResultStr), types.ResultSuccess)
 	if len(finalResultStr) == 0 {
 		msgReport.AggregatedResult = []byte(types.FailedResponseOs)
 		msgReport.ResultStatus = types.ResultFailure
