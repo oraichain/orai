@@ -18,9 +18,10 @@ services:
     cap_add:
       - SYS_PTRACE
     env_file:
-      - orai.env
+      - orai.dev.env
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       #- ./vendor:/go/pkg/mod/
       - ./:/workspace
-      - ./setup_genesis.sh:/usr/bin/setup
+    command:
+      - fn init && fn start
