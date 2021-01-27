@@ -225,7 +225,7 @@ EOF
 initFn(){ 
 
   ### Check if a directory does not exist ###
-  if [[ ! -d "$PWD/.oraid/" || ! -d "$PWD/.oraicli/" ]] 
+  if [[ ! -d "$PWD/.oraid/" ]] 
   then
     echo "Directory /path/to/dir DOES NOT exists."
 
