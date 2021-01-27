@@ -89,20 +89,6 @@ helloFn() {
   echo "passphrase: $PASS"
 }
 
-getKey() {
-    expect << EOF
-    set timeout 3
-    spawn oraicli keys show $@
-    expect "Enter keyring passphrase:"
-    send -- "$PASS\r"
-    expect eof
-EOF
-}
-
-getKeyAddr() {
-  key=$(getKey $@)
-  echo "$key" | tail -1 | xargs
-}
 
 # Get a value:
 getArgument() {     
@@ -181,9 +167,7 @@ esac
 
 
 clear(){
-    rm -rf .oraid/
-    rm -rf .oraicli/
-    rm -rf .oraifiles/    
+    rm -rf .oraid/    
 }
 
 oraidFn(){
@@ -194,22 +178,6 @@ oraidFn(){
     else
       tail -f /dev/null 
     fi
-}
-
-enterPassPhrase(){
-  expect << EOF
-        spawn $@
-        expect {
-          "*passphrase:" { send -- "$PASS\r" }
-        }
-        expect {
-          "confirm transaction*" {send -- "y\r"}
-        }
-        expect {
-          "*passphrase:" { send -- "$PASS\r" }
-        }
-        expect eof
-EOF
 }
 
 
@@ -316,7 +284,7 @@ createValidatorFn() {
   echo "start creating validator..."
   sleep 10
 
-  enterPassPhrase oraicli tx staking create-validator --amount $amount --pubkey $pubkey --moniker $moniker --chain-id Oraichain --commission-rate $commissionRate --commission-max-rate $commissionMaxRate --commission-max-change-rate $commissionMaxChangeRate --min-self-delegation $minDelegation --gas $gas --gas-prices $gasPrices --security-contact $securityContract --identity $identity --website $website --details $details --from $user
+  (echo $PASS; echo $PASS) | oraid tx staking create-validator --amount $amount --pubkey $pubkey --moniker $moniker --chain-id Oraichain --commission-rate $commissionRate --commission-max-rate $commissionMaxRate --commission-max-change-rate $commissionMaxChangeRate --min-self-delegation $minDelegation --gas $gas --gas-prices $gasPrices --security-contact $securityContract --identity $identity --website $website --details $details --from $user -y
 }
 
 USER=$(getArgument "user" $USER)
