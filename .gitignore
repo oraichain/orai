@@ -51,9 +51,9 @@ contract_tests/*
 .oraicli/
 .oraid/
 .wasmd/
-registry_cache/
+.registry_cache/
 .ash_history
-.cache
+.cache/
 smart-contracts/**/artifacts/
 libwasmvm_muslc.a
 .vscode-server
