@@ -87,4 +87,4 @@ make proto-gen PROTO_DIR=x/websocket/types/
 ```
 
 ## Build docker image
-`docker build -t orai/orai:alpine-prod -f Dockerfile.prod .`
+`docker build -t orai/orai:0.15-alpine -f Dockerfile.prod .`
