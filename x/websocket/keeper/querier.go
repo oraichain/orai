@@ -43,6 +43,11 @@ func (k *Querier) DataSourceContract(goCtx context.Context, req *types.QueryData
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	datasource, err := k.keeper.providerKeeper.GetAIDataSource(ctx, req.Name)
+	if err != nil {
+		// already wrapped at providerKeeper
+		return nil, err
+	}
+
 	result, err := k.keeper.QueryContract(ctx, sdk.AccAddress(datasource.Contract), []byte(`{}`))
 	return &types.ResponseContract{
 		Data: result,
@@ -57,7 +62,16 @@ func (k *Querier) TestCaseContract(goCtx context.Context, req *types.QueryTestCa
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	testcase, err := k.keeper.providerKeeper.GetTestCase(ctx, req.Name)
+	if err != nil {
+		return nil, err
+	}
+
 	datasource, err := k.keeper.providerKeeper.GetAIDataSource(ctx, req.DataSourcName)
+	if err != nil {
+		// already wrapped at providerKeeper
+		return nil, err
+	}
+
 	// re-bind
 	req.Request.DataSourceContract = sdk.AccAddress(datasource.Contract)
 	contractReq := k.keeper.cdc.MustMarshalJSON(req.Request)
@@ -75,6 +89,11 @@ func (k *Querier) OracleScriptContract(goCtx context.Context, req *types.QueryOr
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	oscript, err := k.keeper.providerKeeper.GetTestCase(ctx, req.Name)
+	if err != nil {
+		// already wrapped at providerKeeper
+		return nil, err
+	}
+
 	contractReq := k.keeper.cdc.MustMarshalJSON(req.Request)
 	result, err := k.keeper.QueryContract(ctx, sdk.AccAddress(oscript.Contract), contractReq)
 	return &types.ResponseContract{

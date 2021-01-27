@@ -1,5 +1,7 @@
 ## Installation
 
+We dont change the x/wasm module but replacing the package name
+
 ```bash
 docker-compose up -d && docker-compose exec orai ash
 # wget https://github.com/CosmWasm/wasmvm/releases/download/v0.13.0/libwasmvm_muslc.a -O /lib/libwasmvm_muslc.a

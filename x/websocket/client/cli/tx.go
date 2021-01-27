@@ -167,6 +167,7 @@ func GetCmdSubscribe() *cobra.Command {
 		Short: "Subscribe to AI request log to submit report transactions.",
 		RunE: func(cmd *cobra.Command, args []string) error {
 
+			// txContext no require for block height, it just broadcast tx
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
