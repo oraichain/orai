@@ -20,5 +20,4 @@ services:
     env_file:
       - orai.env
     volumes:            
-      - ./:/workspace
-    entrypoint: tail -f /dev/null
+      - ./:/workspace    
