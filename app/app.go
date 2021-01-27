@@ -135,7 +135,7 @@ func GetEnabledProposals() []wasm.ProposalType {
 // any overrides above
 var (
 	// DefaultNodeHome default home directories for wasmd
-	DefaultNodeHome = os.ExpandEnv("$HOME/") + NodeDir
+	DefaultNodeHome = os.ExpandEnv("$PWD/") + NodeDir
 
 	// Bech32PrefixAccAddr defines the Bech32 prefix of an account's address
 	Bech32PrefixAccAddr = Bech32Prefix

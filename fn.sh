@@ -198,16 +198,10 @@ oraidFn(){
     # # sleep 3
     # # kill -9 `lsof -t -i:26657`
     sleep 3
-    oraid start --rpc.laddr tcp://0.0.0.0:26657 &
-    timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
 
-    if [ -f $PWD/.oraid/websocket.yaml ]; then
-      echo "Found configuration files for the websocket"
-      oraicli rest-server --chain-id Oraichain --trust-node --laddr tcp://0.0.0.0:1317 &
-      sleep 5
-      websocket --home $PWD/.oraid run
-    else
-      oraicli rest-server --chain-id Oraichain --trust-node --laddr tcp://0.0.0.0:1317
+    if [[ -d "$PWD/.oraid/" ]] 
+    then
+      oraid start --rpc.laddr tcp://0.0.0.0:26657
     fi
 }
 
@@ -237,15 +231,27 @@ initFn(){
 
     oraid init $(getArgument "moniker" $MONIKER) --chain-id Oraichain
 
+    requirePass
+
+    echo "passphrase: $PASS"
+
+    sleep 3
+
+    if [ -z "$MNEMONIC" ]
+    then 
+      echo "Enter mnemonic: "  
+      read MNEMONIC
+    fi 
+
+    echo "mnemonic: $MNEMONIC"
+
+    sleep 3
+
     # Configure your CLI to eliminate need to declare them as flags
-    oraicli config chain-id Oraichain
-    oraicli config output json
-    oraicli config indent true
-    oraicli config trust-node true
 
     expect << EOF
 
-        spawn oraicli keys add $USER --recover
+        spawn oraid keys add $USER --recover
         expect {
           "override the existing name*" {send -- "y\r"}
         }
@@ -277,173 +283,6 @@ EOF
     oraid validate-genesis
     # done init
   fi
-}
-
-initGenesisFn() {
-    ### Check if a directory does not exist ###
-  if [[ ! -d "$HOME/.oraid/" ]] 
-  then
-    echo "Directory /path/to/dir DOES NOT exists."
-
-    oraid init $(getArgument "moniker" $MONIKER) --chain-id Oraichain 
-
-    expect << EOF
-
-        spawn oraid keys add $USER --recover
-        expect {
-          "override the existing name*" {send -- "y\r"}
-        }
-
-        expect "Enter your bip39 mnemonic*"
-        send -- "$MNEMONIC\r"
-
-        expect {
-          "*passphrase:" { send -- "$PASS\r" }
-        }
-        expect {
-          "*passphrase:" { send -- "$PASS\r" }
-        }
-        expect eof
-EOF
-    sleep 4
-
-    expect << EOF
-
-
-        spawn oraid add-genesis-account $USER "100000000000000orai"
-
-        expect {
-          "*passphrase:" { send -- "$PASS\r" }
-        }
-
-        expect eof
-EOF
-
-    sleep 4
-
-    expect << EOF
-
-        spawn oraid gentx $USER "250000000orai" --chain-id=Oraichain --amount="250000000orai"
-
-        expect {
-          "*passphrase:" { send -- "$PASS\r" }
-        }
-
-        expect eof
-EOF
-
-    sleep 4
-
-    # write genesis information into files
-
-    oraid collect-gentxs
-    oraid validate-genesis
-
-    # TODO: need to change this to curl to send the data to a server
-    cat $HOME/.oraid/config/genesis.json | jq .app_state.auth.accounts > "$MONIKER"_accounts.txt
-    cat $HOME/.oraid/config/genesis.json | jq .app_state.genutil.gen_txs > "$MONIKER"_validators.txt
-    # done init
-  fi
-}
-
-websocketInitFn() {
-  # run at background without websocket
-  # # 30 seconds timeout to check if the node is alive or not
-  timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
-  local reporter="${USER}_reporter"
-  local user=$(getArgument "user" $USER)
-
-  local gas=$(getArgument "gas" $GAS)
-  if [[ $gas != "auto" && !$gas =~ $re ]]; then
-    gas=200000
-  fi
-
-  # workaround, since auto gas in this case is not good, sometimes get out of gas
-  if [[ $gas == "auto" || $gas < 200000 ]]; then
-    gas=200000
-  fi
-
-  local gasPrices=$(getArgument "gas_prices" $GAS_PRICES)
-  if [[ $gasPrices == "" ]]; then
-    gasPrices="0.000000000025orai"
-  fi
-
-  # for i in $(eval echo {1..$2})
-  # do
-    # add reporter key
-
-  ###################### init websocket for the validator
-
-  echo "start initiating websocket..."
-  HOME=$PWD/.oraid
-  # rm -rf ~/.websocket
-  WEBSOCKET="websocket --home $HOME"
-  #$WEBSOCKET keys delete-all
-  $WEBSOCKET keys add $reporter
-
-  # config chain id
-  $WEBSOCKET config chain-id Oraichain
-
-  # add validator to websocket config
-  echo "get user validator address..."
-  local val_address=$(getKeyAddr $USER -a --bech val)
-  $WEBSOCKET config validator $val_address
-
-  # setup broadcast-timeout to websocket config
-  $WEBSOCKET config broadcast-timeout "30s"
-
-  # setup rpc-poll-interval to websocket config
-  $WEBSOCKET config rpc-poll-interval "1s"
-
-  # setup max-try to websocket config
-  $WEBSOCKET config max-try 5
-
-  # config log type
-  $WEBSOCKET config log-level debug
-
-  $WEBSOCKET config gas-prices $gasPrices
-
-  $WEBSOCKET config gas $gas
-
-  echo "start sending tokens to the reporter"
-
-  sleep 10
-
-  local reporterAmount=$(getArgument "reporter_amount" $REPORTER_AMOUNT)
-
-  echo "collecting user account address from local node..."
-  local user_address=$(getKeyAddr $user -a)
-
-  # send orai tokens to reporters
-
-  echo "collecting the reporter's information..."
-
-  enterPassPhrase oraicli tx send $user_address $($WEBSOCKET keys show $reporter) $reporterAmount --from $user_address --gas-prices $gasPrices
-
-  echo "start broadcasting the reporter..."
-  sleep 10
-
-  #wait for sending orai tokens transaction success
-
-  # add reporter to oraichain
-  enterPassPhrase oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $user --gas-prices $gasPrices
-  sleep 8
-
-  pkill oraid 
-  sleep 3
-  pkill oraicli
-  sleep 3
-  pkill websocket
-  sleep 3
-  echo "Finished setting up the websocket. you can restart your node again ..."
-}
-
-websocketRunFn() {
-  HOME=$PWD/.oraid
-  # rm -rf ~/.websocket
-  WEBSOCKET="websocket --home $HOME"
-
-  $WEBSOCKET run
 }
 
 createValidatorFn() {
@@ -504,83 +343,6 @@ createValidatorFn() {
   sleep 10
 
   enterPassPhrase oraicli tx staking create-validator --amount $amount --pubkey $pubkey --moniker $moniker --chain-id Oraichain --commission-rate $commissionRate --commission-max-rate $commissionMaxRate --commission-max-change-rate $commissionMaxChangeRate --min-self-delegation $minDelegation --gas $gas --gas-prices $gasPrices --security-contact $securityContract --identity $identity --website $website --details $details --from $user
-
-  local reporter="${user}_reporter"
-  # # for i in $(eval echo {1..$2})
-  # # do
-  #   # add reporter key
-
-  # ###################### init websocket for the validator
-
-  echo "start initiating websocket..."
-  HOME=$PWD/.oraid
-  # rm -rf ~/.websocket
-  WEBSOCKET="websocket --home $HOME"
-  #$WEBSOCKET keys delete-all
-  $WEBSOCKET keys add $reporter
-
-  # config chain id
-  $WEBSOCKET config chain-id Oraichain
-
-  # add validator to websocket config
-  echo "get user validator address..."
-  local val_address=$(getKeyAddr $user -a --bech val)
-  $WEBSOCKET config validator $val_address
-
-  # setup broadcast-timeout to websocket config
-  $WEBSOCKET config broadcast-timeout "30s"
-
-  # setup rpc-poll-interval to websocket config
-  $WEBSOCKET config rpc-poll-interval "1s"
-
-  # setup max-try to websocket config
-  $WEBSOCKET config max-try 5
-
-  # config log type
-  $WEBSOCKET config log-level debug
-
-  $WEBSOCKET config gas-prices $gasPrices
-
-  $WEBSOCKET config gas $gas
-
-  echo "start sending tokens to the reporter"
-
-  sleep 10
-
-  local reporterAmount=$(getArgument "reporter_amount" $REPORTER_AMOUNT)
-
-  echo "collecting user account address from local node..."
-  local user_address=$(getKeyAddr $user -a)
-
-  # send orai tokens to reporters
-
-  echo "collecting the reporter's information..."
-
-  enterPassPhrase oraicli tx send $user_address $($WEBSOCKET keys show $reporter) $reporterAmount --from $user_address --gas-prices $gasPrices
-
-  echo "start broadcasting the reporter..."
-  sleep 10
-
-  #wait for sending orai tokens transaction success
-
-  # add reporter to oraichain
-  enterPassPhrase oraicli tx websocket add-reporters $($WEBSOCKET keys list -a) --from $user --gas-prices $gasPrices
-  sleep 8
-
-  echo "killing the processes to get ready to restart the node..."
-  pkill oraid 
-  sleep 3
-  pkill oraicli
-  sleep 3
-  pkill websocket
-  # kill -9 `lsof -t -i:1317`
-  # sleep 3
-  # kill -9 `lsof -t -i:26656`
-  # sleep 3
-  # kill -9 `lsof -t -i:26657`
-  sleep 3
-  echo "done!"
-  echo ""
 }
 
 USER=$(getArgument "user" $USER)
@@ -592,15 +354,6 @@ case "${METHOD}" in
   ;;
   init)
     initFn
-  ;;
-  initGenesis)
-    initGenesisFn
-  ;;
-  wsInit)
-  websocketInitFn
-  ;;
-  wsRun)
-  websocketRunFn
   ;;
   start)
     oraidFn
