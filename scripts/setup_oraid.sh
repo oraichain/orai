@@ -19,13 +19,13 @@ CONTRACT_CODE=${CONTRACT_CODE:-smart-contracts/play-smartc/target/wasm32-unknown
 
 if [ -f $CONTRACT_CODE ];then     
   echo "## Genesis CosmWasm contract"
-  oraid add-wasm-genesis-message store $CONTRACT_CODE --instantiate-everybody false --run-as $USER
+  (echo "$PASSWORD") | oraid add-wasm-genesis-message store $CONTRACT_CODE --instantiate-everybody false --run-as $USER
 
   echo "-----------------------"
   echo "## Genesis CosmWasm instance"
   INIT='{"count":10}'
-  BASE_ACCOUNT=$(oraid keys show $USER -a)
-  oraid add-wasm-genesis-message instantiate-contract 1 $INIT --run-as $USER --label=oracle --amount=100orai --admin $BASE_ACCOUNT
+  BASE_ACCOUNT=$(echo "$PASSWORD" | oraid keys show $USER -a)
+  (echo "$PASSWORD") | oraid add-wasm-genesis-message instantiate-contract 1 $INIT --run-as $USER --label=oracle --amount=100orai --admin $BASE_ACCOUNT
 
   # if need execute
   CONTRACT=$(oraid add-wasm-genesis-message list-contracts | jq '.[0].contract_address' -r)

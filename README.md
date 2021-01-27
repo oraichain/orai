@@ -51,6 +51,13 @@ oraid query wasm contract-state smart $CONTRACT '{"get_count":{}}'
 # step 5: migrate contract to a new code
 # TODO: this is for oracle aggregation only in the future with latest version of wasmvm
 
+# step 6: test testcase contract call datasource contract
+# install contract and get the CODE_ID
+oraid tx wasm store smart-contracts/datasource-price/artifacts/datasource_price.wasm --from $USER --gas="auto" --gas-adjustment="1.2" --chain-id=testing -y
+TESTCASE_CONTRACT=$(oraid query wasm list-contract-by-code $CODE_ID | grep address | awk '{print $(NF)}')
+# then query it with datasource contract address
+oraid query wasm contract-state smart $TESTCASE_CONTRACT "{\"get_price\":{\"contract\":\"$CONTRACT\",\"token\":\"bitcoin\"}}"
+
 ```
 
 ## Some basic commands to test with the node
