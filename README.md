@@ -85,3 +85,6 @@ make proto-lint
 # build protobuf templates
 make proto-gen PROTO_DIR=x/websocket/types/
 ```
+
+## Build docker image
+`docker build -t orai/orai:alpine-prod -f Dockerfile.prod .`
