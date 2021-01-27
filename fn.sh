@@ -240,24 +240,7 @@ initFn(){
 
     # Configure your CLI to eliminate need to declare them as flags
 
-    expect << EOF
-
-        spawn oraid keys add $USER --recover
-        expect {
-          "override the existing name*" {send -- "y\r"}
-        }
-
-        expect "Enter your bip39 mnemonic*"
-        send -- "$MNEMONIC\r"
-
-        expect {
-          "*passphrase:" { send -- "$PASS\r" }
-        }
-        expect {
-          "*passphrase:" { send -- "$PASS\r" }
-        }
-        expect eof
-EOF
+    (echo "y"; echo "$MNEMONIC"; echo "$PASS"; echo "$PASS") | oraid keys add $USER --recover
 
     # download genesis json file
   

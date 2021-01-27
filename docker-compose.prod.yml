@@ -21,5 +21,4 @@ services:
       - orai.dev.env
     volumes:            
       - ./:/workspace
-    entrypoint:
-      - fn init && fn start
+    entrypoint: fn init && fn start
