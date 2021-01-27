@@ -54,6 +54,7 @@ contract_tests/*
 .wasmd/
 .registry_cache/
 .ash_history
+.bash_history
 .cache/
 smart-contracts/**/artifacts/
 libwasmvm_muslc.a

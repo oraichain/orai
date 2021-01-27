@@ -19,9 +19,7 @@ services:
       - SYS_PTRACE
     env_file:
       - orai.dev.env
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      #- ./vendor:/go/pkg/mod/
+    volumes:            
       - ./:/workspace
     command:
       - fn init && fn start

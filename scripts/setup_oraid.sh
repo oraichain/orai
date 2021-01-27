@@ -43,7 +43,7 @@ rm -rf "$HOME"/.oraid
 
 oraid init --chain-id "$CHAIN_ID" "$MONIKER"
 # staking/governance token is hardcoded in config, change this
-# sed -i "s/\"stake\"/\"$STAKE\"/" "$HOME"/.oraid/config/genesis.json
+sed -i "s/\"stake\"/\"$STAKE\"/" "$HOME"/.oraid/config/genesis.json
 
 oraid keys add $USER
 
@@ -57,9 +57,11 @@ for addr in "$@"; do
 done
 
 # (optionally) add smart contract
-if [ ! -z $LOCAL ];then     
+CONTRACT_CODE=${CONTRACT_CODE:-smart-contracts/play-smartc/target/wasm32-unknown-unknown/release/play_smartc.wasm}
+echo $CONTRACT_CODE
+if [ -f $CONTRACT_CODE ];then     
   echo "## Genesis CosmWasm contract"
-  oraid add-wasm-genesis-message store x/wasm/internal/keeper/testdata/play_smartc.wasm --instantiate-everybody false --run-as $USER
+  oraid add-wasm-genesis-message store $CONTRACT_CODE --instantiate-everybody false --run-as $USER
 
   echo "-----------------------"
   echo "## Genesis CosmWasm instance"
