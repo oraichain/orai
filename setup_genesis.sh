@@ -56,16 +56,6 @@ oraid validate-genesis
 accounts=$(cat $PWD/.oraid/config/genesis.json | jq .app_state.auth.accounts[0])
 validators=$(cat $PWD/.oraid/config/genesis.json | jq .app_state.genutil.gen_txs[0])
 
-# curl --location --request POST 'https://genesis.oraichain.io/api/genesis/accounts' \
-#     --header 'Content-Type: application/json' \
-#     -H "Accept: application/json" \
-#     --data "'$accounts'"
-
-# curl --location --request POST 'https://genesis.oraichain.io/api/genesis/gentxs' \
-#     --header 'Content-Type: application/json' \
-#     -H "Accept: application/json" \
-#     --data "'$validators'"
-
 cat $PWD/.oraid/config/genesis.json | jq .app_state.auth.accounts > "$MONIKER"_accounts.txt
 cat $PWD/.oraid/config/genesis.json | jq .app_state.genutil.gen_txs > "$MONIKER"_validators.txt
 

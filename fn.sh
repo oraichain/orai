@@ -187,21 +187,12 @@ clear(){
 }
 
 oraidFn(){
-    pkill oraid 
-    sleep 3
-    pkill oraicli
-    sleep 3
-    pkill websocket
-    # # kill -9 `lsof -t -i:1317`
-    # # sleep 3
-    # # kill -9 `lsof -t -i:26656`
-    # # sleep 3
-    # # kill -9 `lsof -t -i:26657`
-    sleep 3
-
+    pkill oraid
     if [[ -d "$PWD/.oraid/" ]] 
     then
-      oraid start --rpc.laddr tcp://0.0.0.0:26657
+      oraid start --rpc.laddr tcp://0.0.0.0:26657 --log_level error
+    else
+      tail -f /dev/null 
     fi
 }
 

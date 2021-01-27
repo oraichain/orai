@@ -18,7 +18,7 @@ ADD https://github.com/CosmWasm/wasmvm/releases/download/v0.13.0/libwasmvm_muslc
 RUN sha256sum /lib/libwasmvm_muslc.a | grep 39dc389cc6b556280cbeaebeda2b62cf884993137b83f90d1398ac47d09d3900
 
 # force it to use static lib (from above) not standard libgo_cosmwasm.so file
-RUN LEDGER_ENABLED=false BUILD_TAGS=muslc make build
+RUN make build LEDGER_ENABLED=false BUILD_TAGS=muslc GOMOD_FLAGS=
 
 # --------------------------------------------------------
 FROM alpine:3.12
@@ -27,7 +27,7 @@ WORKDIR /code
 
 COPY --from=go-builder /code/build/oraid /usr/bin/oraid
 
-RUN apk add expect nano jq curl bash ncurses
+RUN apk add expect nano jq curl bash ncurses make git upx
 
 COPY fn.sh /usr/bin/fn
 

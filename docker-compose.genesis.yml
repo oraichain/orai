@@ -24,3 +24,4 @@ services:
       #- ./vendor:/go/pkg/mod/
       - ./:/workspace
       - ./setup_genesis.sh:/usr/bin/setup
+      - ./fn.sh:/usr/bin/fn

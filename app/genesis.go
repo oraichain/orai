@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
+	wasm "github.com/CosmWasm/wasmd/x/wasm"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	auth "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -23,7 +24,6 @@ import (
 	aiRequest "github.com/oraichain/orai/x/airequest/types"
 	airesult "github.com/oraichain/orai/x/airesult/types"
 	provider "github.com/oraichain/orai/x/provider/types"
-	wasm "github.com/CosmWasm/wasmd/x/wasm"
 	websocket "github.com/oraichain/orai/x/websocket/types"
 )
 

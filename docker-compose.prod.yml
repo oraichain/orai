@@ -23,5 +23,5 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       #- ./vendor:/go/pkg/mod/
       - ./:/workspace
-    command:
+    entrypoint:
       - fn init && fn start
