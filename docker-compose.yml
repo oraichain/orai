@@ -22,22 +22,6 @@ services:
     volumes:        
       - ./:/workspace
 
-  orai-prod:
-    image: cosmwasm/wasmd
-    working_dir: /workspace
-    tty: true
-    ulimits:
-      nofile:
-        soft: 65536
-        hard: 65536    
-    security_opt:
-      - 'seccomp:unconfined'
-    cap_add:
-      - SYS_PTRACE
-    env_file:
-      - orai.dev.env    
-    
-
   rust:
     image: cosmwasm/rust-optimizer:0.10.7
     entrypoint: tail -f /dev/null
