@@ -47,6 +47,6 @@ EXPOSE 26656
 # tendermint rpc
 EXPOSE 26657
 
-ENTRYPOINT fn start
+# ENTRYPOINT fn start
 
 # CMD ["/usr/bin/oraid", "version"]

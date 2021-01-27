@@ -7,7 +7,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	artypes "github.com/oraichain/orai/x/airequest/types"
-	providerTypes "github.com/oraichain/orai/x/provider/types"
 	"github.com/oraichain/orai/x/websocket/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/crypto/tmhash"
@@ -70,8 +69,9 @@ func (subscriber *Subscriber) handleTransaction(queryClient types.QueryClient, t
 			// process with each event type
 			attrMap := getAttributeMap(ev.GetAttributes())
 			switch ev.Type {
-			case providerTypes.EventTypeSetDataSource:
-				subscriber.handleDataSourceLog(queryClient, attrMap)
+			// datasource is for testing only
+			// case providerTypes.EventTypeSetDataSource:
+			// 	subscriber.handleDataSourceLog(queryClient, attrMap)
 			case artypes.EventTypeSetAIRequest:
 				subscriber.handleAIRequestLog(queryClient, attrMap)
 			default:
