@@ -63,5 +63,5 @@ libwasmvm_muslc.a
 
 # ignore generated files
 x/**/types/*.pb.*
-
+tmp
 go.sum
