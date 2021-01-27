@@ -3,10 +3,10 @@ package subscribe
 import (
 	"context"
 
+	"github.com/CosmWasm/wasmd/x/wasm"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	providerTypes "github.com/oraichain/orai/x/provider/types"
-	"github.com/oraichain/orai/x/wasm"
 	"github.com/oraichain/orai/x/websocket/types"
 )
 

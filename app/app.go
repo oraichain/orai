@@ -87,8 +87,8 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	"github.com/oraichain/orai/x/airequest"
 	"github.com/oraichain/orai/x/airesult"
-	"github.com/oraichain/orai/x/wasm"
-	wasmclient "github.com/oraichain/orai/x/wasm/client"
+	"github.com/CosmWasm/wasmd/x/wasm"
+	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
 	"github.com/oraichain/orai/x/websocket"
 
 	"github.com/oraichain/orai/x/provider"

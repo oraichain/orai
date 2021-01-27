@@ -3,14 +3,11 @@ module github.com/oraichain/orai
 go 1.15
 
 require (
-	github.com/CosmWasm/wasmvm v0.13.0
+	github.com/CosmWasm/wasmd v0.14.1
 	github.com/cosmos/cosmos-sdk v0.40.1
 	github.com/cosmos/go-bip39 v1.0.0
-	github.com/cosmos/iavl v0.15.3
-	github.com/dvsekhvalnov/jose2go v0.0.0-20200901110807-248326c1351b
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.4.3
-	github.com/google/gofuzz v1.2.0
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/kyokomi/emoji v2.2.4+incompatible
@@ -30,7 +27,6 @@ require (
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
 	google.golang.org/genproto v0.0.0-20210114201628-6edceaf6022f
 	google.golang.org/grpc v1.35.0
-	gopkg.in/yaml.v2 v2.4.0
 )
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1

@@ -23,7 +23,7 @@ import (
 	aiRequest "github.com/oraichain/orai/x/airequest/types"
 	airesult "github.com/oraichain/orai/x/airesult/types"
 	provider "github.com/oraichain/orai/x/provider/types"
-	wasm "github.com/oraichain/orai/x/wasm"
+	wasm "github.com/CosmWasm/wasmd/x/wasm"
 	websocket "github.com/oraichain/orai/x/websocket/types"
 )
 

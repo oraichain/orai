@@ -1,7 +1,7 @@
 package main
 
 import (
-	wasmcli "github.com/oraichain/orai/x/wasm/client/cli"
+	wasmcli "github.com/CosmWasm/wasmd/x/wasm/client/cli"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/spf13/cobra"
 )
