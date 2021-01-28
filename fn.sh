@@ -172,12 +172,11 @@ clear(){
 
 oraidFn(){
     pkill oraid
-    local log=$(getArgument "log" "error")
-    if [[ -d "$PWD/.oraid/" ]]
+    if [[ -d "$PWD/.oraid/" ]] 
     then
-      oraid start --rpc.laddr tcp://0.0.0.0:26657 --log_level $log
+      oraid start --rpc.laddr tcp://0.0.0.0:26657 --log_level $LOG_LEVEL
     else
-      tail -f /dev/null
+      tail -f /dev/null 
     fi
 }
 
@@ -209,10 +208,28 @@ initFn(){
 
     # Configure your CLI to eliminate need to declare them as flags
 
-    (echo "y"; echo "$MNEMONIC"; echo "$PASS"; echo "$PASS") | oraid keys add $USER --recover
+    expect << EOF
 
-    # download genesis json file    
-    wget -O .oraid/config/genesis.json $GENESIS_URL
+        spawn oraid keys add $USER --recover
+        expect {
+          "override the existing name*" {send -- "y\r"}
+        }
+
+        expect "Enter your bip39 mnemonic*"
+        send -- "$MNEMONIC\r"
+
+        expect {
+          "*passphrase:" { send -- "$PASS\r" }
+        }
+        expect {
+          "*passphrase:" { send -- "$PASS\r" }
+        }
+        expect eof
+EOF
+
+    # download genesis json file
+  
+    curl $GENESIS_URL > .oraid/config/genesis.json
     
     # rm -f .oraid/config/genesis.json && wget https://raw.githubusercontent.com/oraichain/oraichain-static-files/ducphamle2-test/genesis.json -q -P .oraid/config/
 
@@ -233,7 +250,7 @@ createValidatorFn() {
   # # 30 seconds timeout to check if the node is alive or not, the '&' symbol allows to run below commands while still having the process running
   # oraid start &
     # 30 seconds timeout
-  timeout 30 bash -c 'while [[ "$(wget --spider -S localhost:26657/health 2>&1 | grep "HTTP/" | awk ''{print $2}'')" != "200" ]]; do sleep 1; done' || false
+  timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
 
   local amount=$(getArgument "amount" $AMOUNT)
   local pubkey=$(oraid tendermint show-validator)
@@ -282,9 +299,10 @@ createValidatorFn() {
   local details=$(getArgument "details" $DETAILS)
 
   echo "start creating validator..."
-  sleep 10
+  requirePass
+  sleep 5
 
-  (echo $PASS; echo $PASS) | oraid tx staking create-validator --amount $amount --pubkey $pubkey --moniker $moniker --chain-id Oraichain --commission-rate $commissionRate --commission-max-rate $commissionMaxRate --commission-max-change-rate $commissionMaxChangeRate --min-self-delegation $minDelegation --gas $gas --gas-prices $gasPrices --security-contact $securityContract --identity $identity --website $website --details $details --from $user -y
+  (echo "$PASS"; echo "$PASS") | oraid tx staking create-validator --amount $amount --pubkey $pubkey --moniker $moniker --chain-id Oraichain --commission-rate $commissionRate --commission-max-rate $commissionMaxRate --commission-max-change-rate $commissionMaxChangeRate --min-self-delegation $minDelegation --gas $gas --gas-prices $gasPrices --security-contact $securityContract --identity $identity --website $website --details $details --from $user -y
 }
 
 USER=$(getArgument "user" $USER)

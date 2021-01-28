@@ -31,7 +31,7 @@ WORKDIR /workspace
 
 COPY --from=go-builder /code/build/oraid /usr/bin/oraid
 
-RUN apk add curl nano jq bash ncurses
+RUN apk add curl nano jq bash ncurses expect
 
 COPY fn.sh /usr/bin/fn
 
