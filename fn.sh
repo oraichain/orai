@@ -13,6 +13,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 BOLD=$(tput bold)
 NORMAL=$(tput sgr0)
+LOG_LEVEL=${LOG_LEVEL:-error}
 
 # environment
 BASE_DIR=$PWD
@@ -237,7 +238,7 @@ EOF
 
     # download genesis json file
   
-    curl $GENESIS_URL > .oraid/config/genesis.json
+    wget -O .oraid/config/genesis.json $GENESIS_URL
     
     # rm -f .oraid/config/genesis.json && wget https://raw.githubusercontent.com/oraichain/oraichain-static-files/ducphamle2-test/genesis.json -q -P .oraid/config/
 

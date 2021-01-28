@@ -31,9 +31,9 @@ WORKDIR /workspace
 
 COPY --from=go-builder /code/build/oraid /usr/bin/oraid
 
-RUN apk add curl nano jq bash ncurses
+RUN apk add nano jq bash ncurses
 
-COPY fn.sh /usr/bin/fn
+# COPY fn.sh /usr/bin/fn
 
 # rest server
 EXPOSE 1317
