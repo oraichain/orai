@@ -180,9 +180,17 @@ oraidFn(){
     fi
 }
 
+checkExpectProgram() {
+  if [ ! `command -v expect` ]; then  
+    echo "Installing expect ..."
+    apk add expect
+  fi  
+}
 
 initFn(){ 
 
+  checkExpectProgram
+  
   ### Check if a directory does not exist ###
   if [[ ! -d "$PWD/.oraid/" ]] 
   then
