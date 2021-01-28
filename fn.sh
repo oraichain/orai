@@ -249,8 +249,8 @@ createValidatorFn() {
   # run at background without websocket
   # # 30 seconds timeout to check if the node is alive or not, the '&' symbol allows to run below commands while still having the process running
   # oraid start &
-    # 30 seconds timeout
-  timeout 30 bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' localhost:26657/health)" != "200" ]]; do sleep 1; done' || false
+  # 30 seconds timeout  
+  timeout 30 bash -c 'while [[ -z `wget --spider -S localhost:26657/health 2>&1 | grep "HTTP/.*200"` ]]; do sleep 1; done' || false
 
   local amount=$(getArgument "amount" $AMOUNT)
   local pubkey=$(oraid tendermint show-validator)
