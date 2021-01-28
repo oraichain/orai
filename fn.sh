@@ -172,11 +172,12 @@ clear(){
 
 oraidFn(){
     pkill oraid
-    if [[ -d "$PWD/.oraid/" ]] 
+    local log=$(getArgument "log" "error")
+    if [[ -d "$PWD/.oraid/" ]]
     then
-      oraid start --rpc.laddr tcp://0.0.0.0:26657 --log_level error
+      oraid start --rpc.laddr tcp://0.0.0.0:26657 --log_level $log
     else
-      tail -f /dev/null 
+      tail -f /dev/null
     fi
 }
 
