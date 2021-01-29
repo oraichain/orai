@@ -52,13 +52,3 @@ pub struct QueryFetchResponse {
 pub struct CountResponse {
     pub count: i32,
 }
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct Price {
-    pub usd: f32,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct QueryResponse {
-    pub ethereum: Price,
-}

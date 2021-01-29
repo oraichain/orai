@@ -27,11 +27,10 @@ impl CustomQuery for SpecialQuery {}
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct Price {
-    pub usd: f32,
+    pub usd: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-#[serde(rename_all = "snake_case")]
 pub struct QueryResponse {
     pub ethereum: Price,
 }
