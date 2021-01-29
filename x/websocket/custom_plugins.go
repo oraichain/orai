@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"regexp"
 	"strings"
 	"time"
 
@@ -19,10 +18,8 @@ type OracleQueryPlugin struct {
 	client  *http.Client
 	bank    bankkeeper.ViewKeeper
 	staking stakingkeeper.Keeper
-	re      *regexp.Regexp
 }
 
-// Custom run custom command
 func (oracleQueryPlugin OracleQueryPlugin) Custom(ctx sdk.Context, query json.RawMessage) ([]byte, error) {
 	var request types.Request
 
@@ -52,17 +49,12 @@ func (oracleQueryPlugin OracleQueryPlugin) Custom(ctx sdk.Context, query json.Ra
 	}
 
 	defer resp.Body.Close()
+	contents, _ := ioutil.ReadAll(resp.Body)
 
-	// we treat content as json, and fix float problem for wasm contract to help deterministically deserialization
-	contents, err := ioutil.ReadAll(resp.Body)
-	if err == nil {
-		contents = oracleQueryPlugin.re.ReplaceAll(contents, []byte(`$1"$2"$3`))
-	}
-
-	return contents, err
+	// bad case we dont care about the error, just return empty content, as long it is Binary compatible
+	return ModuleCdc.LegacyAmino.MarshalJSON(contents)
 }
 
-// CreateQueryPlugins create custom query
 func CreateQueryPlugins(bank bankkeeper.ViewKeeper, staking stakingkeeper.Keeper) *wasm.QueryPlugins {
 
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
@@ -70,7 +62,6 @@ func CreateQueryPlugins(bank bankkeeper.ViewKeeper, staking stakingkeeper.Keeper
 		client:  client,
 		bank:    bank,
 		staking: staking,
-		re:      regexp.MustCompile(`([:,\[])\s*(\d+\.\d+)\s*([},\]])`),
 	}
 
 	return &wasm.QueryPlugins{

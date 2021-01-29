@@ -1,5 +1,5 @@
 use crate::error::ContractError;
-use crate::msg::{HandleMsg, InitMsg, QueryMsg, QueryResponse, SpecialQuery};
+use crate::msg::{HandleMsg, InitMsg, QueryMsg, SpecialQuery};
 use cosmwasm_std::{
     to_binary, Api, Binary, Env, Extern, HandleResponse, InitResponse, MessageInfo, Querier,
     StdResult, Storage,
@@ -38,11 +38,17 @@ pub fn query<S: Storage, A: Api, Q: Querier>(
 
 fn query_price<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> StdResult<String> {
     // create specialquery with default empty string
-    let msg = SpecialQuery::Fetch {
+    let req = SpecialQuery::Fetch {
         url: "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
             .to_string(),
     }
     .into();
-    let response: QueryResponse = deps.querier.custom_query(&msg)?;
-    Ok(response.ethereum.usd)
+    // because not support f32, we need to do it manually
+    // dont use String because it will deserialize bytes to base 64
+    let response: Binary = deps.querier.custom_query(&req)?;
+    let data = String::from_utf8(response.to_vec()).unwrap();
+    let first = data.find(r#""usd":"#).unwrap() + 6;
+    let last = first + data.get(first..).unwrap().find("}").unwrap();
+    let price = data.get(first..last).unwrap().to_string();
+    Ok(price)
 }

@@ -25,12 +25,12 @@ impl CustomQuery for SpecialQuery {}
 
 // We define a custom struct for each query response
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct Price {
-    pub usd: String,
-}
+// #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+// pub struct Price {
+//     pub usd: String,
+// }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-pub struct QueryResponse {
-    pub ethereum: Price,
-}
+// #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+// pub struct QueryResponse {
+//     pub ethereum: Price,
+// }
