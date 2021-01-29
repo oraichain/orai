@@ -1,5 +1,5 @@
 use crate::error::ContractError;
-use crate::msg::{CountResponse, HandleMsg, InitMsg, QueryMsg, SpecialQuery};
+use crate::msg::{CountResponse, HandleMsg, InitMsg, QueryMsg, QueryResponse, SpecialQuery};
 use crate::state::{config, config_read, State};
 use cosmwasm_std::{
     to_binary, Api, Binary, Env, Extern, HandleResponse, InitResponse, MessageInfo, Querier,
@@ -129,6 +129,12 @@ mod tests {
         let res = query(&deps, mock_env(), QueryMsg::GetCount {}).unwrap();
         let value: CountResponse = from_binary(&res).unwrap();
         assert_eq!(17, value.count);
+
+        // let data = "{\"count\":17}";
+        // let res1 = data.to_string().into_bytes();
+        let data = Binary::from(r#"{"ethereum":{"usd":1377.17}}"#.to_string().into_bytes());
+        let res1: QueryResponse = from_binary(&data).unwrap();
+        println!("ethereum : {:?} | {:?}", data, res1.ethereum.usd);
     }
 
     #[test]

@@ -81,7 +81,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "datasource-price"
+name = "datasource-eth"
 version = "0.1.0"
 dependencies = [
  "cosmwasm-schema",

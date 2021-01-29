@@ -1,9 +1,9 @@
 use crate::error::ContractError;
-use crate::msg::{Fetch, HandleMsg, InitMsg, QueryFetch, QueryMsg};
+use crate::msg::{HandleMsg, InitMsg, QueryMsg, QueryResponse, SpecialQuery};
 use crate::state::{config, State};
 use cosmwasm_std::{
-    to_binary, Api, Binary, Env, Extern, HandleResponse, HumanAddr, InitResponse, MessageInfo,
-    Querier, StdResult, Storage,
+    to_binary, Api, Binary, Env, Extern, HandleResponse, InitResponse, MessageInfo, Querier,
+    StdResult, Storage,
 };
 
 // Note, you can use StdResult in some functions where you do not
@@ -38,24 +38,20 @@ pub fn query<S: Storage, A: Api, Q: Querier>(
     msg: QueryMsg,
 ) -> StdResult<Binary> {
     match msg {
-        QueryMsg::GetPrice { token, contract } => to_binary(&query_price(deps, token, &contract)?),
+        QueryMsg::GetPrice {} => query_price(deps),
     }
 }
 
-fn query_price<S: Storage, A: Api, Q: Querier>(
-    deps: &Extern<S, A, Q>,
-    token: String,
-    contract: &HumanAddr,
-) -> StdResult<String> {
+fn query_price<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> StdResult<Binary> {
     // create specialquery with default empty string
-    let url = format!(
-        "https://api.coingecko.com/api/v3/simple/price?ids={}&vs_currencies=usd",
-        token
-    );
+    let msg = SpecialQuery::Fetch {
+        url: "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
+            .to_string(),
+    }
+    .into();
 
-    let msg = QueryFetch {
-        fetch: Fetch { url },
-    };
+    let binary: Binary = deps.querier.custom_query(&msg)?;
+    let response: QueryResponse = cosmwasm_std::from_binary(&binary).unwrap();
 
-    deps.querier.query_wasm_smart(contract, &msg)
+    Ok(binary)
 }
