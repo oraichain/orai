@@ -1,8 +1,8 @@
 [package]
-name = "datasource-price"
+name = "testcase-price"
 version = "0.1.0"
 authors = ["tupt <tubackkhoa@gmail.com>"]
-edition = "2020"
+edition = "2018"
 
 exclude = [
   # Those files are rust-optimizer artifacts. You might want to commit them for convenience but they should not be part of the source code publication.
@@ -32,7 +32,6 @@ backtraces = ["cosmwasm-std/backtraces"]
 
 [dependencies]
 cosmwasm-std = { version = "0.11.0" }
-cosmwasm-storage = { version = "0.11.0" }
 schemars = "0.7"
 serde = { version = "1.0.103", default-features = false, features = ["derive"] }
 thiserror = { version = "1.0.21" }

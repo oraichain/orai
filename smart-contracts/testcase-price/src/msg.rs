@@ -9,20 +9,16 @@ pub struct InitMsg {}
 #[serde(rename_all = "snake_case")]
 pub enum HandleMsg {}
 
+// this TestCase does not have input
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum QueryMsg {
-    GetPrice { contract: HumanAddr, token: String },
+    TestPrice { contract: HumanAddr, output: String },
 }
 
+// for query other contract
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
-pub struct Fetch {
-    pub url: String,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-#[serde(rename_all = "snake_case")]
-pub struct QueryFetch {
-    pub fetch: Fetch,
+pub enum DataSourceQueryMsg {
+    GetPrice {},
 }
