@@ -14,4 +14,4 @@ contract_address=$(oraid query wasm list-contract-by-code $code_id | grep addres
 
 echo "Contract address: $contract_address"
 
-oraid query wasm contract-state smart $contract_address '{"test_price":{"contract":"orai1wgnpjk9s5dgyashvf4xl9hy3kzkfqynjjmnt8y","output":"1333.65"}}'
+# oraid query wasm contract-state smart $contract_address '{"test_price":{"contract":"orai1wgnpjk9s5dgyashvf4xl9hy3kzkfqynjjmnt8y","output":"1333.65"}}'

@@ -28,6 +28,9 @@ optimize.sh .
 docker-compose exec simulate bash
 cosmwasm-simulate oscript-price/artifacts/oscript_price.wasm
 
+# can using automated deployment
+./scripts/deploy-contract.sh smart-contracts/testcase-price/artifacts/testcase_price.wasm "testcase-price 1"
+
 # run unit-test
 RUST_BACKTRACE=1 cargo unit-test -- --exact contract::tests::increment --show-output
 
