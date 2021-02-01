@@ -3,16 +3,19 @@
   "title": "State",
   "type": "object",
   "required": [
-    "count",
-    "owner"
+    "ai_data_source",
+    "owner",
+    "testcase"
   ],
   "properties": {
-    "count": {
-      "type": "integer",
-      "format": "int32"
+    "ai_data_source": {
+      "type": "string"
     },
     "owner": {
       "$ref": "#/definitions/CanonicalAddr"
+    },
+    "testcase": {
+      "type": "string"
     }
   },
   "definitions": {

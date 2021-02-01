@@ -5,29 +5,36 @@
     {
       "type": "object",
       "required": [
-        "increment"
+        "update_datesource"
       ],
       "properties": {
-        "increment": {
-          "type": "object"
+        "update_datesource": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          }
         }
       }
     },
     {
       "type": "object",
       "required": [
-        "reset"
+        "update_testcase"
       ],
       "properties": {
-        "reset": {
+        "update_testcase": {
           "type": "object",
           "required": [
-            "count"
+            "name"
           ],
           "properties": {
-            "count": {
-              "type": "integer",
-              "format": "int32"
+            "name": {
+              "type": "string"
             }
           }
         }

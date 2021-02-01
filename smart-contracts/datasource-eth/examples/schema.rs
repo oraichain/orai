@@ -3,8 +3,7 @@ use std::fs::create_dir_all;
 
 use cosmwasm_schema::{export_schema, remove_schemas, schema_for};
 
-use oscript_price::msg::{HandleMsg, InitMsg, QueryMsg};
-use oscript_price::state::State;
+use datasource_eth::msg::{HandleMsg, InitMsg, QueryMsg, SpecialQuery};
 
 fn main() {
     let mut out_dir = current_dir().unwrap();
@@ -15,5 +14,5 @@ fn main() {
     export_schema(&schema_for!(InitMsg), &out_dir);
     export_schema(&schema_for!(HandleMsg), &out_dir);
     export_schema(&schema_for!(QueryMsg), &out_dir);
-    export_schema(&schema_for!(State), &out_dir);
+    export_schema(&schema_for!(SpecialQuery), &out_dir);
 }

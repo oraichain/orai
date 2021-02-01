@@ -1,5 +1,5 @@
 use crate::error::ContractError;
-use crate::msg::{CountResponse, HandleMsg, InitMsg, QueryMsg, SpecialQuery};
+use crate::msg::{HandleMsg, InitMsg, QueryMsg};
 use crate::state::{config, config_read, State};
 use cosmwasm_std::{
     to_binary, Api, Binary, Env, Extern, HandleResponse, InitResponse, MessageInfo, Querier,
@@ -15,7 +15,8 @@ pub fn init<S: Storage, A: Api, Q: Querier>(
     msg: InitMsg,
 ) -> StdResult<InitResponse> {
     let state = State {
-        count: msg.count,
+        ai_data_source: msg.ai_data_source,
+        testcase: msg.testcase,
         owner: deps.api.canonical_address(&info.sender)?,
     };
     config(&mut deps.storage).save(&state)?;
@@ -31,37 +32,38 @@ pub fn handle<S: Storage, A: Api, Q: Querier>(
     msg: HandleMsg,
 ) -> Result<HandleResponse, ContractError> {
     match msg {
-        HandleMsg::Increment {} => try_increment(deps, info),
-        HandleMsg::Reset { count } => try_reset(deps, info, count),
+        HandleMsg::UpdateDatesource { name } => try_update_datasource(deps, info, name),
+        HandleMsg::UpdateTestcase { name } => try_update_testcase(deps, info, name),
     }
 }
 
-pub fn try_increment<S: Storage, A: Api, Q: Querier>(
+pub fn try_update_datasource<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     info: MessageInfo,
+    name: String,
 ) -> Result<HandleResponse, ContractError> {
     let api = &deps.api;
     config(&mut deps.storage).update(|mut state| -> Result<_, ContractError> {
         if api.canonical_address(&info.sender)? != state.owner {
             return Err(ContractError::Unauthorized {});
         }
-        state.count += 1;
+        state.ai_data_source = name;
         Ok(state)
     })?;
     Ok(HandleResponse::default())
 }
 
-pub fn try_reset<S: Storage, A: Api, Q: Querier>(
+pub fn try_update_testcase<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     info: MessageInfo,
-    count: i32,
+    name: String,
 ) -> Result<HandleResponse, ContractError> {
     let api = &deps.api;
     config(&mut deps.storage).update(|mut state| -> Result<_, ContractError> {
         if api.canonical_address(&info.sender)? != state.owner {
             return Err(ContractError::Unauthorized {});
         }
-        state.count = count;
+        state.testcase = name;
         Ok(state)
     })?;
     Ok(HandleResponse::default())
@@ -73,39 +75,57 @@ pub fn query<S: Storage, A: Api, Q: Querier>(
     msg: QueryMsg,
 ) -> StdResult<Binary> {
     match msg {
-        QueryMsg::GetCount {} => to_binary(&query_count(deps)?),
-        QueryMsg::Fetch {
-            url,
-            method,
-            authorization,
-            body,
-        } => to_binary(&query_fetch(deps, url, method, authorization, body)?),
+        QueryMsg::GetDatasource {} => to_binary(&query_datasource(deps)?),
+        QueryMsg::GetTestcase {} => to_binary(&query_testcase(deps)?),
+        QueryMsg::Aggregation { results } => to_binary(&query_aggregation(deps, results)?),
     }
 }
 
-fn query_count<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> StdResult<CountResponse> {
+fn query_datasource<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> StdResult<String> {
     let state = config_read(&deps.storage).load()?;
-    Ok(CountResponse { count: state.count })
+    Ok(state.ai_data_source)
 }
 
-fn query_fetch<S: Storage, A: Api, Q: Querier>(
-    deps: &Extern<S, A, Q>,
-    url: String,
-    method: Option<String>,
-    authorization: Option<String>,
-    body: Option<String>,
-) -> StdResult<String> {
-    // create specialquery with default empty string
-    let req = SpecialQuery::Fetch {
-        url,
-        method: method.unwrap_or(String::new()),
-        authorization: authorization.unwrap_or(String::new()),
-        body: body.unwrap_or(String::new()),
-    }
-    .into();
+fn query_testcase<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> StdResult<String> {
+    let state = config_read(&deps.storage).load()?;
+    Ok(state.testcase)
+}
 
-    let response: Binary = deps.querier.custom_query(&req)?;
-    Ok(String::from_utf8(response.to_vec()).unwrap())
+fn query_aggregation<S: Storage, A: Api, Q: Querier>(
+    _deps: &Extern<S, A, Q>,
+    results: String,
+) -> StdResult<String> {
+    let numbers = results.split('-');
+    let mut sum: i32 = 0;
+    let mut floating_sum: i32 = 0;
+    let mut count = 0;
+    for input in numbers {
+        // get first item from iterator
+        let mut iter = input.split('.');
+        let first = iter.next();
+        let last = iter.next();
+        // will panic instead for forward error with ?
+        let number: i32 = first.unwrap().parse().unwrap();
+        let mut floating: i32 = 0;
+        if last.is_some() {
+            let mut last_part = last.unwrap().to_owned();
+            if last_part.len() < 2 {
+                last_part.push_str("0");
+            } else if last_part.len() > 2 {
+                last_part = last_part[..2].to_string();
+            }
+            floating = last_part.parse().unwrap();
+        }
+        sum += number;
+        floating_sum += floating;
+        count += 1;
+    }
+
+    sum = sum / count;
+    floating_sum = floating_sum / count;
+    let final_result = format!("{}.{}", sum, floating_sum);
+
+    Ok(final_result)
 }
 
 #[cfg(test)]
@@ -118,7 +138,10 @@ mod tests {
     fn proper_initialization() {
         let mut deps = mock_dependencies(&[]);
 
-        let msg = InitMsg { count: 17 };
+        let msg = InitMsg {
+            ai_data_source: "datasource_eth".to_string(),
+            testcase: "testcase_price".to_string(),
+        };
         let info = mock_info("creator", &coins(1000, "earth"));
 
         // we can just call .unwrap() to assert this was a success
@@ -126,55 +149,32 @@ mod tests {
         assert_eq!(0, res.messages.len());
 
         // it worked, let's query the state
-        let res = query(&deps, mock_env(), QueryMsg::GetCount {}).unwrap();
-        let value: CountResponse = from_binary(&res).unwrap();
-        assert_eq!(17, value.count);
+        let res = query(&deps, mock_env(), QueryMsg::GetDatasource {}).unwrap();
+        let value: String = from_binary(&res).unwrap();
+        assert_eq!("datasource_eth", value);
     }
 
     #[test]
-    fn increment() {
+    fn update_datasource() {
         let mut deps = mock_dependencies(&coins(2, "token"));
 
-        let msg = InitMsg { count: 17 };
+        let msg = InitMsg {
+            ai_data_source: "datasource_eth".to_string(),
+            testcase: "testcase_price".to_string(),
+        };
         let info = mock_info("creator", &coins(2, "token"));
         let _res = init(&mut deps, mock_env(), info, msg).unwrap();
 
         // beneficiary can release it
         let info = mock_info("creator", &coins(2, "token"));
-        let msg = HandleMsg::Increment {};
+        let msg = HandleMsg::UpdateDatesource {
+            name: "datasource_btc".to_string(),
+        };
         let _res = handle(&mut deps, mock_env(), info, msg).unwrap();
 
         // should increase counter by 1
-        let res = query(&deps, mock_env(), QueryMsg::GetCount {}).unwrap();
-        let value: CountResponse = from_binary(&res).unwrap();
-        assert_eq!(18, value.count);
-    }
-
-    #[test]
-    fn reset() {
-        let mut deps = mock_dependencies(&coins(2, "token"));
-
-        let msg = InitMsg { count: 17 };
-        let info = mock_info("creator", &coins(2, "token"));
-        let _res = init(&mut deps, mock_env(), info, msg).unwrap();
-
-        // beneficiary can release it
-        let unauth_info = mock_info("anyone", &coins(2, "token"));
-        let msg = HandleMsg::Reset { count: 5 };
-        let res = handle(&mut deps, mock_env(), unauth_info, msg);
-        match res {
-            Err(ContractError::Unauthorized {}) => {}
-            _ => panic!("Must return unauthorized error"),
-        }
-
-        // only the original creator can reset the counter
-        let auth_info = mock_info("creator", &coins(2, "token"));
-        let msg = HandleMsg::Reset { count: 5 };
-        let _res = handle(&mut deps, mock_env(), auth_info, msg).unwrap();
-
-        // should now be 5
-        let res = query(&deps, mock_env(), QueryMsg::GetCount {}).unwrap();
-        let value: CountResponse = from_binary(&res).unwrap();
-        assert_eq!(5, value.count);
+        let res = query(&deps, mock_env(), QueryMsg::GetDatasource {}).unwrap();
+        let value: String = from_binary(&res).unwrap();
+        assert_eq!("datasource_btc", value);
     }
 }
