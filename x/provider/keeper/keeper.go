@@ -61,7 +61,7 @@ func (k *Keeper) GetMinimumFees(ctx sdk.Context, dNames, tcNames []string, valNu
 	}
 
 	for j := 0; j < len(dNames); j++ {
-		fmt.Println("data source: ", dNames[j])
+		// fmt.Println("data source: ", dNames[j])
 		// collect all the data source objects to store in the ai request
 		aiDataSource, err := k.GetAIDataSource(ctx, dNames[j])
 		if err != nil {
@@ -84,7 +84,7 @@ func (k *Keeper) GetMinimumFees(ctx sdk.Context, dNames, tcNames []string, valNu
 	bothFees := sdk.NewDecCoinsFromCoins(totalFees.Add(valFees...)...)
 	finalFees, _ := bothFees.MulDec(sdk.NewDec(int64(valNum))).TruncateDecimal()
 	minimumFees, _ := sdk.NewDecCoinsFromCoins(finalFees...).QuoDec(rewardRatio).TruncateDecimal()
-	fmt.Println("minimum fees: ", minimumFees)
+	// fmt.Println("minimum fees: ", minimumFees)
 	return minimumFees, nil
 }
 
