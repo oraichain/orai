@@ -24,6 +24,10 @@ docker-compose exec rust bash
 cd play-smartc
 optimize.sh .
 
+# can run using simulate environment
+docker-compose exec simulate bash
+cosmwasm-simulate oscript-price/artifacts/oscript_price.wasm
+
 # run unit-test
 RUST_BACKTRACE=1 cargo unit-test -- --exact contract::tests::increment --show-output
 
