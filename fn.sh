@@ -175,7 +175,7 @@ oraidFn(){
     pkill oraid
     if [[ -d "$PWD/.oraid/" ]] 
     then
-      oraid start --rpc.laddr tcp://0.0.0.0:26657 --log_level $LOG_LEVEL
+      oraid start --rpc.laddr tcp://0.0.0.0:26657 --log_level $(getArgument "log_level" $LOG_LEVEL) --p2p.seeds $(getArgument "seeds" $SEEDS) --p2p.seed_mode $(getArgument "seed_mode" false)
     else
       tail -f /dev/null 
     fi
@@ -203,7 +203,7 @@ initFn(){
 
     echo "passphrase: $PASS"
 
-    sleep 3
+    sleep 10
 
     if [ -z "$MNEMONIC" ]
     then 
@@ -213,7 +213,7 @@ initFn(){
 
     echo "mnemonic: $MNEMONIC"
 
-    sleep 3
+    sleep 10
 
     # Configure your CLI to eliminate need to declare them as flags
 
@@ -243,8 +243,8 @@ EOF
     # rm -f .oraid/config/genesis.json && wget https://raw.githubusercontent.com/oraichain/oraichain-static-files/ducphamle2-test/genesis.json -q -P .oraid/config/
 
     # add persistent peers to listen to blocks
-    local persistentPeers=$(getArgument "persistent_peers" "$PERSISTENT_PEERS")
-    [ ! -z $persistentPeers ] && sed -i 's/persistent_peers *= *".*"/persistent_peers = "'"$persistentPeers"'"/g' .oraid/config/config.toml 
+    local persistentPeers=$(getArgument "persistent_peers" "$SEEDS")
+    # [ ! -z $persistentPeers ] && sed -i 's/seeds *= *".*"/seeds = "'"$persistentPeers"'"/g' .oraid/config/config.toml 
 
     # sed -i 's/persistent_peers *= *".*"/persistent_peers = "25e3dd0839fa44a89735b38b7b749acdfac8438e@164.90.180.95:26656,e07a89a185c538820258b977b01b44a806dfcece@157.230.22.169:26656,db13b4e2d1fd922640904590d6c9b5ae698de85c@165.232.118.44:26656,b46c45fdbb59ef0509d93e89e574b2080a146b14@178.128.61.252:26656,2a8c59cfdeccd2ed30471b90f626da09adcf3342@178.128.57.195:26656,b495da1980d3cd7c3686044e800412af53ae4be4@159.89.206.139:26656,addb91a1dbc48ffb7ddba30964ae649343179822@178.128.220.155:26656"/g' .oraid/config/config.toml
 
