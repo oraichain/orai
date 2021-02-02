@@ -97,23 +97,12 @@ func (k *Keeper) SampleIndexes(valOperators []sdk.ValAddress, size int, randomGe
 
 	// store a mapping of validators that have already been chosen
 	chosenVal := make([]bool, valOperatorLen)
-
+	// time := 0
 	for i := 0; i < size; {
 		// the dividend is randomed to make sure no one can predict the next validator
-		dividend := randomGenerator.RandUint64()
-		quotient := uint64(0)
-
-		divisor := uint64(totalPowers)
-		// this value init makes sure that we at least calculate the modulo once
-		if divisor > 0 {
-			// quotient = calucateMol(dividend, divisor)
-			quotient = dividend % divisor
-			if quotient >= valOperatorLen {
-				quotient = 0
-			}
-		}
-
-		// fmt.Printf("quotient :%v\n", quotient)
+		quotient := randomGenerator.RandUint64() % valOperatorLen
+		// time++
+		// fmt.Printf("%d) quotient :%v\n", time, quotient)
 		// if the quotient is in the sampling list, and it is not in the chosen validator map range then we pick it
 		if !chosenVal[quotient] {
 			// add to the chosen validator list
