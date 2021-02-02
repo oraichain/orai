@@ -1,5 +1,5 @@
 [package]
-name = "testcase-price"
+name = "datasource-eth"
 version = "0.1.0"
 authors = ["tupt <tubackkhoa@gmail.com>"]
 edition = "2018"

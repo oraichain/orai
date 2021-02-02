@@ -26,6 +26,12 @@ services:
       - .registry_cache:/usr/local/cargo/registry:delegated
       - ./smart-contracts:/code
 
+  simulate:
+    image: orai/cosmwasm-simulate:0.11-slim
+    tty: true 
+    volumes:
+      - ./smart-contracts:/code
+
   proto:
     image: cosmwasm/prototools-docker
     tty: true

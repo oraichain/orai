@@ -42,7 +42,7 @@ func GetQueryCmd() *cobra.Command {
 // GetCmdQueryDataSource lists data source code uploaded
 func GetCmdQueryDataSource() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "datasource [name]",
+		Use:   "dsource [name]",
 		Short: "query an AI data source",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -127,7 +127,7 @@ func GetCmdQueryDataSources() *cobra.Command {
 
 // GetCmdQueryOracleScript queries information about a oScript
 func GetCmdQueryOracleScript() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "oscript [name]",
 		Short: "query oscript",
 		Args:  cobra.ExactArgs(1),
@@ -156,6 +156,8 @@ func GetCmdQueryOracleScript() *cobra.Command {
 			return clientCtx.PrintProto(res)
 		},
 	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
 // GetCmdQueryOracleScripts queries a list of all oscript names
@@ -207,10 +209,10 @@ func GetCmdQueryOracleScripts() *cobra.Command {
 	return cmd
 }
 
-// GetCmdQueryTestCase queries information about an AI request test case
+// GetCmdQueryTestCase lists data source code uploaded
 func GetCmdQueryTestCase() *cobra.Command {
-	return &cobra.Command{
-		Use:   "testcase [name]",
+	cmd := &cobra.Command{
+		Use:   "tcase [name]",
 		Short: "query an ai request test case using name",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -231,13 +233,16 @@ func GetCmdQueryTestCase() *cobra.Command {
 			if err != nil {
 				return err
 			}
+
 			if len(res.Name) == 0 {
-				return fmt.Errorf("testcase not found")
+				return fmt.Errorf("data source not found")
 			}
 
 			return clientCtx.PrintProto(res)
 		},
 	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
 // GetCmdQueryTestCases queries a list of all test case names

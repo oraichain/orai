@@ -1,11 +1,14 @@
 #!/bin/sh
 set -o errexit -o nounset -o pipefail
 
-CHAIN_ID=${CHAIN_ID:-testing}
+echo -n "Enter passphrase:"
+read -s PASSWORD
+
+CHAIN_ID=${CHAIN_ID:-Oraichain}
 USER=${USER:-tupt}
 MONIKER=${MONIKER:-node001}
-PASSWORD=${PASSWORD:-$1}
-rm -rf "$HOME"/.oraid
+# PASSWORD=${PASSWORD:-$1}
+rm -rf .oraid/
 
 oraid init --chain-id "$CHAIN_ID" "$MONIKER"
 

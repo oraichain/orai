@@ -1,4 +1,4 @@
-use cosmwasm_std::HumanAddr;
+use cosmwasm_std::CustomQuery;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -9,16 +9,16 @@ pub struct InitMsg {}
 #[serde(rename_all = "snake_case")]
 pub enum HandleMsg {}
 
-// this TestCase does not have input
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum QueryMsg {
-    TestPrice { contract: HumanAddr, output: String },
-}
-
-// for query other contract
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
-#[serde(rename_all = "snake_case")]
-pub enum DataSourceQueryMsg {
     GetPrice {},
 }
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+/// An implementation of QueryRequest::Custom to show this works and can be extended in the contract
+pub enum SpecialQuery {
+    Fetch { url: String },
+}
+impl CustomQuery for SpecialQuery {}

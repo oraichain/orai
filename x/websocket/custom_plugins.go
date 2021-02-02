@@ -51,6 +51,7 @@ func (oracleQueryPlugin OracleQueryPlugin) Custom(ctx sdk.Context, query json.Ra
 	defer resp.Body.Close()
 	contents, _ := ioutil.ReadAll(resp.Body)
 
+	// bad case we dont care about the error, just return empty content, as long it is Binary compatible
 	return ModuleCdc.LegacyAmino.MarshalJSON(contents)
 }
 
