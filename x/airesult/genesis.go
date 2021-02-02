@@ -9,12 +9,12 @@ import (
 // and the k's address to pubkey map
 func InitGenesis(ctx sdk.Context, k *Keeper, data *GenesisState) {
 	// TODO: Define logic for when you would like to initialize a new genesis
-	// Init params for the airequest module
+	// Init params for the airesult module
 	k.SetParam(ctx, types.KeyExpirationCount, data.Params.ExpirationCount)
 	k.SetParam(ctx, types.KeyTotalReports, data.Params.TotalReports)
 }
 
-// DefaultGenesisState returns the default airequest genesis state.
+// DefaultGenesisState returns the default airesult genesis state.
 func DefaultGenesisState() *GenesisState {
 	return types.DefaultGenesisState()
 }
