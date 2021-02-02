@@ -67,15 +67,18 @@ func (subscriber *Subscriber) handleTransaction(queryClient types.QueryClient, t
 	for _, log := range logs {
 		for _, ev := range log.Events {
 			// process with each event type
-			attrMap := getAttributeMap(ev.GetAttributes())
 			switch ev.Type {
 			// datasource is for testing only
 			// case providerTypes.EventTypeSetDataSource:
-			// 	subscriber.handleDataSourceLog(queryClient, attrMap)
-			case artypes.EventTypeSetAIRequest:
-				subscriber.handleAIRequestLog(queryClient, attrMap)
+			// 	err = subscriber.handleDataSourceLog(queryClient, &ev)
+			case artypes.EventTypeRequestWithData:
+				err = subscriber.handleAIRequestLog(queryClient, &ev)
 			default:
 				subscriber.log.Debug(":ghost: Skipping non-{request/packet} type: %s", ev.Type)
+			}
+
+			if err != nil {
+				return err
 			}
 		}
 	}
@@ -86,7 +89,8 @@ func (subscriber *Subscriber) handleTransaction(queryClient types.QueryClient, t
 // Subscribe subscribe to event log
 func (subscriber *Subscriber) Subscribe() error {
 
-	subscriber.log.Info(":beer: Websocket Subscribing with validator: %s ...", subscriber.config.FromValidator)
+	subscriber.log.Info(":beer: Websocket Subscribing with validator: %s, exit on error: %b ...",
+		subscriber.config.FromValidator, subscriber.config.ErrExit)
 
 	// Instantiate and start tendermint RPC client
 	client, err := subscriber.cliCtx.GetNode()
@@ -122,10 +126,12 @@ func (subscriber *Subscriber) Subscribe() error {
 				break
 			case ev := <-eventChan:
 				txResult := ev.Data.(tmtypes.EventDataTx).TxResult
-				err := subscriber.handleTransaction(queryClient, &txResult)
-				if err != nil {
-					return err
-				}
+				err = subscriber.handleTransaction(queryClient, &txResult)
+			}
+
+			// check exit on error
+			if err != nil && subscriber.config.ErrExit {
+				return err
 			}
 		}
 	})

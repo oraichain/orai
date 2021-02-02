@@ -13,12 +13,16 @@ pub enum HandleMsg {}
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum QueryMsg {
-    TestPrice { contract: HumanAddr, output: String },
+    Test {
+        contract: HumanAddr,
+        input: String,
+        output: String,
+    },
 }
 
 // for query other contract
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum DataSourceQueryMsg {
-    GetPrice {},
+    Get { input: String },
 }

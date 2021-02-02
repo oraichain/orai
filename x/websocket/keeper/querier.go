@@ -48,7 +48,15 @@ func (k *Querier) DataSourceContract(goCtx context.Context, req *types.QueryData
 		return nil, err
 	}
 
-	result, err := k.keeper.QueryContract(ctx, sdk.AccAddress(datasource.Contract), []byte(`{}`))
+	datasourceContract, err := sdk.AccAddressFromBech32(datasource.Contract)
+	if err != nil {
+		return nil, err
+	}
+
+	contractReq := k.keeper.cdc.MustMarshalJSON(&types.QueryDataSourceSmartContract{
+		Get: req.Request,
+	})
+	result, err := k.keeper.QueryContract(ctx, datasourceContract, contractReq)
 	return &types.ResponseContract{
 		Data: result,
 	}, err
@@ -66,16 +74,29 @@ func (k *Querier) TestCaseContract(goCtx context.Context, req *types.QueryTestCa
 		return nil, err
 	}
 
-	datasource, err := k.keeper.providerKeeper.GetAIDataSource(ctx, req.DataSourcName)
+	datasource, err := k.keeper.providerKeeper.GetAIDataSource(ctx, req.DataSourceName)
 	if err != nil {
 		// already wrapped at providerKeeper
 		return nil, err
 	}
 
+	testCaseContract, err := sdk.AccAddressFromBech32(testcase.Contract)
+	if err != nil {
+		return nil, err
+	}
+
 	// re-bind
-	req.Request.DataSourceContract = sdk.AccAddress(datasource.Contract)
-	contractReq := k.keeper.cdc.MustMarshalJSON(req.Request)
-	result, err := k.keeper.QueryContract(ctx, sdk.AccAddress(testcase.Contract), contractReq)
+	if req.Request.Contract.Empty() {
+		req.Request.Contract, err = sdk.AccAddressFromBech32(datasource.Contract)
+		if err != nil {
+			return nil, err
+		}
+	}
+	contractReq := k.keeper.cdc.MustMarshalJSON(&types.QueryTestCaseSmartContract{
+		Test: req.Request,
+	})
+
+	result, err := k.keeper.QueryContract(ctx, testCaseContract, contractReq)
 	return &types.ResponseContract{
 		Data: result,
 	}, err
@@ -88,14 +109,22 @@ func (k *Querier) OracleScriptContract(goCtx context.Context, req *types.QueryOr
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	oscript, err := k.keeper.providerKeeper.GetTestCase(ctx, req.Name)
+	oscript, err := k.keeper.providerKeeper.GetOracleScript(ctx, req.Name)
 	if err != nil {
 		// already wrapped at providerKeeper
 		return nil, err
 	}
 
-	contractReq := k.keeper.cdc.MustMarshalJSON(req.Request)
-	result, err := k.keeper.QueryContract(ctx, sdk.AccAddress(oscript.Contract), contractReq)
+	oscriptContract, err := sdk.AccAddressFromBech32(oscript.Contract)
+	if err != nil {
+		return nil, err
+	}
+
+	contractReq := k.keeper.cdc.MustMarshalJSON(&types.QueryOracleScriptSmartContract{
+		Aggregate: req.Request,
+	})
+
+	result, err := k.keeper.QueryContract(ctx, oscriptContract, contractReq)
 	return &types.ResponseContract{
 		Data: result,
 	}, err

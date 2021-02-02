@@ -71,20 +71,7 @@ func (k msgServer) CreateAIRequest(goCtx context.Context, msg *types.MsgSetAIReq
 
 	// TODO: Define your msg events
 	// Emit an event describing a data request and asked validators.
-	event := sdk.NewEvent(types.EventTypeSetAIRequest)
-	event = event.AppendAttributes(
-		sdk.NewAttribute(types.AttributeRequestID, string(request.RequestID[:])),
-	)
-	for _, validator := range validators {
-		event = event.AppendAttributes(
-			sdk.NewAttribute(types.AttributeRequestValidator, validator.String()),
-		)
-	}
-	ctx.EventManager().EmitEvent(event)
-
-	// TODO: Define your msg events
-	// Emit an event describing a data request and asked validators.
-	event = sdk.NewEvent(types.EventTypeRequestWithData)
+	event := sdk.NewEvent(types.EventTypeRequestWithData)
 	event = event.AppendAttributes(
 		sdk.NewAttribute(types.AttributeRequestID, string(request.RequestID[:])),
 		sdk.NewAttribute(types.AttributeOracleScriptName, request.OracleScriptName),
@@ -93,6 +80,12 @@ func (k msgServer) CreateAIRequest(goCtx context.Context, msg *types.MsgSetAIReq
 		sdk.NewAttribute(types.AttributeRequestInput, string(msg.Input)),
 		sdk.NewAttribute(types.AttributeRequestExpectedOutput, string(msg.ExpectedOutput)),
 	)
+
+	for _, validator := range validators {
+		event = event.AppendAttributes(
+			sdk.NewAttribute(types.AttributeRequestValidator, validator.String()),
+		)
+	}
 
 	// these are multiple attribute for array
 	for _, aiDataSource := range aiDataSources {

@@ -10,7 +10,10 @@ import (
 	"github.com/oraichain/orai/x/websocket/types"
 )
 
-func (subscriber *Subscriber) handleDataSourceLog(queryClient types.QueryClient, attrMap map[string][]string) {
+func (subscriber *Subscriber) handleDataSourceLog(queryClient types.QueryClient, ev *sdk.StringEvent) error {
+
+	attrMap := getAttributeMap(ev.GetAttributes())
+
 	contractAddr, _ := sdk.AccAddressFromBech32(attrMap[providerTypes.AttributeContractAddress][0])
 	query := &types.QueryOracleContract{
 		Contract: contractAddr,
@@ -41,5 +44,5 @@ func (subscriber *Subscriber) handleDataSourceLog(queryClient types.QueryClient,
 		Msg:      []byte(`{"increment":{}}`),
 	}
 	txf := subscriber.newTxFactory("websocket")
-	tx.BroadcastTx(*subscriber.cliCtx, txf, contractMsg)
+	return tx.BroadcastTx(*subscriber.cliCtx, txf, contractMsg)
 }

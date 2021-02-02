@@ -32,11 +32,14 @@ pub fn query<S: Storage, A: Api, Q: Querier>(
     msg: QueryMsg,
 ) -> StdResult<Binary> {
     match msg {
-        QueryMsg::GetPrice {} => to_binary(&query_price(deps)?),
+        QueryMsg::Get { input } => to_binary(&query_price(deps, input)?),
     }
 }
 
-fn query_price<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> StdResult<String> {
+fn query_price<S: Storage, A: Api, Q: Querier>(
+    deps: &Extern<S, A, Q>,
+    _input: String,
+) -> StdResult<String> {
     // create specialquery with default empty string
     let req = SpecialQuery::Fetch {
         url: "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
