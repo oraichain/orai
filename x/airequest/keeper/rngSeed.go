@@ -19,16 +19,15 @@ func (k Keeper) GetRngSeed(ctx sdk.Context) []byte {
 // ResolveRngSeed resolves the seed for the Rng package
 func (k Keeper) ResolveRngSeed(ctx sdk.Context, req abci.RequestBeginBlock) {
 	oldSeed := k.GetRngSeed(ctx)
-	var newSeed []byte
 	if len(oldSeed) == 0 {
 		k.SetRngSeed(ctx, make([]byte, types.RngSeedSize))
-		oldSeed = k.GetRngSeed(ctx)
+	} else {
+		newSeed := oldSeed[types.NumSeedRemoval:]
+		hash := req.GetHash()
+		// generate a new seed by removing the first byte of the previous seed, and add a new byte from the new hash.
+		for i := 0; i < types.NumSeedRemoval; i++ {
+			newSeed = append(newSeed, hash[i])
+		}
+		k.SetRngSeed(ctx, newSeed)
 	}
-	newSeed = oldSeed[types.NumSeedRemoval:]
-	hash := req.GetHash()
-	// generate a new seed by removing the first byte of the previous seed, and add a new byte from the new hash.
-	for i := 0; i < types.NumSeedRemoval; i++ {
-		newSeed = append(newSeed, hash[i])
-	}
-	k.SetRngSeed(ctx, newSeed)
 }

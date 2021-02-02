@@ -23,7 +23,7 @@ var _ types.MsgServer = msgServer{}
 func (m msgServer) CreateAIDataSource(goCtx context.Context, msg *types.MsgCreateAIDataSource) (*types.MsgCreateAIDataSourceRes, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if m.keeper.isKeyPresent(ctx, types.DataSourceStoreKey(msg.Name)) {
+	if m.keeper.HasDataSource(ctx, msg.Name) {
 		return nil, sdkerrors.Wrap(types.ErrDataSourceNameExists, "Name already exists")
 	}
 
@@ -58,7 +58,7 @@ func (m msgServer) EditAIDataSource(goCtx context.Context, msg *types.MsgEditAID
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if m.keeper.isKeyPresent(ctx, types.DataSourceStoreKey(msg.NewName)) {
+	if m.keeper.HasDataSource(ctx, msg.NewName) {
 		return nil, sdkerrors.Wrap(types.ErrDataSourceNameExists, "Name already exists")
 	}
 
@@ -102,7 +102,7 @@ func (m msgServer) CreateOracleScript(goCtx context.Context, msg *types.MsgCreat
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if m.keeper.isKeyPresent(ctx, types.OracleScriptStoreKey(msg.Name)) {
+	if m.keeper.HasOracleScript(ctx, msg.Name) {
 		return nil, sdkerrors.Wrap(types.ErrOracleScriptNameExists, "Name already exists")
 	}
 
@@ -144,7 +144,7 @@ func (m msgServer) EditOracleScript(goCtx context.Context, msg *types.MsgEditOra
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if m.keeper.isKeyPresent(ctx, types.OracleScriptStoreKey(msg.NewName)) {
+	if m.keeper.HasDataSource(ctx, msg.NewName) {
 		return nil, sdkerrors.Wrap(types.ErrOracleScriptNameExists, "Name already exists")
 	}
 
@@ -195,7 +195,7 @@ func (m msgServer) CreateTestCase(goCtx context.Context, msg *types.MsgCreateTes
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if m.keeper.isKeyPresent(ctx, types.TestCaseStoreKey(msg.Name)) {
+	if m.keeper.HasTestCase(ctx, msg.Name) {
 		return nil, sdkerrors.Wrap(types.ErrTestCaseNameExists, "Name already exists")
 	}
 
@@ -231,7 +231,7 @@ func (m msgServer) EditTestCase(goCtx context.Context, msg *types.MsgEditTestCas
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if m.keeper.isKeyPresent(ctx, types.TestCaseStoreKey(msg.NewName)) {
+	if m.keeper.HasTestCase(ctx, msg.NewName) {
 		return nil, sdkerrors.Wrap(types.ErrTestCaseNameExists, "Name already exists")
 	}
 
