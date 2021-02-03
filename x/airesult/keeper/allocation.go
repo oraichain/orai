@@ -15,23 +15,17 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo) {
 	// fetch and clear the collected fees for distribution, since this is
 	// called in BeginBlock, collected fees will be from the previous block
 	// (and distributed to the previous proposer)
-	feeCollector := k.authKeeper.GetModuleAccount(ctx, k.feeCollectorName)
-	feesCollectedInt := k.bankKeeper.GetAllBalances(ctx, feeCollector.GetAddress())
-	// If there are no fees, we do not need to handle anything
-	if feesCollectedInt.Empty() {
-		return
-	}
-	requestFees := k.CollectRequestFees(ctx, ctx.BlockHeight()-int64(1))
+
+	requestFees, creators := k.CollectRequestFees(ctx, ctx.BlockHeight()-int64(1))
 	// if there are fees from the requests, we remove them from the fee collector
-	if !requestFees.IsZero() {
-		// 100 - 70 = 30%
-		rewardRatio := sdk.NewDecWithPrec(int64(100)-int64(k.providerKeeper.GetOracleScriptRewardPercentageParam(ctx)), 2)
-		rewardFeesDec := sdk.NewDecCoinsFromCoins(requestFees...)
-		rewardFees, _ := rewardFeesDec.MulDecTruncate(rewardRatio).TruncateDecimal()
-		// substract coins from the fee collector using the bank keeper
-		err := k.bankKeeper.SubtractCoins(ctx, feeCollector.GetAddress(), rewardFees)
-		if err != nil {
-			return
+	if requestFees != nil && creators != nil {
+		// since both share the same length, we only need to iterate one time through either array
+		for i := range requestFees {
+			// we substract fees from the creator based on the fees they provide
+			err := k.bankKeeper.SubtractCoins(ctx, creators[i], requestFees[i])
+			if err != nil {
+				return
+			}
 		}
 	}
 	// get reward from the previous block
@@ -40,11 +34,14 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo) {
 	if err != nil || rewardObj.BlockHeight == int64(-1) {
 		return
 	}
+
+	// retrieve fee collector module account to prepare token allocation1
+	feeCollector := k.authKeeper.GetModuleAccount(ctx, k.feeCollectorName)
 	// add all the fees from the report since we only reward those included in the report
-	feesCollectedInt = feesCollectedInt.Add(rewardObj.ProviderFees...).Add(rewardObj.ValidatorFees...)
-	reward := sdk.NewDecCoinsFromCoins(feesCollectedInt...)
+	feesCollected := rewardObj.ProviderFees.Add(rewardObj.ValidatorFees...)
+	reward := sdk.NewDecCoinsFromCoins(feesCollected...)
 	// append those coins into the fee collector to get ready allocating them to the distr module.
-	err = k.bankKeeper.AddCoins(ctx, feeCollector.GetAddress(), feesCollectedInt)
+	err = k.bankKeeper.AddCoins(ctx, feeCollector.GetAddress(), feesCollected)
 	if err != nil {
 		fmt.Println("error adding coins using bank keeper: ", err)
 		return

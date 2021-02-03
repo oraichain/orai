@@ -6,7 +6,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	airequest "github.com/oraichain/orai/x/airequest/types"
 	"github.com/oraichain/orai/x/airesult/types"
-	"github.com/oraichain/orai/x/provider"
 	websocket "github.com/oraichain/orai/x/websocket/types"
 )
 
@@ -26,16 +25,17 @@ func (k Keeper) GetRequestsBlockHeight(ctx sdk.Context, blockHeight int64) (reqs
 }
 
 // CollectRequestFees collects total fees of the requests from the previous block to remove them from the fee collector
-func (k Keeper) CollectRequestFees(ctx sdk.Context, blockHeight int64) (fees sdk.Coins) {
+func (k Keeper) CollectRequestFees(ctx sdk.Context, blockHeight int64) (fees []sdk.Coins, creators []sdk.AccAddress) {
 	// collect requests from the previous block
 	requests := k.GetRequestsBlockHeight(ctx, blockHeight)
 	if len(requests) == 0 {
-		return sdk.NewCoins(sdk.NewCoin(provider.Denom, sdk.NewInt(int64(0))))
+		return nil, nil
 	}
 	for _, request := range requests {
-		fees = fees.Add(request.GetFees()...)
+		fees = append(fees, request.GetFees())
+		creators = append(creators, request.GetCreator())
 	}
-	return fees
+	return fees, creators
 }
 
 // ResolveExpiredRequest handles requests that have been expired
