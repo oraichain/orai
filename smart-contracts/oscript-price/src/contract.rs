@@ -32,7 +32,7 @@ pub fn handle<S: Storage, A: Api, Q: Querier>(
     msg: HandleMsg,
 ) -> Result<HandleResponse, ContractError> {
     match msg {
-        HandleMsg::UpdateDatesource { name } => try_update_datasource(deps, info, name),
+        HandleMsg::UpdateDatasource { name } => try_update_datasource(deps, info, name),
         HandleMsg::UpdateTestcase { name } => try_update_testcase(deps, info, name),
     }
 }
@@ -77,7 +77,7 @@ pub fn query<S: Storage, A: Api, Q: Querier>(
     match msg {
         QueryMsg::GetDatasource {} => to_binary(&query_datasource(deps)?),
         QueryMsg::GetTestcase {} => to_binary(&query_testcase(deps)?),
-        QueryMsg::Aggregation { results } => to_binary(&query_aggregation(deps, results)?),
+        QueryMsg::Aggregate { results } => to_binary(&query_aggregation(deps, results)?),
     }
 }
 
@@ -93,13 +93,12 @@ fn query_testcase<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> Std
 
 fn query_aggregation<S: Storage, A: Api, Q: Querier>(
     _deps: &Extern<S, A, Q>,
-    results: String,
+    results: Vec<String>,
 ) -> StdResult<String> {
-    let numbers = results.split('-');
     let mut sum: i32 = 0;
     let mut floating_sum: i32 = 0;
     let mut count = 0;
-    for input in numbers {
+    for input in results {
         // get first item from iterator
         let mut iter = input.split('.');
         let first = iter.next();
@@ -167,7 +166,7 @@ mod tests {
 
         // beneficiary can release it
         let info = mock_info("creator", &coins(2, "token"));
-        let msg = HandleMsg::UpdateDatesource {
+        let msg = HandleMsg::UpdateDatasource {
             name: "datasource_btc".to_string(),
         };
         let _res = handle(&mut deps, mock_env(), info, msg).unwrap();

@@ -39,6 +39,21 @@ func (k *Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
+// HasDataSource checks if the data source name is present in the store or not
+func (k *Keeper) HasDataSource(ctx sdk.Context, name string) bool {
+	return k.isKeyPresent(ctx, types.DataSourceStoreKey(name))
+}
+
+// HasOracleScript checks if the data source name is present in the store or not
+func (k *Keeper) HasOracleScript(ctx sdk.Context, name string) bool {
+	return k.isKeyPresent(ctx, types.OracleScriptStoreKey(name))
+}
+
+// HasTestCase checks if the data source name is present in the store or not
+func (k *Keeper) HasTestCase(ctx sdk.Context, name string) bool {
+	return k.isKeyPresent(ctx, types.TestCaseStoreKey(name))
+}
+
 // isKeyPresent checks if the name is present in the store or not
 func (k *Keeper) isKeyPresent(ctx sdk.Context, key []byte) bool {
 	store := ctx.KVStore(k.storeKey)

@@ -15,13 +15,6 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(MsgCreateReport{}, "websocket/AddReport", nil)
 	cdc.RegisterConcrete(MsgAddReporter{}, "websocket/AddReporter", nil)
 	cdc.RegisterConcrete(MsgRemoveReporter{}, "websocket/RemoveReporter", nil)
-
-	// cdc.RegisterConcrete(&Report{}, "websocket/Report", nil)
-	// cdc.RegisterConcrete(&Reporter{}, "websocket/Reporter", nil)
-	// cdc.RegisterConcrete(&DataSourceResult{}, "websocket/DataSourceResult", nil)
-	// cdc.RegisterConcrete(&TestCaseResult{}, "websocket/TestCaseResult", nil)
-	// cdc.RegisterConcrete(&Validator{}, "websocket/Validator", nil)
-	// cdc.RegisterConcrete(&ValResult{}, "websocket/ValResult", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
