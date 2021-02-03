@@ -7,7 +7,7 @@ watch_dir = ""
 
 [build]
 # Just plain old shell command. You could use `make` as well.
-cmd = "LEDGER_ENABLED=false BUILD_TAGS=muslc make build"
+cmd = "make build"
 # Binary file yields from `cmd`.
 bin = "build/oraid"
 # Customize binary.
