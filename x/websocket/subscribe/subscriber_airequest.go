@@ -96,7 +96,11 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 	}
 
 	// prepare data
-	creator, _ := sdk.AccAddressFromBech32(creatorStr)
+	creator, err := sdk.AccAddressFromBech32(creatorStr)
+	if err != nil {
+		return err
+	}
+
 	// collect ai data sources and test cases from the ai request event.
 	aiDataSources := attrMap[aiRequest.AttributeRequestDSources]
 	testCases := attrMap[aiRequest.AttributeRequestTCases]
@@ -186,7 +190,10 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 	}
 	subscriber.log.Info("star: final result: ", resultArr)
 	// Create a new MsgCreateReport with a new reporter to the Oraichain
-	reporter := types.NewReporter(creator, subscriber.config.FromValidator, sdk.ValAddress(subscriber.cliCtx.FromAddress))
+	reporter := types.NewReporter(
+		creator, subscriber.cliCtx.GetFromName(),
+		sdk.ValAddress(subscriber.cliCtx.GetFromAddress()),
+	)
 	finalResult := []byte(strings.Join(resultArr, JoinString))
 	msgReport := types.NewMsgCreateReport(
 		requestID, dataSourceResults,

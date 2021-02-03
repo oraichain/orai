@@ -45,10 +45,6 @@ func ParseWebSocketConfig(flagSet *pflag.FlagSet) *subscribe.WebSocketConfig {
 		cfg.MaxTry = v
 	}
 
-	if v, err := flagSet.GetString(flags.FlagFrom); err == nil {
-		cfg.FromValidator = v
-	}
-
 	if v, err := flagSet.GetBool(flagErrExit); err == nil {
 		cfg.ErrExit = v
 	}

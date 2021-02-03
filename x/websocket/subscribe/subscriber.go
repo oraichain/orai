@@ -90,7 +90,7 @@ func (subscriber *Subscriber) handleTransaction(queryClient types.QueryClient, t
 func (subscriber *Subscriber) Subscribe() error {
 
 	subscriber.log.Info(":beer: Websocket Subscribing with validator: %s, exit on error: %b ...",
-		subscriber.config.FromValidator, subscriber.config.ErrExit)
+		subscriber.cliCtx.GetFromName(), subscriber.config.ErrExit)
 
 	// Instantiate and start tendermint RPC client
 	client, err := subscriber.cliCtx.GetNode()

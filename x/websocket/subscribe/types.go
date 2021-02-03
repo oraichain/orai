@@ -11,7 +11,6 @@ import (
 
 // WebSocketConfig is the extra config required for wasm
 type WebSocketConfig struct {
-	FromValidator    string
 	BroadcastTimeout time.Duration
 	RPCPollInterval  time.Duration
 	MaxTry           uint64
