@@ -68,9 +68,6 @@ func (subscriber *Subscriber) handleTransaction(queryClient types.QueryClient, t
 		for _, ev := range log.Events {
 			// process with each event type
 			switch ev.Type {
-			// datasource is for testing only
-			// case providerTypes.EventTypeSetDataSource:
-			// 	err = subscriber.handleDataSourceLog(queryClient, &ev)
 			case artypes.EventTypeRequestWithData:
 				err = subscriber.handleAIRequestLog(queryClient, &ev)
 			default:
