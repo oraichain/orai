@@ -60,6 +60,21 @@ func (k *Keeper) isKeyPresent(ctx sdk.Context, key []byte) bool {
 	return store.Has(key)
 }
 
+// HasDataSource checks if the data source name is present in the store or not
+func (k *Keeper) HasDataSource(ctx sdk.Context, name string) bool {
+	return k.isKeyPresent(ctx, types.DataSourceStoreKey(name))
+}
+
+// HasOracleScript checks if the data source name is present in the store or not
+func (k *Keeper) HasOracleScript(ctx sdk.Context, name string) bool {
+	return k.isKeyPresent(ctx, types.OracleScriptStoreKey(name))
+}
+
+// HasTestCase checks if the data source name is present in the store or not
+func (k *Keeper) HasTestCase(ctx sdk.Context, name string) bool {
+	return k.isKeyPresent(ctx, types.TestCaseStoreKey(name))
+}
+
 // GetMinimumFees collects minimum fees needed of an oracle script
 func (k *Keeper) GetMinimumFees(ctx sdk.Context, dNames, tcNames []string, valCount int) (sdk.Coins, error) {
 	var scriptFees sdk.Coins

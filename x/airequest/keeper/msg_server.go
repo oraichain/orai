@@ -3,7 +3,6 @@ package keeper
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -27,9 +26,8 @@ func (k msgServer) CreateAIRequest(goCtx context.Context, msg *types.MsgSetAIReq
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// validate if the oracle script exists or not
-	_, err := k.keeper.providerKeeper.GetOracleScript(ctx, msg.OracleScriptName)
-	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrOScriptNotFound, err.Error())
+	if !k.keeper.providerKeeper.HasOracleScript(ctx, msg.OracleScriptName) {
+		return nil, types.ErrOScriptNotFound
 	}
 
 	validators, err := k.keeper.RandomValidators(ctx, int(msg.ValidatorCount), []byte(msg.RequestID))
@@ -69,20 +67,7 @@ func (k msgServer) CreateAIRequest(goCtx context.Context, msg *types.MsgSetAIReq
 
 	// TODO: Define your msg events
 	// Emit an event describing a data request and asked validators.
-	event := sdk.NewEvent(types.EventTypeSetAIRequest)
-	event = event.AppendAttributes(
-		sdk.NewAttribute(types.AttributeRequestID, string(request.RequestID[:])),
-	)
-	for _, validator := range validators {
-		event = event.AppendAttributes(
-			sdk.NewAttribute(types.AttributeRequestValidator, validator.String()),
-		)
-	}
-	ctx.EventManager().EmitEvent(event)
-
-	// TODO: Define your msg events
-	// Emit an event describing a data request and asked validators.
-	event = sdk.NewEvent(types.EventTypeRequestWithData)
+	event := sdk.NewEvent(types.EventTypeRequestWithData)
 	event = event.AppendAttributes(
 		sdk.NewAttribute(types.AttributeRequestID, string(request.RequestID[:])),
 		sdk.NewAttribute(types.AttributeOracleScriptName, request.OracleScriptName),
@@ -90,12 +75,29 @@ func (k msgServer) CreateAIRequest(goCtx context.Context, msg *types.MsgSetAIReq
 		sdk.NewAttribute(types.AttributeRequestValidatorCount, fmt.Sprint(msg.ValidatorCount)),
 		sdk.NewAttribute(types.AttributeRequestInput, string(msg.Input)),
 		sdk.NewAttribute(types.AttributeRequestExpectedOutput, string(msg.ExpectedOutput)),
-		sdk.NewAttribute(types.AttributeRequestDSources, strings.Join(aiDataSources, "-")),
-		sdk.NewAttribute(types.AttributeRequestTCases, strings.Join(testCases, "-")),
 	)
+
+	for _, validator := range validators {
+		event = event.AppendAttributes(
+			sdk.NewAttribute(types.AttributeRequestValidator, validator.String()),
+		)
+	}
+
+	// these are multiple attribute for array
+	for _, aiDataSource := range aiDataSources {
+		event = event.AppendAttributes(sdk.NewAttribute(types.AttributeRequestDSources, aiDataSource))
+	}
+	for _, testCase := range testCases {
+		event = event.AppendAttributes(sdk.NewAttribute(types.AttributeRequestTCases, testCase))
+	}
+
 	ctx.EventManager().EmitEvent(event)
 
-	return types.NewMsgSetAIRequestRes(request.GetRequestID(), request.GetOracleScriptName(), request.GetCreator(), request.GetFees().String(), msg.GetValidatorCount(), request.GetInput(), request.GetExpectedOutput()), nil
+	return types.NewMsgSetAIRequestRes(
+		request.GetRequestID(), request.GetOracleScriptName(),
+		request.GetCreator(), request.GetFees().String(), msg.GetValidatorCount(),
+		request.GetInput(), request.GetExpectedOutput(),
+	), nil
 }
 
 func (k msgServer) getDSourcesTCases(ctx sdk.Context, dSources, tCases []string) (dSourceObjs []provider.AIDataSource, tCaseObjs []provider.TestCase, errors error) {
