@@ -50,7 +50,7 @@ func (k msgServer) CreateAIRequest(goCtx context.Context, msg *types.MsgSetAIReq
 		return nil, err
 	}
 
-	requiredFees, err := k.keeper.providerKeeper.GetMinimumFees(ctx, aiDataSources, testCases, len(validators))
+	requiredFees, err := k.keeper.providerKeeper.GetMinimumFees(ctx, aiDataSources, testCases, len(validators), k.keeper.providerKeeper.GetOracleScriptRewardPercentageParam(ctx))
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Error getting minimum fees from oracle script")
 	}

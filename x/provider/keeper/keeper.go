@@ -60,8 +60,8 @@ func (k *Keeper) HasTestCase(ctx sdk.Context, name string) bool {
 	return k.isKeyPresent(ctx, types.TestCaseStoreKey(name))
 }
 
-// GetMinimumFees collects minimum fees needed of an oracle script
-func (k *Keeper) GetMinimumFees(ctx sdk.Context, dNames, tcNames []string, valCount int) (sdk.Coins, error) {
+// GetMinimumFees collects minimum fees needed of an oracle script. Source: https://medium.com/p/958db9b4bb4b/edit
+func (k *Keeper) GetMinimumFees(ctx sdk.Context, dNames, tcNames []string, valCount int, rewardPercentage int64) (sdk.Coins, error) {
 	var scriptFees sdk.Coins
 	// we have different test cases, so we need to loop through them
 	for i := 0; i < len(tcNames); i++ {
@@ -87,7 +87,7 @@ func (k *Keeper) GetMinimumFees(ctx sdk.Context, dNames, tcNames []string, valCo
 	}
 
 	// 0.6 by default
-	percentageDec := sdk.NewDecWithPrec(int64(k.GetParam(ctx, types.KeyOracleScriptRewardPercentage)), 2)
+	percentageDec := sdk.NewDecWithPrec(rewardPercentage, 2)
 
 	// check division by zero or negative figure
 	if percentageDec.IsZero() || percentageDec.IsNegative() {
@@ -120,6 +120,10 @@ func (k *Keeper) getPaginatedAIDataSourceNames(ctx sdk.Context, page, limit uint
 
 // GetAIDataSource returns the data source object given the name of the data source
 func (k *Keeper) GetAIDataSource(ctx sdk.Context, name string) (*types.AIDataSource, error) {
+	// check if there exists an AIDataSource given a name or not
+	if !k.HasDataSource(ctx, name) {
+		return nil, fmt.Errorf("")
+	}
 	store := ctx.KVStore(k.storeKey)
 	aiDataSource := &types.AIDataSource{}
 	err := k.cdc.UnmarshalBinaryBare(store.Get(types.DataSourceStoreKey(name)), aiDataSource)
@@ -145,6 +149,11 @@ func (k *Keeper) GetAIDataSources(ctx sdk.Context, page, limit uint) ([]types.AI
 		}
 		dSources = append(dSources, dSource)
 	}
+
+	// if cannot find any data sources
+	if len(dSources) == 0 {
+		return nil, fmt.Errorf("")
+	}
 	return dSources, nil
 }
 
@@ -163,6 +172,10 @@ func (k Keeper) SetAIDataSource(ctx sdk.Context, name string, aiDataSource *type
 // EditAIDataSource allows users to edit a data source in the store, just change address
 func (k Keeper) EditAIDataSource(ctx sdk.Context, oldName, newName string, aiDataSource *types.AIDataSource) error {
 
+	// check if there exists an AIDataSource given a name or not
+	if !k.HasDataSource(ctx, oldName) {
+		return fmt.Errorf("")
+	}
 	// if the user does not want to reuse the old name
 	if oldName != newName {
 		store := ctx.KVStore(k.storeKey)
@@ -175,6 +188,10 @@ func (k Keeper) EditAIDataSource(ctx sdk.Context, oldName, newName string, aiDat
 
 // GetOracleScript returns the oScript object given the name of the oScript
 func (k *Keeper) GetOracleScript(ctx sdk.Context, name string) (*types.OracleScript, error) {
+	// check if there exists an AIDataSource given a name or not
+	if !k.HasOracleScript(ctx, name) {
+		return nil, fmt.Errorf("")
+	}
 	store := ctx.KVStore(k.storeKey)
 	oScript := &types.OracleScript{}
 	err := k.cdc.UnmarshalBinaryBare(store.Get(types.OracleScriptStoreKey(name)), oScript)
@@ -207,6 +224,11 @@ func (k *Keeper) GetOracleScripts(ctx sdk.Context, page, limit uint) ([]types.Or
 		}
 		oScripts = append(oScripts, oScript)
 	}
+
+	// if cannot find any oracle scripts
+	if len(oScripts) == 0 {
+		return nil, fmt.Errorf("")
+	}
 	return oScripts, nil
 }
 
@@ -224,6 +246,11 @@ func (k *Keeper) GetPaginatedOracleScriptNames(ctx sdk.Context, page, limit uint
 
 // EditOracleScript allows users to edit a oScript in the store
 func (k Keeper) EditOracleScript(ctx sdk.Context, oldName, newName string, oScript *types.OracleScript) error {
+
+	// check if there exists an AIDataSource given a name or not
+	if !k.HasDataSource(ctx, oldName) {
+		return fmt.Errorf("")
+	}
 
 	// if the user does not want to reuse the old name
 	if oldName != newName {
@@ -269,6 +296,10 @@ func (k *Keeper) GetPaginatedTestCaseNames(ctx sdk.Context, page, limit uint) sd
 
 // GetTestCase returns the the AI test case of a given request
 func (k *Keeper) GetTestCase(ctx sdk.Context, name string) (*types.TestCase, error) {
+	// check if there exists a test case or not
+	if !k.HasTestCase(ctx, name) {
+		return nil, fmt.Errorf("")
+	}
 	store := ctx.KVStore(k.storeKey)
 	testCase := &types.TestCase{}
 	err := k.cdc.UnmarshalBinaryBare(store.Get(types.TestCaseStoreKey(name)), testCase)
@@ -288,6 +319,10 @@ func (k *Keeper) GetTestCases(ctx sdk.Context, page, limit uint) ([]types.TestCa
 			return []types.TestCase{}, err
 		}
 		tCases = append(tCases, tCase)
+	}
+	// if cannot find any test cases
+	if len(tCases) == 0 {
+		return nil, fmt.Errorf("")
 	}
 	return tCases, nil
 }
@@ -313,6 +348,9 @@ func (k Keeper) DefaultTestCase() *types.TestCase {
 // EditTestCase allows users to edit a test case in the store
 func (k Keeper) EditTestCase(ctx sdk.Context, oldName, newName string, testCase *types.TestCase) error {
 
+	if !k.HasTestCase(ctx, oldName) {
+		return fmt.Errorf("")
+	}
 	// if the user does not want to reuse the old name
 	if oldName != newName {
 		store := ctx.KVStore(k.storeKey)

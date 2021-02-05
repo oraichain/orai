@@ -2,46 +2,40 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	airequest "github.com/oraichain/orai/x/airequest/types"
 	"github.com/oraichain/orai/x/airesult/types"
 	websocket "github.com/oraichain/orai/x/websocket/types"
 )
 
 // ResolveResult aggregates the results from the reports before storing it into the blockchain
-func (k Keeper) ResolveResult(ctx sdk.Context, req *airequest.AIRequest, rep *websocket.Report) {
-	// hard code the result first if the request does not have a result
+func (k Keeper) ResolveResult(ctx sdk.Context, rep *websocket.Report, valCount int, totalReportPercentage int64) {
 
+	id := rep.GetRequestID()
 	// get a new validator object for the result object.
 	valAddress := rep.GetReporter().GetValidator()
 	validator := k.webSocketKeeper.NewValidator(valAddress, k.stakingKeeper.Validator(ctx, valAddress).GetConsensusPower(), "active")
 
-	if !k.HasResult(ctx, req.GetRequestID()) {
+	if !k.HasResult(ctx, id) {
 		// if the the request only needs a validator to return a result from the report then it's finished
 		resultList := make([]websocket.ValResult, 0)
 		resultList = append(resultList, *k.webSocketKeeper.NewValResult(validator, rep.GetAggregatedResult(), rep.GetResultStatus()))
-		if len(req.GetValidators()) == 1 {
-			k.SetResult(ctx, req.GetRequestID(), types.NewAIRequestResult(req.GetRequestID(), resultList, types.RequestStatusFinished))
+		if valCount == 1 {
+			k.SetResult(ctx, id, types.NewAIRequestResult(id, resultList, types.RequestStatusFinished))
 		} else {
 			// assume that we have already checked the number of validators required for a request
-			k.SetResult(ctx, req.GetRequestID(), types.NewAIRequestResult(req.GetRequestID(), resultList, types.RequestStatusPending))
+			k.SetResult(ctx, id, types.NewAIRequestResult(id, resultList, types.RequestStatusPending))
 		}
 	} else {
 		// if there are more than one validators then we add more results
-		if len(req.GetValidators()) > 1 {
+		if valCount > 1 {
 			// if already has result then we add more results
-			result, _ := k.GetResult(ctx, req.GetRequestID())
+			result, _ := k.GetResult(ctx, id)
 			result.Results = append(result.Results, *k.webSocketKeeper.NewValResult(validator, rep.GetAggregatedResult(), rep.GetResultStatus()))
 
-			// validate param
-			totalReportsParam := k.GetTotalReportsParam(ctx)
-			if k.GetTotalReportsParam(ctx) <= int64(0) {
-				totalReportsParam = int64(70)
-			}
 			// check if there are enough results from the validators or not
-			ratio := sdk.NewDecWithPrec(totalReportsParam, 2)
+			ratio := sdk.NewDecWithPrec(totalReportPercentage, 2)
 
 			// the number of reports that the user requires
-			reportLengths := sdk.NewDec(int64(len(req.GetValidators())))
+			reportLengths := sdk.NewDec(int64(valCount))
 
 			// the threshold that the length of the result must pass
 			threshold := reportLengths.Mul(ratio)
@@ -54,18 +48,15 @@ func (k Keeper) ResolveResult(ctx sdk.Context, req *airequest.AIRequest, rep *we
 				result.Status = types.RequestStatusFinished
 			}
 			// store the result
-			k.SetResult(ctx, req.GetRequestID(), result)
+			k.SetResult(ctx, id, result)
 		}
 	}
 }
 
 // HasResult checks if a given request has result or not
 func (k Keeper) HasResult(ctx sdk.Context, reqID string) bool {
-	_, err := k.GetResult(ctx, reqID)
-	if err != nil {
-		return false
-	}
-	return true
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(types.ResultStoreKey(reqID))
 }
 
 // GetResult returns the result of a given request

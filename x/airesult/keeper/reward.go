@@ -17,8 +17,15 @@ func (k Keeper) SetReward(ctx sdk.Context, blockHeight int64, rew *types.Reward)
 // GetReward retrieves a specific reward given a block height
 func (k Keeper) GetReward(ctx sdk.Context, blockHeight int64) (*types.Reward, error) {
 	store := ctx.KVStore(k.storeKey)
+	// check if there exists a reward in that block height or not
+	hasReward := store.Has(types.RewardStoreKey(blockHeight))
+	var err error
+	if !hasReward {
+		err = fmt.Errorf("")
+		return nil, err
+	}
 	var reward types.Reward
-	err := k.cdc.UnmarshalBinaryBare(store.Get(types.RewardStoreKey(blockHeight)), &reward)
+	err = k.cdc.UnmarshalBinaryBare(store.Get(types.RewardStoreKey(blockHeight)), &reward)
 	if err != nil {
 		return &types.Reward{
 			BlockHeight: int64(-1),
@@ -37,9 +44,21 @@ func (k Keeper) ProcessReward(ctx sdk.Context) {
 	}
 	reward := types.DefaultReward(blockHeight)
 
+	// get param reward percentage oracle
+	rewardPercentage := k.providerKeeper.GetOracleScriptRewardPercentageParam(ctx)
 	// Collect all the reports in the current block to get all the information for the reward
 	for _, report := range k.webSocketKeeper.GetReportsBlockHeight(ctx, blockHeight) {
-		k.ResolveRequestsFromReports(ctx, &report, reward, blockHeight)
+		isValid, valCount := k.ResolveRequestsFromReports(ctx, &report, reward, blockHeight, rewardPercentage)
+		// if we can resolve the requests from the reports successfully, we resolve its result
+		if isValid {
+			// collect param for the the total reports needed to be considered finished
+			totalReportsPercentage := k.GetTotalReportsParam(ctx)
+			if k.GetTotalReportsParam(ctx) <= int64(0) {
+				totalReportsPercentage = int64(70)
+			}
+			k.ResolveResult(ctx, &report, valCount, totalReportsPercentage)
+		}
+
 	}
 	// check if the reward is empty or not
 	if len(reward.Validators) > 0 {

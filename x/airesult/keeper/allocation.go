@@ -71,7 +71,8 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo) {
 	} else {
 		for _, val := range rewardObj.Validators {
 			powerFraction := sdk.NewDec(val.GetVotingPower()).QuoTruncate(sdk.NewDec(rewardObj.TotalPower))
-			valRewardDec := sdk.NewDecCoinsFromCoins(rewardObj.ValidatorFees...).MulDec(powerFraction)
+			// since validator fees here is the sum of all validator fees, so we need to divide with total number of validators to get fees for one validator.
+			valRewardDec := sdk.NewDecCoinsFromCoins(rewardObj.ValidatorFees...).QuoDec(sdk.NewDec(int64(len(rewardObj.Validators)))).MulDec(powerFraction)
 			valRewardInt, _ := valRewardDec.TruncateDecimal()
 			err = k.bankKeeper.SendCoinsFromModuleToModule(ctx, k.feeCollectorName, distr.ModuleName, valRewardInt)
 			if err != nil {

@@ -34,6 +34,23 @@ type (
 		authKeeper       auth.AccountKeeper
 		feeCollectorName string
 	}
+
+	// TestKeeper is created solely for unit test
+	TestKeeper struct {
+		Keeper           Keeper
+		Cdc              codec.Marshaler
+		StoreKey         sdk.StoreKey
+		WasmKeeper       *wasm.Keeper
+		ParamSpace       params.Subspace
+		StakingKeeper    staking.Keeper
+		ProviderKeeper   *provider.Keeper
+		WebSocketKeeper  *websocket.Keeper
+		AiRequestKeeper  *airequest.Keeper
+		BankKeeper       bank.Keeper
+		DistrKeeper      distr.Keeper
+		AuthKeeper       auth.AccountKeeper
+		FeeCollectorName string
+	}
 )
 
 // NewKeeper creates a airequest keeper
@@ -55,6 +72,29 @@ func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, s
 		webSocketKeeper:  webSocketKeeper,
 		aiRequestKeeper:  aiRequestKeeper,
 		feeCollectorName: feeCollectorName,
+	}
+}
+
+// NewTestKeeper creates a airequest keeper for testing
+func NewTestKeeper(keeper Keeper, cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, subspace params.Subspace, stakingKeeper staking.Keeper, providerKeeper *provider.Keeper, bankKeeper bank.Keeper, distrKeeper distr.Keeper, authKeeper auth.AccountKeeper, webSocketKeeper *websocket.Keeper, aiRequestKeeper *airequest.Keeper, feeCollectorName string) *TestKeeper {
+	if !subspace.HasKeyTable() {
+		// register parameters of the airequest module into the param space
+		subspace = subspace.WithKeyTable(types.ParamKeyTable())
+	}
+	return &TestKeeper{
+		Keeper:           keeper,
+		StoreKey:         key,
+		Cdc:              cdc,
+		WasmKeeper:       wasmKeeper,
+		ParamSpace:       subspace,
+		StakingKeeper:    stakingKeeper,
+		ProviderKeeper:   providerKeeper,
+		BankKeeper:       bankKeeper,
+		DistrKeeper:      distrKeeper,
+		AuthKeeper:       authKeeper,
+		WebSocketKeeper:  webSocketKeeper,
+		AiRequestKeeper:  aiRequestKeeper,
+		FeeCollectorName: feeCollectorName,
 	}
 }
 

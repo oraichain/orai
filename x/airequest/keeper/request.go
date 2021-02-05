@@ -11,9 +11,21 @@ import (
 // GetAIRequest returns the information of an AI request
 func (k Keeper) GetAIRequest(ctx sdk.Context, id string) (*types.AIRequest, error) {
 	store := ctx.KVStore(k.storeKey)
+	hasAIRequest := store.Has(types.RequestStoreKey(id))
+	var err error
+	if !hasAIRequest {
+		err = fmt.Errorf("")
+		return nil, err
+	}
 	result := &types.AIRequest{}
-	err := k.cdc.UnmarshalBinaryBare(store.Get(types.RequestStoreKey(id)), result)
+	err = k.cdc.UnmarshalBinaryBare(store.Get(types.RequestStoreKey(id)), result)
 	return result, err
+}
+
+// HasAIRequest checks if there exists an ai request given an id
+func (k Keeper) HasAIRequest(ctx sdk.Context, id string) bool {
+	store := ctx.KVStore(k.storeKey)
+	return store.Has(types.RequestStoreKey(id))
 }
 
 // SetAIRequest allows users to set a oScript into the store
