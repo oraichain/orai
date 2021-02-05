@@ -38,7 +38,7 @@ func NewSubscriber(cliCtx *client.Context, config *WebSocketConfig) *Subscriber 
 	}
 }
 
-func getAttributeMap(attrs []sdk.Attribute) map[string][]string {
+func GetAttributeMap(attrs []sdk.Attribute) map[string][]string {
 	ret := make(map[string][]string)
 	for _, attr := range attrs {
 		if values, ok := ret[attr.Key]; ok {
@@ -69,7 +69,12 @@ func (subscriber *Subscriber) handleTransaction(queryClient types.QueryClient, t
 			// process with each event type
 			switch ev.Type {
 			case artypes.EventTypeRequestWithData:
-				err = subscriber.handleAIRequestLog(queryClient, &ev)
+				msgReport, err := subscriber.handleAIRequestLog(queryClient, &ev)
+				if err != nil {
+					return err
+				}
+				// split two functions to do unit test easier an decouple the business logic
+				err = subscriber.submitReport(msgReport)
 			default:
 				subscriber.log.Debug(":ghost: Skipping non-{request/packet} type: %s", ev.Type)
 			}

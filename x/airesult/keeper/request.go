@@ -104,6 +104,11 @@ func (k Keeper) validateBasic(ctx sdk.Context, req *airequest.AIRequest, rep *we
 	// 	return false
 	// }
 
+	if rep.ResultStatus == websocket.ResultFailure {
+		fmt.Println("result status is fail")
+		return false
+	}
+
 	// Count the total number of data source results to see if it matches the requested data sources
 	if len(rep.GetDataSourceResults()) != len(req.GetAiDataSources()) {
 		fmt.Println("data source result length is different")

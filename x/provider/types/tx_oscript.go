@@ -27,24 +27,49 @@ func (msg *MsgCreateOracleScript) ValidateBasic() error {
 	// 	return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	// }
 	if len(msg.Name) == 0 || len(msg.Contract) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Name and/or Contract cannot be empty")
+		return sdkerrors.Wrap(ErrCannotSetOracleScript, "Name and/or Contract cannot be empty")
 	}
-	if len(msg.DataSources) == 0 || len(msg.TestCases) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "data source & test case identifiers cannot be empty")
+	if !isStringAlphabetic(msg.Name) || !isStringAlphabetic(msg.Contract) {
+		return sdkerrors.Wrap(ErrCannotSetOracleScript, "Input contains invalid characters")
 	}
-	// if len(msg.Contract) > MaximumContractLength {
-	// 	return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "The length of the smart contract address is too large!\n")
-	// }
-	// verify contract address
-	_, err := sdk.AccAddressFromBech32(msg.Contract)
+
+	err := validateDSourcesTCases(msg.DataSources, msg.TestCases)
 	if err != nil {
 		return err
 	}
 
-	if len(msg.DataSources) == 0 || len(msg.TestCases) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "data source & test case identifiers cannot be empty")
+	if len(msg.Contract) > 1*1024*1024 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "The size of the source code is too large!\n")
 	}
 
+	_, err = sdk.AccAddressFromBech32(msg.Contract)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func validateDSourcesTCases(dSources, tCases []string) error {
+	if len(dSources) == 0 || len(tCases) == 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "data source & test case identifiers cannot be empty")
+	}
+	for _, dSource := range dSources {
+		if len(dSource) == 0 {
+			return sdkerrors.Wrap(ErrCannotSetOracleScript, "data source inputs of oracle script cannot be empty")
+		}
+		if !isStringAlphabetic(dSource) {
+			return sdkerrors.Wrap(ErrCannotSetOracleScript, "Input data source contains invalid characters")
+		}
+	}
+
+	for _, tCase := range tCases {
+		if len(tCase) == 0 {
+			return sdkerrors.Wrap(ErrCannotSetOracleScript, "test case inputs of oracle script cannot be empty")
+		}
+		if !isStringAlphabetic(tCase) {
+			return sdkerrors.Wrap(ErrCannotSetOracleScript, "Input test case contains invalid characters")
+		}
+	}
 	return nil
 }
 
@@ -81,8 +106,13 @@ func (msg *MsgEditOracleScript) ValidateBasic() error {
 	if len(msg.OldName) == 0 || len(msg.Contract) == 0 || len(msg.NewName) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Name and/or Contract cannot be empty")
 	}
-	if len(msg.DataSources) == 0 || len(msg.TestCases) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "data source & test case identifiers cannot be empty")
+	if !isStringAlphabetic(msg.OldName) || !isStringAlphabetic(msg.NewName) || !isStringAlphabetic(msg.Contract) {
+		return sdkerrors.Wrap(ErrCannotSetOracleScript, "Input contains invalid characters")
+	}
+
+	err := validateDSourcesTCases(msg.DataSources, msg.TestCases)
+	if err != nil {
+		return err
 	}
 	if len(msg.Contract) > 1*1024*1024 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "The size of the source code is too large!\n")
