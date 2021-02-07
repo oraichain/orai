@@ -33,7 +33,7 @@ func (k Keeper) SetAIRequest(ctx sdk.Context, id string, request *types.AIReques
 	store := ctx.KVStore(k.storeKey)
 	bz, err := k.cdc.MarshalBinaryBare(request)
 	if err != nil {
-		fmt.Println("error: ", err)
+		k.Logger(ctx).Error(fmt.Sprintf("error: %v\n", err.Error()))
 	}
 	store.Set(types.RequestStoreKey(id), bz)
 }

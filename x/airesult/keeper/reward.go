@@ -62,7 +62,7 @@ func (k Keeper) ProcessReward(ctx sdk.Context) {
 	}
 	// check if the reward is empty or not
 	if len(reward.Validators) > 0 {
-		fmt.Println("block for reward: ", blockHeight)
+		k.Logger(ctx).Info(fmt.Sprintf("block for reward: %v\n", blockHeight))
 		k.SetReward(ctx, blockHeight, reward)
 	}
 }

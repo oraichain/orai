@@ -43,7 +43,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo) {
 	// append those coins into the fee collector to get ready allocating them to the distr module.
 	err = k.bankKeeper.AddCoins(ctx, feeCollector.GetAddress(), feesCollected)
 	if err != nil {
-		fmt.Println("error adding coins using bank keeper: ", err)
+		k.Logger(ctx).Error(fmt.Sprintf("error adding coins using bank keeper: %v\n", err.Error()))
 		return
 	}
 	remaining := reward
@@ -76,7 +76,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo) {
 			valRewardInt, _ := valRewardDec.TruncateDecimal()
 			err = k.bankKeeper.SendCoinsFromModuleToModule(ctx, k.feeCollectorName, distr.ModuleName, valRewardInt)
 			if err != nil {
-				fmt.Println("error in sending coins from fee collector to distrution module: ", err)
+				k.Logger(ctx).Error(fmt.Sprintf("error in sending coins from fee collector to distrution module: %v\n", err.Error()))
 				return
 			}
 			// allocate tokens to validator with a specific commission
@@ -84,7 +84,12 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo) {
 			remaining = remaining.Sub(valRewardDec)
 		}
 	}
-	fmt.Println("Finish allocating the tokens")
+
+	// allocate community funding
+	feePool := k.distrKeeper.GetFeePool(ctx)
+	feePool.CommunityPool = feePool.CommunityPool.Add(remaining...)
+	k.distrKeeper.SetFeePool(ctx, feePool)
+	k.Logger(ctx).Info("finish allocating tokens")
 }
 
 // // DirectAllocateTokens allocates the tokens to the validators, data sources and test cases that participate in the AI request handling directly using coins from the requester account

@@ -105,26 +105,26 @@ func (k Keeper) validateBasic(ctx sdk.Context, req *airequest.AIRequest, rep *we
 	// }
 
 	if rep.ResultStatus == websocket.ResultFailure {
-		fmt.Println("result status is fail")
+		k.Logger(ctx).Error("result status is fail")
 		return false
 	}
 
 	// Count the total number of data source results to see if it matches the requested data sources
 	if len(rep.GetDataSourceResults()) != len(req.GetAiDataSources()) {
-		fmt.Println("data source result length is different")
+		k.Logger(ctx).Error("data source result length is different")
 		return false
 	}
 
 	// Count the total number of test case results to see if it matches the requested test cases
 	if len(rep.GetTestCaseResults()) != len(req.GetTestCases()) {
-		fmt.Println("test case result length is different")
+		k.Logger(ctx).Error("test case result length is different")
 		return false
 	}
 
 	// TODO
 	err := k.webSocketKeeper.ValidateReport(ctx, rep.GetReporter(), req)
 	if err != nil {
-		fmt.Println("error in validating the report: ", err.Error())
+		k.Logger(ctx).Error(fmt.Sprintf("error in validating the report: %v\n", err.Error()))
 		return false
 	}
 	return true

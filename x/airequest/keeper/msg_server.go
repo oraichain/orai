@@ -54,7 +54,7 @@ func (k msgServer) CreateAIRequest(goCtx context.Context, msg *types.MsgSetAIReq
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Error getting minimum fees from oracle script")
 	}
-	fmt.Println("required fees needed: ", requiredFees.String())
+	k.keeper.Logger(ctx).Info(fmt.Sprintf("required fees needed: %v\n", requiredFees.String()))
 
 	// If the total fee is larger than the fee provided by the user then we return error
 	if requiredFees.IsAnyGT(providedFees) {
