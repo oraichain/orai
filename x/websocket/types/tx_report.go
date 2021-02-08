@@ -19,7 +19,7 @@ func (msg *MsgCreateReport) Type() string { return "create_report" }
 // ValidateBasic runs stateless checks on the message
 func (msg *MsgCreateReport) ValidateBasic() error {
 	reporter := msg.GetReporter()
-	if reporter.GetAddress().Empty() || len(reporter.GetName()) == 0 || isStringAlphabetic(reporter.GetName()) {
+	if reporter.GetAddress().Empty() || len(reporter.GetName()) == 0 || !isStringAlphabetic(reporter.GetName()) {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, reporter.String())
 	} else if len(msg.GetRequestID()) == 0 || reporter.Validator.Empty() {
 		return sdkerrors.Wrap(ErrMsgReportInvalid, "Request ID / validator address cannot be empty")
