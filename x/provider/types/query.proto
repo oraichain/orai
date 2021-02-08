@@ -1,0 +1,48 @@
+syntax = "proto3";
+package oraichain.orai.provider;
+// this line is used by starport scaffolding # 1
+
+option go_package = "github.com/oraichain/orai/x/provider/types";
+
+// this line is used by starport scaffolding # 3
+
+import "google/api/annotations.proto";
+import "x/provider/types/query_dsource.proto";
+import "x/provider/types/query_oscript.proto";
+import "x/provider/types/query_tcase.proto";
+
+// Query provides defines the gRPC querier service
+service Query {
+
+    // DataSourceInfo gets the data source meta data
+    rpc DataSourceInfo (DataSourceInfoReq) returns (DataSourceInfoRes) {
+        option (google.api.http).get = "/provider/datasource/{name}";
+    }
+    // ListDataSources gets the list of data sources
+    rpc ListDataSources (ListDataSourcesReq) returns (ListDataSourcesRes) {
+        option (google.api.http).get = "/provider/datasources";
+    }
+
+    // OracleScriptInfo gets the oracle script meta data
+    rpc OracleScriptInfo (OracleScriptInfoReq) returns (OracleScriptInfoRes) {
+        option (google.api.http).get = "/provider/oscript/{name}";
+    }
+    // ListOracleScripts gets the list of oracle scripts
+    rpc ListOracleScripts (ListOracleScriptsReq) returns (ListOracleScriptsRes) {
+        option (google.api.http).get = "/provider/oscripts";
+    }
+
+    // TestCaseInfo gets the test case meta data
+    rpc TestCaseInfo (TestCaseInfoReq) returns (TestCaseInfoRes) {
+        option (google.api.http).get = "/provider/testcase/{name}";
+    }
+    // ListTestCases gets the list of test cases
+    rpc ListTestCases (ListTestCasesReq) returns (ListTestCasesRes) {
+        option (google.api.http).get = "/provider/testcases";
+    }
+
+    // QueryMinFees gets the min fees of oracle script
+    rpc QueryMinFees (MinFeesReq) returns (MinFeesRes) {
+        option (google.api.http).get = "/provider/minfees";
+    }
+}

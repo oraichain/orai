@@ -1,0 +1,76 @@
+syntax = "proto3";
+package oraichain.orai.websocket;
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/oraichain/orai/x/websocket/types";
+
+message Fetch {
+    option (gogoproto.goproto_stringer) = true;    
+    string url = 1 [(gogoproto.moretags) = "json:\"url\""];
+    string method = 2 [(gogoproto.moretags) = "json:\"method,omitempty\""]; 
+    string authorization = 3 [(gogoproto.moretags) = "json:\"authorization,omitempty\""]; 
+    string body = 4 [(gogoproto.moretags) = "json:\"body,omitempty\""]; 
+}
+
+// Report stores the result of the data source when validator executes it
+message Request {
+  option (gogoproto.goproto_stringer) = true;    
+  Fetch fetch = 1 [(gogoproto.moretags) = "json:\"fetch\""];  
+}
+
+message RequestDataSource {
+  option (gogoproto.goproto_stringer) = true;    
+  string input = 1 [(gogoproto.moretags) = "json:\"input\""];  
+}
+
+message RequestTestCase {  
+  option (gogoproto.goproto_stringer) = true;    
+  bytes contract = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress", (gogoproto.moretags) = "json:\"contract\""];  
+  string input = 2 [(gogoproto.moretags) = "json:\"input\""];  
+  string output = 3 [(gogoproto.moretags) = "json:\"output\""];  
+}
+
+message RequestOracleScript {
+  option (gogoproto.goproto_stringer) = true;    
+  repeated string results = 1 [(gogoproto.moretags) = "json:\"results\""];  
+}
+
+message QueryOracleContract {
+  option (gogoproto.goproto_stringer) = true;    
+  bytes contract = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress", (gogoproto.moretags) = "json:\"contract\""];  
+  Request request = 2 [(gogoproto.moretags) = "json:\"request\""];  
+}
+
+message QueryDataSourceContract {
+  option (gogoproto.goproto_stringer) = true;    
+  string name = 1 [(gogoproto.moretags) = "json:\"name\""];  
+  RequestDataSource request = 2 [(gogoproto.moretags) = "json:\"request\""];  
+}
+message QueryDataSourceSmartContract {    
+  RequestDataSource get = 2 [(gogoproto.moretags) = "json:\"get\""];  
+}
+
+message QueryTestCaseContract {
+  option (gogoproto.goproto_stringer) = true;    
+  string name = 1 [(gogoproto.moretags) = "json:\"name\""];  
+  string dataSourceName = 2 [(gogoproto.moretags) = "json:\"dsource_name\""];  
+  RequestTestCase request = 3 [(gogoproto.moretags) = "json:\"request\""];  
+}
+message QueryTestCaseSmartContract {    
+  RequestTestCase test = 2 [(gogoproto.moretags) = "json:\"test\""];  
+}
+
+message QueryOracleScriptContract {
+  option (gogoproto.goproto_stringer) = true;    
+  string name = 1 [(gogoproto.moretags) = "json:\"name\""];    
+  RequestOracleScript request = 2 [(gogoproto.moretags) = "json:\"request\""];  
+}
+message QueryOracleScriptSmartContract {    
+  RequestOracleScript aggregate = 2 [(gogoproto.moretags) = "json:\"aggregate\""];  
+}
+
+// Report stores the result of the data source when validator executes it
+message ResponseContract {
+  option (gogoproto.goproto_stringer) = true;    
+  bytes data = 1 [(gogoproto.moretags) = "json:\"data\""];    
+}

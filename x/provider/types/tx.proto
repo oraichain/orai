@@ -1,0 +1,62 @@
+syntax = "proto3";
+package oraichain.orai.provider;
+import "x/provider/types/tx_dsource.proto";
+import "x/provider/types/tx_oscript.proto";
+import "x/provider/types/tx_tcase.proto";
+option go_package = "github.com/oraichain/orai/x/provider/types";
+import "google/api/annotations.proto";
+//import "x/provider/types/types_ds.proto";
+
+// Msg defines the provider Msg service.
+service Msg {
+  // Create a new data source
+  rpc CreateAIDataSource(MsgCreateAIDataSource) returns (MsgCreateAIDataSourceRes) {
+    option (google.api.http) = {
+      // The `parent` captures the parent resource name, such as "shelves/1".
+      post: "/provider/datasource"
+      body: "name",
+    };
+  };
+  // Edit an existing data source
+  rpc EditAIDataSource(MsgEditAIDataSource) returns (MsgEditAIDataSourceRes) {
+    option (google.api.http) = {
+      // The `parent` captures the parent resource name, such as "shelves/1".
+      patch: "/provider/datasource"
+      body: "*"
+    };
+  };
+
+  // Create a new oracle script
+  rpc CreateOracleScript(MsgCreateOracleScript) returns (MsgCreateOracleScriptRes) {
+    option (google.api.http) = {
+      // The `parent` captures the parent resource name, such as "shelves/1".
+      post: "/provider/oscript"
+      body: "*"
+    };
+  };
+  // Edit an existing oracle script
+  rpc EditOracleScript(MsgEditOracleScript) returns (MsgEditOracleScriptRes) {
+    option (google.api.http) = {
+      // The `parent` captures the parent resource name, such as "shelves/1".
+      patch: "/provider/oscript"
+      body: "*"
+    };
+  };
+
+  // Create a new test case
+  rpc CreateTestCase(MsgCreateTestCase) returns (MsgCreateTestCaseRes) {
+    option (google.api.http) = {
+      // The `parent` captures the parent resource name, such as "shelves/1".
+      post: "/provider/testcase"
+      body: "*"
+    };
+  };
+  // Edit an existing test case
+  rpc EditTestCase(MsgEditTestCase) returns (MsgEditTestCaseRes) {
+    option (google.api.http) = {
+      // The `parent` captures the parent resource name, such as "shelves/1".
+      patch: "/provider/testcase"
+      body: "*"
+    };
+  };
+}

@@ -3,74 +3,115 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/tendermint/tendermint/libs/log"
-
+	"github.com/CosmWasm/wasmd/x/wasm"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/params"
+	auth "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	bank "github.com/cosmos/cosmos-sdk/x/bank/keeper"
+	distr "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
+	params "github.com/cosmos/cosmos-sdk/x/params/types"
+	staking "github.com/cosmos/cosmos-sdk/x/staking/keeper"
+	"github.com/oraichain/orai/x/airequest"
 	"github.com/oraichain/orai/x/airesult/types"
+	"github.com/oraichain/orai/x/provider"
+	"github.com/oraichain/orai/x/websocket"
+	"github.com/tendermint/tendermint/libs/log"
 )
 
-// Keeper of the provider store
-type Keeper struct {
-	storeKey         sdk.StoreKey
-	cdc              *codec.Codec
-	paramSpace       params.Subspace
-	supplyKeeper     types.SupplyKeeper
-	bankKeeper       types.BankKeeper
-	stakingKeeper    types.StakingKeeper
-	distrKeeper      types.DistrKeeper
-	ProviderKeeper   types.ProviderKeeper
-	webSocketKeeper  types.WebSocketKeeper
-	aiRequestKeeper  types.AIRequestKeeper
-	feeCollectorName string
-}
-
-// NewKeeper creates a provider keeper
-func NewKeeper(cdc *codec.Codec, key sdk.StoreKey, aiResultSubSpace params.Subspace, supplyKeeper types.SupplyKeeper, bankKeeper types.BankKeeper, stakingKeeper types.StakingKeeper, distrKeeper types.DistrKeeper, providerKeeper types.ProviderKeeper, socketKeeper types.WebSocketKeeper, aiRequestKeeper types.AIRequestKeeper, feeCollectorName string) Keeper {
-	if !aiResultSubSpace.HasKeyTable() {
-		// register parameters of the provider module into the param space
-		aiResultSubSpace = aiResultSubSpace.WithKeyTable(types.ParamKeyTable())
+// always clone keeper to make it immutable
+type (
+	Keeper struct {
+		cdc              codec.Marshaler
+		storeKey         sdk.StoreKey
+		wasmKeeper       *wasm.Keeper
+		paramSpace       params.Subspace
+		stakingKeeper    staking.Keeper
+		providerKeeper   *provider.Keeper
+		webSocketKeeper  *websocket.Keeper
+		aiRequestKeeper  *airequest.Keeper
+		bankKeeper       bank.Keeper
+		distrKeeper      distr.Keeper
+		authKeeper       auth.AccountKeeper
+		feeCollectorName string
 	}
-	return Keeper{
+
+	// TestKeeper is created solely for unit test
+	TestKeeper struct {
+		Keeper           Keeper
+		Cdc              codec.Marshaler
+		StoreKey         sdk.StoreKey
+		WasmKeeper       *wasm.Keeper
+		ParamSpace       params.Subspace
+		StakingKeeper    staking.Keeper
+		ProviderKeeper   *provider.Keeper
+		WebSocketKeeper  *websocket.Keeper
+		AiRequestKeeper  *airequest.Keeper
+		BankKeeper       bank.Keeper
+		DistrKeeper      distr.Keeper
+		AuthKeeper       auth.AccountKeeper
+		FeeCollectorName string
+	}
+)
+
+// NewKeeper creates a airequest keeper
+func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, subspace params.Subspace, stakingKeeper staking.Keeper, providerKeeper *provider.Keeper, bankKeeper bank.Keeper, distrKeeper distr.Keeper, authKeeper auth.AccountKeeper, webSocketKeeper *websocket.Keeper, aiRequestKeeper *airequest.Keeper, feeCollectorName string) *Keeper {
+	if !subspace.HasKeyTable() {
+		// register parameters of the airequest module into the param space
+		subspace = subspace.WithKeyTable(types.ParamKeyTable())
+	}
+	return &Keeper{
 		storeKey:         key,
 		cdc:              cdc,
-		paramSpace:       aiResultSubSpace,
-		supplyKeeper:     supplyKeeper,
-		bankKeeper:       bankKeeper,
+		wasmKeeper:       wasmKeeper,
+		paramSpace:       subspace,
 		stakingKeeper:    stakingKeeper,
+		providerKeeper:   providerKeeper,
+		bankKeeper:       bankKeeper,
 		distrKeeper:      distrKeeper,
-		ProviderKeeper:   providerKeeper,
-		webSocketKeeper:  socketKeeper,
+		authKeeper:       authKeeper,
+		webSocketKeeper:  webSocketKeeper,
 		aiRequestKeeper:  aiRequestKeeper,
 		feeCollectorName: feeCollectorName,
 	}
 }
 
-// Logger returns a module-specific logger.
-func (k Keeper) Logger(ctx sdk.Context) log.Logger {
+// NewTestKeeper creates a airequest keeper for testing
+func NewTestKeeper(keeper Keeper, cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, subspace params.Subspace, stakingKeeper staking.Keeper, providerKeeper *provider.Keeper, bankKeeper bank.Keeper, distrKeeper distr.Keeper, authKeeper auth.AccountKeeper, webSocketKeeper *websocket.Keeper, aiRequestKeeper *airequest.Keeper, feeCollectorName string) *TestKeeper {
+	if !subspace.HasKeyTable() {
+		// register parameters of the airequest module into the param space
+		subspace = subspace.WithKeyTable(types.ParamKeyTable())
+	}
+	return &TestKeeper{
+		Keeper:           keeper,
+		StoreKey:         key,
+		Cdc:              cdc,
+		WasmKeeper:       wasmKeeper,
+		ParamSpace:       subspace,
+		StakingKeeper:    stakingKeeper,
+		ProviderKeeper:   providerKeeper,
+		BankKeeper:       bankKeeper,
+		DistrKeeper:      distrKeeper,
+		AuthKeeper:       authKeeper,
+		WebSocketKeeper:  webSocketKeeper,
+		AiRequestKeeper:  aiRequestKeeper,
+		FeeCollectorName: feeCollectorName,
+	}
+}
+
+func (k *Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-//IsNamePresent checks if the name is present in the store or not
-func (k Keeper) IsNamePresent(ctx sdk.Context, name string) bool {
-	store := ctx.KVStore(k.storeKey)
-	return store.Has([]byte(name))
+// GetExpirationCountParam returns the expiration count from param
+func (k *Keeper) GetExpirationCountParam(ctx sdk.Context) int64 {
+	// TODO
+	percentage := k.GetParam(ctx, types.KeyExpirationCount)
+	return int64(percentage)
 }
 
-// GetParam returns the parameter as specified by key as an uint64.
-func (k Keeper) GetParam(ctx sdk.Context, key []byte) (res uint64) {
-	k.paramSpace.Get(ctx, key, &res)
-	return res
-}
-
-// SetParam saves the given key-value parameter to the store.
-func (k Keeper) SetParam(ctx sdk.Context, key []byte, value uint64) {
-	k.paramSpace.Set(ctx, key, value)
-}
-
-// GetParams returns all current parameters as a types.Params instance.
-func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
-	k.paramSpace.GetParamSet(ctx, &params)
-	return params
+// GetTotalReportsParam returns the total reports from param
+func (k *Keeper) GetTotalReportsParam(ctx sdk.Context) int64 {
+	// TODO
+	percentage := k.GetParam(ctx, types.KeyTotalReports)
+	return int64(percentage)
 }

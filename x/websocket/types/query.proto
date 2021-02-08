@@ -1,0 +1,29 @@
+syntax = "proto3";
+package oraichain.orai.websocket;
+// this line is used by starport scaffolding # 1
+import "x/websocket/types/types_oracle_query.proto";
+
+option go_package = "github.com/oraichain/orai/x/websocket/types";
+
+// this line is used by starport scaffolding # 3
+
+
+// Query provides defines the gRPC querier service
+service Query {
+    // DataSourceInfo gets the data source meta data
+    rpc OracleContract (QueryOracleContract) returns (ResponseContract) {
+        
+    }
+
+    rpc DataSourceContract (QueryDataSourceContract) returns (ResponseContract) {
+        
+    }
+
+    rpc TestCaseContract (QueryTestCaseContract) returns (ResponseContract) {
+        
+    }
+
+    rpc OracleScriptContract (QueryOracleScriptContract) returns (ResponseContract) {
+        
+    }
+}

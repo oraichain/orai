@@ -1,0 +1,24 @@
+syntax = "proto3";
+package oraichain.orai.provider;
+
+import "x/provider/types/types_ds.proto";
+import "x/provider/types/types_os.proto";
+import "x/provider/types/types_tc.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/oraichain/orai/x/provider/types";
+
+// GenesisState defines the capability module's genesis state.
+message GenesisState {
+    repeated AIDataSource AIDataSources = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "AIDataSources", (gogoproto.moretags) = "json:\"datasources\""];
+    repeated OracleScript OracleScripts = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "OracleScripts", (gogoproto.moretags) = "json:\"oracle_scripts\""];
+    repeated TestCase TestCases = 3 [(gogoproto.nullable) = false, (gogoproto.customname) = "TestCases", (gogoproto.moretags) = "json:\"test_cases\""];
+    Params params = 4 [(gogoproto.nullable) = false];
+}
+
+// Params defines the set of wasm parameters.
+message Params {
+    option (gogoproto.goproto_stringer) = false;
+    uint64 oracle_script_reward_percentage = 1 [(gogoproto.moretags) = "json:\"oscript_reward_percentage\""];
+    uint64 maximum_code_bytes = 2;
+}

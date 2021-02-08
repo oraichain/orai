@@ -1,0 +1,47 @@
+syntax = "proto3";
+package oraichain.orai.websocket;
+//import "cosmos/base/v1beta1/coin.proto";
+import "gogoproto/gogo.proto";
+option go_package = "github.com/oraichain/orai/x/websocket/types";
+
+
+// MsgAddReporter is a message for adding a new reporter for a validator.
+message MsgAddReporter {
+    // Validator is the validator that wishes to add a new reporter. This is the signer.
+    bytes validator = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.ValAddress", (gogoproto.moretags) = "json:\"validator\""];
+    // Reporter is the address to be added as a reporter to the validator.
+    bytes reporter = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress", (gogoproto.moretags) = "json:\"reporter\""];  
+    // Adder is the address responsible for adding the reporter
+    bytes adder = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress", (gogoproto.moretags) = "json:\"adder\""];  
+}
+
+// MsgAddReporterRes returns added reporter data.
+message MsgAddReporterRes{
+    // Validator is the validator that wishes to add a new reporter. This is the signer.
+    bytes validator = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.ValAddress", (gogoproto.moretags) = "json:\"validator\""];
+    // Reporter is the address to be added as a reporter to the validator.
+    bytes reporter = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress", (gogoproto.moretags) = "json:\"reporter\""];  
+    // Adder is the address responsible for adding the reporter
+    bytes adder = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress", (gogoproto.moretags) = "json:\"adder\""];  
+}
+
+
+// MsgRemoveReporter is a message for remove an existing reporter for a validator.
+message MsgRemoveReporter {
+    // Validator is the validator that wishes to add a new reporter. This is the signer.
+    bytes validator = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.ValAddress", (gogoproto.moretags) = "json:\"validator\""];
+    // Reporter is the address to be added as a reporter to the validator.
+    bytes reporter = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress", (gogoproto.moretags) = "json:\"reporter\""];  
+    // Remover is the address responsible for removing the reporter
+    bytes remover = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress", (gogoproto.moretags) = "json:\"remover\""];  
+}
+
+// MsgRemoveReporterRes returns removed reporter data.
+message MsgRemoveReporterRes{
+    // Validator is the validator that wishes to add a new reporter. This is the signer.
+    bytes validator = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.ValAddress", (gogoproto.moretags) = "json:\"validator\""];
+    // Reporter is the address to be added as a reporter to the validator.
+    bytes reporter = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress", (gogoproto.moretags) = "json:\"reporter\""];  
+    // Remover is the address responsible for removing the reporter
+    bytes remover = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress", (gogoproto.moretags) = "json:\"remover\""];  
+}

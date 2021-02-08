@@ -1,0 +1,12 @@
+syntax = "proto3";
+package oraichain.orai.websocket;
+import "gogoproto/gogo.proto";
+import "x/websocket/types/types_dsource_result.proto";
+
+option go_package = "github.com/oraichain/orai/x/websocket/types";
+
+message TestCaseResult {
+  option (gogoproto.goproto_stringer) = true;  
+  string name = 1 [(gogoproto.moretags) = "json:\"test_case\""];
+  repeated DataSourceResult DataSourceResults = 2 [(gogoproto.moretags) = "json:\"data_source_result\"", (gogoproto.customname) = "DataSourceResults"];	  
+}

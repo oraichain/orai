@@ -5,26 +5,30 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/gogo/protobuf/proto"
 	"github.com/oraichain/orai/x/airequest/keeper"
-	"github.com/oraichain/orai/x/airequest/types"
 )
 
-// NewHandler creates an sdk.Handler for all the airequest type messages
-func NewHandler(k keeper.Keeper) sdk.Handler {
+// NewHandler returns a handler for "bank" type messages.
+func NewHandler(k *Keeper) sdk.Handler {
+	msgServer := keeper.NewMsgServerImpl(k)
+
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
+		goCtx := sdk.WrapSDKContext(ctx)
+		var (
+			res proto.Message
+			err error
+		)
+		// this is for server to broadcast, query is for client to query
 		switch msg := msg.(type) {
-		case types.MsgSetKYCRequest:
-			return handleMsgSetKYCRequest(ctx, k, msg)
-		case types.MsgSetClassificationRequest:
-			return handleMsgSetClassificationRequest(ctx, k, msg)
-		case types.MsgSetOCRRequest:
-			return handleMsgSetOCRRequest(ctx, k, msg)
-		case types.MsgSetPriceRequest:
-			return handleMsgSetPriceRequest(ctx, k, msg)
+		case *MsgSetAIRequest:
+			res, err = msgServer.CreateAIRequest(goCtx, msg)
 		default:
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", ModuleName, msg)
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)
 		}
+
+		return sdk.WrapServiceResult(ctx, res, err)
 	}
 }

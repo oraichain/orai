@@ -1,0 +1,20 @@
+syntax = "proto3";
+package oraichain.orai.airesult;
+
+import "x/airesult/types/types_result.proto";
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/oraichain/orai/x/airesult/types";
+
+// GenesisState defines the capability module's genesis state.
+message GenesisState {
+    repeated AIRequestResult ai_request_results = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "AIRequestResults", (gogoproto.moretags) = "json:\"ai_results\""];
+    Params params = 2 [(gogoproto.nullable) = false];
+}
+
+// Params defines the set of wasm parameters.
+message Params {
+    option (gogoproto.goproto_stringer) = true;
+    uint64 expiration_count = 1;
+    uint64 total_reports = 2;
+}

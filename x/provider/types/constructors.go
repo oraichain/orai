@@ -1,160 +1,154 @@
 package types
 
-// import (
-// 	sdk "github.com/cosmos/cosmos-sdk/types"
-// )
+import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
+)
 
-// // NewAIRequest is the constructor of the ai request struct
-// func NewAIRequest(
-// 	requestID string,
-// 	oscriptName string,
-// 	creator sdk.AccAddress,
-// 	validators []sdk.ValAddress,
-// 	blockHeight int64,
-// 	aiDataSources []AIDataSource,
-// 	testCases []TestCase,
-// 	fees sdk.Coins,
-// 	input string,
-// 	expectedOutput string,
-// ) AIRequest {
-// 	return AIRequest{
-// 		RequestID:        requestID,
-// 		OracleScriptName: oscriptName,
-// 		Creator:          creator,
-// 		Validators:       validators,
-// 		BlockHeight:      blockHeight,
-// 		AIDataSources:    aiDataSources,
-// 		TestCases:        testCases,
-// 		Fees:             fees,
-// 		Input:            input,
-// 		ExpectedOutput:   expectedOutput,
-// 	}
-// }
+// NewAIDataSource is the constructor of the data source struct
+func NewAIDataSource(
+	name string,
+	contract string,
+	owner sdk.AccAddress,
+	fees sdk.Coins,
+	des string,
+) *AIDataSource {
+	return &AIDataSource{
+		Name:        name,
+		Contract:    contract,
+		Owner:       owner,
+		Fees:        fees,
+		Description: des,
+	}
+}
 
-// // NewReport is the constructor of the report struct
-// func NewReport(
-// 	requestID string,
-// 	validator Validator,
-// 	dataSourceResults []DataSourceResult,
-// 	testCaseResults []TestCaseResult,
-// 	blockHeight int64,
-// 	fees sdk.Coins,
-// 	aggregatedResult []byte,
-// ) Report {
-// 	return Report{
-// 		RequestID:         requestID,
-// 		Validator:         validator,
-// 		DataSourceResults: dataSourceResults,
-// 		TestCaseResults:   testCaseResults,
-// 		BlockHeight:       blockHeight,
-// 		Fees:              fees,
-// 		AggregatedResult:  aggregatedResult,
-// 	}
-// }
+// verify interface at compile time
+var _ sdk.Msg = &MsgCreateAIDataSource{}
+var _ sdk.Msg = &MsgEditAIDataSource{}
 
-// // NewDataSourceResult is the constructor of the data source result struct
-// func NewDataSourceResult(
-// 	name string,
-// 	result []byte,
-// 	status string,
-// ) DataSourceResult {
-// 	return DataSourceResult{
-// 		Name:   name,
-// 		Result: result,
-// 		Status: status,
-// 	}
-// }
+// NewMsgCreateAIDataSource is a constructor function for MsgCreateAIDataSource
+func NewMsgCreateAIDataSource(name string, contract string, owner sdk.AccAddress, fees string, des string) *MsgCreateAIDataSource {
+	return &MsgCreateAIDataSource{
+		Name:        name,
+		Description: des,
+		Contract:    contract,
+		Owner:       owner,
+		Fees:        fees,
+	}
+}
 
-// // NewTestCaseResult is the constructor of the test case result struct
-// func NewTestCaseResult(
-// 	name string,
-// 	dataSourceResults []DataSourceResult,
-// ) TestCaseResult {
-// 	return TestCaseResult{
-// 		Name:              name,
-// 		DataSourceResults: dataSourceResults,
-// 	}
-// }
+// NewMsgEditAIDataSource is a constructor function for MsgEditAIDataSource
+func NewMsgEditAIDataSource(oldName, newName string, contract string, owner sdk.AccAddress, fees string, des string) *MsgEditAIDataSource {
+	return &MsgEditAIDataSource{
+		OldName:     oldName,
+		NewName:     newName,
+		Description: des,
+		Contract:    contract,
+		Owner:       owner,
+		Fees:        fees,
+	}
+}
 
-// // NewValidator is the constructor of the validator struct
-// func NewValidator(
-// 	address sdk.ValAddress,
-// 	votingPower int64,
-// 	status string,
-// ) Validator {
-// 	return Validator{
-// 		Address:     address,
-// 		VotingPower: votingPower,
-// 		Status:      status,
-// 	}
-// }
+// NewOracleScript is the constructor of the oScript struct
+func NewOracleScript(
+	name string,
+	contract string,
+	owner sdk.AccAddress,
+	des string,
+	minimumFees sdk.Coins,
+	dSources []string,
+	tCases []string,
+) *OracleScript {
+	return &OracleScript{
+		Name:        name,
+		Contract:    contract,
+		Owner:       owner,
+		Description: des,
+		MinimumFees: minimumFees,
+		DSources:    dSources,
+		TCases:      tCases,
+	}
+}
 
-// // NewReward is a constructor for the reward struct
-// func NewReward(
-// 	validators []Validator,
-// 	dataSources []AIDataSource,
-// 	testCases []TestCase,
-// 	blockHeight int64,
-// 	totalVotingPower int64,
-// 	providerFees sdk.Coins,
-// 	validatorFees sdk.Coins,
-// ) Reward {
-// 	return Reward{
-// 		Validators:    validators,
-// 		DataSources:   dataSources,
-// 		TestCases:     testCases,
-// 		BlockHeight:   blockHeight,
-// 		TotalPower:    totalVotingPower,
-// 		ProviderFees:  providerFees,
-// 		ValidatorFees: validatorFees,
-// 	}
-// }
+var _ sdk.Msg = &MsgCreateOracleScript{}
+var _ sdk.Msg = &MsgEditOracleScript{}
 
-// // NewAIRequestResult is a constructor for the ai request result struct
-// func NewAIRequestResult(
-// 	requestID string,
-// 	results ValResults,
-// 	status string,
-// ) AIRequestResult {
-// 	return AIRequestResult{
-// 		RequestID: requestID,
-// 		Results:   results,
-// 		Status:    status,
-// 	}
-// }
+// NewMsgCreateOracleScript is a constructor function for MsgCreateOracleScript
+func NewMsgCreateOracleScript(name string, contract string, owner sdk.AccAddress, fees string, des string, dSources, tCases []string) *MsgCreateOracleScript {
+	return &MsgCreateOracleScript{
+		Name:        name,
+		Contract:    contract,
+		Owner:       owner,
+		Fees:        fees,
+		Description: des,
+		DataSources: dSources,
+		TestCases:   tCases,
+	}
+}
 
-// // NewValResult is a constructor for the validator result
-// func NewValResult(
-// 	val sdk.ValAddress,
-// 	result []byte,
-// ) ValResult {
-// 	return ValResult{
-// 		Validator: val,
-// 		Result:    result,
-// 	}
-// }
+// NewMsgEditOracleScript is a constructor function for MsgEditOracleScript
+func NewMsgEditOracleScript(oldName, newName string, contract string, owner sdk.AccAddress, fees string, des string, dSources, tCases []string) *MsgEditOracleScript {
+	return &MsgEditOracleScript{
+		OldName:     oldName,
+		NewName:     newName,
+		Contract:    contract,
+		Owner:       owner,
+		Fees:        fees,
+		Description: des,
+		DataSources: dSources,
+		TestCases:   tCases,
+	}
+}
 
-// // NewStrategy is a constructor for the strategy struct
-// func NewStrategy(
-// 	stratID uint64,
-// 	stratName string,
-// 	stratFlow []string,
-// 	performanceFee uint64,
-// 	performanceMax uint64,
-// 	withdrawalFee uint64,
-// 	withdrawalMax uint64,
-// 	governanceAddr string,
-// 	strategistAddr string,
-// ) Strategy {
-// 	return Strategy{
-// 		StratID:        stratID,
-// 		StratName:      stratName,
-// 		StratFlow:      stratFlow,
-// 		PerformanceFee: performanceFee,
-// 		PerformanceMax: performanceMax,
-// 		WithdrawalFee:  withdrawalFee,
-// 		WithdrawalMax:  withdrawalMax,
-// 		GovernanceAddr: governanceAddr,
-// 		StrategistAddr: strategistAddr,
-// 	}
-// }
+// NewTestCase is the constructor of the testcase struct
+func NewTestCase(
+	name string,
+	contract string,
+	owner sdk.AccAddress,
+	fees sdk.Coins,
+	des string,
+) *TestCase {
+	return &TestCase{
+		Name:        name,
+		Contract:    contract,
+		Owner:       owner,
+		Fees:        fees,
+		Description: des,
+	}
+}
+
+// verify interface at compile time
+var _ sdk.Msg = &MsgCreateTestCase{}
+var _ sdk.Msg = &MsgEditTestCase{}
+
+// NewMsgCreateTestCase is a constructor function for MsgCreateTestCase
+func NewMsgCreateTestCase(name string, contract string, owner sdk.AccAddress, fees string, des string) *MsgCreateTestCase {
+	return &MsgCreateTestCase{
+		Name:        name,
+		Description: des,
+		Contract:    contract,
+		Owner:       owner,
+		Fees:        fees,
+	}
+}
+
+// NewMsgEditTestCase is a constructor function for MsgEditTestCase
+func NewMsgEditTestCase(oldName, newName string, contract string, owner sdk.AccAddress, fees string, des string) *MsgEditTestCase {
+	return &MsgEditTestCase{
+		OldName:     oldName,
+		NewName:     newName,
+		Description: des,
+		Contract:    contract,
+		Owner:       owner,
+		Fees:        fees,
+	}
+}
+
+// NewGenesisState creates a new GenesisState object
+func NewGenesisState(oScripts []OracleScript, aiDataSources []AIDataSource, testCases []TestCase) *GenesisState {
+	return &GenesisState{
+		// TODO: Fill out according to your genesis state
+		OracleScripts: oScripts,
+		AIDataSources: aiDataSources,
+		TestCases:     testCases,
+	}
+}

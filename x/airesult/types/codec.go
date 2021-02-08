@@ -2,21 +2,29 @@ package types
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
+	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
+	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
+	// this line is used by starport scaffolding # 1
 )
 
-// RegisterCodec registers concrete types on codec
-func RegisterCodec(cdc *codec.Codec) {
-	// TODO: Register the modules msgs
-	// cdc.RegisterConcrete(MsgSetKYCRequest{}, "airequest/SetKYCRequest", nil)
-	// cdc.RegisterConcrete(MsgSetPriceRequest{}, "airequest/SetPriceRequest", nil)
+func RegisterCodec(cdc *codec.LegacyAmino) {
+	// this line is used by starport scaffolding # 2
 }
 
-// ModuleCdc defines the module codec
-var ModuleCdc *codec.Codec
+func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
+	// this line is used by starport scaffolding # 3
+	// TODO: register msgs here to run
+
+	// msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
+}
+
+var (
+	amino     = codec.NewLegacyAmino()
+	ModuleCdc = codec.NewAminoCodec(amino)
+)
 
 func init() {
-	ModuleCdc = codec.New()
-	RegisterCodec(ModuleCdc)
-	codec.RegisterCrypto(ModuleCdc)
-	ModuleCdc.Seal()
+	RegisterCodec(amino)
+	cryptocodec.RegisterCrypto(amino)
+	amino.Seal()
 }

@@ -5,8 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	aiRequest "github.com/oraichain/orai/x/airequest/exported"
-	"github.com/oraichain/orai/x/websocket/exported"
+	"github.com/oraichain/orai/x/airequest"
 	"github.com/oraichain/orai/x/websocket/types"
 )
 
@@ -16,7 +15,7 @@ func (k Keeper) HasReport(ctx sdk.Context, id string, val sdk.ValAddress) bool {
 }
 
 // SetReport saves the report to the storage without performing validation.
-func (k Keeper) SetReport(ctx sdk.Context, id string, rep types.Report) error {
+func (k Keeper) SetReport(ctx sdk.Context, id string, rep *types.Report) error {
 	bz, err := k.cdc.MarshalBinaryBare(rep)
 	if err != nil {
 		return err
@@ -27,7 +26,7 @@ func (k Keeper) SetReport(ctx sdk.Context, id string, rep types.Report) error {
 
 // AddReport performs sanity checks and adds a new batch from one validator to one request
 // to the store. Note that we expect each validator to report to all raw data requests at once.
-func (k Keeper) AddReport(ctx sdk.Context, rid string, rep types.Report) error {
+func (k Keeper) AddReport(ctx sdk.Context, rid string, rep *types.Report) error {
 
 	k.SetReport(ctx, rid, rep)
 	return nil
@@ -49,7 +48,7 @@ func (k Keeper) GetReportCount(ctx sdk.Context, rid string) (count uint64) {
 }
 
 // GetReports returns all reports for the given request ID, or nil if there is none.
-func (k Keeper) GetReports(ctx sdk.Context, rid string) (reports []exported.ReportI) {
+func (k Keeper) GetReports(ctx sdk.Context, rid string) (reports []types.Report) {
 	iterator := k.GetReportIterator(ctx, rid)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
@@ -61,11 +60,11 @@ func (k Keeper) GetReports(ctx sdk.Context, rid string) (reports []exported.Repo
 }
 
 // GetReportsBlockHeight returns all reports for the given block height, or nil if there is none.
-func (k Keeper) GetReportsBlockHeight(ctx sdk.Context, blockHeight int64) (reports []exported.ReportI) {
+func (k Keeper) GetReportsBlockHeight(ctx sdk.Context, blockHeight int64) (reports []types.Report) {
 	iterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), types.ReportStoreKeyPrefixAll())
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
-		var rep exported.ReportI
+		var rep types.Report
 		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &rep)
 		// check if block height is equal or not
 		if rep.GetBlockHeight() == blockHeight {
@@ -102,22 +101,11 @@ func (k Keeper) GetAllReports(ctx sdk.Context) (reports []types.Report) {
 }
 
 // ValidateReport validates if the report is valid to get rewards
-func (k Keeper) ValidateReport(ctx sdk.Context, rep exported.ReportI, req aiRequest.AIRequestI) error {
+func (k Keeper) ValidateReport(ctx sdk.Context, reporter *types.Reporter, req *airequest.AIRequest) error {
 	// Check if the validator is in the requested list of validators
-	if !containsVal(req.GetValidators(), rep.GetValidator()) {
-		return sdkerrors.Wrap(types.ErrCannotFindValidator, fmt.Sprintln("failed to find the requested validator"))
+	if !containsVal(req.GetValidators(), reporter.GetValidator()) {
+		return sdkerrors.Wrap(types.ErrValidatorNotFound, fmt.Sprintln("failed to find the requested validator"))
 	}
-	// if len(rep.RawReports) != len(req.RawRequests) {
-	// 	return types.ErrInvalidReportSize
-	// }
-	// for _, rep := range rep.RawReports {
-	// 	// Here we can safely assume that external IDs are unique, as this has already been
-	// 	// checked by ValidateBasic performed in baseapp's runTx function.
-	// 	if !ContainsEID(req.RawRequests, rep.ExternalID) {
-	// 		return sdkerrors.Wrapf(
-	// 			types.ErrRawRequestNotFound, "reqID: %d, extID: %d", rid, rep.ExternalID)
-	// 	}
-	// }
 	return nil
 }
 

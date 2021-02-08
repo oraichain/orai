@@ -1,43 +1,13 @@
 package types
 
-import (
-	"fmt"
-)
+import fmt "fmt"
 
-// GenesisState - all provider state that must be provided at genesis
-type GenesisState struct {
-	OracleScripts []OracleScript `json:"oracle_scripts"`
-	AIDataSources []AIDataSource `json:"datasources"`
-	TestCases     []TestCase     `json:"test_cases"`
-	Params        Params         `json:"params"`
-	// TODO: Fill out what is needed by the module for genesis
-}
-
-// // NewGenesisState creates a new GenesisState object
-// func NewGenesisState(oScripts []OracleScript, aiDataSources []AIDataSource, aiRequests []AIRequest, testCases []TestCase, params Params) GenesisState {
-// 	return GenesisState{
-// 		// TODO: Fill out according to your genesis state
-// 		OracleScripts: oScripts,
-// 		AIDataSources: aiDataSources,
-// 		TestCases:     testCases,
-// 		Params:        params,
-// 	}
-// }
-
-// NewGenesisState creates a new GenesisState object
-func NewGenesisState(oScripts []OracleScript, aiDataSources []AIDataSource, testCases []TestCase, params Params) GenesisState {
-	return GenesisState{
-		// TODO: Fill out according to your genesis state
-		OracleScripts: oScripts,
-		AIDataSources: aiDataSources,
-		TestCases:     testCases,
-		Params:        params,
-	}
-}
+// DefaultIndex is the default capability global index
+const DefaultIndex uint64 = 1
 
 // DefaultGenesisState - default GenesisState used by Cosmos Hub
-func DefaultGenesisState() GenesisState {
-	return GenesisState{
+func DefaultGenesisState() *GenesisState {
+	return &GenesisState{
 		OracleScripts: []OracleScript{},
 		AIDataSources: []AIDataSource{},
 		TestCases:     []TestCase{},
@@ -47,9 +17,10 @@ func DefaultGenesisState() GenesisState {
 	}
 }
 
-// ValidateGenesis validates the provider genesis parameters
-func ValidateGenesis(data GenesisState) error {
-	for _, record := range data.OracleScripts {
+// Validate performs basic genesis state validation returning an error upon any
+// failure.
+func (gs *GenesisState) Validate() error {
+	for _, record := range gs.OracleScripts {
 		if record.Name == "" {
 			return fmt.Errorf("invalid OracleScripts: Value: %s. Error: Missing Name", record.Name)
 		}
@@ -58,7 +29,7 @@ func ValidateGenesis(data GenesisState) error {
 		}
 	}
 
-	for _, record := range data.AIDataSources {
+	for _, record := range gs.AIDataSources {
 		if record.Name == "" {
 			return fmt.Errorf("invalid AIDataSources: Value: %s. Error: Missing Name", record.Name)
 		}
@@ -67,7 +38,7 @@ func ValidateGenesis(data GenesisState) error {
 		}
 	}
 
-	for _, record := range data.TestCases {
+	for _, record := range gs.TestCases {
 		if len(record.Owner) == 0 {
 			return fmt.Errorf("invalid request: Owner: %s. Error: Missing requestID", string(record.Owner[:]))
 		}

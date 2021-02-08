@@ -1,0 +1,40 @@
+syntax = "proto3";
+package oraichain.orai.provider;
+// this line is used by starport scaffolding # 1
+
+option go_package = "github.com/oraichain/orai/x/provider/types";
+
+// this line is used by starport scaffolding # 3
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "x/provider/types/types_tc.proto";
+
+// TestCaseInfoReq is the request type for the Query/TestCaseInfo RPC method
+message TestCaseInfoReq {
+    // address is the address of the contract to query
+    string name = 1;
+}
+
+// TestCaseInfoRes is the response type for the Query/TestCaseInfo RPC method
+message TestCaseInfoRes {
+    string name = 1;
+    // Owner is the address who is allowed to make further changes to the test case.
+    bytes owner = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    string contract = 3;
+    string description = 4;
+	repeated cosmos.base.v1beta1.Coin fees = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "json:\"fees\""];
+}
+
+// ListTestCasesReq is the request type for the Query/ListTestCases RPC method
+message ListTestCasesReq {
+    string name = 1;
+    int64 page = 2;
+    int64 limit = 3;
+}
+
+// ListTestCasesRes is the response type for the Query/ListTestCases RPC method
+message ListTestCasesRes {
+    repeated TestCase TestCases = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "TestCases", (gogoproto.moretags) = "json:\"test_cases\""];
+    int64 count = 2;
+}

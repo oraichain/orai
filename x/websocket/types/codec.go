@@ -2,37 +2,51 @@ package types
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/oraichain/orai/x/websocket/exported"
+	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
+	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/msgservice"
+	// "github.com/cosmos/cosmos-sdk/types/msgservice"
 )
 
 // RegisterCodec registers concrete types on codec
-func RegisterCodec(cdc *codec.Codec) {
+func RegisterCodec(cdc *codec.LegacyAmino) {
 	// TODO: Register the modules msgs
 	cdc.RegisterConcrete(MsgCreateReport{}, "websocket/AddReport", nil)
 	cdc.RegisterConcrete(MsgAddReporter{}, "websocket/AddReporter", nil)
 	cdc.RegisterConcrete(MsgRemoveReporter{}, "websocket/RemoveReporter", nil)
-	cdc.RegisterConcrete(MsgCreateStrategy{}, "websocket/CreateStrategy", nil)
-	// When exporting interfaces for other modules to use, we need to register those interfaces as well as concrete structs so that the message can be encoded properly according to the Codec module
-	cdc.RegisterInterface((*exported.ReportI)(nil), nil) // has to be pointer of interface
-	cdc.RegisterInterface((*exported.ReporterI)(nil), nil)
-	cdc.RegisterInterface((*exported.DataSourceResultI)(nil), nil) // has to be pointer of interface
-	cdc.RegisterInterface((*exported.TestCaseResultI)(nil), nil)   // has to be pointer of interface
-	cdc.RegisterInterface((*exported.ValidatorI)(nil), nil)        // has to be pointer of interface
-	cdc.RegisterInterface((*exported.ValResultI)(nil), nil)        // has to be pointer of interface
-	cdc.RegisterConcrete(&Report{}, "websocket/Report", nil)
-	cdc.RegisterConcrete(&Reporter{}, "websocket/Reporter", nil)
-	cdc.RegisterConcrete(&DataSourceResult{}, "websocket/DataSourceResult", nil)
-	cdc.RegisterConcrete(&TestCaseResult{}, "websocket/TestCaseResult", nil)
-	cdc.RegisterConcrete(&Validator{}, "websocket/Validator", nil)
-	cdc.RegisterConcrete(&ValResult{}, "websocket/ValResult", nil)
 }
 
-// ModuleCdc defines the module codec
-var ModuleCdc *codec.Codec
+func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
+	// this line is used by starport scaffolding # 3
+	// TODO: register msgs here to run
+	registry.RegisterImplementations(
+		(*sdk.Msg)(nil),
+		&MsgCreateReport{},
+		&MsgAddReporter{},
+		&MsgRemoveReporter{},
+	)
+
+	// registry.RegisterImplementations(
+	// 	(*govtypes.Content)(nil),
+	// 	&Report{},
+	// 	&Reporter{},
+	// 	&DataSourceResult{},
+	// 	&TestCaseResult{},
+	// 	&Validator{},
+	// 	&ValResult{},
+	// )
+
+	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
+}
+
+var (
+	amino     = codec.NewLegacyAmino()
+	ModuleCdc = codec.NewAminoCodec(amino)
+)
 
 func init() {
-	ModuleCdc = codec.New()
-	RegisterCodec(ModuleCdc)
-	codec.RegisterCrypto(ModuleCdc)
-	ModuleCdc.Seal()
+	RegisterCodec(amino)
+	cryptocodec.RegisterCrypto(amino)
+	amino.Seal()
 }

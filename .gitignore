@@ -1,17 +1,67 @@
-# Runtime data
+# OS
+.DS_Store
+*.swp
+*.swo
+*.swl
+*.swm
+*.swn
+*.txt
+.vscode
+.idea
+
+# Build
+vendor
+build
+tools/bin/*
+examples/build/*
+docs/_build
+docs/tutorial
+dist
+tools-stamp
+docs/node_modules
+
+# Data - ideally these don't exist
+baseapp/data/*
+client/lcd/keys/*
+mytestnet
+
+# Testing
+coverage.txt
+profile.out
+
+# Vagrant
+.vagrant/
+*.box
+*.log
+vagrant
+
+# IDE
+.idea/
+*.iml
+
+# Graphviz
+dependency-graph.png
+
+# Latex
+*.aux
+*.out
+*.synctex.gz
+contract_tests/*
+
+.devcontainer/
 .oraicli/
 .oraid/
-.oraifiles/
-.images/
-.websocket/
-.vscode/
-cosmosjs/node_modules/
-images/
-cosmosjs/.uploads/
+.wasmd/
+.registry_cache/
+.ash_history
+.bash_history
+.cache/
+smart-contracts/**/artifacts/
+libwasmvm_muslc.a
+.vscode-server
+.gitconfig
 
-signedTx.json
-unsignedTx.json
-test.json
+# ignore generated files
+x/**/types/*.pb.*
+tmp
 go.sum
-cosmosjs/package-lock.json
-cosmosjs/.env

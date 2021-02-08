@@ -1,0 +1,31 @@
+syntax = "proto3";
+package oraichain.orai.airequest;
+//import "cosmos/base/v1beta1/coin.proto";
+import "gogoproto/gogo.proto";
+option go_package = "github.com/oraichain/orai/x/airequest/types";
+//import "x/provider/types/types_ds.proto";
+
+// MsgSetAIRequest submit ai request metadata onto Oraichain
+message MsgSetAIRequest {
+  option (gogoproto.goproto_stringer) = true;
+  string request_id = 1 [(gogoproto.customname) = "RequestID"];
+  string oracle_script_name = 2 [ (gogoproto.moretags) = "json:\"oscript_name\""];
+  // Owner is the address who is allowed to make further changes to the data source.
+  bytes creator = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress",  (gogoproto.moretags) = "json:\"request_creator\""];
+  int64 validator_count = 5;
+  string fees = 6 [(gogoproto.moretags) = "json:\"transaction_fee\""];
+  bytes input = 7 [ (gogoproto.moretags) = "json:\"request_input\""];
+  bytes expected_output = 8 [ (gogoproto.moretags) = "json:\"expected_output\""];
+}
+// MsgSetAIRequestRes returns store result data.
+message MsgSetAIRequestRes{
+  option (gogoproto.goproto_stringer) = true;
+  string request_id = 1 [(gogoproto.customname) = "RequestID"];
+  string oracle_script_name = 2 [ (gogoproto.moretags) = "json:\"oscript_name\""];
+  // Owner is the address who is allowed to make further changes to the data source.
+  bytes creator = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress",  (gogoproto.moretags) = "json:\"request_creator\""];
+  int64 validator_count = 5;
+  string fees = 6 [(gogoproto.moretags) = "json:\"transaction_fee\""];
+  bytes input = 7 [ (gogoproto.moretags) = "json:\"request_input\""];
+  bytes expected_output = 8 [ (gogoproto.moretags) = "json:\"expected_output\""];
+}

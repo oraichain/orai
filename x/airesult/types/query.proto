@@ -1,0 +1,24 @@
+syntax = "proto3";
+package oraichain.orai.airesult;
+// this line is used by starport scaffolding # 1
+import "x/airesult/types/query_full_req.proto";
+import "x/airesult/types/query_reward.proto";
+
+option go_package = "github.com/oraichain/orai/x/airesult/types";
+
+// this line is used by starport scaffolding # 3
+
+import "google/api/annotations.proto";
+
+// Query provides defines the gRPC querier service
+service Query {
+
+    // QueryFullRequest gets the ai result meta data
+    rpc QueryFullRequest (QueryFullRequestReq) returns (QueryFullRequestRes) {
+        option (google.api.http).get = "/airesult/fullreq/{request_id}";
+    }
+    // QueryReward gets the reward given a block height
+    rpc QueryReward (QueryRewardReq) returns (QueryRewardRes) {
+        option (google.api.http).get = "/airesult/reward/{block_height}";
+    }
+}

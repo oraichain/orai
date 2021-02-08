@@ -10,24 +10,17 @@ const (
 	RouterKey         = types.RouterKey
 	StoreKey          = types.StoreKey
 	QuerierRoute      = types.QuerierRoute
-	IPFSUrl           = types.IPFSUrl
-	IPFSAdd           = types.IPFSAdd
-	IPFSCat           = types.IPFSCat
 	DefaultParamspace = types.DefaultParamspace
 )
 
 var (
-	NewKeeper         = keeper.NewKeeper
-	NewQuerier        = keeper.NewQuerier
-	ModuleCdc         = types.ModuleCdc
-	RegisterCodec     = types.RegisterCodec
-	NewGenesisState   = types.NewGenesisState
-	RequestKeyPrefix  = types.RequestKeyPrefix
-	ResultKeyPrefix   = types.ResultKeyPrefix
-	ReportKeyPrefix   = types.ReportKeyPrefix
-	ReporterKeyPrefix = types.ReporterKeyPrefix
-	RewardKeyPrefix   = types.RewardKeyPrefix
-	StrategyKeyPrefix = types.StrategyKeyPrefix
+	NewKeeper       = keeper.NewKeeper
+	NewQuerier      = keeper.NewQuerier
+	ModuleCdc       = types.ModuleCdc
+	RegisterCodec   = types.RegisterCodec
+	NewGenesisState = types.NewGenesisState
+	ResultKeyPrefix = types.ResultKeyPrefix
+	RewardKeyPrefix = types.RewardKeyPrefix
 )
 
 type (

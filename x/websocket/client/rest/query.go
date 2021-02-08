@@ -1,11 +1,10 @@
 package rest
 
 import (
+	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/gorilla/mux"
-
-	"github.com/cosmos/cosmos-sdk/client/context"
 )
 
-func registerQueryRoutes(cliCtx context.CLIContext, r *mux.Router) {
+func registerQueryRoutes(cliCtx client.Context, r *mux.Router) {
 	// TODO: Define your GET REST AIDataSources
 }

@@ -1,0 +1,27 @@
+syntax = "proto3";
+package oraichain.orai.airesult;
+// this line is used by starport scaffolding # 1
+
+// this line is used by starport scaffolding # 3
+
+import "gogoproto/gogo.proto";
+// import "cosmos/base/v1beta1/coin.proto";
+import "x/airequest/types/types_ai_request.proto";
+import "x/websocket/types/types_report.proto";
+import "x/airesult/types/types_result.proto";
+option go_package = "github.com/oraichain/orai/x/airesult/types";
+
+// QueryFullRequestReq is the request type for the Query/QueryFullRequest RPC method
+message QueryFullRequestReq {
+    // address is the address of the contract to query
+    option (gogoproto.goproto_stringer) = true;
+    string request_id = 1;
+}
+
+// QueryFullRequestRes is the response type for the Query/QueryFullRequest RPC method
+message QueryFullRequestRes {
+  option (gogoproto.goproto_stringer) = true;
+  oraichain.orai.airequest.AIRequest ai_request = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "AIRequest", (gogoproto.moretags) = "json:\"ai_request\""];
+  repeated oraichain.orai.websocket.Report reports = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "json:\"reports\""];
+  AIRequestResult result = 3 [(gogoproto.nullable) = false, (gogoproto.moretags) = "json:\"ai_result\""];
+}

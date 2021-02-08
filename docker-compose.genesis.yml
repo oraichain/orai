@@ -1,0 +1,22 @@
+version: '3.3'
+services:
+  orai:
+    image: orai/orai:0.15-alpine
+    working_dir: /workspace
+    tty: true
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - 1317:1317
+      - 26656:26656
+      - 26657:26657
+    cap_add:
+      - SYS_PTRACE
+    env_file:
+      - orai.env
+    volumes:      
+      - ./:/workspace
+      - ./init_genesis.sh:/usr/bin/setup
+      - ./fn.sh:/usr/bin/fn

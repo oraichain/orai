@@ -1,0 +1,47 @@
+syntax = "proto3";
+package oraichain.orai.airequest;
+// this line is used by starport scaffolding # 1
+
+// this line is used by starport scaffolding # 3
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "x/provider/types/types_ds.proto";
+import "x/provider/types/types_tc.proto";
+option go_package = "github.com/oraichain/orai/x/airequest/types";
+
+// QueryAIRequestReq is the request type for the Query/QueryAIRequest RPC method
+message QueryAIRequestReq {
+    // address is the address of the contract to query
+    option (gogoproto.goproto_stringer) = true;
+    string request_id = 1;
+}
+
+// QueryAIRequestRes is the response type for the Query/QueryAIRequest RPC method
+message QueryAIRequestRes {
+  option (gogoproto.goproto_stringer) = true;
+  string request_id = 1;
+  string oracle_script_name = 2 [ (gogoproto.moretags) = "json:\"oscript_name\""];
+  // Owner is the address who is allowed to make further changes to the data source.
+  bytes creator = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress",  (gogoproto.moretags) = "json:\"request_creator\""];
+  repeated bytes validators = 4 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.ValAddress",  (gogoproto.moretags) = "json:\"validator_addr\""];
+  int64 block_height = 5;
+  repeated oraichain.orai.provider.AIDataSource ai_data_sources = 6 [(gogoproto.nullable) = false, (gogoproto.moretags) = "json:\"data_sources\""];
+  repeated  oraichain.orai.provider.TestCase test_cases = 7 [(gogoproto.nullable) = false, (gogoproto.moretags) = "json:\"test_cases\""];
+  repeated cosmos.base.v1beta1.Coin fees = 8 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "json:\"transaction_fee\""];
+  bytes input = 9 [ (gogoproto.moretags) = "json:\"request_input\""];
+  bytes output = 10 [ (gogoproto.moretags) = "json:\"expected_output\""];
+}
+
+// QueryAIRequestIDsReq is the request type for the Query/QueryAIRequestIDs RPC method
+message QueryAIRequestIDsReq {
+  option (gogoproto.goproto_stringer) = true;
+  int64 page = 1;
+  int64 limit = 2;
+}
+
+// QueryAIRequestIDsRes is the response type for the Query/QueryAIRequestIDs RPC method
+message QueryAIRequestIDsRes {
+    option (gogoproto.goproto_stringer) = true;
+    repeated string request_ids = 1 [(gogoproto.moretags) = "json:\"request_ids\""];
+}

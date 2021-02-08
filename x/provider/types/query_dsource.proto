@@ -1,0 +1,40 @@
+syntax = "proto3";
+package oraichain.orai.provider;
+// this line is used by starport scaffolding # 1
+
+option go_package = "github.com/oraichain/orai/x/provider/types";
+
+// this line is used by starport scaffolding # 3
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "x/provider/types/types_ds.proto";
+
+// DataSourceInfoReq is the request type for the Query/DataSourceInfo RPC method
+message DataSourceInfoReq {
+    // address is the address of the contract to query
+    string name = 1;
+}
+
+// DataSourceInfoRes is the response type for the Query/DataSourceInfo RPC method
+message DataSourceInfoRes {
+    string name = 1;
+    // Owner is the address who is allowed to make further changes to the data source.
+    bytes owner = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    string contract = 3;
+    string description = 4;
+	repeated cosmos.base.v1beta1.Coin fees = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "json:\"fees\""];
+}
+
+// ListDataSourcesReq is the request type for the Query/ListDataSources RPC method
+message ListDataSourcesReq {
+    string name = 1;    
+    int64 page = 2;
+    int64 limit = 3;
+}
+
+// ListDataSourcesRes is the response type for the Query/ListDataSources RPC method
+message ListDataSourcesRes {
+    repeated AIDataSource AIDataSources = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "AIDataSources", (gogoproto.moretags) = "json:\"data_sources\""];
+    int64 count = 2;
+}

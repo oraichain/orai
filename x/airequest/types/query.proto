@@ -1,0 +1,23 @@
+syntax = "proto3";
+package oraichain.orai.airequest;
+// this line is used by starport scaffolding # 1
+import "x/airequest/types/query_ai_request.proto";
+
+option go_package = "github.com/oraichain/orai/x/airequest/types";
+
+// this line is used by starport scaffolding # 3
+
+import "google/api/annotations.proto";
+
+// Query provides defines the gRPC querier service
+service Query {
+
+    // QueryAIRequest gets the ai request meta data
+    rpc QueryAIRequest (QueryAIRequestReq) returns (QueryAIRequestRes) {
+        option (google.api.http).get = "/airequest/aireq/{request_id}";
+    }
+    // QueryAIRequestIDs gets the list of ai requests
+    rpc QueryAIRequestIDs (QueryAIRequestIDsReq) returns (QueryAIRequestIDsRes) {
+        option (google.api.http).get = "/airequest/aireqs";
+    }
+}

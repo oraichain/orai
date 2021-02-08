@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "QueryMsg",
+  "anyOf": [
+    {
+      "type": "object",
+      "required": [
+        "get_datasource"
+      ],
+      "properties": {
+        "get_datasource": {
+          "type": "object"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "get_testcase"
+      ],
+      "properties": {
+        "get_testcase": {
+          "type": "object"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "HandleMsg",
+  "anyOf": [
+    {
+      "type": "object",
+      "required": [
+        "update_datesource"
+      ],
+      "properties": {
+        "update_datesource": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "update_testcase"
+      ],
+      "properties": {
+        "update_testcase": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

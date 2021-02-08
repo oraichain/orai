@@ -1,0 +1,53 @@
+syntax = "proto3";
+package oraichain.orai.provider;
+// this line is used by starport scaffolding # 1
+
+option go_package = "github.com/oraichain/orai/x/provider/types";
+
+// this line is used by starport scaffolding # 3
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "x/provider/types/types_os.proto";
+
+// OracleScriptInfoReq is the request type for the Query/OracleScriptInfo RPC method
+message OracleScriptInfoReq {
+    // address is the address of the contract to query
+    string name = 1;
+}
+
+// OracleScriptInfoRes is the response type for the Query/OracleScriptInfo RPC method
+message OracleScriptInfoRes {
+    string name = 1;
+    // Owner is the address who is allowed to make further changes to the oracle script.
+    bytes owner = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
+    string contract = 3;
+    string description = 4;
+    repeated cosmos.base.v1beta1.Coin fees = 5 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "json:\"fees\""];
+    repeated string d_sources = 6 [(gogoproto.moretags) = "json:\"data_sources\""];
+    repeated string t_cases = 7 [(gogoproto.moretags) = "json:\"test_cases\""];
+}
+
+// ListOracleScriptsReq is the request type for the Query/ListOracleScripts RPC method
+message ListOracleScriptsReq {
+    string name = 1;
+    int64 page = 2;
+    int64 limit = 3;
+}
+
+// ListOracleScriptsRes is the response type for the Query/ListOracleScripts RPC method
+message ListOracleScriptsRes {
+    repeated OracleScript OracleScripts = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "OracleScripts", (gogoproto.moretags) = "json:\"oracle_scripts\""];
+    int64 count = 2;
+}
+
+// ListOracleScriptsReq is the request type for the Query/ListOracleScripts RPC method
+message MinFeesReq {
+    string OracleScriptName = 1 [(gogoproto.moretags) = "json:\"oscript_name\""];        
+	int64 ValNum            = 2 [(gogoproto.moretags) = "json:\"val_num\""];     
+}
+
+// ListOracleScriptsRes is the response type for the Query/ListOracleScripts RPC method
+message MinFeesRes {
+    string minFees = 1 [(gogoproto.moretags) = "json:\"minimum_fees\""];    
+}

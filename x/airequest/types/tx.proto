@@ -1,0 +1,17 @@
+syntax = "proto3";
+package oraichain.orai.airequest;
+import "x/airequest/types/tx_ai_request.proto";
+option go_package = "github.com/oraichain/orai/x/airequest/types";
+import "google/api/annotations.proto";
+
+// Msg defines the airequest Msg service.
+service Msg {
+  // Create a new AI request
+  rpc CreateAIRequest(MsgSetAIRequest) returns (MsgSetAIRequestRes) {
+    option (google.api.http) = {
+      // The `parent` captures the parent resource name, such as "shelves/1".
+      post: "/airequest/aireq"
+      body: "*"
+    };
+  };
+}

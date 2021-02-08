@@ -1,58 +1,65 @@
 package keeper
 
 import (
-	abci "github.com/tendermint/tendermint/abci/types"
+	"context"
 
-	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/oraichain/orai/x/airequest/types"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-// NewQuerier creates a new querier for provider clients.
-func NewQuerier(keeper Keeper) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
-		switch path[0] {
-		case types.QueryAIRequest:
-			return queryAIRequest(ctx, path[1:], keeper)
-		case types.QueryAIRequestIDs:
-			return queryAIRequestIDs(ctx, keeper)
-		default:
-			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown provider query")
-		}
-	}
+// Querier is used as Keeper will have duplicate methods if used directly, and gRPC names take precedence over keeper
+type Querier struct {
+	keeper *Keeper
 }
 
-// queryAIRequest queries an AI request given its request ID
-func queryAIRequest(ctx sdk.Context, path []string, keeper Keeper) ([]byte, error) {
-	// tsao cho nay lai lay path[0] ?
-	request, err := keeper.GetAIRequest(ctx, path[0])
-	if err != nil {
-		return []byte{}, sdkerrors.Wrap(types.ErrRequestNotFound, err.Error())
-	}
-
-	res, err := codec.MarshalJSONIndent(keeper.cdc, types.NewQueryResAIRequest(request.GetRequestID(), request.GetCreator(), request.GetOScriptName(), request.GetValidators(), request.GetBlockHeight(), request.GetAIDataSources(), request.GetTestCases(), request.GetFees().String()))
-	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
-	}
-
-	return res, nil
+// NewQuerier return querier implementation
+func NewQuerier(keeper *Keeper) *Querier {
+	return &Querier{keeper: keeper}
 }
 
-// queryAIRequestIDs returns all the AI Request IDs in the store
-func queryAIRequestIDs(ctx sdk.Context, keeper Keeper) ([]byte, error) {
-	var requestIDs types.QueryResAIRequestIDs
+var _ types.QueryServer = &Querier{}
 
-	iterator := keeper.GetAllAIRequestIDs(ctx)
+// QueryAIRequest implements the Query/QueryAIRequest gRPC method
+func (k *Querier) QueryAIRequest(goCtx context.Context, req *types.QueryAIRequestReq) (*types.QueryAIRequestRes, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+
+	if req.GetRequestId() == "" {
+		return nil, status.Error(codes.InvalidArgument, "ai request id query cannot be empty")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	aiRequest, err := k.keeper.GetAIRequest(ctx, req.GetRequestId())
+	if err != nil {
+		return nil, sdkerrors.Wrap(types.ErrRequestNotFound, err.Error())
+	}
+
+	return types.NewQueryAIRequestRes(
+		aiRequest.GetRequestID(), aiRequest.GetOracleScriptName(),
+		aiRequest.GetCreator(), aiRequest.GetFees(),
+		aiRequest.GetValidators(), aiRequest.GetBlockHeight(),
+		aiRequest.GetAiDataSources(), aiRequest.GetTestCases(),
+		aiRequest.GetInput(), aiRequest.GetExpectedOutput(),
+	), nil
+}
+
+// QueryAIRequestIDs implements the Query/QueryAIRequestIDs gRPC method
+func (k *Querier) QueryAIRequestIDs(goCtx context.Context, req *types.QueryAIRequestIDsReq) (*types.QueryAIRequestIDsRes, error) {
+
+	var requestIDs []string
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	iterator := k.keeper.GetPaginatedAIRequests(ctx, uint(req.Page), uint(req.Limit))
 
 	for ; iterator.Valid(); iterator.Next() {
 		requestIDs = append(requestIDs, string(iterator.Key()))
 	}
 
-	res, err := codec.MarshalJSONIndent(keeper.cdc, requestIDs)
-	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
-	}
-
-	return res, nil
+	return &types.QueryAIRequestIDsRes{
+		RequestIds: requestIDs,
+	}, nil
 }

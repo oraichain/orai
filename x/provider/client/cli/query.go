@@ -1,21 +1,24 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/oraichain/orai/x/provider/types"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/codec"
 )
 
-// GetQueryCmd returns the cli query commands for this module
-func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
-	// Group provider queries under a subcommand
-	providerQueryCmd := &cobra.Command{
+const (
+	flagPage   = "page"
+	flagLimit  = "limit"
+	flagValNum = "val_num"
+)
+
+func GetQueryCmd() *cobra.Command {
+	queryCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      fmt.Sprintf("Querying commands for the %s module", types.ModuleName),
 		DisableFlagParsing:         true,
@@ -23,226 +26,308 @@ func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	providerQueryCmd.AddCommand(
-		flags.GetCommands(
-			// TODO: Add query Cmds
-			GetCmdQueryOracleScript(queryRoute, cdc),
-			GetCmdQueryDataSource(queryRoute, cdc),
-			GetCmdOracleScriptNames(queryRoute, cdc),
-			GetCmdDataSourceNames(queryRoute, cdc),
-			// GetCmdQueryAIRequest(queryRoute, cdc),
-			// GetCmdAIRequestIDs(queryRoute, cdc),
-			GetCmdQueryTestCase(queryRoute, cdc),
-			GetCmdTestCaseNames(queryRoute, cdc),
-			// GetCmdQueryFullRequest(queryRoute, cdc),
-		)...,
+	// using the same clientRequest as rest
+	queryCmd.AddCommand(
+		GetCmdQueryDataSource(),
+		GetCmdQueryDataSources(),
+		GetCmdQueryOracleScript(),
+		GetCmdQueryOracleScripts(),
+		GetCmdQueryTestCase(),
+		GetCmdQueryTestCases(),
+		GetCmdQueryMinFees(),
 	)
-
-	return providerQueryCmd
+	return queryCmd
 }
 
-// TODO: Add Query Commands
+// GetCmdQueryDataSource lists data source code uploaded
+func GetCmdQueryDataSource() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "dsource [name]",
+		Short: "query an AI data source",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			name := args[0]
+
+			queryClient := types.NewQueryClient(clientCtx)
+			res, err := queryClient.DataSourceInfo(
+				context.Background(),
+				&types.DataSourceInfoReq{
+					Name: name,
+				},
+			)
+			if err != nil {
+				return err
+			}
+
+			if len(res.Name) == 0 {
+				return fmt.Errorf("data source not found")
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+// GetCmdQueryDataSources queries a Queryall data source names
+func GetCmdQueryDataSources() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "dsources [name] --page [1] --limit [5]",
+		Short: "query all AI data sources",
+		// Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			name := ""
+			if len(args) > 0 {
+				name = args[0]
+			}
+
+			page, err := cmd.Flags().GetInt64(flagPage)
+			if err != nil {
+				return err
+			}
+
+			limit, err := cmd.Flags().GetInt64(flagLimit)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			res, err := queryClient.ListDataSources(
+				context.Background(),
+				&types.ListDataSourcesReq{
+					Name:  name,
+					Page:  page,
+					Limit: limit,
+				},
+			)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	cmd.Flags().Int64(flagPage, types.DefaultQueryPage, "from page")
+	cmd.Flags().Int64(flagLimit, types.DefaultQueryLimit, "limit number")
+	return cmd
+}
 
 // GetCmdQueryOracleScript queries information about a oScript
-func GetCmdQueryOracleScript(queryRoute string, cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+func GetCmdQueryOracleScript() *cobra.Command {
+	cmd := &cobra.Command{
 		Use:   "oscript [name]",
 		Short: "query oscript",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
 			name := args[0]
 
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/oscript/%s", queryRoute, name), nil)
+			queryClient := types.NewQueryClient(clientCtx)
+			res, err := queryClient.OracleScriptInfo(
+				context.Background(),
+				&types.OracleScriptInfoReq{
+					Name: name,
+				},
+			)
 			if err != nil {
-				fmt.Printf("could not query oScript - %s \n", err.Error())
-				return nil
+				return err
+			}
+			if len(res.Name) == 0 {
+				return fmt.Errorf("oscript not found")
 			}
 
-			var out types.QueryResOracleScript
-			cdc.MustUnmarshalJSON(res, &out)
-			return cliCtx.PrintOutput(out)
+			return clientCtx.PrintProto(res)
 		},
 	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
-// GetCmdOracleScriptNames queries a list of all oscript names
-func GetCmdOracleScriptNames(queryRoute string, cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
-		Use:   "onames",
-		Short: "query all oscript names",
-		// Args:  cobra.ExactArgs(1),
+// GetCmdQueryOracleScripts queries a list of all oscript names
+func GetCmdQueryOracleScripts() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "oscripts",
+		Short: "query all oscripts",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			fmt.Printf("address string: %s\n", cliCtx.ChainID)
-
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/onames", queryRoute), nil)
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
-				fmt.Printf("could not get query names\n")
-				return nil
+				return err
 			}
 
-			var out types.QueryResOracleScriptNames
-			cdc.MustUnmarshalJSON(res, &out)
-			return cliCtx.PrintOutput(out)
-		},
-	}
-}
-
-// GetCmdQueryDataSource queries information about an AIDataSource
-func GetCmdQueryDataSource(queryRoute string, cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
-		Use:   "datasource [name]",
-		Short: "query datasource",
-		Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			name := args[0]
-
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/datasource/%s", queryRoute, name), nil)
-			if err != nil {
-				fmt.Printf("could not query data source - %s \n", name)
-				return nil
+			name := ""
+			if len(args) > 0 {
+				name = args[0]
 			}
 
-			var out types.QueryResAIDataSource
-			cdc.MustUnmarshalJSON(res, &out)
-			return cliCtx.PrintOutput(out)
-		},
-	}
-}
-
-// GetCmdDataSourceNames queries a list of all data source names
-func GetCmdDataSourceNames(queryRoute string, cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
-		Use:   "dnames",
-		Short: "query all data source names",
-		// Args:  cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/dnames", queryRoute), nil)
+			page, err := cmd.Flags().GetInt64(flagPage)
 			if err != nil {
-				fmt.Printf("could not get query names\n")
-				return nil
+				return err
 			}
 
-			var out types.QueryResAIDataSourceNames
-			cdc.MustUnmarshalJSON(res, &out)
-			return cliCtx.PrintOutput(out)
+			limit, err := cmd.Flags().GetInt64(flagLimit)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			res, err := queryClient.ListOracleScripts(
+				context.Background(),
+				&types.ListOracleScriptsReq{
+					Name:  name,
+					Page:  page,
+					Limit: limit,
+				},
+			)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	cmd.Flags().Int64(flagPage, types.DefaultQueryPage, "from page")
+	cmd.Flags().Int64(flagLimit, types.DefaultQueryLimit, "limit number")
+	return cmd
 }
 
-// // GetCmdQueryAIRequest queries information about an AI request
-// func GetCmdQueryAIRequest(queryRoute string, cdc *codec.Codec) *cobra.Command {
-// 	return &cobra.Command{
-// 		Use:   "aireq [id]",
-// 		Short: "query an ai request using its request ID",
-// 		Args:  cobra.ExactArgs(1),
-// 		RunE: func(cmd *cobra.Command, args []string) error {
-// 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-// 			id := []byte(args[0])
-
-// 			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/aireq/%s", queryRoute, id), nil)
-// 			if err != nil {
-// 				fmt.Printf("could not query request - %s \n", args[0])
-// 				return nil
-// 			}
-
-// 			var out types.QueryResAIRequest
-// 			cdc.MustUnmarshalJSON(res, &out)
-// 			return cliCtx.PrintOutput(out)
-// 		},
-// 	}
-// }
-
-// // GetCmdQueryFullRequest queries full information about an AI request
-// func GetCmdQueryFullRequest(queryRoute string, cdc *codec.Codec) *cobra.Command {
-// 	return &cobra.Command{
-// 		Use:   "fullreq [id]",
-// 		Short: "query a full ai request using its request ID",
-// 		Args:  cobra.ExactArgs(1),
-// 		RunE: func(cmd *cobra.Command, args []string) error {
-// 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-// 			id := []byte(args[0])
-
-// 			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/fullreq/%s", queryRoute, id), nil)
-// 			if err != nil {
-// 				fmt.Printf("could not query request - %s \n", args[0])
-// 				return nil
-// 			}
-
-// 			var out types.QueryResFullRequest
-// 			cdc.MustUnmarshalJSON(res, &out)
-// 			return cliCtx.PrintOutput(out)
-// 		},
-// 	}
-// }
-
-// // GetCmdAIRequestIDs queries a list of all request IDs
-// func GetCmdAIRequestIDs(queryRoute string, cdc *codec.Codec) *cobra.Command {
-// 	return &cobra.Command{
-// 		Use:   "aireqs",
-// 		Short: "query all AI request IDs",
-// 		// Args:  cobra.ExactArgs(1),
-// 		RunE: func(cmd *cobra.Command, args []string) error {
-// 			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-// 			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/aireqs", queryRoute), nil)
-// 			if err != nil {
-// 				fmt.Printf("could not get request IDs\n")
-// 				return nil
-// 			}
-
-// 			var out types.QueryResAIRequestIDs
-// 			cdc.MustUnmarshalJSON(res, &out)
-// 			return cliCtx.PrintOutput(out)
-// 		},
-// 	}
-// }
-
-// GetCmdQueryTestCase queries information about an AI request test case
-func GetCmdQueryTestCase(queryRoute string, cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
-		Use:   "testcase [name]",
+// GetCmdQueryTestCase lists data source code uploaded
+func GetCmdQueryTestCase() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "tcase [name]",
 		Short: "query an ai request test case using name",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-			name := []byte(args[0])
-
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/testcase/%s", queryRoute, name), nil)
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
-				fmt.Printf("could not query request test case - %s \n", args[0])
-				return nil
+				return err
 			}
 
-			var out types.QueryResTestCase
-			cdc.MustUnmarshalJSON(res, &out)
-			return cliCtx.PrintOutput(out)
+			name := args[0]
+
+			queryClient := types.NewQueryClient(clientCtx)
+			res, err := queryClient.TestCaseInfo(
+				context.Background(),
+				&types.TestCaseInfoReq{
+					Name: name,
+				},
+			)
+			if err != nil {
+				return err
+			}
+
+			if len(res.Name) == 0 {
+				return fmt.Errorf("data source not found")
+			}
+
+			return clientCtx.PrintProto(res)
 		},
 	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }
 
-// GetCmdTestCaseNames queries a list of all test case names
-func GetCmdTestCaseNames(queryRoute string, cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
-		Use:   "tcnames",
-		Short: "query all AI request test case names",
-		// Args:  cobra.ExactArgs(1),
+// GetCmdQueryTestCases queries a list of all test case names
+func GetCmdQueryTestCases() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "tcases",
+		Short: "query all AI request test cases",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-			res, _, err := cliCtx.QueryWithData(fmt.Sprintf("custom/%s/tcnames", queryRoute), nil)
+			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
-				fmt.Printf("could not get test case IDs\n")
-				return nil
+				return err
 			}
 
-			var out types.QueryResTestCaseNames
-			cdc.MustUnmarshalJSON(res, &out)
-			return cliCtx.PrintOutput(out)
+			name := ""
+			if len(args) > 0 {
+				name = args[0]
+			}
+
+			page, err := cmd.Flags().GetInt64(flagPage)
+			if err != nil {
+				return err
+			}
+
+			limit, err := cmd.Flags().GetInt64(flagLimit)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			res, err := queryClient.ListTestCases(
+				context.Background(),
+				&types.ListTestCasesReq{
+					Name:  name,
+					Page:  page,
+					Limit: limit,
+				},
+			)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
 		},
 	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	cmd.Flags().Int64(flagPage, types.DefaultQueryPage, "from page")
+	cmd.Flags().Int64(flagLimit, types.DefaultQueryLimit, "limit number")
+	return cmd
+}
+
+// GetCmdQueryMinFees queries a list of all test case names
+func GetCmdQueryMinFees() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "minfees [name] --val_num [1]",
+		Short: "query the min fees",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			valNum, err := cmd.Flags().GetInt64(flagValNum)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			res, err := queryClient.QueryMinFees(
+				context.Background(),
+				&types.MinFeesReq{
+					OracleScriptName: args[0],
+					ValNum:           valNum,
+				},
+			)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+	cmd.Flags().Int64(flagValNum, types.DefaultValNum, "val num")
+	return cmd
 }

@@ -8,8 +8,8 @@ import (
 	"github.com/oraichain/orai/x/airesult/keeper"
 )
 
-// NewHandler creates an sdk.Handler for all the airequest type messages
-func NewHandler(k keeper.Keeper) sdk.Handler {
+// NewHandler creates an sdk.Handler for all the airesult type messages
+func NewHandler(k *keeper.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 		switch msg := msg.(type) {
