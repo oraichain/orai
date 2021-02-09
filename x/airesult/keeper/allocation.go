@@ -12,22 +12,6 @@ import (
 
 // AllocateTokens allocates the tokens to the validators that participate in the AI request handling
 func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo) {
-	// fetch and clear the collected fees for distribution, since this is
-	// called in BeginBlock, collected fees will be from the previous block
-	// (and distributed to the previous proposer)
-
-	requestFees, creators := k.CollectRequestFees(ctx, ctx.BlockHeight()-int64(1))
-	// if there are fees from the requests, we remove them from the fee collector
-	if requestFees != nil && creators != nil {
-		// since both share the same length, we only need to iterate one time through either array
-		for i := range requestFees {
-			// we substract fees from the creator based on the fees they provide
-			err := k.bankKeeper.SubtractCoins(ctx, creators[i], requestFees[i])
-			if err != nil {
-				return
-			}
-		}
-	}
 	// get reward from the previous block
 	rewardObj, err := k.GetReward(ctx, ctx.BlockHeight()-int64(1))
 	// If there's no reward in the previous block, then we do not handle

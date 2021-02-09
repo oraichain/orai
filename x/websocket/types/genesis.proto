@@ -2,13 +2,11 @@ syntax = "proto3";
 package oraichain.orai.websocket;
 
 import "x/websocket/types/types_report.proto";
-import "x/websocket/types/types_reporter.proto";
 import "gogoproto/gogo.proto";
 
 option go_package = "github.com/oraichain/orai/x/websocket/types";
 
 // GenesisState - all websocket state that must be provided at genesis
 message GenesisState {
-    repeated Report Reports = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "Reports", (gogoproto.moretags) = "json:\"validator_report\""];
-    repeated Reporter Reporters = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "Reporters", (gogoproto.moretags) = "json:\"validator_reporter\""];    
+    repeated Report Reports = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "Reports", (gogoproto.moretags) = "json:\"validator_report\""];   
 }
