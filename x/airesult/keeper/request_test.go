@@ -53,7 +53,7 @@ func TestResolveRequestsFromReports(t *testing.T) {
 	tstaking.CreateValidator(valAddrs[2], valConsPk3, sdk.NewInt(150000000), true)
 
 	providerKeeper := providerkeeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName))
-	airequestKeeper := airequestkeeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName), app.StakingKeeper, nil)
+	airequestKeeper := airequestkeeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName), app.StakingKeeper, app.BankKeeper, nil)
 	websocketKeeper := websocketkeeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, nil, app.StakingKeeper)
 
 	// init keeper to run custom allocate tokens

@@ -7,8 +7,7 @@ import (
 // DefaultGenesisState - default GenesisState used by Cosmos Hub
 func DefaultGenesisState() *GenesisState {
 	return &GenesisState{
-		Reports:   []Report{},
-		Reporters: []Reporter{},
+		Reports: []Report{},
 
 		// TODO: Fill out according to your genesis state, these values will be initialized but empty
 	}
@@ -25,21 +24,6 @@ func (gs *GenesisState) Validate() error {
 		}
 		if record.Reporter.Address.Empty() {
 			return fmt.Errorf("invalid AIRequests: Reporter: %s. Error: Missing Reporter information", record.Reporter)
-		}
-		// if record.Fees.Empty() {
-		// 	return fmt.Errorf("invalid AIRequests: Owner: %s. Error: Missing Fees", record.Fees)
-		// }
-	}
-
-	for _, record := range gs.Reporters {
-		if record.Name == "" {
-			return fmt.Errorf("invalid Report: Name: %s. Error: Missing reporter name", record.Name)
-		}
-		if record.Address.Empty() {
-			return fmt.Errorf("invalid Report: Address: %s. Error: Address empty", record.Address)
-		}
-		if record.Validator.Empty() {
-			return fmt.Errorf("invalid Validator: Reporter: %s. Error: Missing Validator information", record.Validator)
 		}
 		// if record.Fees.Empty() {
 		// 	return fmt.Errorf("invalid AIRequests: Owner: %s. Error: Missing Fees", record.Fees)

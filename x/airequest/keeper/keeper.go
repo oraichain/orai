@@ -6,6 +6,7 @@ import (
 	"github.com/CosmWasm/wasmd/x/wasm"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	bank "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	params "github.com/cosmos/cosmos-sdk/x/params/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/oraichain/orai/x/airequest/types"
@@ -21,12 +22,13 @@ type (
 		wasmKeeper     *wasm.Keeper
 		paramSpace     params.Subspace
 		stakingKeeper  staking.Keeper
+		bankKeeper     bank.Keeper
 		providerKeeper *provider.Keeper
 	}
 )
 
 // NewKeeper creates a airequest keeper
-func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, aiRequestSubspace params.Subspace, stakingKeeper staking.Keeper, providerKeeper *provider.Keeper) *Keeper {
+func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, aiRequestSubspace params.Subspace, stakingKeeper staking.Keeper, bankKeeper bank.Keeper, providerKeeper *provider.Keeper) *Keeper {
 	if !aiRequestSubspace.HasKeyTable() {
 		// register parameters of the airequest module into the param space
 		aiRequestSubspace = aiRequestSubspace.WithKeyTable(types.ParamKeyTable())
@@ -37,6 +39,7 @@ func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, a
 		wasmKeeper:     wasmKeeper,
 		paramSpace:     aiRequestSubspace,
 		stakingKeeper:  stakingKeeper,
+		bankKeeper:     bankKeeper,
 		providerKeeper: providerKeeper,
 	}
 }

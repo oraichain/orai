@@ -1,7 +1,6 @@
 syntax = "proto3";
 package oraichain.orai.websocket;
 import "x/websocket/types/tx_report.proto";
-import "x/websocket/types/tx_reporter.proto";
 option go_package = "github.com/oraichain/orai/x/websocket/types";
 
 
@@ -10,11 +9,4 @@ service Msg {
     
   // add report
   rpc AddReport(MsgCreateReport) returns (MsgCreateReportRes);
-
-  // add reporter
-  rpc AddReporter(MsgAddReporter) returns (MsgAddReporterRes);
-
-  // remove reporter
-  rpc RemoveReporter(MsgRemoveReporter) returns (MsgRemoveReporterRes);
-  
 }
