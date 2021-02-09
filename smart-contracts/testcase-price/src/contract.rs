@@ -54,9 +54,13 @@ fn test_price<S: Storage, A: Api, Q: Querier>(
     input: String,
     output: String,
 ) -> StdResult<String> {
+    // check output if empty then do nothing
+    if output.is_empty() {
+        return Ok(String::new());
+    }
     let msg = DataSourceQueryMsg::Get { input };
     let data_source: String = deps.querier.query_wasm_smart(contract, &msg)?;
-    // positive using unwrap
+    // positive using unwrap, otherwise rather panic than return default value
     let data_source_result = parse_i32(&data_source);
     let expected_result = parse_i32(&output);
     let deviation = data_source_result - expected_result;
