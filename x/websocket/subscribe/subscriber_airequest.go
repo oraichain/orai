@@ -43,10 +43,10 @@ func (subscriber *Subscriber) submitReport(msgReport *types.MsgCreateReport) (er
 	return err
 }
 
-func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, ev *sdk.StringEvent) error {
+func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, ev *sdk.StringEvent) (*types.MsgCreateReport, error) {
 	subscriber.log.Info(":delivery_truck: Processing incoming request event before checking validators")
 
-	attrMap := getAttributeMap(ev.GetAttributes())
+	attrMap := GetAttributeMap(ev.GetAttributes())
 
 	// Skip if not related to this validator
 	validators := attrMap[aiRequest.AttributeRequestValidator]
@@ -62,7 +62,7 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 
 	if !hasMe {
 		subscriber.log.Info(":next_track_button: Skip request not related to this validator")
-		return sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "Skip request not related to this validator")
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "Skip request not related to this validator")
 	}
 
 	subscriber.log.Info(":delivery_truck: Processing incoming request event")
@@ -72,33 +72,33 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 	if val, ok := attrMap[aiRequest.AttributeRequestID]; ok {
 		requestID = val[0]
 	} else {
-		return sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, aiRequest.AttributeRequestID)
+		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, aiRequest.AttributeRequestID)
 	}
 	if val, ok := attrMap[aiRequest.AttributeOracleScriptName]; ok {
 		oscriptName = val[0]
 	} else {
-		return sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, aiRequest.AttributeOracleScriptName)
+		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, aiRequest.AttributeOracleScriptName)
 	}
 	if val, ok := attrMap[aiRequest.AttributeRequestCreator]; ok {
 		creatorStr = val[0]
 	} else {
-		return sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, aiRequest.AttributeRequestCreator)
+		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, aiRequest.AttributeRequestCreator)
 	}
 	if val, ok := attrMap[aiRequest.AttributeRequestInput]; ok {
 		inputStr = val[0]
 	} else {
-		return sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, aiRequest.AttributeRequestInput)
+		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, aiRequest.AttributeRequestInput)
 	}
 	if val, ok := attrMap[aiRequest.AttributeRequestExpectedOutput]; ok {
 		expectedOutputStr = val[0]
 	} else {
-		return sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, aiRequest.AttributeRequestExpectedOutput)
+		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, aiRequest.AttributeRequestExpectedOutput)
 	}
 
 	// prepare data
 	creator, err := sdk.AccAddressFromBech32(creatorStr)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// collect ai data sources and test cases from the ai request event.
@@ -109,6 +109,7 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 	var dataSourceResultsTest []*types.DataSourceResult
 	var dataSourceResults []*types.DataSourceResult
 	var testCaseResults []*types.TestCaseResult
+	var resultArr = []string{}
 
 	// we have different test cases, so we need to loop through them
 	ctx := context.Background()
@@ -127,16 +128,16 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 
 			if err != nil {
 				subscriber.log.Info(":skull: failed to execute test case 1st loop: %s", err.Error())
-				return err
+				return nil, err
 			}
 			result := string(outTestCase.Data)
 
 			subscriber.log.Info("result after running test case: ", result)
 
-			dataSourceResult := types.NewDataSourceResult(aiDataSource, []byte(result), types.ResultSuccess)
+			dataSourceResult := types.NewDataSourceResult(aiDataSource, outTestCase.Data, types.ResultSuccess)
 
 			// By default, we consider returning null as failure. If any datasource does not follow this rule then it should not be used by any oracle scripts.
-			if len(result) == 0 {
+			if len(outTestCase.Data) == 0 || result == "null" {
 				// change status to fail so the datasource cannot be rewarded afterwards
 				dataSourceResult.Status = types.ResultFailure
 				dataSourceResult.Result = []byte(types.FailedResponseTc)
@@ -149,7 +150,6 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 		testCaseResults = append(testCaseResults, types.NewTestCaseResult(testCase, dataSourceResultsTest))
 	}
 
-	var resultArr = []string{}
 	// after passing the test cases, we run the actual data sources to collect their results
 	// create data source results to store in the report
 	// we use dataSourceResultsTest since this list is the complete list of data sources that have passed the test cases
@@ -167,7 +167,7 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 			})
 			if err != nil {
 				subscriber.log.Error(":skull: failed to execute data source script: %s", err.Error())
-				return err
+				return nil, err
 			}
 			// remove all quote at start and begine
 			result := strings.Trim(string(outDataSource.Data), QuoteString)
@@ -218,13 +218,13 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 
 		if err != nil {
 			subscriber.log.Error(":skull: failed to aggregate results: %s", err.Error())
-			return err
+			return nil, err
 		}
 		subscriber.log.Info("final result from oScript: %s", string(outOScript.Data))
 		msgReport.AggregatedResult = outOScript.Data
 	}
 
 	// TODO: check aggregated result value of the oracle script to verify if it fails or success
-	return subscriber.submitReport(msgReport)
+	return msgReport, nil
 
 }

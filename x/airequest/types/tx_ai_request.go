@@ -1,6 +1,8 @@
 package types
 
 import (
+	"regexp"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -18,6 +20,11 @@ func (msg *MsgSetAIRequest) ValidateBasic() error {
 	// }
 	if len(msg.OracleScriptName) == 0 || msg.ValidatorCount <= 0 {
 		return sdkerrors.Wrap(ErrRequestInvalid, "Name or / and validator count cannot be empty")
+	}
+	// regex allow only alphabet, numeric and underscore characters
+	isStringAlphabetic := regexp.MustCompile(`^[a-zA-Z0-9_]*$`).MatchString
+	if !isStringAlphabetic(msg.OracleScriptName) {
+		return sdkerrors.Wrap(ErrRequestInvalid, "The oracle script name contains invalid characters")
 	}
 	_, err := sdk.ParseCoinsNormalized(msg.Fees)
 	if err != nil {

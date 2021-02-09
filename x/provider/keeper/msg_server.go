@@ -106,8 +106,10 @@ func (m msgServer) CreateOracleScript(goCtx context.Context, msg *types.MsgCreat
 		return nil, sdkerrors.Wrap(types.ErrOracleScriptNameExists, "Name already exists")
 	}
 
+	// collect oracle script reward percentage
+	rewardPercentage := m.keeper.GetOracleScriptRewardPercentageParam(ctx)
 	// collect minimum fees required to run the oracle script (for 1 validator)
-	minimumFees, err := m.keeper.GetMinimumFees(ctx, msg.DataSources, msg.TestCases, 1)
+	minimumFees, err := m.keeper.GetMinimumFees(ctx, msg.DataSources, msg.TestCases, 1, rewardPercentage)
 	if err != nil {
 		return nil, err
 	}
@@ -157,8 +159,10 @@ func (m msgServer) EditOracleScript(goCtx context.Context, msg *types.MsgEditOra
 		return nil, sdkerrors.Wrap(types.ErrEditorNotAuthorized, "Only owner can edit the oScript")
 	}
 
+	// collect oracle script reward percentage
+	rewardPercentage := m.keeper.GetOracleScriptRewardPercentageParam(ctx)
 	// collect minimum fees required to run the oracle script (for one validator)
-	minimumFees, err := m.keeper.GetMinimumFees(ctx, msg.DataSources, msg.TestCases, 1)
+	minimumFees, err := m.keeper.GetMinimumFees(ctx, msg.DataSources, msg.TestCases, 1, rewardPercentage)
 	if err != nil {
 		return nil, err
 	}

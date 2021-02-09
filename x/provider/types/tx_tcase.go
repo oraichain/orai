@@ -29,10 +29,12 @@ func (msg *MsgCreateTestCase) ValidateBasic() error {
 	if len(msg.Name) == 0 || len(msg.Contract) == 0 {
 		return sdkerrors.Wrap(ErrEmpty, "Name or/and contract address cannot be empty")
 	}
-	// if len(msg.Contract) > MaximumContractLength {
-	// 	return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "The length of the contract address is too large!\n")
-	if len(msg.Name) == 0 {
-		return sdkerrors.Wrap(ErrEmpty, "Name or/and contract address cannot be empty")
+	if !isStringAlphabetic(msg.Name) || !isStringAlphabetic(msg.Contract) {
+		return sdkerrors.Wrap(ErrCannotSetOracleScript, "Input contains invalid characters")
+	}
+
+	if len(msg.Contract) > 1*1024*1024 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "The size of the source code is too large!\n")
 	}
 	// verify contract address
 	_, err := sdk.AccAddressFromBech32(msg.Contract)
@@ -75,10 +77,12 @@ func (msg MsgEditTestCase) ValidateBasic() error {
 	if len(msg.OldName) == 0 || len(msg.Contract) == 0 || len(msg.NewName) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Name and/or Contract cannot be empty")
 	}
-	// if len(msg.Contract) > MaximumContractLength {
-	// 	return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "The length of the contract address is too large!\n")
-	if len(msg.OldName) == 0 || len(msg.NewName) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Name and/or Contract cannot be empty")
+	if !isStringAlphabetic(msg.OldName) || !isStringAlphabetic(msg.NewName) || !isStringAlphabetic(msg.Contract) {
+		return sdkerrors.Wrap(ErrCannotSetOracleScript, "Input contains invalid characters")
+	}
+
+	if len(msg.Contract) > 1*1024*1024 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "The size of the source code is too large!\n")
 	}
 	// verify contract address
 	_, err := sdk.AccAddressFromBech32(msg.Contract)

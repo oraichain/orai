@@ -3,8 +3,6 @@ package keeper
 import (
 	//"fmt"
 
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -27,10 +25,10 @@ func (k Keeper) RandomValidators(ctx sdk.Context, size int, nonce []byte) ([]sdk
 	if totalPowers == int64(0) {
 		return nil, sdkerrors.Wrapf(types.ErrValidatorsHaveNoVotes, "%d < %d", maxValidatorSize, size)
 	} else if maxValidatorSize < size {
-		fmt.Println("not enough validators")
+		k.Logger(ctx).Error("not enough validators")
 		return nil, sdkerrors.Wrapf(types.ErrNotEnoughValidators, "%d < %d", maxValidatorSize, size)
 	} else {
-		fmt.Println("enough validators")
+		k.Logger(ctx).Info("enough validators")
 		valOperators := k.createValSamplingList(ctx, maxValidatorSize)
 		randomGenerator, err := rng.NewRng(k.GetRngSeed(ctx), nonce, []byte(ctx.ChainID()))
 		if err != nil {
