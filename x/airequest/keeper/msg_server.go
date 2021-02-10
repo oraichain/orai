@@ -35,12 +35,7 @@ func (k msgServer) CreateAIRequest(goCtx context.Context, msg *types.MsgSetAIReq
 		return nil, sdkerrors.Wrap(types.ErrCannotRandomValidators, err.Error())
 	}
 
-	// we can safely parse fees to coins since we have validated it in the Msg already
-	fees, _ := sdk.ParseCoinsNormalized(msg.Fees)
-	// Compute the fee allocated for oracle module to distribute to active validators.
-	rewardRatio := sdk.NewDecWithPrec(k.keeper.providerKeeper.GetOracleScriptRewardPercentageParam(ctx), 2)
-	// We need to calculate the final 70% fee given by the user because the remaining 30% must be reserved for the proposer and validators.
-	providedCoins, _ := sdk.NewDecCoinsFromCoins(fees...).MulDecTruncate(rewardRatio).TruncateDecimal()
+	providedFees, _ := sdk.ParseCoinsNormalized(msg.Fees)
 
 	// get data source and test case names from the oracle script
 	aiDataSources, testCases, err := k.keeper.providerKeeper.GetDNamesTcNames(ctx, msg.OracleScriptName)
@@ -54,18 +49,18 @@ func (k msgServer) CreateAIRequest(goCtx context.Context, msg *types.MsgSetAIReq
 		return nil, err
 	}
 
-	finalFees, err := k.keeper.providerKeeper.GetMinimumFees(ctx, aiDataSources, testCases, len(validators))
+	requiredFees, err := k.keeper.providerKeeper.GetMinimumFees(ctx, aiDataSources, testCases, len(validators))
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Error getting minimum fees from oracle script")
 	}
-	fmt.Println("final fees needed: ", finalFees.String())
+	fmt.Println("required fees needed: ", requiredFees.String())
 
 	// If the total fee is larger than the fee provided by the user then we return error
-	if finalFees.IsAnyGT(providedCoins) {
+	if requiredFees.IsAnyGT(providedFees) {
 		return nil, sdkerrors.Wrap(types.ErrNeedMoreFees, "Fees given by the users are less than the total fees needed")
 	}
 	// set a new request with the aggregated result into blockchain
-	request := types.NewAIRequest(msg.RequestID, msg.OracleScriptName, msg.Creator, validators, ctx.BlockHeight(), dataSourceObjs, testcaseObjs, fees, msg.Input, msg.ExpectedOutput)
+	request := types.NewAIRequest(msg.RequestID, msg.OracleScriptName, msg.Creator, validators, ctx.BlockHeight(), dataSourceObjs, testcaseObjs, providedFees, msg.Input, msg.ExpectedOutput)
 
 	k.keeper.SetAIRequest(ctx, request.RequestID, request)
 

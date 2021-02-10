@@ -12,6 +12,10 @@ import (
 
 // GetRequestsBlockHeight returns all requests for the given block height, or nil if there is none.
 func (k Keeper) GetRequestsBlockHeight(ctx sdk.Context, blockHeight int64) (reqs []airequest.AIRequest) {
+	// check if it's the start of the node or not
+	if blockHeight <= 0 {
+		return nil
+	}
 	iterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), airequest.RequeststoreKeyPrefixAll())
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
