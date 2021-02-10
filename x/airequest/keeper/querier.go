@@ -38,7 +38,13 @@ func (k *Querier) QueryAIRequest(goCtx context.Context, req *types.QueryAIReques
 		return nil, sdkerrors.Wrap(types.ErrRequestNotFound, err.Error())
 	}
 
-	return types.NewQueryAIRequestRes(aiRequest.GetRequestID(), aiRequest.GetOracleScriptName(), aiRequest.GetCreator(), aiRequest.GetFees(), aiRequest.GetValidators(), aiRequest.GetBlockHeight(), aiRequest.GetAiDataSources(), aiRequest.GetTestCases(), aiRequest.GetInput(), aiRequest.GetExpectedOutput()), nil
+	return types.NewQueryAIRequestRes(
+		aiRequest.GetRequestID(), aiRequest.GetOracleScriptName(),
+		aiRequest.GetCreator(), aiRequest.GetFees(),
+		aiRequest.GetValidators(), aiRequest.GetBlockHeight(),
+		aiRequest.GetAiDataSources(), aiRequest.GetTestCases(),
+		aiRequest.GetInput(), aiRequest.GetExpectedOutput(),
+	), nil
 }
 
 // QueryAIRequestIDs implements the Query/QueryAIRequestIDs gRPC method

@@ -26,8 +26,8 @@ func (k Keeper) SetAIRequest(ctx sdk.Context, id string, request *types.AIReques
 	store.Set(types.RequestStoreKey(id), bz)
 }
 
-// GetAllAIRequestIDs get an iterator of all key-value pairs in the store
-func (k Keeper) GetAllAIRequestIDs(ctx sdk.Context) sdk.Iterator {
+// GetAIRequestIDIter get an iterator of all key-value pairs in the store
+func (k Keeper) GetAIRequestIDIter(ctx sdk.Context) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, types.RequeststoreKeyPrefixAll())
 }
@@ -35,7 +35,7 @@ func (k Keeper) GetAllAIRequestIDs(ctx sdk.Context) sdk.Iterator {
 // GetPaginatedAIRequests get an iterator of paginated key-value pairs in the store
 func (k *Keeper) GetPaginatedAIRequests(ctx sdk.Context, page, limit uint) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIteratorPaginated(store, []byte(types.RequeststoreKeyPrefixAll()), page, limit)
+	return sdk.KVStorePrefixIteratorPaginated(store, types.RequeststoreKeyPrefixAll(), page, limit)
 }
 
 // GetRequestsBlockHeight returns all requests for the given block height, or nil if there is none.
