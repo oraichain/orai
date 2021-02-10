@@ -35,6 +35,7 @@ func (k msgServer) CreateAIRequest(goCtx context.Context, msg *types.MsgSetAIReq
 		return nil, sdkerrors.Wrap(types.ErrCannotRandomValidators, err.Error())
 	}
 
+	// we can safely parse fees to coins since we have validated it in the Msg already
 	providedFees, _ := sdk.ParseCoinsNormalized(msg.Fees)
 
 	// get data source and test case names from the oracle script
@@ -49,11 +50,11 @@ func (k msgServer) CreateAIRequest(goCtx context.Context, msg *types.MsgSetAIReq
 		return nil, err
 	}
 
-	requiredFees, err := k.keeper.providerKeeper.GetMinimumFees(ctx, aiDataSources, testCases, len(validators))
+	requiredFees, err := k.keeper.providerKeeper.GetMinimumFees(ctx, aiDataSources, testCases, len(validators), k.keeper.providerKeeper.GetOracleScriptRewardPercentageParam(ctx))
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Error getting minimum fees from oracle script")
 	}
-	fmt.Println("required fees needed: ", requiredFees.String())
+	k.keeper.Logger(ctx).Info(fmt.Sprintf("required fees needed: %v\n", requiredFees.String()))
 
 	// If the total fee is larger than the fee provided by the user then we return error
 	if requiredFees.IsAnyGT(providedFees) {
@@ -66,20 +67,7 @@ func (k msgServer) CreateAIRequest(goCtx context.Context, msg *types.MsgSetAIReq
 
 	// TODO: Define your msg events
 	// Emit an event describing a data request and asked validators.
-	event := sdk.NewEvent(types.EventTypeSetAIRequest)
-	event = event.AppendAttributes(
-		sdk.NewAttribute(types.AttributeRequestID, string(request.RequestID[:])),
-	)
-	for _, validator := range validators {
-		event = event.AppendAttributes(
-			sdk.NewAttribute(types.AttributeRequestValidator, validator.String()),
-		)
-	}
-	ctx.EventManager().EmitEvent(event)
-
-	// TODO: Define your msg events
-	// Emit an event describing a data request and asked validators.
-	event = sdk.NewEvent(types.EventTypeRequestWithData)
+	event := sdk.NewEvent(types.EventTypeRequestWithData)
 	event = event.AppendAttributes(
 		sdk.NewAttribute(types.AttributeRequestID, string(request.RequestID[:])),
 		sdk.NewAttribute(types.AttributeOracleScriptName, request.OracleScriptName),
@@ -88,6 +76,12 @@ func (k msgServer) CreateAIRequest(goCtx context.Context, msg *types.MsgSetAIReq
 		sdk.NewAttribute(types.AttributeRequestInput, string(msg.Input)),
 		sdk.NewAttribute(types.AttributeRequestExpectedOutput, string(msg.ExpectedOutput)),
 	)
+
+	for _, validator := range validators {
+		event = event.AppendAttributes(
+			sdk.NewAttribute(types.AttributeRequestValidator, validator.String()),
+		)
+	}
 
 	// these are multiple attribute for array
 	for _, aiDataSource := range aiDataSources {

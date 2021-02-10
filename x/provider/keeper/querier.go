@@ -224,7 +224,9 @@ func (k *Querier) QueryMinFees(goCtx context.Context, req *types.MinFeesReq) (*t
 		return nil, err
 	}
 
-	minimumFees, err := k.keeper.GetMinimumFees(ctx, aiDataSources, testCases, int(req.ValNum))
+	// collect oracle script reward percentage
+	rewardPercentage := k.keeper.GetOracleScriptRewardPercentageParam(ctx)
+	minimumFees, err := k.keeper.GetMinimumFees(ctx, aiDataSources, testCases, int(req.ValNum), rewardPercentage)
 	if err != nil {
 		return nil, err
 	}

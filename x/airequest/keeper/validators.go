@@ -3,8 +3,6 @@ package keeper
 import (
 	//"fmt"
 
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -27,10 +25,10 @@ func (k Keeper) RandomValidators(ctx sdk.Context, size int, nonce []byte) ([]sdk
 	if totalPowers == int64(0) {
 		return nil, sdkerrors.Wrapf(types.ErrValidatorsHaveNoVotes, "%d < %d", maxValidatorSize, size)
 	} else if maxValidatorSize < size {
-		fmt.Println("not enough validators")
+		k.Logger(ctx).Error("not enough validators")
 		return nil, sdkerrors.Wrapf(types.ErrNotEnoughValidators, "%d < %d", maxValidatorSize, size)
 	} else {
-		fmt.Println("enough validators")
+		k.Logger(ctx).Info("enough validators")
 		valOperators := k.createValSamplingList(ctx, maxValidatorSize)
 		randomGenerator, err := rng.NewRng(k.GetRngSeed(ctx), nonce, []byte(ctx.ChainID()))
 		if err != nil {
@@ -97,23 +95,12 @@ func (k *Keeper) SampleIndexes(valOperators []sdk.ValAddress, size int, randomGe
 
 	// store a mapping of validators that have already been chosen
 	chosenVal := make([]bool, valOperatorLen)
-
+	// time := 0
 	for i := 0; i < size; {
 		// the dividend is randomed to make sure no one can predict the next validator
-		dividend := randomGenerator.RandUint64()
-		quotient := uint64(0)
-
-		divisor := uint64(totalPowers)
-		// this value init makes sure that we at least calculate the modulo once
-		if divisor > 0 {
-			// quotient = calucateMol(dividend, divisor)
-			quotient = dividend % divisor
-			if quotient >= valOperatorLen {
-				quotient = 0
-			}
-		}
-
-		// fmt.Printf("quotient :%v\n", quotient)
+		quotient := randomGenerator.RandUint64() % valOperatorLen
+		// time++
+		// fmt.Printf("%d) quotient :%v\n", time, quotient)
 		// if the quotient is in the sampling list, and it is not in the chosen validator map range then we pick it
 		if !chosenVal[quotient] {
 			// add to the chosen validator list

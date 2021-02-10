@@ -10,13 +10,12 @@ import (
 
 // RegisterCodec registers concrete types on codec
 func RegisterCodec(cdc *codec.LegacyAmino) {
-	// TODO: Register the modules msgs
-	// cdc.RegisterConcrete(MsgCreateOracleScript{}, "provider/CreateOracleScript", nil)
-	// cdc.RegisterConcrete(MsgEditOracleScript{}, "provider/EditOracleScript", nil)
-	// cdc.RegisterConcrete(MsgCreateAIDataSource{}, "provider/CreateAIDataSource", nil)
-	// cdc.RegisterConcrete(MsgEditAIDataSource{}, "provider/EditAIDataSource", nil)
-	// cdc.RegisterConcrete(MsgCreateTestCase{}, "provider/SetTestCase", nil)
-	// cdc.RegisterConcrete(MsgEditTestCase{}, "provider/EditTestCase", nil)
+	cdc.RegisterConcrete(MsgCreateOracleScript{}, "provider/CreateOracleScript", nil)
+	cdc.RegisterConcrete(MsgEditOracleScript{}, "provider/EditOracleScript", nil)
+	cdc.RegisterConcrete(MsgCreateAIDataSource{}, "provider/CreateAIDataSource", nil)
+	cdc.RegisterConcrete(MsgEditAIDataSource{}, "provider/EditAIDataSource", nil)
+	cdc.RegisterConcrete(MsgCreateTestCase{}, "provider/SetTestCase", nil)
+	cdc.RegisterConcrete(MsgEditTestCase{}, "provider/EditTestCase", nil)
 
 }
 
@@ -48,7 +47,7 @@ var (
 )
 
 func init() {
-	// RegisterCodec(amino)
+	RegisterCodec(amino)
 	cryptocodec.RegisterCrypto(amino)
 	amino.Seal()
 }
