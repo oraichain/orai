@@ -32,9 +32,11 @@ pub fn query<S: Storage, A: Api, Q: Querier>(
     msg: QueryMsg,
 ) -> StdResult<Binary> {
     match msg {
-        QueryMsg::TestPrice { output, contract } => {
-            to_binary(&test_price(deps, output, &contract)?)
-        }
+        QueryMsg::Test {
+            input,
+            output,
+            contract,
+        } => to_binary(&test_price(deps, &contract, input, output)?),
     }
 }
 
@@ -48,10 +50,11 @@ fn parse_i32(input: &str) -> i32 {
 
 fn test_price<S: Storage, A: Api, Q: Querier>(
     deps: &Extern<S, A, Q>,
-    output: String,
     contract: &HumanAddr,
+    input: String,
+    output: String,
 ) -> StdResult<String> {
-    let msg = DataSourceQueryMsg::GetPrice {};
+    let msg = DataSourceQueryMsg::Get { input };
     let data_source: String = deps.querier.query_wasm_smart(contract, &msg)?;
     // positive using unwrap
     let data_source_result = parse_i32(&data_source);

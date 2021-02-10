@@ -22,16 +22,13 @@ const (
 	flagBroadcastTimeout = "broadcast-timeout"
 	flagRPCPollInterval  = "rpc-poll-interval"
 	flagMaxTry           = "max-try"
+	flagErrExit          = "errexit"
 )
 
-// NewWebSocketConfig returns the default settings for WasmConfig
-func NewWebSocketConfig(flagSet *pflag.FlagSet) *subscribe.WebSocketConfig {
-	cfg := &subscribe.WebSocketConfig{
-		BroadcastTimeout: time.Minute * 5,
-		RPCPollInterval:  time.Second,
-		MaxTry:           5,
-		AllowLogLevel:    log.AllowInfo(),
-	}
+// ParseWebSocketConfig returns the default settings for WasmConfig
+func ParseWebSocketConfig(flagSet *pflag.FlagSet) *subscribe.WebSocketConfig {
+
+	cfg := subscribe.DefaultWebSocketConfig()
 
 	if v, err := flagSet.GetString(flagBroadcastTimeout); err == nil {
 		if cfg.BroadcastTimeout, err = time.ParseDuration(v); err != nil {
@@ -48,12 +45,24 @@ func NewWebSocketConfig(flagSet *pflag.FlagSet) *subscribe.WebSocketConfig {
 		cfg.MaxTry = v
 	}
 
-	if v, err := flagSet.GetString(flags.FlagFrom); err == nil {
-		cfg.FromValidator = v
+	if v, err := flagSet.GetBool(flagErrExit); err == nil {
+		cfg.ErrExit = v
 	}
 
 	if v, err := flagSet.GetString(flags.FlagLogLevel); err == nil {
 		if cfg.AllowLogLevel, err = log.AllowLevel(v); err != nil {
+			return cfg
+		}
+	}
+
+	if v, err := flagSet.GetString(flags.FlagLogLevel); err == nil {
+		if cfg.AllowLogLevel, err = log.AllowLevel(v); err != nil {
+			return cfg
+		}
+	}
+
+	if v, err := flagSet.GetString(flags.FlagFees); err == nil {
+		if cfg.Fees, err = sdk.ParseCoinsNormalized(v); err != nil {
 			return cfg
 		}
 	}
@@ -173,7 +182,7 @@ func GetCmdSubscribe() *cobra.Command {
 				return err
 			}
 
-			cfg := NewWebSocketConfig(cmd.Flags())
+			cfg := ParseWebSocketConfig(cmd.Flags())
 			cfg.Txf = tx.NewFactoryCLI(clientCtx, cmd.Flags())
 
 			subscriber := subscribe.NewSubscriber(&clientCtx, cfg)
@@ -184,6 +193,7 @@ func GetCmdSubscribe() *cobra.Command {
 	cmd.Flags().String(flagBroadcastTimeout, "5m", "The time that the websocket will wait for tx commit")
 	cmd.Flags().String(flagRPCPollInterval, "1s", "The duration of rpc poll interval")
 	cmd.Flags().Uint64(flagMaxTry, 5, "The maximum number of tries to submit a report transaction")
+	cmd.Flags().Bool(flagErrExit, false, "Exit on error")
 	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
