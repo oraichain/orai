@@ -85,6 +85,7 @@ func NewMsgCreateReport(
 func NewGenesisState(reports []Report, reporters []Reporter) GenesisState {
 	return GenesisState{
 		// TODO: Fill out according to your genesis state
-		Reports: reports,
+		Reports:   reports,
+		Reporters: reporters,
 	}
 }
