@@ -74,7 +74,7 @@ oraid tx provider set-datasource eth_price $CONTRACT "test eth price" --from duc
 
 oraid tx provider set-testcase eth_price_testcase $CONTRACT "test eth price testcase" --from duc --chain-id $CHAIN_ID -y
 
-./scripts/deploy-contract.sh smart-contracts/oscript-price/artifacts/oscript_price.wasm "oscript-price 1" ''
+./scripts/deploy-contract.sh smart-contracts/oscript-price/artifacts/oscript_price.wasm "oscript-price 1" '{"ai_data_source":"datasource_eth","testcase":"testcase_price"}'
 
 oraid tx provider set-oscript oscript_eth $CONTRACT "test eth price oracle script" --ds eth_price --tc eth_price_testcase --from duc --chain-id $CHAIN_ID -y
 
