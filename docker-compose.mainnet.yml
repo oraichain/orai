@@ -5,18 +5,14 @@ services:
     image: orai/orai:mainnet-alpine
     working_dir: /workspace
     tty: true
-    ulimits:
-      nofile:
-        soft: 65536
-        hard: 65536
     ports:
       - 1317:1317
       - 26656:26656
       - 26657:26657
     cap_add:
       - SYS_PTRACE
-    env_file:
+    env_file: 
       - orai.env
-    volumes:      
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - ./:/workspace
-      - ./init_genesis.sh:/usr/bin/setup
