@@ -25,10 +25,6 @@ func NewHandler(k *Keeper) sdk.Handler {
 		switch msg := msg.(type) {
 		case *MsgCreateReport:
 			res, err = msgServer.AddReport(goCtx, msg)
-		case *MsgAddReporter:
-			res, err = msgServer.AddReporter(goCtx, msg)
-		case *MsgRemoveReporter:
-			res, err = msgServer.RemoveReporter(goCtx, msg)
 		default:
 			errMsg := fmt.Sprintf("unrecognized %s message type: %T", ModuleName, msg)
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, errMsg)

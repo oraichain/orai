@@ -35,6 +35,9 @@ oraid start --rpc.laddr tcp://0.0.0.0:26657 --log_level error
 
 # start websocket subscribe for processing event log in another terminal
 oraid tx websocket subscribe --max-try 10 --from $USER --gas="auto" --gas-adjustment="1.2" --chain-id=$CHAIN_ID -y
+
+# run as a background process
+docker-compose exec -d orai ash -c "echo $KEYRING_PASS | oraid tx websocket subscribe --max-try 10 --from $USER --gas="auto" --gas-adjustment="1.2" --chain-id=Oraichain -y"
 ```
 
 ## Build smart contract and interact with it
