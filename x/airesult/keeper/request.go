@@ -9,35 +9,6 @@ import (
 	websocket "github.com/oraichain/orai/x/websocket/types"
 )
 
-// GetRequestsBlockHeight returns all requests for the given block height, or nil if there is none.
-func (k Keeper) GetRequestsBlockHeight(ctx sdk.Context, blockHeight int64) (reqs []airequest.AIRequest) {
-	iterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), airequest.RequeststoreKeyPrefixAll())
-	defer iterator.Close()
-	for ; iterator.Valid(); iterator.Next() {
-		var req airequest.AIRequest
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &req)
-		// check if block height is equal or not
-		if req.GetBlockHeight() == blockHeight {
-			reqs = append(reqs, req)
-		}
-	}
-	return reqs
-}
-
-// CollectRequestFees collects total fees of the requests from the previous block to remove them from the fee collector
-func (k Keeper) CollectRequestFees(ctx sdk.Context, blockHeight int64) (fees []sdk.Coins, creators []sdk.AccAddress) {
-	// collect requests from the previous block
-	requests := k.GetRequestsBlockHeight(ctx, blockHeight)
-	if len(requests) == 0 {
-		return nil, nil
-	}
-	for _, request := range requests {
-		fees = append(fees, request.GetFees())
-		creators = append(creators, request.GetCreator())
-	}
-	return fees, creators
-}
-
 // ResolveExpiredRequest handles requests that have been expired
 func (k Keeper) ResolveExpiredRequest(ctx sdk.Context, reqID string) {
 	// hard code the result first if the request does not have a result
