@@ -156,11 +156,11 @@ After that line, add the following snippet:
 	})
 ```
 
-Now recompile a new binary and place it in `$DAEMON_HOME/oraivisor/upgrades/test1/bin`:
+Now recompile a new binary and place it in `$DAEMON_HOME/oraivisor/upgrades/ai-oracle/bin`:
 
 ```bash
 make build
-cp ./build/oraid $DAEMON_HOME/oraivisor/upgrades/test1/bin
+cp ./build/oraid $DAEMON_HOME/oraivisor/upgrades/ai-oracle/bin
 ```
 
 The upgrade will occur automatically at height 100.
