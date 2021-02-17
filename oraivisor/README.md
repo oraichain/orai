@@ -1,6 +1,6 @@
 # oraivisor Quick Start
 
-`oraivisor` is a small process manager around Cosmos SDK binaries that monitors the governance module via stdout to see if there's a chain upgrade proposal coming in. If it see a proposal that gets approved it can be run manually or automatically to download the new code, stop the node, run the migration script, replace the node binary, and start with the new genesis file.
+`oraivisor` is a small process manager around Oraichain binaries that monitors the governance module via stdout to see if there's a chain upgrade proposal coming in. If it see a proposal that gets approved it can be run manually or automatically to download the new code, stop the node, run the migration script, replace the node binary, and start with the new genesis file.
 
 ## Installation
 
@@ -43,7 +43,7 @@ subprocesses that are controlled by it. The folder content is organised as follo
             └── $DAEMON_NAME
 ```
 
-Each version of the Cosmos SDK application is stored under either `genesis` or `upgrades/<name>`, which holds `bin/$DAEMON_NAME`
+Each version of the Oraichain application is stored under either `genesis` or `upgrades/<name>`, which holds `bin/$DAEMON_NAME`
 along with any other needed files such as auxiliary client programs or libraries. `current` is a symbolic link to the currently
 active folder (so `current/bin/$DAEMON_NAME` is the currently active binary).
 
@@ -83,7 +83,7 @@ Application binaries' directives such as command-line flags and environment vari
 ## Example: oraid
 
 The following instructions provide a demonstration of `oraivisor`'s integration with the `oraid` application
-shipped along the Cosmos SDK's source code.
+shipped along the Oraichain's source code.
 
 First compile `oraid`:
 
