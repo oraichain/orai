@@ -532,6 +532,8 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		),
 	)
 	app.SetEndBlocker(app.EndBlocker)
+	// set upgrade module
+	app.upgradeHandler()
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
@@ -551,6 +553,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
+
 	return app
 }
 
@@ -696,4 +699,13 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(airesult.ModuleName)
 
 	return paramsKeeper
+}
+
+func (app *OraichainApp) upgradeHandler() {
+	planNames := []string{}
+	for _, planName := range planNames {
+		app.upgradeKeeper.SetUpgradeHandler(planName, func(ctx sdk.Context, plan upgradetypes.Plan) {
+			// upgrade changes here
+		})
+	}
 }
