@@ -127,7 +127,7 @@ oraid tx gov submit-proposal software-upgrade "ai-oracle" --title "upgrade-demo"
 
 # allow auto download and upgrade form a URL
 export DAEMON_ALLOW_DOWNLOAD_BINARIES=true
-export DAEMON_RESTART_AFTER_UPGRADE
+export DAEMON_RESTART_AFTER_UPGRADE=true
 
 oraid tx gov submit-proposal software-upgrade "ai-oracle" --title "upgrade-demo" --description "upgrade"  --from $USER --upgrade-height 100 --upgrade-info "https://static.orai.io/files/oraid" --deposit 10000000orai --chain-id Oraichain -y
 
