@@ -92,12 +92,6 @@ cd /workspace
 make build
 ```
 
-Create a new key and setup the `oraid` node:
-
-```bash
-./scripts/setup_oraid.sh 12345678
-```
-
 Set the required environment variables:
 
 ```bash
@@ -112,7 +106,17 @@ mkdir -p $DAEMON_HOME/oraivisor/genesis/bin
 cp ./build/oraid $DAEMON_HOME/oraivisor/genesis/bin
 ```
 
-For the sake of this demonstration, we would amend `voting_params.voting_period` in `.oraid/config/genesis.json` to a reduced time ~5 minutes (300s) and eventually launch `oraivisor`:
+Create a new key and setup the `oraid` node:
+
+```bash
+./scripts/setup_oraid.sh 12345678
+```
+
+For the sake of this demonstration, we would amend `voting_params.voting_period` in `.oraid/config/genesis.json` to a reduced time ~1 minutes (60s) and eventually launch `oraivisor`:
+
+```bash
+sed -i 's/voting_period" *: *".*"/voting_period": "60s"/g' .oraid/config/genesis.json
+```
 
 Now oraivisor is a replacement for oraid
 
@@ -120,47 +124,46 @@ Now oraivisor is a replacement for oraid
 oraivisor start
 ```
 
+For the sake of this demonstration, we will hardcode a modification in `oraid` to simulate a code change.
+In `oraid/app.go`, find the line containing the upgrade Keeper initialisation, it should look like
+`app.upgradekeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, ...)`.
+After that line, add the following snippet:
+
+```go
+app.upgradekeeper.SetUpgradeHandler("ai-oracle", func(ctx sdk.Context, plan upgradetypes.Plan) {
+    // Add modification logic		
+})
+```
+then rebuild it with `make build`
+
 Submit a software upgrade proposal:
 
 ```bash
-oraid tx gov submit-proposal software-upgrade "ai-oracle" --title "upgrade-demo" --description "upgrade"  --from $USER --upgrade-height 100 --deposit 10000000orai --chain-id Oraichain -y
+# check orai.env for allowing auto download and upgrade form a URL
+# DAEMON_ALLOW_DOWNLOAD_BINARIES=true
+# DAEMON_RESTART_AFTER_UPGRADE=true
 
-# allow auto download and upgrade form a URL
-export DAEMON_ALLOW_DOWNLOAD_BINARIES=true
-export DAEMON_RESTART_AFTER_UPGRADE=true
+# using s3 to store build file
+aws s3 mb s3://orai
+echo '{"binaries":{"linux/amd64":"https://orai.s3.us-east-2.amazonaws.com/oraid"}}' > build/manifest.json
+aws s3 cp build/oraid s3://orai --acl public-read
+aws s3 cp build/manifest.json s3://orai --acl public-read
 
-oraid tx gov submit-proposal software-upgrade "ai-oracle" --title "upgrade-demo" --description "upgrade"  --from $USER --upgrade-height 100 --upgrade-info "https://static.orai.io/files/oraid" --deposit 10000000orai --chain-id Oraichain -y
+# then submit proposal
+oraid tx gov submit-proposal software-upgrade "ai-oracle" --title "upgrade-demo" --description "upgrade"  --from $USER --upgrade-height 20 --upgrade-info "http://orai.s3.amazonaws.com/manifest.json" --deposit 10000000orai --chain-id Oraichain -y
 
 ```
  
-Query the proposal to ensure it was correctly broadcast and added to a block:
-
-```bash
-oraid query gov proposal 1
-```
- 
-Submit a `Yes` vote for the upgrade proposal:
+ Submit a `Yes` vote for the upgrade proposal:
 
 ```bash
 oraid tx gov vote 1 yes --from $USER --chain-id Oraichain -y
 ```
 
-For the sake of this demonstration, we will hardcode a modification in `oraid` to simulate a code change.
-In `oraid/app.go`, find the line containing the upgrade Keeper initialisation, it should look like
-`app.upgradekeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath)`.
-After that line, add the following snippet:
-
- ```go
- app.upgradekeeper.SetUpgradeHandler("ai-oracle", func(ctx sdk.Context, plan upgradetypes.Plan) {
-		// Add modification logic		
-	})
-```
-
-Now recompile a new binary and place it in `$DAEMON_HOME/oraivisor/upgrades/ai-oracle/bin`:
+Query the proposal to ensure it was correctly broadcast and added to a block:
 
 ```bash
-make build
-cp ./build/oraid $DAEMON_HOME/oraivisor/upgrades/ai-oracle/bin
+oraid query gov proposal 1
 ```
 
-The upgrade will occur automatically at height 100.
+The upgrade will occur automatically at height 20.
