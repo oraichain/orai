@@ -129,7 +129,11 @@ oraid tx gov submit-proposal software-upgrade "ai-oracle" --title "upgrade-demo"
 export DAEMON_ALLOW_DOWNLOAD_BINARIES=true
 export DAEMON_RESTART_AFTER_UPGRADE=true
 
-oraid tx gov submit-proposal software-upgrade "ai-oracle" --title "upgrade-demo" --description "upgrade"  --from $USER --upgrade-height 100 --upgrade-info "https://static.orai.io/files/oraid" --deposit 10000000orai --chain-id Oraichain -y
+# using s3 to store build file
+aws s3 mb s3://orai
+aws s3 cp build/oraid s3://orai --acl public-read
+
+oraid tx gov submit-proposal software-upgrade "ai-oracle" --title "upgrade-demo" --description "upgrade"  --from $USER --upgrade-height 100 --upgrade-info "https://orai.s3.us-east-2.amazonaws.com/oraid" --deposit 10000000orai --chain-id Oraichain -y
 
 ```
  
