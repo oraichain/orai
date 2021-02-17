@@ -36,7 +36,7 @@ RUN mkdir -p $DAEMON_HOME/oraivisor/genesis/bin
 # init first symbolic link to run oraid and later oraivisor will update the link
 RUN ln -s $DAEMON_HOME/oraivisor/genesis $DAEMON_HOME/oraivisor/current
 # copy binaries
-COPY --from=go-builder /code/oraivisor/oraivisor /usr/bin
+COPY --from=go-builder /code/oraivisor/build/oraivisor /usr/bin
 COPY --from=go-builder /code/build/oraid $DAEMON_HOME/oraivisor/genesis/bin
 
 RUN apk add nano jq bash ncurses
