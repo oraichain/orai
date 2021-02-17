@@ -127,30 +127,31 @@ oraivisor start
 Submit a software upgrade proposal:
 
 ```bash
-oraid tx gov submit-proposal software-upgrade "ai-oracle" --title "upgrade-demo" --description "upgrade"  --from $USER --upgrade-height 30 --deposit 10000000orai --chain-id Oraichain -y
-
 # allow auto download and upgrade form a URL
 export DAEMON_ALLOW_DOWNLOAD_BINARIES=true
 export DAEMON_RESTART_AFTER_UPGRADE=true
 
 # using s3 to store build file
 aws s3 mb s3://orai
+echo '{"binaries":{"linux/amd64":"https://orai.s3.us-east-2.amazonaws.com/oraid"}}' > build/manifest.json
 aws s3 cp build/oraid s3://orai --acl public-read
+aws s3 cp build/manifest.json s3://orai --acl public-read
 
-oraid tx gov submit-proposal software-upgrade "ai-oracle" --title "upgrade-demo" --description "upgrade"  --from $USER --upgrade-height 30 --upgrade-info "https://orai.s3.us-east-2.amazonaws.com/oraid" --deposit 10000000orai --chain-id Oraichain -y
+# then submit proposal
+oraid tx gov submit-proposal software-upgrade "ai-oracle" --title "upgrade-demo" --description "upgrade"  --from $USER --upgrade-height 20 --upgrade-info "http://orai.s3.amazonaws.com/manifest.json" --deposit 10000000orai --chain-id Oraichain -y
 
 ```
  
+ Submit a `Yes` vote for the upgrade proposal:
+
+```bash
+oraid tx gov vote 1 yes --from $USER --chain-id Oraichain -y
+```
+
 Query the proposal to ensure it was correctly broadcast and added to a block:
 
 ```bash
 oraid query gov proposal 1
-```
- 
-Submit a `Yes` vote for the upgrade proposal:
-
-```bash
-oraid tx gov vote 1 yes --from $USER --chain-id Oraichain -y
 ```
 
 For the sake of this demonstration, we will hardcode a modification in `oraid` to simulate a code change.
@@ -171,4 +172,4 @@ make build
 cp ./build/oraid $DAEMON_HOME/oraivisor/upgrades/ai-oracle/bin
 ```
 
-The upgrade will occur automatically at height 30.
+The upgrade will occur automatically at height 20.
