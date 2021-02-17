@@ -92,12 +92,6 @@ cd /workspace
 make build
 ```
 
-Create a new key and setup the `oraid` node:
-
-```bash
-./scripts/setup_oraid.sh 12345678
-```
-
 Set the required environment variables:
 
 ```bash
@@ -112,7 +106,17 @@ mkdir -p $DAEMON_HOME/oraivisor/genesis/bin
 cp ./build/oraid $DAEMON_HOME/oraivisor/genesis/bin
 ```
 
-For the sake of this demonstration, we would amend `voting_params.voting_period` in `.oraid/config/genesis.json` to a reduced time ~5 minutes (300s) and eventually launch `oraivisor`:
+Create a new key and setup the `oraid` node:
+
+```bash
+./scripts/setup_oraid.sh 12345678
+```
+
+For the sake of this demonstration, we would amend `voting_params.voting_period` in `.oraid/config/genesis.json` to a reduced time ~2 minutes (120s) and eventually launch `oraivisor`:
+
+```bash
+sed -i 's/voting_period" *: *".*"/voting_period": "120s"/g' .oraid/config/genesis.json
+```
 
 Now oraivisor is a replacement for oraid
 
@@ -123,7 +127,7 @@ oraivisor start
 Submit a software upgrade proposal:
 
 ```bash
-oraid tx gov submit-proposal software-upgrade "ai-oracle" --title "upgrade-demo" --description "upgrade"  --from $USER --upgrade-height 100 --deposit 10000000orai --chain-id Oraichain -y
+oraid tx gov submit-proposal software-upgrade "ai-oracle" --title "upgrade-demo" --description "upgrade"  --from $USER --upgrade-height 50 --deposit 10000000orai --chain-id Oraichain -y
 
 # allow auto download and upgrade form a URL
 export DAEMON_ALLOW_DOWNLOAD_BINARIES=true
@@ -133,7 +137,7 @@ export DAEMON_RESTART_AFTER_UPGRADE=true
 aws s3 mb s3://orai
 aws s3 cp build/oraid s3://orai --acl public-read
 
-oraid tx gov submit-proposal software-upgrade "ai-oracle" --title "upgrade-demo" --description "upgrade"  --from $USER --upgrade-height 100 --upgrade-info "https://orai.s3.us-east-2.amazonaws.com/oraid" --deposit 10000000orai --chain-id Oraichain -y
+oraid tx gov submit-proposal software-upgrade "ai-oracle" --title "upgrade-demo" --description "upgrade"  --from $USER --upgrade-height 50 --upgrade-info "https://orai.s3.us-east-2.amazonaws.com/oraid" --deposit 10000000orai --chain-id Oraichain -y
 
 ```
  
@@ -167,4 +171,4 @@ make build
 cp ./build/oraid $DAEMON_HOME/oraivisor/upgrades/ai-oracle/bin
 ```
 
-The upgrade will occur automatically at height 100.
+The upgrade will occur automatically at height 50.
