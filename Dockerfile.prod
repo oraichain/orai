@@ -24,7 +24,7 @@ RUN cd oraivisor && make build
 # make size smaller
 RUN go get github.com/pwaller/goupx
 RUN goupx /code/build/oraid
-RUN goupx /code/oraivisor/oraivisor
+RUN goupx /code/oraivisor/build/oraivisor
 
 # --------------------------------------------------------
 FROM alpine:3.12
