@@ -323,6 +323,11 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	)
 	app.upgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath)
 
+	// NOTE: upgrade feature
+	app.upgradeKeeper.SetUpgradeHandler("ai-oracle", func(ctx sdk.Context, plan upgradetypes.Plan) {
+		// TODO: Add some modification logic here
+	})
+
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.stakingKeeper = *stakingKeeper.SetHooks(
