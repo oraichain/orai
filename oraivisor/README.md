@@ -124,6 +124,18 @@ Now oraivisor is a replacement for oraid
 oraivisor start
 ```
 
+For the sake of this demonstration, we will hardcode a modification in `oraid` to simulate a code change.
+In `oraid/app.go`, find the line containing the upgrade Keeper initialisation, it should look like
+`app.upgradekeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, ...)`.
+After that line, add the following snippet:
+
+```go
+app.upgradekeeper.SetUpgradeHandler("ai-oracle", func(ctx sdk.Context, plan upgradetypes.Plan) {
+    // Add modification logic		
+})
+```
+then rebuild it with `make build`
+
 Submit a software upgrade proposal:
 
 ```bash
@@ -152,24 +164,6 @@ Query the proposal to ensure it was correctly broadcast and added to a block:
 
 ```bash
 oraid query gov proposal 1
-```
-
-For the sake of this demonstration, we will hardcode a modification in `oraid` to simulate a code change.
-In `oraid/app.go`, find the line containing the upgrade Keeper initialisation, it should look like
-`app.upgradekeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath)`.
-After that line, add the following snippet:
-
- ```go
- app.upgradekeeper.SetUpgradeHandler("ai-oracle", func(ctx sdk.Context, plan upgradetypes.Plan) {
-		// Add modification logic		
-	})
-```
-
-Now recompile a new binary and place it in `$DAEMON_HOME/oraivisor/upgrades/ai-oracle/bin`:
-
-```bash
-make build
-cp ./build/oraid $DAEMON_HOME/oraivisor/upgrades/ai-oracle/bin
 ```
 
 The upgrade will occur automatically at height 20.
