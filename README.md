@@ -33,6 +33,9 @@ ln -s $PWD/build/oraid /usr/bin/oraid
 # start node
 oraid start --rpc.laddr tcp://0.0.0.0:26657 --log_level error
 
+# replace oraid with oraivisor for auto-upgrade
+oraivisor start --rpc.laddr tcp://0.0.0.0:26657 --log_level error
+
 # start websocket subscribe for processing event log in another terminal
 oraid tx websocket subscribe --max-try 10 --from $USER --gas="auto" --gas-adjustment="1.2" --chain-id=$CHAIN_ID -y
 ```

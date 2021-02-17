@@ -19,17 +19,25 @@ RUN sha256sum /lib/libwasmvm_muslc.a | grep 39dc389cc6b556280cbeaebeda2b62cf8849
 
 # force it to use static lib (from above) not standard libgo_cosmwasm.so file
 RUN make build LEDGER_ENABLED=false BUILD_TAGS=muslc GOMOD_FLAGS=
+RUN cd oraivisor && make build
 
 # make size smaller
 RUN go get github.com/pwaller/goupx
 RUN goupx /code/build/oraid
+RUN goupx /code/oraivisor/oraivisor
 
 # --------------------------------------------------------
 FROM alpine:3.12
 
 WORKDIR /workspace
 
-COPY --from=go-builder /code/build/oraid /usr/bin/oraid
+ENV DAEMON_NAME=oraid DAEMON_HOME=/workspace PATH="/workspace/oraivisor/current/bin:${PATH}"
+RUN mkdir -p $DAEMON_HOME/oraivisor/genesis/bin 
+# init first symbolic link to run oraid and later oraivisor will update the link
+RUN ln -s $DAEMON_HOME/oraivisor/genesis $DAEMON_HOME/oraivisor/current
+# copy binaries
+COPY --from=go-builder /code/oraivisor/oraivisor /usr/bin
+COPY --from=go-builder /code/build/oraid $DAEMON_HOME/oraivisor/genesis/bin
 
 RUN apk add nano jq bash ncurses
 

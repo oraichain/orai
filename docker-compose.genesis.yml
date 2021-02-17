@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   orai:
-    image: orai/orai:0.15-alpine
+    image: orai/orai:0.17-alpine
     working_dir: /workspace
     tty: true
     ulimits:
