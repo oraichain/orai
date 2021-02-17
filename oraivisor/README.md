@@ -150,14 +150,14 @@ aws s3 cp build/oraid s3://orai --acl public-read
 aws s3 cp build/manifest.json s3://orai --acl public-read
 
 # then submit proposal
-oraid tx gov submit-proposal software-upgrade "ai-oracle" --title "upgrade-demo" --description "upgrade"  --from $USER --upgrade-height 20 --upgrade-info "http://orai.s3.amazonaws.com/manifest.json" --deposit 10000000orai --chain-id Oraichain -y
+oraid tx gov submit-proposal software-upgrade "ai-oracle" --title "upgrade-demo" --description "upgrade"  --from $USER --upgrade-height 20 --upgrade-info "http://orai.s3.amazonaws.com/manifest.json" --deposit 10000000orai --chain-id $CHAIN_ID -y
 
 ```
  
- Submit a `Yes` vote for the upgrade proposal:
+Submit a `Yes` vote for the upgrade proposal:
 
 ```bash
-oraid tx gov vote 1 yes --from $USER --chain-id Oraichain -y
+oraid tx gov vote 1 yes --from $USER --chain-id $CHAIN_ID -y
 ```
 
 Query the proposal to ensure it was correctly broadcast and added to a block:
