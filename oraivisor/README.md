@@ -139,9 +139,9 @@ then rebuild it with `make build`
 Submit a software upgrade proposal:
 
 ```bash
-# allow auto download and upgrade form a URL
-export DAEMON_ALLOW_DOWNLOAD_BINARIES=true
-export DAEMON_RESTART_AFTER_UPGRADE=true
+# check orai.env for allowing auto download and upgrade form a URL
+# DAEMON_ALLOW_DOWNLOAD_BINARIES=true
+# DAEMON_RESTART_AFTER_UPGRADE=true
 
 # using s3 to store build file
 aws s3 mb s3://orai
