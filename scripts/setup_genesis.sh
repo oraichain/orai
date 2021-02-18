@@ -24,7 +24,7 @@ oraid collect-gentxs
 
 oraid validate-genesis
 
-cat $PWD/.oraid/config/genesis.json | jq .app_state.genutil.gen_txs[0] -c > "$MONIKER"_validators.txt
+# cat $PWD/.oraid/config/genesis.json | jq .app_state.genutil.gen_txs[0] -c > "$MONIKER"_validators.txt
 
 echo "The genesis initiation process has finished ..."
 
