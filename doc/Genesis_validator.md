@@ -4,12 +4,13 @@
 
 ```bash
 curl -OL https://raw.githubusercontent.com/oraichain/oraichain-static-files/master/setup_genesis.sh
+sudo chmod +x setup_genesis.sh
 ```
 
 ### 2. Run the setup file.
 
 ```bash
-sudo chmod -R +x setup_genesis.sh && ./setup_genesis.sh
+./setup_genesis.sh
 ```
 
 ### 3. Edit wallet name and moniker you prefer to create a new wallet and validator.
@@ -36,7 +37,7 @@ After running, there will be three .txt files generated.
 
 One file, which is account.txt, stores your genesis account information as well as its mnemonic. Please keep it safe, and remove the file when you finish storing your account infromation.
 
-The next two files are <moniker_name>_accounts.txt & <moniker_name>_validators.txt. Please copy the contents of these two files and paste them to the following google form: 
+Please upload the .oraid/config/gentx/gentx-*.json file to the following google form: 
 
 ### 8. Wait for the team to setup the genesis file
 
