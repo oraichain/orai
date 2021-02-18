@@ -2,7 +2,6 @@ version: '3.3'
 services:
   orai:
     image: orai/orai:0.17-alpine
-    working_dir: /workspace
     tty: true
     ulimits:
       nofile:
@@ -16,7 +15,7 @@ services:
       - SYS_PTRACE
     env_file:
       - orai.env
-    volumes:      
+    volumes:
       - ./:/workspace
-      - ./init_genesis.sh:/usr/bin/setup
-      - ./fn.sh:/usr/bin/fn
+      - ./scripts/setup_genesis.sh:/usr/bin/setup
+      - ./scripts/fn.sh:/usr/bin/fn
