@@ -63,7 +63,10 @@ printHelp () {
     printBoldColor $BLUE  "          fn sign --key value"           
     echo
     printBoldColor $BROWN "      - 'initScript' - init AI request script"
-    printBoldColor $BLUE  "          fn initScript --key value"           
+    printBoldColor $BLUE  "          fn initScript --key value"    
+    echo
+    printBoldColor $BROWN "      - 'addGenAccount' - add a genesis account with balance"
+    printBoldColor $BLUE  "          fn addGenAccount --address value --amount value"           
     echo
     printBoldColor $BROWN "      - 'clear' - Clear all existing data"
     printBoldColor $BLUE  "          fn clear"           
@@ -187,6 +190,30 @@ checkExpectProgram() {
     echo "Installing expect ..."
     apk add expect
   fi  
+}
+
+addGenAccount(){
+  address=$(getArgument "address")
+  if [ -z "$address" ] 
+  then 
+    echo "Address is empty"
+    exit 1
+  fi 
+
+  amount=$(getArgument "amount" "100000000000000")
+  genesis=.oraid/config/genesis.json
+  account='{"@type":"/cosmos.auth.v1beta1.BaseAccount","address":"'$address'","pub_key":null,"account_number":"0","sequence":"0"}'
+  balance='{"address":"'$address'","coins":[{"denom":"orai","amount":"'$amount'"}]}'
+
+  exsited_account=$(jq '.app_state.auth.accounts[] | select(.address == "'$address'")' $genesis)
+  exsited_balance=$(jq '.app_state.bank.balances[] | select(.address == "'$address'")' $genesis)
+  if [ ! -z "$exsited_account" ] || [ ! -z "$exsited_balance" ]
+  then 
+    echo "$address is already existed"
+  else 
+    result=$(jq --argjson account $account --argjson balance $balance '.app_state.auth.accounts += [$account] | .app_state.bank.balances += [$balance]' $genesis)
+    echo $result | jq > $genesis
+  fi
 }
 
 initFn(){ 
@@ -330,6 +357,9 @@ case "${METHOD}" in
   ;;
   initScript)
     initScriptFn
+  ;;
+  addGenAccount)
+    addGenAccount  
   ;; 
   clear)
     clear

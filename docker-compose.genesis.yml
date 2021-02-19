@@ -1,9 +1,13 @@
 version: '3.3'
 services:
   orai:
+<<<<<<< HEAD
     container_name: orai_node
     image: orai/orai:mainnet-alpine
     working_dir: /workspace
+=======
+    image: orai/orai:0.17-alpine
+>>>>>>> c90adbaaa95c84bb0d116694b8c1af1faf7e0eef
     tty: true
     ulimits:
       nofile:
@@ -17,6 +21,7 @@ services:
       - SYS_PTRACE
     env_file:
       - orai.env
-    volumes:      
+    volumes:
       - ./:/workspace
-      - ./init_genesis.sh:/usr/bin/setup
+      - ./scripts/setup_genesis.sh:/usr/bin/setup
+      - ./scripts/fn.sh:/usr/bin/fn
