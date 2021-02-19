@@ -17,18 +17,18 @@ binary).
 
 `oraivisor` reads its configuration from environment variables:
 
-* `DAEMON_HOME` is the location where upgrade binaries should be kept (e.g. `$HOME/.oraid`).
-* `DAEMON_NAME` is the name of the binary itself (eg. `oraid`, etc).
-* `DAEMON_ALLOW_DOWNLOAD_BINARIES` (*optional*) if set to `true` will enable auto-downloading of new binaries
-(for security reasons, this is intended for full nodes rather than validators).
-* `DAEMON_RESTART_AFTER_UPGRADE` (*optional*) if set to `true` it will restart the sub-process with the same
-command line arguments and flags (but new binary) after a successful upgrade. By default, `oraivisor` dies
-afterwards and allows the supervisor to restart it if needed. Note that this will not auto-restart the child
-if there was an error.
+- `DAEMON_HOME` is the location where upgrade binaries should be kept (e.g. `$HOME/.oraid`).
+- `DAEMON_NAME` is the name of the binary itself (eg. `oraid`, etc).
+- `DAEMON_ALLOW_DOWNLOAD_BINARIES` (_optional_) if set to `true` will enable auto-downloading of new binaries
+  (for security reasons, this is intended for full nodes rather than validators).
+- `DAEMON_RESTART_AFTER_UPGRADE` (_optional_) if set to `true` it will restart the sub-process with the same
+  command line arguments and flags (but new binary) after a successful upgrade. By default, `oraivisor` dies
+  afterwards and allows the supervisor to restart it if needed. Note that this will not auto-restart the child
+  if there was an error.
 
 ## Data Folder Layout
 
-`$DAEMON_HOME/oraivisor` is expected to belong completely to `oraivisor` and 
+`$DAEMON_HOME/oraivisor` is expected to belong completely to `oraivisor` and
 subprocesses that are controlled by it. The folder content is organised as follows:
 
 ```bash
@@ -47,9 +47,9 @@ Each version of the Oraichain application is stored under either `genesis` or `u
 along with any other needed files such as auxiliary client programs or libraries. `current` is a symbolic link to the currently
 active folder (so `current/bin/$DAEMON_NAME` is the currently active binary).
 
-*Note: the `name` variable in `upgrades/<name>` holds the URI-encoded name of the upgrade as specified in the upgrade module plan.*
+_Note: the `name` variable in `upgrades/<name>` holds the URI-encoded name of the upgrade as specified in the upgrade module plan._
 
-Please note that `$DAEMON_HOME/oraivisor` just stores the *binaries* and associated *program code*.
+Please note that `$DAEMON_HOME/oraivisor` just stores the _binaries_ and associated _program code_.
 The `oraivisor` binary can be stored in any typical location (eg `/usr/local/bin`). The actual blockchain
 program will store it's data under their default data directory (e.g. `$HOME/.oraid`) which is independent of
 the `$DAEMON_HOME`. You can choose to set `$DAEMON_HOME` to the actual binary's home directory and then end up
@@ -66,9 +66,10 @@ directory layout:
 ## Usage
 
 The system administrator admin is responsible for:
-* installing the `oraivisor` binary and configure the host's init system (e.g. `systemd`, `launchd`, etc) along with the environmental variables appropriately;
-* installing the `genesis` folder manually;
-* installing the `upgrades/<name>` folders manually.
+
+- installing the `oraivisor` binary and configure the host's init system (e.g. `systemd`, `launchd`, etc) along with the environmental variables appropriately;
+- installing the `genesis` folder manually;
+- installing the `upgrades/<name>` folders manually.
 
 `oraivisor` will set the `current` link to point to `genesis` at first start (when no `current` link exists) and handles
 binaries switch overs at the correct points in time, so that the system administrator can prepare days in advance and relax at upgrade time.
@@ -131,9 +132,10 @@ After that line, add the following snippet:
 
 ```go
 app.upgradekeeper.SetUpgradeHandler("ai-oracle", func(ctx sdk.Context, plan upgradetypes.Plan) {
-    // Add modification logic		
+    // Add modification logic
 })
 ```
+
 then rebuild it with `make build`
 
 Submit a software upgrade proposal:
@@ -145,15 +147,15 @@ Submit a software upgrade proposal:
 
 # using s3 to store build file
 aws s3 mb s3://orai
-echo '{"binaries":{"linux/amd64":"https://orai.s3.us-east-2.amazonaws.com/oraid"}}' > build/manifest.json
 aws s3 cp build/oraid s3://orai --acl public-read
+echo '{"binaries":{"linux/amd64":"https://orai.s3.amazonaws.com/oraid?versionId=new_oraid_version"}}' > build/manifest.json
 aws s3 cp build/manifest.json s3://orai --acl public-read
 
 # then submit proposal
-oraid tx gov submit-proposal software-upgrade "ai-oracle" --title "upgrade-demo" --description "upgrade"  --from $USER --upgrade-height 20 --upgrade-info "http://orai.s3.amazonaws.com/manifest.json" --deposit 10000000orai --chain-id $CHAIN_ID -y
+oraid tx gov submit-proposal software-upgrade "ai-oracle" --title "upgrade-demo" --description "upgrade"  --from $USER --upgrade-height 20 --upgrade-info "https://orai.s3.amazonaws.com/manifest.json?versionId=new_manifest_version" --deposit 10000000orai --chain-id $CHAIN_ID -y
 
 ```
- 
+
 Submit a `Yes` vote for the upgrade proposal:
 
 ```bash
