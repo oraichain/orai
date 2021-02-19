@@ -18,6 +18,7 @@ require (
 	github.com/oasisprotocol/oasis-core/go v0.2012.4
 	github.com/pelletier/go-toml v1.8.1 // indirect
 	github.com/pkg/errors v0.9.1
+	github.com/pwaller/goupx v0.0.0-20160623083017-1d58e01d5ce2 // indirect
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/zerolog v1.20.0
 	github.com/segmentio/ksuid v1.0.3

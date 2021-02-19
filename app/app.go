@@ -707,10 +707,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 }
 
 func (app *OraichainApp) upgradeHandler() {
-	planNames := []string{}
-	for _, planName := range planNames {
-		app.upgradeKeeper.SetUpgradeHandler(planName, func(ctx sdk.Context, plan upgradetypes.Plan) {
-			// upgrade changes here
-		})
-	}
+	// app.upgradeKeeper.SetUpgradeHandler("ai-oracle-v7", func(ctx sdk.Context, plan upgradetypes.Plan) {
+	// 	// upgrade changes here
+	// })
 }
