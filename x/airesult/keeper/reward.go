@@ -8,9 +8,9 @@ import (
 )
 
 // SetReward saves the reward to the storage without performing validation.
-func (k Keeper) SetReward(ctx sdk.Context, blockHeight int64, rew *types.Reward) error {
+func (k Keeper) SetReward(ctx sdk.Context, rew *types.Reward) error {
 	bz, err := k.cdc.MarshalBinaryBare(rew)
-	ctx.KVStore(k.storeKey).Set(types.RewardStoreKey(blockHeight), bz)
+	ctx.KVStore(k.storeKey).Set(types.RewardStoreKey(rew.BlockHeight), bz)
 	return err
 }
 
@@ -63,6 +63,6 @@ func (k Keeper) ProcessReward(ctx sdk.Context) {
 	// check if the reward is empty or not
 	if len(reward.Validators) > 0 {
 		k.Logger(ctx).Info(fmt.Sprintf("block for reward: %v\n", blockHeight))
-		k.SetReward(ctx, blockHeight, reward)
+		k.SetReward(ctx, reward)
 	}
 }

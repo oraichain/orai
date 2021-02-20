@@ -32,7 +32,6 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo) {
 	}
 	remaining := reward
 	//Allocate non-community pool tokens to active validators weighted by voting power.
-
 	// reward for test cases that contribute
 	for _, testCase := range rewardObj.TestCases {
 		// send coins to test case owner addresses
@@ -51,22 +50,22 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo) {
 
 	// fix check division by zero
 	if rewardObj.TotalPower <= int64(0) {
+		k.Logger(ctx).Error(fmt.Sprintf("total power zero\n"))
 		return
-	} else {
-		for _, val := range rewardObj.Validators {
-			powerFraction := sdk.NewDec(val.GetVotingPower()).QuoTruncate(sdk.NewDec(rewardObj.TotalPower))
-			// since validator fees here is the sum of all validator fees, so we need to divide with total number of validators to get fees for one validator.
-			valRewardDec := sdk.NewDecCoinsFromCoins(rewardObj.ValidatorFees...).QuoDec(sdk.NewDec(int64(len(rewardObj.Validators)))).MulDec(powerFraction)
-			valRewardInt, _ := valRewardDec.TruncateDecimal()
-			err = k.bankKeeper.SendCoinsFromModuleToModule(ctx, k.feeCollectorName, distr.ModuleName, valRewardInt)
-			if err != nil {
-				k.Logger(ctx).Error(fmt.Sprintf("error in sending coins from fee collector to distrution module: %v\n", err.Error()))
-				return
-			}
-			// allocate tokens to validator with a specific commission
-			k.distrKeeper.AllocateTokensToValidator(ctx, k.stakingKeeper.Validator(ctx, val.GetAddress()), valRewardDec)
-			remaining = remaining.Sub(valRewardDec)
+	}
+	for _, val := range rewardObj.Validators {
+		powerFraction := sdk.NewDec(val.GetVotingPower()).QuoTruncate(sdk.NewDec(rewardObj.TotalPower))
+		// since validator fees here is the sum of all validator fees, so we need to divide with total number of validators to get fees for one validator.
+		valRewardDec := sdk.NewDecCoinsFromCoins(rewardObj.ValidatorFees...).QuoDec(sdk.NewDec(int64(len(rewardObj.Validators)))).MulDec(powerFraction)
+		valRewardInt, _ := valRewardDec.TruncateDecimal()
+		err = k.bankKeeper.SendCoinsFromModuleToModule(ctx, k.feeCollectorName, distr.ModuleName, valRewardInt)
+		if err != nil {
+			k.Logger(ctx).Error(fmt.Sprintf("error in sending coins from fee collector to distrution module: %v\n", err.Error()))
+			return
 		}
+		// allocate tokens to validator with a specific commission
+		k.distrKeeper.AllocateTokensToValidator(ctx, k.stakingKeeper.Validator(ctx, val.GetAddress()), valRewardDec)
+		remaining = remaining.Sub(valRewardDec)
 	}
 
 	// allocate community funding

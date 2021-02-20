@@ -128,7 +128,7 @@ func TestAllocateTokensToManyValidators(t *testing.T) {
 	require.Equal(t, &airequest.AIRequest{RequestID: id}, aiRequest)
 
 	// init reward
-	reward := airesulttypes.DefaultReward(0)
+	reward := airesulttypes.DefaultReward(1)
 
 	// init data sources
 	firstDataSource := providertypes.NewAIDataSource("first data source", "abc", addrs[0], sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5))), "none")
@@ -165,7 +165,6 @@ func TestAllocateTokensToManyValidators(t *testing.T) {
 	reward.Validators = append(reward.Validators, *validatorA)
 	reward.Validators = append(reward.Validators, *validatorB)
 	reward.Validators = append(reward.Validators, *validatorC)
-	reward.BlockHeight = 0
 
 	temp := reward.ProviderFees
 
@@ -173,7 +172,17 @@ func TestAllocateTokensToManyValidators(t *testing.T) {
 	reward.ProviderFees = reward.ProviderFees.Add(temp...).Add(temp...)
 
 	// set reward
-	testKeeper.Keeper.SetReward(ctx, 0, reward)
+	testKeeper.Keeper.SetReward(ctx, reward)
+
+	t.Logf("balance of provider 1: %v\n", app.BankKeeper.GetBalance(ctx, addrs[0], sdk.DefaultBondDenom))
+
+	t.Logf("balance of provider 2: %v\n", app.BankKeeper.GetBalance(ctx, addrs[1], sdk.DefaultBondDenom))
+
+	t.Logf("balance of provider 3: %v\n", app.BankKeeper.GetBalance(ctx, addrs[2], sdk.DefaultBondDenom))
+
+	t.Logf("balance of provider 4: %v\n", app.BankKeeper.GetBalance(ctx, addrs[3], sdk.DefaultBondDenom))
+
+	t.Logf("balance of provider 5: %v\n", app.BankKeeper.GetBalance(ctx, addrs[4], sdk.DefaultBondDenom))
 
 	testKeeper.Keeper.AllocateTokens(ctx, votes)
 
@@ -193,7 +202,19 @@ func TestAllocateTokensToManyValidators(t *testing.T) {
 	require.Equal(t, int64(reward.TotalPower), validatorA.VotingPower+validatorB.VotingPower+validatorC.VotingPower)
 	require.Equal(t, int64(reward.TotalPower), int64(70))
 
-	t.Logf("outstanding reward of validators: %v\n", app.DistrKeeper.GetValidatorOutstandingRewards(ctx, valAddrs[8]).Rewards)
+	t.Logf("after allocation\n")
+
+	t.Logf("outstanding reward of validators: %v\n", app.DistrKeeper.GetValidatorOutstandingRewards(ctx, valAddrs[8]))
+
+	t.Logf("balance of provider 1: %v\n", app.BankKeeper.GetBalance(ctx, addrs[0], sdk.DefaultBondDenom))
+
+	t.Logf("balance of provider 2: %v\n", app.BankKeeper.GetBalance(ctx, addrs[1], sdk.DefaultBondDenom))
+
+	t.Logf("balance of provider 3: %v\n", app.BankKeeper.GetBalance(ctx, addrs[2], sdk.DefaultBondDenom))
+
+	t.Logf("balance of provider 4: %v\n", app.BankKeeper.GetBalance(ctx, addrs[3], sdk.DefaultBondDenom))
+
+	t.Logf("balance of provider 5: %v\n", app.BankKeeper.GetBalance(ctx, addrs[4], sdk.DefaultBondDenom))
 }
 
 func TestAllocateTokensTruncation(t *testing.T) {

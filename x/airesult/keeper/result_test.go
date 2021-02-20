@@ -95,12 +95,19 @@ func TestResolveResult(t *testing.T) {
 	t.Logf("result after resolve with 2 validators: %v\n", result.Status)
 
 	for i := 0; i < 68; i++ {
-		// test result with 2 validators aka two reports, total 70% reports to finish
+		// test result with 100 validators aka 100 reports, total 70% reports to finish
 		testKeeper.Keeper.ResolveResult(ctx, report, 100, 70)
 	}
 
 	result, err = testKeeper.Keeper.GetResult(ctx, id)
-	t.Logf("result after resolve with 2 validators: %v\n", result.Status)
+	t.Logf("result after resolve with 100 validators and 68 reports: %v\n", result.Status)
+	require.Equal(t, "pending", result.Status)
+
+	// add another report to the list of 100 reports will lead to finished
+	testKeeper.Keeper.ResolveResult(ctx, report, 100, 70)
+	result, err = testKeeper.Keeper.GetResult(ctx, id)
+	t.Logf("result after resolve with 100 validators and 69 reports: %v\n", result.Status)
+	require.Equal(t, "finished", result.Status)
 
 	id = ksuid.New().String()
 	report = websockettypes.NewReport(id, dsResults, tcResults, 1, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(29))), []byte{0x50}, reporter, "")
@@ -113,4 +120,5 @@ func TestResolveResult(t *testing.T) {
 
 	result, err = testKeeper.Keeper.GetResult(ctx, id)
 	t.Logf("result after resolve with 1 validator: %v\n", result.Status)
+	require.Equal(t, "finished", result.Status)
 }
