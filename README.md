@@ -74,11 +74,11 @@ RUST_BACKTRACE=1 cargo unit-test -- --exact contract::tests::increment --show-ou
 
 ./scripts/deploy-contract.sh smart-contracts/datasource-eth/artifacts/datasource_eth.wasm "datasource-eth 1" ''
 
-oraid tx provider set-datasource eth_price $CONTRACT "test eth price" --from duc --chain-id $CHAIN_ID -y
+oraid tx provider set-datasource eth_price $CONTRACT "test eth price" --from duc --chain-id $CHAIN_ID -y --fees 5000orai
 
 ./scripts/deploy-contract.sh smart-contracts/testcase-price/artifacts/testcase_price.wasm "testcase-price 1" ''
 
-oraid tx provider set-testcase eth_price_testcase $CONTRACT "test eth price testcase" --from duc --chain-id $CHAIN_ID -y
+oraid tx provider set-testcase eth_price_testcase $CONTRACT "test eth price testcase" --from duc --chain-id $CHAIN_ID -y --fees 5000orai
 
 ./scripts/deploy-contract.sh smart-contracts/oscript-price/artifacts/oscript_price.wasm "oscript-price 1" '{"ai_data_source":"datasource_eth","testcase":"testcase_price"}'
 

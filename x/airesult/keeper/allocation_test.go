@@ -128,7 +128,7 @@ func TestAllocateTokensToManyValidators(t *testing.T) {
 	require.Equal(t, &airequest.AIRequest{RequestID: id}, aiRequest)
 
 	// init reward
-	reward := airesulttypes.DefaultReward(1)
+	reward := airesulttypes.DefaultReward(0)
 
 	// init data sources
 	firstDataSource := providertypes.NewAIDataSource("first data source", "abc", addrs[0], sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5))), "none")
@@ -184,23 +184,26 @@ func TestAllocateTokensToManyValidators(t *testing.T) {
 
 	t.Logf("balance of provider 5: %v\n", app.BankKeeper.GetBalance(ctx, addrs[4], sdk.DefaultBondDenom))
 
-	testKeeper.Keeper.AllocateTokens(ctx, votes)
+	testKeeper.Keeper.AllocateTokens(ctx, votes, 1)
+	rewardObj, err := testKeeper.Keeper.GetReward(ctx, 1-1)
+
+	require.NoError(t, err)
 
 	// confirm that each validator fee is 8.4 ORAI
 	require.Equal(t, sdk.Coins{{Denom: sdk.DefaultBondDenom, Amount: sdk.NewInt(8)}}, valFees)
 
-	// provider fees must equal 21 ORAI
-	require.Equal(t, sdk.DecCoins{{Denom: sdk.DefaultBondDenom, Amount: sdk.NewDecWithPrec(21, 0)}}, sdk.NewDecCoinsFromCoins(temp...))
+	// provider fees must equal 21 * 3 ORAI (3 validators)
+	require.Equal(t, sdk.DecCoins{{Denom: sdk.DefaultBondDenom, Amount: sdk.NewDecWithPrec(63, 0)}}, sdk.NewDecCoinsFromCoins(rewardObj.ProviderFees...))
 
 	// validator fees must equal 24 ORAI
-	require.Equal(t, sdk.Coins{{Denom: sdk.DefaultBondDenom, Amount: sdk.NewInt(24)}}, reward.ValidatorFees)
+	require.Equal(t, sdk.Coins{{Denom: sdk.DefaultBondDenom, Amount: sdk.NewInt(24)}}, rewardObj.ValidatorFees)
 
 	// reward must equal to 87 ORAI
-	require.Equal(t, sdk.Coins{{Denom: sdk.DefaultBondDenom, Amount: sdk.NewInt(87)}}, reward.ProviderFees.Add(reward.ValidatorFees...))
+	require.Equal(t, sdk.Coins{{Denom: sdk.DefaultBondDenom, Amount: sdk.NewInt(87)}}, rewardObj.ProviderFees.Add(rewardObj.ValidatorFees...))
 
 	// total power must equal
-	require.Equal(t, int64(reward.TotalPower), validatorA.VotingPower+validatorB.VotingPower+validatorC.VotingPower)
-	require.Equal(t, int64(reward.TotalPower), int64(70))
+	require.Equal(t, int64(rewardObj.TotalPower), validatorA.VotingPower+validatorB.VotingPower+validatorC.VotingPower)
+	require.Equal(t, int64(rewardObj.TotalPower), int64(70))
 
 	t.Logf("after allocation\n")
 
@@ -215,6 +218,16 @@ func TestAllocateTokensToManyValidators(t *testing.T) {
 	t.Logf("balance of provider 4: %v\n", app.BankKeeper.GetBalance(ctx, addrs[3], sdk.DefaultBondDenom))
 
 	t.Logf("balance of provider 5: %v\n", app.BankKeeper.GetBalance(ctx, addrs[4], sdk.DefaultBondDenom))
+
+	require.Equal(t, sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10000000015))), app.BankKeeper.GetBalance(ctx, addrs[0], sdk.DefaultBondDenom))
+
+	require.Equal(t, sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10000000015))), app.BankKeeper.GetBalance(ctx, addrs[0], sdk.DefaultBondDenom))
+
+	require.Equal(t, sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10000000009))), app.BankKeeper.GetBalance(ctx, addrs[0], sdk.DefaultBondDenom))
+
+	require.Equal(t, sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10000000012))), app.BankKeeper.GetBalance(ctx, addrs[0], sdk.DefaultBondDenom))
+
+	require.Equal(t, sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(10000000012))), app.BankKeeper.GetBalance(ctx, addrs[0], sdk.DefaultBondDenom))
 }
 
 func TestAllocateTokensTruncation(t *testing.T) {

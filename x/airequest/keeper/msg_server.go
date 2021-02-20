@@ -62,13 +62,13 @@ func (k msgServer) CreateAIRequest(goCtx context.Context, msg *types.MsgSetAIReq
 		return nil, sdkerrors.Wrap(types.ErrNeedMoreFees, "Fees given by the users are less than the total fees needed")
 	}
 
-	// // check if the account has enough spendable coins
-	// spendableCoins := k.keeper.bankKeeper.SpendableCoins(ctx, msg.Creator)
-	// // If the total fee is larger or equal to the spendable coins of the user then we return error
-	// if requiredFees.IsAnyGTE(spendableCoins) {
-	// 	k.keeper.Logger(ctx).Error(fmt.Sprintf("Your account has run out of tokens to create the AI Request\n"))
-	// 	return nil, sdkerrors.Wrap(types.ErrNeedMoreFees, "Your account has run out of tokens to create the AI Request")
-	// }
+	// check if the account has enough spendable coins
+	spendableCoins := k.keeper.bankKeeper.SpendableCoins(ctx, msg.Creator)
+	// If the total fee is larger or equal to the spendable coins of the user then we return error
+	if requiredFees.IsAnyGTE(spendableCoins) {
+		k.keeper.Logger(ctx).Error(fmt.Sprintf("Your account has run out of tokens to create the AI Request\n"))
+		return nil, sdkerrors.Wrap(types.ErrNeedMoreFees, "Your account has run out of tokens to create the AI Request")
+	}
 
 	// substract coins in the creator wallet to charge fees
 	err = k.keeper.bankKeeper.SubtractCoins(ctx, msg.Creator, providedFees)

@@ -11,9 +11,9 @@ import (
 )
 
 // AllocateTokens allocates the tokens to the validators that participate in the AI request handling
-func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo) {
+func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, blockHeight int64) {
 	// get reward from the previous block
-	rewardObj, err := k.GetReward(ctx, ctx.BlockHeight()-int64(1))
+	rewardObj, err := k.GetReward(ctx, blockHeight-1)
 	// If there's no reward in the previous block, then we do not handle
 	if err != nil || rewardObj.BlockHeight == int64(-1) {
 		return
@@ -35,14 +35,20 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo) {
 	// reward for test cases that contribute
 	for _, testCase := range rewardObj.TestCases {
 		// send coins to test case owner addresses
+		temp := k.bankKeeper.GetBalance(ctx, testCase.GetOwner(), "orai")
 		k.bankKeeper.SendCoinsFromModuleToAccount(ctx, k.feeCollectorName, testCase.GetOwner(), testCase.GetFees())
+		rewardCollected := k.bankKeeper.GetBalance(ctx, testCase.GetOwner(), "orai").Sub(temp)
+		k.Logger(ctx).Info(fmt.Sprintf("Reward collected for the following address %v - %v\n", testCase.GetOwner().String(), rewardCollected))
 		remaining = remaining.Sub(sdk.NewDecCoinsFromCoins(testCase.GetFees()...))
 	}
 
 	// reward for test cases that contribute
 	for _, dataSource := range rewardObj.DataSources {
 		// send coins to data source owner addresses
+		temp := k.bankKeeper.GetBalance(ctx, dataSource.GetOwner(), "orai")
 		k.bankKeeper.SendCoinsFromModuleToAccount(ctx, k.feeCollectorName, dataSource.GetOwner(), dataSource.GetFees())
+		rewardCollected := k.bankKeeper.GetBalance(ctx, dataSource.GetOwner(), "orai").Sub(temp)
+		k.Logger(ctx).Info(fmt.Sprintf("Reward collected for the following address %v - %v\n", dataSource.GetOwner().String(), rewardCollected))
 		remaining = remaining.Sub(sdk.NewDecCoinsFromCoins(dataSource.GetFees()...))
 	}
 	// reward for the validators that contribute in the ai request test
@@ -65,6 +71,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo) {
 		}
 		// allocate tokens to validator with a specific commission
 		k.distrKeeper.AllocateTokensToValidator(ctx, k.stakingKeeper.Validator(ctx, val.GetAddress()), valRewardDec)
+		k.Logger(ctx).Info(fmt.Sprintf("outstanding reward of validator %v - %v\n", val.GetAddress().String(), k.distrKeeper.GetValidatorAccumulatedCommission(ctx, val.GetAddress())))
 		remaining = remaining.Sub(valRewardDec)
 	}
 
