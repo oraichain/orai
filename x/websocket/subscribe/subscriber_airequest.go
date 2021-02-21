@@ -35,7 +35,7 @@ func (subscriber *Subscriber) submitReport(msgReport *types.MsgCreateReport) (er
 		if err == nil {
 			break
 		}
-		subscriber.log.Info(":warning: Failed to broadcast tx with error: %s", err.Error())
+		subscriber.log.Error(":warning: Failed to broadcast tx with error: %s", err.Error())
 		time.Sleep(subscriber.config.RPCPollInterval)
 	}
 
@@ -50,6 +50,7 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 
 	// Skip if not related to this validator
 	validators := attrMap[aiRequest.AttributeRequestValidator]
+	subscriber.log.Info(":delivery_truck: Validator lists: ", validators)
 	currentValidator := sdk.ValAddress(subscriber.cliCtx.GetFromAddress()).String()
 	hasMe := false
 	for _, validator := range validators {

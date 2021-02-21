@@ -12,13 +12,14 @@ import (
 
 func TestCalucateMol(t *testing.T) {
 	k := &keeper.Keeper{}
-	size := 99
-	maxValidatorSize := 100
+	size := 5
+	maxValidatorSize := 5
 	totalPowers := int64(1000000)
 	randomGenerator, _ := rng.NewRng(make([]byte, types.RngSeedSize), []byte("nonce"), []byte("Oraichain"))
 	valOperators := make([]sdk.ValAddress, maxValidatorSize)
+	t.Logf("Validator length: %v\n", len(valOperators))
 	for i := 0; i < maxValidatorSize; i++ {
-		valOperators = append(valOperators, ed25519.GenPrivKey().PubKey().Address().Bytes())
+		valOperators[i] = ed25519.GenPrivKey().PubKey().Address().Bytes()
 	}
 
 	validators := k.SampleIndexes(valOperators, size, randomGenerator, totalPowers)

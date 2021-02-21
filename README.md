@@ -37,7 +37,7 @@ oraid start --rpc.laddr tcp://0.0.0.0:26657 --log_level error
 oraivisor start --rpc.laddr tcp://0.0.0.0:26657 --log_level error
 
 # start websocket subscribe for processing event log in another terminal
-oraid tx websocket subscribe --max-try 10 --from $USER --gas="auto" --gas-adjustment="1.2" --chain-id=$CHAIN_ID -y
+echo 123456789 | oraid tx websocket subscribe --max-try 10 --from $USER --gas="auto" --gas-adjustment="1.2" --chain-id=Oraichain -y
 
 # run as a background process
 docker-compose exec -d orai ash -c "echo $KEYRING_PASS | oraid tx websocket subscribe --max-try 10 --from $USER --gas="auto" --gas-adjustment="1.2" --chain-id=Oraichain -y"
@@ -85,7 +85,7 @@ oraid tx provider set-testcase eth_price_testcase $CONTRACT "test eth price test
 oraid tx provider set-oscript oscript_eth $CONTRACT "test eth price oracle script" --ds eth_price --tc eth_price_testcase --from duc --chain-id $CHAIN_ID -y
 
 # open another terminal and run
-oraid tx airequest set-aireq oscript_eth "5" "6" 30000orai 1 --from duc --chain-id $CHAIN_ID -y
+oraid tx airequest set-aireq oscript_eth "5" "6" 30000orai 1 --from $USER --chain-id $CHAIN_ID -y
 
 # Check if the AI request has finished executing
 oraid query airesult fullreq <request-id>

@@ -3,6 +3,8 @@ package keeper
 import (
 	//"fmt"
 
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -30,11 +32,13 @@ func (k Keeper) RandomValidators(ctx sdk.Context, size int, nonce []byte) ([]sdk
 	} else {
 		k.Logger(ctx).Info("enough validators")
 		valOperators := k.createValSamplingList(ctx, maxValidatorSize)
+		k.Logger(ctx).Error(fmt.Sprintf("AI request validator operators: %v\n", valOperators))
 		randomGenerator, err := rng.NewRng(k.GetRngSeed(ctx), nonce, []byte(ctx.ChainID()))
 		if err != nil {
 			return nil, sdkerrors.Wrapf(types.ErrSeedinitiation, err.Error())
 		}
 		validators := k.SampleIndexes(valOperators, size, randomGenerator, totalPowers)
+		k.Logger(ctx).Error(fmt.Sprintf("AI request validator list final: %v\n", validators))
 		return validators, nil
 	}
 }
@@ -102,6 +106,9 @@ func (k *Keeper) SampleIndexes(valOperators []sdk.ValAddress, size int, randomGe
 		// time++
 		// fmt.Printf("%d) quotient :%v\n", time, quotient)
 		// if the quotient is in the sampling list, and it is not in the chosen validator map range then we pick it
+		if quotient == valOperatorLen {
+			quotient--
+		}
 		if !chosenVal[quotient] {
 			// add to the chosen validator list
 			chosenVal[quotient] = true
