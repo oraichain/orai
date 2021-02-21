@@ -143,5 +143,8 @@ func (subscriber *Subscriber) Subscribe() error {
 }
 
 func (subscriber *Subscriber) newTxFactory(memo string) tx.Factory {
-	return subscriber.config.Txf.WithMemo(memo)
+	// set sequence = 0 to retrieve later
+	return subscriber.config.Txf.
+		WithSequence(0).
+		WithMemo(memo)
 }
