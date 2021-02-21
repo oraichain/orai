@@ -3,6 +3,7 @@ package oraivisor
 import (
 	"bufio"
 	"regexp"
+	"strings"
 )
 
 // Trim off whitespace around the info - match least greedy, grab as much space on both sides
@@ -29,6 +30,13 @@ type UpgradeInfo struct {
 func WaitForUpdate(scanner *bufio.Scanner) (*UpgradeInfo, error) {
 	for scanner.Scan() {
 		line := scanner.Text()
+
+		// pre-check incase processing wrong string
+		if !strings.HasPrefix(line, "UPGRADE") {
+			continue
+		}
+
+		// the do regular match
 		if upgradeRegex.MatchString(line) {
 			subs := upgradeRegex.FindStringSubmatch(line)
 			info := UpgradeInfo{
