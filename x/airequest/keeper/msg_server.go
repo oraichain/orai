@@ -98,10 +98,6 @@ func (k msgServer) CreateAIRequest(goCtx context.Context, msg *types.MsgSetAIReq
 			sdk.NewAttribute(types.AttributeRequestValidator, validator.String()),
 		)
 	}
-	// event test
-	event = event.AppendAttributes(
-		sdk.NewAttribute(types.AttributeRequestValidator, "abcdefgh"),
-	)
 
 	// these are multiple attribute for array
 	for _, aiDataSource := range aiDataSources {
