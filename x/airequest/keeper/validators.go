@@ -91,8 +91,13 @@ func (k Keeper) createValSamplingList(ctx sdk.Context, maxValidatorSize int) (va
 func (k *Keeper) SampleIndexes(valOperators []sdk.ValAddress, size int, randomGenerator *rng.Rng, totalPowers int64) []sdk.ValAddress {
 
 	validators := make([]sdk.ValAddress, size)
-	for i := 0; i < size; {
-		chosen := valOperators[randomGenerator.RandUint64()%uint64(len(valOperators))]
+	for i := 0; i < size; i++ {
+		valLen := uint64(len(valOperators))
+		// something wrong
+		if valLen == 0 {
+			break
+		}
+		chosen := valOperators[randomGenerator.RandUint64()%valLen]
 		// remove chosen validator from map
 		valOperators = filter(valOperators, chosen)
 		validators[i] = chosen
