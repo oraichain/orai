@@ -4,9 +4,9 @@ import (
 	//"fmt"
 
 	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution/types"
+	"github.com/oraichain/orai/x/provider"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
@@ -35,9 +35,9 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, block
 	// reward for test cases that contribute
 	for _, testCase := range rewardObj.TestCases {
 		// send coins to test case owner addresses
-		temp := k.bankKeeper.GetBalance(ctx, testCase.GetOwner(), "orai")
+		temp := k.bankKeeper.GetBalance(ctx, testCase.GetOwner(), provider.Denom)
 		k.bankKeeper.SendCoinsFromModuleToAccount(ctx, k.feeCollectorName, testCase.GetOwner(), testCase.GetFees())
-		rewardCollected := k.bankKeeper.GetBalance(ctx, testCase.GetOwner(), "orai").Sub(temp)
+		rewardCollected := k.bankKeeper.GetBalance(ctx, testCase.GetOwner(), provider.Denom).Sub(temp)
 		k.Logger(ctx).Info(fmt.Sprintf("Reward collected for the following address %v - %v\n", testCase.GetOwner().String(), rewardCollected))
 		remaining = remaining.Sub(sdk.NewDecCoinsFromCoins(testCase.GetFees()...))
 	}
@@ -45,9 +45,9 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, block
 	// reward for test cases that contribute
 	for _, dataSource := range rewardObj.DataSources {
 		// send coins to data source owner addresses
-		temp := k.bankKeeper.GetBalance(ctx, dataSource.GetOwner(), "orai")
+		temp := k.bankKeeper.GetBalance(ctx, dataSource.GetOwner(), provider.Denom)
 		k.bankKeeper.SendCoinsFromModuleToAccount(ctx, k.feeCollectorName, dataSource.GetOwner(), dataSource.GetFees())
-		rewardCollected := k.bankKeeper.GetBalance(ctx, dataSource.GetOwner(), "orai").Sub(temp)
+		rewardCollected := k.bankKeeper.GetBalance(ctx, dataSource.GetOwner(), provider.Denom).Sub(temp)
 		k.Logger(ctx).Info(fmt.Sprintf("Reward collected for the following address %v - %v\n", dataSource.GetOwner().String(), rewardCollected))
 		remaining = remaining.Sub(sdk.NewDecCoinsFromCoins(dataSource.GetFees()...))
 	}

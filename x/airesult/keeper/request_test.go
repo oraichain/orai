@@ -80,7 +80,7 @@ func TestResolveRequestsFromReports(t *testing.T) {
 	testKeeper.ProviderKeeper.SetTestCase(ctx, secondTestCase.GetName(), secondTestCase)
 
 	// init oscript
-	oscript := providertypes.NewOracleScript("oscript", "abc", addrs[0], "new oracle script", sdk.NewCoins(sdk.NewCoin("orai", sdk.NewInt(29))), []string{firstDataSource.Name, secondDataSource.Name, thirdDataSource.Name}, []string{firstDataSource.Name, secondTestCase.Name})
+	oscript := providertypes.NewOracleScript("oscript", "abc", addrs[0], "new oracle script", sdk.NewCoins(sdk.NewCoin(provider.Denom, sdk.NewInt(29))), []string{firstDataSource.Name, secondDataSource.Name, thirdDataSource.Name}, []string{firstDataSource.Name, secondTestCase.Name})
 
 	// init ai request
 	id := ksuid.New().String()
