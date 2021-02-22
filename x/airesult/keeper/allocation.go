@@ -4,6 +4,7 @@ import (
 	//"fmt"
 
 	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/oraichain/orai/x/provider"
@@ -31,38 +32,67 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, block
 		return
 	}
 	remaining := reward
+	hasNeg := false
+
 	//Allocate non-community pool tokens to active validators weighted by voting power.
 	// reward for test cases that contribute
 	for _, testCase := range rewardObj.TestCases {
+
+		// safesub to prevent panic
+		remaining, hasNeg = remaining.SafeSub(sdk.NewDecCoinsFromCoins(testCase.GetFees()...))
+		if hasNeg {
+			k.Logger(ctx).Error(fmt.Sprintf("not enough balance to reward test case :%v, \n", testCase.Name))
+			return
+		}
+
 		// send coins to test case owner addresses
 		temp := k.bankKeeper.GetBalance(ctx, testCase.GetOwner(), provider.Denom)
 		k.bankKeeper.SendCoinsFromModuleToAccount(ctx, k.feeCollectorName, testCase.GetOwner(), testCase.GetFees())
 		rewardCollected := k.bankKeeper.GetBalance(ctx, testCase.GetOwner(), provider.Denom).Sub(temp)
 		k.Logger(ctx).Info(fmt.Sprintf("Reward collected for the following address %v - %v\n", testCase.GetOwner().String(), rewardCollected))
-		remaining = remaining.Sub(sdk.NewDecCoinsFromCoins(testCase.GetFees()...))
 	}
 
 	// reward for test cases that contribute
 	for _, dataSource := range rewardObj.DataSources {
+
+		// safesub to prevent panic
+		remaining, hasNeg = remaining.SafeSub(sdk.NewDecCoinsFromCoins(dataSource.GetFees()...))
+		if hasNeg {
+			k.Logger(ctx).Error(fmt.Sprintf("not enough balance to reward data source :%v, \n", dataSource.Name))
+			return
+		}
+
 		// send coins to data source owner addresses
 		temp := k.bankKeeper.GetBalance(ctx, dataSource.GetOwner(), provider.Denom)
 		k.bankKeeper.SendCoinsFromModuleToAccount(ctx, k.feeCollectorName, dataSource.GetOwner(), dataSource.GetFees())
 		rewardCollected := k.bankKeeper.GetBalance(ctx, dataSource.GetOwner(), provider.Denom).Sub(temp)
 		k.Logger(ctx).Info(fmt.Sprintf("Reward collected for the following address %v - %v\n", dataSource.GetOwner().String(), rewardCollected))
-		remaining = remaining.Sub(sdk.NewDecCoinsFromCoins(dataSource.GetFees()...))
+
 	}
 	// reward for the validators that contribute in the ai request test
 	// transfer collected fees to the distribution module account to distribute the oracle rewards to the validators. Note that if we transfer all the transaction fees, then other modules won't be able to handle allocation
 
-	// fix check division by zero
-	if rewardObj.TotalPower <= int64(0) {
+	decValLen := sdk.NewDec(int64(len(rewardObj.Validators)))
+	decTotalPower := sdk.NewDec(rewardObj.TotalPower)
+
+	// fix check division by zero, no validator or zero total power
+	if decValLen.IsZero() || decValLen.IsZero() {
 		k.Logger(ctx).Error(fmt.Sprintf("total power zero\n"))
 		return
 	}
+
 	for _, val := range rewardObj.Validators {
-		powerFraction := sdk.NewDec(val.GetVotingPower()).QuoTruncate(sdk.NewDec(rewardObj.TotalPower))
+		powerFraction := sdk.NewDec(val.GetVotingPower()).QuoTruncate(decTotalPower)
 		// since validator fees here is the sum of all validator fees, so we need to divide with total number of validators to get fees for one validator.
-		valRewardDec := sdk.NewDecCoinsFromCoins(rewardObj.ValidatorFees...).QuoDec(sdk.NewDec(int64(len(rewardObj.Validators)))).MulDec(powerFraction)
+		valRewardDec := sdk.NewDecCoinsFromCoins(rewardObj.ValidatorFees...).QuoDec(decValLen).MulDec(powerFraction)
+
+		// safesub to prevent panic
+		remaining, hasNeg = remaining.SafeSub(valRewardDec)
+		if hasNeg {
+			k.Logger(ctx).Error(fmt.Sprintf("not enough balance to reward validator :%v, \n", val.GetAddress()))
+			return
+		}
+
 		valRewardInt, _ := valRewardDec.TruncateDecimal()
 		err = k.bankKeeper.SendCoinsFromModuleToModule(ctx, k.feeCollectorName, distr.ModuleName, valRewardInt)
 		if err != nil {
@@ -72,7 +102,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, block
 		// allocate tokens to validator with a specific commission
 		k.distrKeeper.AllocateTokensToValidator(ctx, k.stakingKeeper.Validator(ctx, val.GetAddress()), valRewardDec)
 		k.Logger(ctx).Info(fmt.Sprintf("outstanding reward of validator %v - %v\n", val.GetAddress().String(), k.distrKeeper.GetValidatorAccumulatedCommission(ctx, val.GetAddress())))
-		remaining = remaining.Sub(valRewardDec)
+
 	}
 
 	// allocate community funding
