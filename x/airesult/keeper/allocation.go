@@ -41,7 +41,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, block
 		// safesub to prevent panic
 		remaining, hasNeg = remaining.SafeSub(sdk.NewDecCoinsFromCoins(testCase.GetFees()...))
 		if hasNeg {
-			k.Logger(ctx).Error(fmt.Sprintf("not enough balance to reward test case :%v, \n", testCase.Name))
+			k.Logger(ctx).Error(fmt.Sprintf("not enough balance to reward test case :%v, \n", testCase.GetName()))
 			return
 		}
 
@@ -58,7 +58,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, block
 		// safesub to prevent panic
 		remaining, hasNeg = remaining.SafeSub(sdk.NewDecCoinsFromCoins(dataSource.GetFees()...))
 		if hasNeg {
-			k.Logger(ctx).Error(fmt.Sprintf("not enough balance to reward data source :%v, \n", dataSource.Name))
+			k.Logger(ctx).Error(fmt.Sprintf("not enough balance to reward data source :%v, \n", dataSource.GetName()))
 			return
 		}
 
