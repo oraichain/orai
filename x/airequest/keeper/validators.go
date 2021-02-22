@@ -32,13 +32,13 @@ func (k Keeper) RandomValidators(ctx sdk.Context, size int, nonce []byte) ([]sdk
 	} else {
 		k.Logger(ctx).Info("enough validators")
 		valOperators := k.createValSamplingList(ctx, maxValidatorSize)
-		k.Logger(ctx).Error(fmt.Sprintf("AI request validator operators: %v\n", valOperators))
+		k.Logger(ctx).Info(fmt.Sprintf("AI request validator operators: %v\n", valOperators))
 		randomGenerator, err := rng.NewRng(k.GetRngSeed(ctx), nonce, []byte(ctx.ChainID()))
 		if err != nil {
 			return nil, sdkerrors.Wrapf(types.ErrSeedinitiation, err.Error())
 		}
 		validators := k.SampleIndexes(valOperators, size, randomGenerator, totalPowers)
-		k.Logger(ctx).Error(fmt.Sprintf("AI request validator list final: %v\n", validators))
+		k.Logger(ctx).Info(fmt.Sprintf("AI request validator list final: %v\n", validators))
 		return validators, nil
 	}
 }

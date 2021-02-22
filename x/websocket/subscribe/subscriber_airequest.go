@@ -68,7 +68,7 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 
 	subscriber.log.Info(":delivery_truck: Processing incoming request event")
 
-	var requestID, oscriptName, creatorStr, inputStr, expectedOutputStr string
+	var requestID, oscriptName, inputStr, expectedOutputStr string
 
 	if val, ok := attrMap[aiRequest.AttributeRequestID]; ok {
 		requestID = val[0]
@@ -80,11 +80,6 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 	} else {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, aiRequest.AttributeOracleScriptName)
 	}
-	if val, ok := attrMap[aiRequest.AttributeRequestCreator]; ok {
-		creatorStr = val[0]
-	} else {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, aiRequest.AttributeRequestCreator)
-	}
 	if val, ok := attrMap[aiRequest.AttributeRequestInput]; ok {
 		inputStr = val[0]
 	} else {
@@ -94,12 +89,6 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 		expectedOutputStr = val[0]
 	} else {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, aiRequest.AttributeRequestExpectedOutput)
-	}
-
-	// prepare data
-	creator, err := sdk.AccAddressFromBech32(creatorStr)
-	if err != nil {
-		return nil, err
 	}
 
 	// collect ai data sources and test cases from the ai request event.
@@ -192,7 +181,7 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 	subscriber.log.Info("star: final result: ", resultArr)
 	// Create a new MsgCreateReport with a new reporter to the Oraichain
 	reporter := types.NewReporter(
-		creator, subscriber.cliCtx.GetFromName(),
+		subscriber.cliCtx.GetFromAddress(), subscriber.cliCtx.GetFromName(),
 		sdk.ValAddress(subscriber.cliCtx.GetFromAddress()),
 	)
 	finalResult := []byte(strings.Join(resultArr, JoinString))
