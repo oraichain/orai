@@ -49,9 +49,10 @@ func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *websocket.Repor
 		reward.ProviderFees = reward.ProviderFees.Add(testCase.GetFees()...)
 	}
 	// change reward ratio to the ratio of validator
-	// 0.6 by default
-	percentageDec := sdk.NewDecWithPrec(rewardPercentage, 2)
-	rewardRatio := sdk.NewDec(int64(1)).Sub(percentageDec)
+	// 0.6 by default, 2 decimals for percentage
+	percentageDec := k.providerKeeper.GetPercentageDec(rewardPercentage)
+	rewardRatio := sdk.NewDecWithPrec(int64(100), 2).Sub(percentageDec)
+
 	// reward = 1 - oracle reward percentage × (data source fees + test case fees)
 	valFees, _ := sdk.NewDecCoinsFromCoins(reward.ProviderFees...).MulDec(rewardRatio).TruncateDecimal()
 	// add validator fees into the total fees of all validators
