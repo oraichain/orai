@@ -20,12 +20,12 @@ persistent_peers	= validator node, optionally other vpn sentry nodes
 private_peer_ids	= validator node id
 addr_book_strict = false
 external_address = public ip
-oraid start --rpc.laddr tcp://0.0.0.0:26657 --p2p.pex false --p2p.persistent_peers "" --p2p.unconditional_peer_ids "" --p2p.private_peer_ids ""
+oraid start --rpc.laddr tcp://0.0.0.0:26657 --p2p.pex true --p2p.persistent_peers "" --p2p.unconditional_peer_ids "" --p2p.private_peer_ids ""
 ```
 
 **Full Node Configuration**
 
 ```bash
-seeds = sentry nodes
+persistent_peers = sentry nodes
 addr_book_strict = true
 ```
