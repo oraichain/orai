@@ -167,6 +167,10 @@ proto-gen: proto-lint
 	./scripts/protocgen.sh $(PROTO_DIR)
 .PHONY: proto-gen
 
+proto-js: 
+	./scripts/protocgen-js.sh $(SRC_DIR)
+.PHONY: proto-js
+
 proto-lint:
 	buf check lint --error-format=json
 .PHONY: proto-lint
