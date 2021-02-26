@@ -13,8 +13,6 @@ import (
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	// TODO: Register the modules msgs
 	cdc.RegisterConcrete(MsgCreateReport{}, "websocket/AddReport", nil)
-	cdc.RegisterConcrete(MsgAddReporter{}, "websocket/AddReporter", nil)
-	cdc.RegisterConcrete(MsgRemoveReporter{}, "websocket/RemoveReporter", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
@@ -23,19 +21,7 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations(
 		(*sdk.Msg)(nil),
 		&MsgCreateReport{},
-		&MsgAddReporter{},
-		&MsgRemoveReporter{},
 	)
-
-	// registry.RegisterImplementations(
-	// 	(*govtypes.Content)(nil),
-	// 	&Report{},
-	// 	&Reporter{},
-	// 	&DataSourceResult{},
-	// 	&TestCaseResult{},
-	// 	&Validator{},
-	// 	&ValResult{},
-	// )
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }

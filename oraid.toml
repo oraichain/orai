@@ -7,7 +7,7 @@ watch_dir = ""
 
 [build]
 # Just plain old shell command. You could use `make` as well.
-cmd = "LEDGER_ENABLED=false BUILD_TAGS=muslc make build"
+cmd = "make build"
 # Binary file yields from `cmd`.
 bin = "build/oraid"
 # Customize binary.
@@ -17,7 +17,7 @@ log = "air_errors.log"
 # Watch these filename extensions.
 include_ext = ["go", "tpl", "tmpl", "html", "env"]
 # Ignore these filename extensions or directories.
-exclude_dir = ["assets", "tmp", "vendor", "node_modules"]
+exclude_dir = ["assets", "tmp", "testfiles", "doc", "vendor", "node_modules", "smart-contracts", "third_party", "proto", "tmp", "oraivisor", "contrib", "build"]
 # There's no necessary to trigger build each time file changes if it's too frequency.
 delay = 1000 # ms
 

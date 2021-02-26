@@ -1,7 +1,8 @@
 version: '3.3'
 services:
   orai:
-    image: orai/orai:alpine-prod
+    container_name: orai_node
+    image: orai/orai:mainnet-alpine
     working_dir: /workspace
     tty: true
     ulimits:
@@ -10,16 +11,13 @@ services:
         hard: 65536
     ports:
       - 1317:1317
-      - 40000:40000
       - 26656:26656
       - 26657:26657
-    security_opt:
-      - 'seccomp:unconfined'
     cap_add:
       - SYS_PTRACE
     env_file:
       - orai.env
-    volumes:      
+    volumes:
       - ./:/workspace
-      - ./init_genesis.sh:/usr/bin/setup
-      - ./fn.sh:/usr/bin/fn
+      - ./scripts/setup_genesis.sh:/usr/bin/setup
+      - ./scripts/fn.sh:/usr/bin/fn

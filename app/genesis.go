@@ -50,11 +50,13 @@ func NewDefaultGenesisState(cdc codec.JSONMarshaler) GenesisState {
 	stakingGenesis.Params.UnbondingTime = time.Hour * 2
 	stakingGenesis.Params.MaxValidators = 100
 	// maximum bonded validators
-	distrGenesis.Params.BaseProposerReward = sdk.NewDecWithPrec(10, 2)  // 5%
-	distrGenesis.Params.BonusProposerReward = sdk.NewDecWithPrec(10, 2) // 12%
-	mintGenesis.Params.BlocksPerYear = 6311200                          // target 5-second block time
+	distrGenesis.Params.BaseProposerReward = sdk.NewDecWithPrec(1, 2)  // 1%
+	distrGenesis.Params.BonusProposerReward = sdk.NewDecWithPrec(4, 2) // 4%
+	mintGenesis.Params.BlocksPerYear = 6311200                         // target 5-second block time
 	mintGenesis.Params.MintDenom = provider.Denom
 	govGenesis.DepositParams.MinDeposit = sdk.NewCoins(sdk.NewCoin(provider.Denom, sdk.TokensFromConsensusPower(10)))
+	// TODO: testing
+	govGenesis.VotingParams.VotingPeriod = time.Minute * 2 // test for 10 mins voting period
 	crisisGenesis.ConstantFee = sdk.NewCoin(provider.Denom, sdk.TokensFromConsensusPower(10))
 	slashingGenesis.Params.SignedBlocksWindow = 30000                         // approximately 1 day
 	slashingGenesis.Params.MinSignedPerWindow = sdk.NewDecWithPrec(5, 2)      // 5%

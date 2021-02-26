@@ -3,6 +3,8 @@ package keeper
 import (
 	//"fmt"
 
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -30,11 +32,13 @@ func (k Keeper) RandomValidators(ctx sdk.Context, size int, nonce []byte) ([]sdk
 	} else {
 		k.Logger(ctx).Info("enough validators")
 		valOperators := k.createValSamplingList(ctx, maxValidatorSize)
+		k.Logger(ctx).Info(fmt.Sprintf("AI request validator operators: %v\n", valOperators))
 		randomGenerator, err := rng.NewRng(k.GetRngSeed(ctx), nonce, []byte(ctx.ChainID()))
 		if err != nil {
 			return nil, sdkerrors.Wrapf(types.ErrSeedinitiation, err.Error())
 		}
 		validators := k.SampleIndexes(valOperators, size, randomGenerator, totalPowers)
+		k.Logger(ctx).Info(fmt.Sprintf("AI request validator list final: %v\n", validators))
 		return validators, nil
 	}
 }
@@ -90,24 +94,26 @@ func (k Keeper) createValSamplingList(ctx sdk.Context, maxValidatorSize int) (va
 // SampleIndexes return random of indexes of chosen validators
 func (k *Keeper) SampleIndexes(valOperators []sdk.ValAddress, size int, randomGenerator *rng.Rng, totalPowers int64) []sdk.ValAddress {
 
-	valOperatorLen := uint64(len(valOperators))
 	validators := make([]sdk.ValAddress, size)
-
-	// store a mapping of validators that have already been chosen
-	chosenVal := make([]bool, valOperatorLen)
-	// time := 0
-	for i := 0; i < size; {
-		// the dividend is randomed to make sure no one can predict the next validator
-		quotient := randomGenerator.RandUint64() % valOperatorLen
-		// time++
-		// fmt.Printf("%d) quotient :%v\n", time, quotient)
-		// if the quotient is in the sampling list, and it is not in the chosen validator map range then we pick it
-		if !chosenVal[quotient] {
-			// add to the chosen validator list
-			chosenVal[quotient] = true
-			validators[i] = valOperators[quotient]
-			i++
+	for i := 0; i < size; i++ {
+		valLen := uint64(len(valOperators))
+		// something wrong
+		if valLen == 0 {
+			break
 		}
+		chosen := valOperators[randomGenerator.RandUint64()%valLen]
+		// remove chosen validator from map
+		valOperators = filter(valOperators, chosen)
+		validators[i] = chosen
 	}
 	return validators
+}
+
+func filter(valOperators []sdk.ValAddress, address sdk.ValAddress) (ret []sdk.ValAddress) {
+	for _, s := range valOperators {
+		if !s.Equals(address) {
+			ret = append(ret, s)
+		}
+	}
+	return
 }

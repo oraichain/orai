@@ -10,7 +10,7 @@ import (
 const (
 	DefaultParamspace = ModuleName
 	// TODO: Define your default parameters
-	DefaultOracleScriptRewardPercentage = uint64(70)
+	DefaultOracleScriptRewardPercentage = uint64(60)
 	DefaultMaximumCodeBytes             = uint64(1024 * 1024) // 1MB
 	MaximumCodeBytesThreshold           = 4 * 1024 * 1024     // 4MB
 )

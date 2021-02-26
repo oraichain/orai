@@ -1,0 +1,18 @@
+version: '3.3'
+services:
+  orai:
+    container_name: orai_node
+    image: orai/orai:mainnet-alpine
+    working_dir: /workspace
+    tty: true
+    ports:
+      - 1317:1317
+      - 26656:26656
+      - 26657:26657
+    cap_add:
+      - SYS_PTRACE
+    env_file: 
+      - orai.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./:/workspace

@@ -60,6 +60,17 @@ func (k *Keeper) HasTestCase(ctx sdk.Context, name string) bool {
 	return k.isKeyPresent(ctx, types.TestCaseStoreKey(name))
 }
 
+// GetPercentageDec safety return percentage
+func (k *Keeper) GetPercentageDec(rewardPercentage int64) sdk.Dec {
+	// change reward ratio to the ratio of validator
+	// 0.6 by default, 2 decimals for percentage
+	if rewardPercentage <= 0 || rewardPercentage >= 100 {
+		return sdk.NewDecWithPrec(int64(60), 2)
+	}
+
+	return sdk.NewDecWithPrec(rewardPercentage, 2)
+}
+
 // GetMinimumFees collects minimum fees needed of an oracle script. Source: https://medium.com/p/958db9b4bb4b/edit
 func (k *Keeper) GetMinimumFees(ctx sdk.Context, dNames, tcNames []string, valCount int, rewardPercentage int64) (sdk.Coins, error) {
 	var scriptFees sdk.Coins
@@ -87,15 +98,10 @@ func (k *Keeper) GetMinimumFees(ctx sdk.Context, dNames, tcNames []string, valCo
 	}
 
 	// 0.6 by default
-	percentageDec := sdk.NewDecWithPrec(rewardPercentage, 2)
-
-	// check division by zero or negative figure
-	if percentageDec.IsZero() || percentageDec.IsNegative() {
-		percentageDec = sdk.NewDecWithPrec(int64(60), 2)
-	}
+	percentageDec := k.GetPercentageDec(rewardPercentage)
 
 	// (2 - oracle script percentage) * k
-	rewardRatio := sdk.NewDec(int64(2)).Sub(percentageDec).Mul(sdk.NewDec(int64(valCount)))
+	rewardRatio := sdk.NewDecWithPrec(int64(200), 2).Sub(percentageDec).Mul(sdk.NewDec(int64(valCount)))
 
 	// (2 - oracle script percentate) * k * total script fees
 	minimumFees, _ := sdk.NewDecCoinsFromCoins(scriptFees...).MulDec(rewardRatio).TruncateDecimal()

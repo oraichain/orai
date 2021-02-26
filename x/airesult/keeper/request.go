@@ -6,41 +6,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	airequest "github.com/oraichain/orai/x/airequest/types"
 	"github.com/oraichain/orai/x/airesult/types"
-	"github.com/oraichain/orai/x/provider"
 	websocket "github.com/oraichain/orai/x/websocket/types"
 )
-
-// GetRequestsBlockHeight returns all requests for the given block height, or nil if there is none.
-func (k Keeper) GetRequestsBlockHeight(ctx sdk.Context, blockHeight int64) (reqs []airequest.AIRequest) {
-	// check if it's the start of the node or not
-	if blockHeight <= 0 {
-		return nil
-	}
-	iterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.storeKey), airequest.RequeststoreKeyPrefixAll())
-	defer iterator.Close()
-	for ; iterator.Valid(); iterator.Next() {
-		var req airequest.AIRequest
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &req)
-		// check if block height is equal or not
-		if req.GetBlockHeight() == blockHeight {
-			reqs = append(reqs, req)
-		}
-	}
-	return reqs
-}
-
-// CollectRequestFees collects total fees of the requests from the previous block to remove them from the fee collector
-func (k Keeper) CollectRequestFees(ctx sdk.Context, blockHeight int64) (fees sdk.Coins) {
-	// collect requests from the previous block
-	requests := k.GetRequestsBlockHeight(ctx, blockHeight)
-	if len(requests) == 0 {
-		return sdk.NewCoins(sdk.NewCoin(provider.Denom, sdk.NewInt(int64(0))))
-	}
-	for _, request := range requests {
-		fees = fees.Add(request.GetFees()...)
-	}
-	return fees
-}
 
 // ResolveExpiredRequest handles requests that have been expired
 func (k Keeper) ResolveExpiredRequest(ctx sdk.Context, reqID string) {
@@ -57,13 +24,13 @@ func (k Keeper) ResolveExpiredRequest(ctx sdk.Context, reqID string) {
 }
 
 // ResolveRequestsFromReports handles the reports received in a block to group all the validators, data source owners and test case owners
-func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *websocket.Report, reward *types.Reward, blockHeight int64) {
+func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *websocket.Report, reward *types.Reward, blockHeight int64, rewardPercentage int64) (bool, int) {
 
 	req, _ := k.aiRequestKeeper.GetAIRequest(ctx, rep.GetRequestID())
 	validation := k.validateBasic(ctx, req, rep, blockHeight)
 	// if the report cannot pass the validation basic then we skip the rest
 	if !validation {
-		return
+		return false, 0
 	}
 
 	// collect data source owners that have their data sources executed to reward
@@ -81,8 +48,13 @@ func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *websocket.Repor
 		reward.TestCases = append(reward.TestCases, *testCase)
 		reward.ProviderFees = reward.ProviderFees.Add(testCase.GetFees()...)
 	}
-	// calculate validator fees from the total fees (50% for data sources, test cases, 20% for list of validators)
-	valFees, _ := sdk.NewDecCoinsFromCoins(reward.ProviderFees...).MulDec(sdk.NewDecWithPrec(int64(40), 2)).TruncateDecimal()
+	// change reward ratio to the ratio of validator
+	// 0.6 by default, 2 decimals for percentage
+	percentageDec := k.providerKeeper.GetPercentageDec(rewardPercentage)
+	rewardRatio := sdk.NewDecWithPrec(int64(100), 2).Sub(percentageDec)
+
+	// reward = 1 - oracle reward percentage × (data source fees + test case fees)
+	valFees, _ := sdk.NewDecCoinsFromCoins(reward.ProviderFees...).MulDec(rewardRatio).TruncateDecimal()
 	// add validator fees into the total fees of all validators
 	reward.ValidatorFees = reward.ValidatorFees.Add(valFees...)
 	// store information into the reward struct to reward these entities in the next begin block
@@ -90,8 +62,9 @@ func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *websocket.Repor
 	validator := k.webSocketKeeper.NewValidator(valAddress, k.stakingKeeper.Validator(ctx, valAddress).GetConsensusPower(), "active")
 	reward.Validators = append(reward.Validators, *validator)
 	reward.TotalPower += validator.GetVotingPower()
-	// Aggregate the result and store it into the blockchain
-	k.ResolveResult(ctx, req, rep)
+
+	// return boolean and length of validator list to resolve result
+	return true, len(req.GetValidators())
 }
 
 func (k Keeper) validateBasic(ctx sdk.Context, req *airequest.AIRequest, rep *websocket.Report, blockHeight int64) bool {
@@ -103,22 +76,27 @@ func (k Keeper) validateBasic(ctx sdk.Context, req *airequest.AIRequest, rep *we
 	// 	return false
 	// }
 
+	if rep.ResultStatus == websocket.ResultFailure {
+		k.Logger(ctx).Error("result status is fail")
+		return false
+	}
+
 	// Count the total number of data source results to see if it matches the requested data sources
 	if len(rep.GetDataSourceResults()) != len(req.GetAiDataSources()) {
-		fmt.Println("data source result length is different")
+		k.Logger(ctx).Error("data source result length is different")
 		return false
 	}
 
 	// Count the total number of test case results to see if it matches the requested test cases
 	if len(rep.GetTestCaseResults()) != len(req.GetTestCases()) {
-		fmt.Println("test case result length is different")
+		k.Logger(ctx).Error("test case result length is different")
 		return false
 	}
 
 	// TODO
 	err := k.webSocketKeeper.ValidateReport(ctx, rep.GetReporter(), req)
 	if err != nil {
-		fmt.Println("error in validating the report: ", err.Error())
+		k.Logger(ctx).Error(fmt.Sprintf("error in validating the report: %v\n", err.Error()))
 		return false
 	}
 	return true

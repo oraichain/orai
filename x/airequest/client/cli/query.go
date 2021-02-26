@@ -2,6 +2,7 @@ package cli
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/oraichain/orai/x/airequest/types"
@@ -46,18 +47,16 @@ func GetCmdQueryAIRequest() *cobra.Command {
 				return err
 			}
 
-			requestId := args[0]
-
-			// TODO: validate basic
-			if len(requestId) == 0 {
-				return fmt.Errorf("data source not found")
+			// validate basic
+			if len(args[0]) == 0 {
+				return errors.New("request ID can not be empty")
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
 			res, err := queryClient.QueryAIRequest(
 				context.Background(),
 				&types.QueryAIRequestReq{
-					RequestId: requestId,
+					RequestId: args[0],
 				},
 			)
 			if err != nil {

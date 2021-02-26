@@ -30,20 +30,5 @@ func (gs *GenesisState) Validate() error {
 		// 	return fmt.Errorf("invalid AIRequests: Owner: %s. Error: Missing Fees", record.Fees)
 		// }
 	}
-
-	for _, record := range gs.Reporters {
-		if record.Name == "" {
-			return fmt.Errorf("invalid Report: Name: %s. Error: Missing reporter name", record.Name)
-		}
-		if record.Address.Empty() {
-			return fmt.Errorf("invalid Report: Address: %s. Error: Address empty", record.Address)
-		}
-		if record.Validator.Empty() {
-			return fmt.Errorf("invalid Validator: Reporter: %s. Error: Missing Validator information", record.Validator)
-		}
-		// if record.Fees.Empty() {
-		// 	return fmt.Errorf("invalid AIRequests: Owner: %s. Error: Missing Fees", record.Fees)
-		// }
-	}
 	return nil
 }

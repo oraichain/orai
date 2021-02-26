@@ -27,12 +27,10 @@ var (
 )
 
 type (
-	Keeper            = keeper.Keeper
-	Subscriber        = subscribe.Subscriber
-	GenesisState      = types.GenesisState
-	Report            = types.Report
-	WebSocketConfig   = subscribe.WebSocketConfig
-	MsgCreateReport   = types.MsgCreateReport
-	MsgAddReporter    = types.MsgAddReporter
-	MsgRemoveReporter = types.MsgRemoveReporter
+	Keeper          = keeper.Keeper
+	Subscriber      = subscribe.Subscriber
+	GenesisState    = types.GenesisState
+	Report          = types.Report
+	WebSocketConfig = subscribe.WebSocketConfig
+	MsgCreateReport = types.MsgCreateReport
 )

@@ -3,20 +3,11 @@ services:
   orai:
     image: orai/orai:alpine-wasm
     working_dir: /workspace
-    tty: true
-    ulimits:
-      nofile:
-        soft: 65536
-        hard: 65536
+    tty: true    
     ports:
       - 1317:1317
-      - 40000:40000
       - 26656:26656
-      - 26657:26657
-    security_opt:
-      - 'seccomp:unconfined'
-    cap_add:
-      - SYS_PTRACE
+      - 26657:26657    
     env_file:
       - orai.dev.env
     volumes:        

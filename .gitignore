@@ -65,3 +65,5 @@ libwasmvm_muslc.a
 x/**/types/*.pb.*
 tmp
 go.sum
+.config/
+.npm/

@@ -4,12 +4,16 @@ go 1.15
 
 require (
 	github.com/CosmWasm/wasmd v0.15.0
-	github.com/cosmos/cosmos-sdk v0.41.0
+	github.com/cosmos/cosmos-sdk v0.41.3
 	github.com/cosmos/go-bip39 v1.0.0
+	github.com/cosmtrek/air v1.21.2 // indirect
+	github.com/creack/pty v1.1.11 // indirect
+	github.com/fatih/color v1.10.0 // indirect
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.4.3
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
+	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/kyokomi/emoji v2.2.4+incompatible
 	github.com/oasisprotocol/oasis-core/go v0.2012.4
 	github.com/pelletier/go-toml v1.8.1 // indirect
@@ -23,10 +27,10 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
-	github.com/tendermint/tendermint v0.34.3
-	github.com/tendermint/tm-db v0.6.3
-	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
-	golang.org/x/sys v0.0.0-20210124154548-22da62e12c0c // indirect
+	github.com/tendermint/tendermint v0.34.7
+	github.com/tendermint/tm-db v0.6.4
+	golang.org/x/sync v0.0.0-20201207232520-09787c993a3a
+	golang.org/x/sys v0.0.0-20210220050731-9a76102bfb43 // indirect
 	google.golang.org/genproto v0.0.0-20210114201628-6edceaf6022f
 	google.golang.org/grpc v1.35.0
 )

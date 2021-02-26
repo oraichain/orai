@@ -120,6 +120,11 @@ fn query_aggregation<S: Storage, A: Api, Q: Querier>(
         count += 1;
     }
 
+    // no results found, return empty
+    if count == 0 {
+        return Ok(String::new());
+    }
+
     sum = sum / count;
     floating_sum = floating_sum / count;
     let final_result = format!("{}.{}", sum, floating_sum);

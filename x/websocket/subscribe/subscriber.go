@@ -41,8 +41,8 @@ func NewSubscriber(cliCtx *client.Context, config *WebSocketConfig) *Subscriber 
 func GetAttributeMap(attrs []sdk.Attribute) map[string][]string {
 	ret := make(map[string][]string)
 	for _, attr := range attrs {
-		if values, ok := ret[attr.Key]; ok {
-			values = append(values, attr.Value)
+		if _, ok := ret[attr.Key]; ok {
+			ret[attr.Key] = append(ret[attr.Key], attr.Value)
 		} else {
 			ret[attr.Key] = []string{attr.Value}
 		}
@@ -143,5 +143,8 @@ func (subscriber *Subscriber) Subscribe() error {
 }
 
 func (subscriber *Subscriber) newTxFactory(memo string) tx.Factory {
-	return subscriber.config.Txf.WithMemo(memo)
+	// set sequence = 0 to retrieve later
+	return subscriber.config.Txf.
+		WithSequence(0).
+		WithMemo(memo)
 }

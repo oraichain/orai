@@ -323,6 +323,11 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	)
 	app.upgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath)
 
+	// NOTE: upgrade feature comment out for new build after proposal done
+	// app.upgradeKeeper.SetUpgradeHandler("ai-oracle", func(ctx sdk.Context, plan upgradetypes.Plan) {
+	// 	// TODO: Add some modification logic here
+	// })
+
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.stakingKeeper = *stakingKeeper.SetHooks(
@@ -410,7 +415,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	)
 
 	app.airequestKeeper = airequest.NewKeeper(
-		appCodec, keys[airequest.StoreKey], &app.wasmKeeper, app.getSubspace(airequest.ModuleName), app.stakingKeeper, app.providerKeeper,
+		appCodec, keys[airequest.StoreKey], &app.wasmKeeper, app.getSubspace(airequest.ModuleName), app.stakingKeeper, app.bankKeeper, app.providerKeeper,
 	)
 
 	app.websocketKeeper = websocket.NewKeeper(
@@ -532,6 +537,8 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		),
 	)
 	app.SetEndBlocker(app.EndBlocker)
+	// set upgrade module
+	app.upgradeHandler()
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
@@ -551,6 +558,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
+
 	return app
 }
 
@@ -696,4 +704,10 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(airesult.ModuleName)
 
 	return paramsKeeper
+}
+
+func (app *OraichainApp) upgradeHandler() {
+	// app.upgradeKeeper.SetUpgradeHandler("ai-oracle-v7", func(ctx sdk.Context, plan upgradetypes.Plan) {
+	// 	// upgrade changes here
+	// })
 }

@@ -4,12 +4,13 @@
 
 ```bash
 curl -OL https://raw.githubusercontent.com/oraichain/oraichain-static-files/master/setup_genesis.sh
+sudo chmod +x setup_genesis.sh
 ```
 
 ### 2. Run the setup file.
 
 ```bash
-sudo chmod -R +x setup_genesis.sh && ./setup_genesis.sh
+./setup_genesis.sh
 ```
 
 ### 3. Edit wallet name and moniker you prefer to create a new wallet and validator.
@@ -32,23 +33,27 @@ docker-compose exec orai ash
 setup <your passphrase>
 ```
 
-After running, there will be three .txt files generated. 
+After running, there will be three .txt files generated.
 
 One file, which is account.txt, stores your genesis account information as well as its mnemonic. Please keep it safe, and remove the file when you finish storing your account infromation.
 
-The next two files are <moniker_name>_accounts.txt & <moniker_name>_validators.txt. Please copy the contents of these two files and paste them to the following google form: 
+Please upload the .oraid/config/gentx/gentx-\*.json file to the following google form:
 
 ### 8. Wait for the team to setup the genesis file
 
+On the same vpn facilitating docker-machine, it can be done using command:
+`docker-machine scp genesis1:"/home/ubuntu/oraichain/.oraid/config/gentx/gentx-*.json" genesis2:/home/ubuntu/oraichain/.oraid/config/gentx/`
+
+then add genesis accounts:
+`./fn.sh addGenAccount --address address --amount 10000000`
+
+and finally call `oraid collect-gentxs` to complete the genesis.json file and use `docker-machine scp genesis1:/home/ubuntu/oraichain/.oraid/config/genesis.json genesis2:/home/ubuntu/oraichain/.oraid/config` to override other node's genesis file.
+
+then following [Network](./network.md) for secured network setup.
+
 ### 9. After the team has finished setting up, type the following commands:
 
-```bash
-sed -i 's/persistent_peers *= *".*"/persistent_peers = "'"<list-of-private-ips-here>"'"/g' .oraid/config/config.toml 
-```
-
-Remember to replace the <list-of-private-ips-here> values to the one that the team provides.
-
-Next, download the new genesis file containing all the information of the genesis nodes.
+Download the new genesis file containing all the information of the genesis nodes.
 
 ```bash
 curl $GENESIS_URL > .oraid/config/genesis.json
