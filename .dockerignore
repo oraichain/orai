@@ -11,5 +11,6 @@ testfiles
 third_party
 scripts
 proto
-doc 
+doc/*.md 
+doc/swagger-ui
 tmp
