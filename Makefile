@@ -163,7 +163,7 @@ format:
 proto-all: proto-gen proto-lint proto-check-breaking
 .PHONY: proto-all
 
-proto-gen: proto-lint
+proto-gen: 
 	./scripts/protocgen.sh $(PROTO_DIR)
 .PHONY: proto-gen
 
