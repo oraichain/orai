@@ -121,3 +121,14 @@ mkdir -p /workspace/.oraid/oraivisor/genesis/bin
 ln -s /workspace/build/oraid /workspace/.oraid/oraivisor/genesis/bin/oraid
 DAEMON_NAME=oraid DAEMON_HOME=/workspace/.oraid oraivisor start
 ```
+
+## Create swagger documentation
+
+```bash
+# go to proto
+docker-compose exec proto bash
+make proto-swagger
+# then create static file
+go get github.com/rakyll/statik
+statik -src doc/swagger-ui/ -dest doc -f
+```

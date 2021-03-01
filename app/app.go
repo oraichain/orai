@@ -94,7 +94,7 @@ import (
 	"github.com/oraichain/orai/x/provider"
 
 	// unnamed import of statik for swagger UI support
-	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
+	_ "github.com/oraichain/orai/doc/statik"
 )
 
 const appName = "Oraichain"

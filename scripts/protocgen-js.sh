@@ -13,8 +13,10 @@ SOURCEDIR=$(realpath ${1:-$PROJECTDIR/tmp})
 MODULE_SDK_DIR=$(realpath $PROJECTDIR/x)
 
 COSMOS_SDK_DIR=${COSMOS_SDK_DIR:-$(go list -f "{{ .Dir }}" -m github.com/cosmos/cosmos-sdk)}
+COSMOS_WASM_DIR=${COSMOS_WASM_DIR:-$(go list -f "{{ .Dir }}" -m github.com/CosmWasm/wasmd)}
+
 # scan all folders that contain proto file
-proto_dirs=$(find $MODULE_SDK_DIR $COSMOS_SDK_DIR/proto $COSMOS_SDK_DIR/third_party/proto -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
+proto_dirs=$(find $MODULE_SDK_DIR $COSMOS_SDK_DIR/proto $COSMOS_SDK_DIR/third_party/proto $COSMOS_WASM_DIR -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
 proto_files=()
 
 for dir in $proto_dirs; do
