@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+set -eo pipefail
+
+# go get ./...
 # apk add nodejs-current 
 # npm install -g protobufjs
 
