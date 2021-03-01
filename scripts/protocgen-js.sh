@@ -18,26 +18,23 @@ for dir in $proto_dirs; do
   proto_files=("${proto_files[@]} $(find "${dir}" -maxdepth 1 -name '*.proto')")
 done
 
-echo ${proto_files[@]}
+# gen files
+pbjs \
+  -o $SOURCEDIR/generated/proto.js \
+  -t static-module \
+  -w es6 \
+  --es6 \
+  --force-long \
+  --keep-case \
+  --no-create \
+  ${proto_files[@]}
 
-# # gen files
-# pbjs \
-#   -o $SOURCEDIR/generated/proto.js \
-#   -t static-module \
-#   -w es6 \
-#   --es6 \
-#   --force-long \
-#   --keep-case \
-#   --no-create \
-#   ${proto_files[@]}
+pbts \
+  -o $SOURCEDIR/generated/proto.d.ts \
+  $SOURCEDIR/generated/proto.js
 
-# pbts \
-#   -o $SOURCEDIR/generated/proto.d.ts \
-#   $SOURCEDIR/generated/proto.js
-
-# # fix for node 14
-# # sed -i 's/import \* as/import/' $SOURCEDIR/generated/proto.js
+# fix for node 14
 # node -e "var fs = require('fs'),file='$SOURCEDIR/generated/proto.js',result = fs.readFileSync(file).toString().replace('import * as', 'import');fs.writeFileSync(file, result)"
 
-# # show results
-# du -hd1 $SOURCEDIR/generated/*
+# show results
+du -hd1 $SOURCEDIR/generated/*

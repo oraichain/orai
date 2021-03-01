@@ -112,3 +112,12 @@ make proto-gen PROTO_DIR=x/websocket/types/
 
 ## Build docker image
 `docker build -t orai/orai:0.15-alpine -f Dockerfile.prod .`
+
+## Development with oraivisor
+
+```bash
+ln -s /workspace/oraivisor/build/oraivisor /usr/bin/oraivisor
+mkdir -p /workspace/.oraid/oraivisor/genesis/bin
+ln -s /workspace/build/oraid /workspace/.oraid/oraivisor/genesis/bin/oraid
+DAEMON_NAME=oraid DAEMON_HOME=/workspace/.oraid oraivisor start
+```
