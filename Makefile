@@ -163,13 +163,17 @@ format:
 proto-all: proto-gen proto-lint proto-check-breaking
 .PHONY: proto-all
 
-proto-gen: proto-lint
+proto-gen: 
 	./scripts/protocgen.sh $(PROTO_DIR)
 .PHONY: proto-gen
 
 proto-js: 
 	./scripts/protocgen-js.sh $(SRC_DIR)
 .PHONY: proto-js
+
+proto-swagger: 
+	./scripts/protocgen-swagger.sh $(SRC_DIR)
+.PHONY: proto-swagger
 
 proto-lint:
 	buf check lint --error-format=json
