@@ -13,10 +13,7 @@ go get ./...
 make proto-lint
 
 # build protobuf templates
-make proto-gen PROTO_DIR=x/provider/types/
-make proto-gen PROTO_DIR=x/airequest/types/
-make proto-gen PROTO_DIR=x/websocket/types/
-make proto-gen PROTO_DIR=x/airesult/types/
+make proto-gen
 
 # exit the container
 exit
