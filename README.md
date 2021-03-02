@@ -96,9 +96,9 @@ oraid query airesult fullreq <request-id>
 
 ```bash
 ln -s /workspace/oraivisor/build/oraivisor /usr/bin/oraivisor
-mkdir -p /workspace/.oraid/oraivisor/genesis/bin
-ln -s /workspace/build/oraid /workspace/.oraid/oraivisor/genesis/bin/oraid
-DAEMON_NAME=oraid DAEMON_HOME=/workspace/.oraid oraivisor start
+mkdir -p /oraivisor/genesis/bin
+ln -s /workspace/build/oraid /oraivisor/genesis/bin/oraid
+DAEMON_NAME=oraid DAEMON_HOME=/ oraivisor start
 ```
 
 ## Create swagger documentation

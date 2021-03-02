@@ -13,6 +13,11 @@ import (
 	"syscall"
 )
 
+const (
+	// DefaultMaxScanSize copy from wasm, we make bigger for sure
+	DefaultMaxScanSize = 700 * 1024
+)
+
 // LaunchProcess runs a subprocess and returns when the subprocess exits,
 // either when it dies, or *after* a successful upgrade.
 func LaunchProcess(cfg *Config, args []string, stdout, stderr io.Writer) (bool, error) {
@@ -38,7 +43,9 @@ func LaunchProcess(cfg *Config, args []string, stdout, stderr io.Writer) (bool, 
 
 	scanOut := bufio.NewScanner(io.TeeReader(outpipe, stdout))
 	scanErr := bufio.NewScanner(io.TeeReader(errpipe, stderr))
-
+	buf := make([]byte, 2)
+	scanOut.Buffer(buf, DefaultMaxScanSize)
+	scanErr.Buffer(buf, DefaultMaxScanSize)
 	if err := cmd.Start(); err != nil {
 		return false, fmt.Errorf("launching process %s %s: %w", bin, strings.Join(args, " "), err)
 	}
