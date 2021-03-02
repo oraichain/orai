@@ -160,7 +160,7 @@ format:
 ###############################################################################
 
 
-proto-all: proto-gen proto-lint proto-check-breaking
+proto-all: proto-gen proto-check-breaking
 .PHONY: proto-all
 
 proto-gen: 
@@ -174,10 +174,6 @@ proto-js:
 proto-swagger: 
 	./scripts/protocgen-swagger.sh $(SRC_DIR)
 .PHONY: proto-swagger
-
-proto-lint:
-	buf check lint --error-format=json
-.PHONY: proto-lint
 
 proto-check-breaking:
 	buf check breaking --against-input $(HTTPS_GIT)#branch=master

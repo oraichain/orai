@@ -9,9 +9,6 @@ docker-compose exec protoc ash
 # first time
 go get ./...
 
-# check protobuf lint
-make proto-lint
-
 # build protobuf templates
 make proto-gen
 
@@ -87,21 +84,6 @@ oraid tx airequest set-aireq oscript_eth "5" "6" 30000orai 1 --from $USER --chai
 # Check if the AI request has finished executing
 oraid query airesult fullreq <request-id>
 
-```
-
-
-## Build protobuf and do lint check
-```bash
-docker-compose exec protoc ash
-
-# first time
-go get ./...
-
-# check protobuf lint
-make proto-lint
-
-# build protobuf templates
-make proto-gen PROTO_DIR=x/websocket/types/
 ```
 
 ## Run test

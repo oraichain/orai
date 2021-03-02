@@ -12,16 +12,12 @@ for PROTO_DIR in $(ls $MODULE_SDK_DIR)
 do   
   echo "processing: $MODULE_SDK_DIR/$PROTO_DIR"
   proto_files=$(find "x/$PROTO_DIR/types/" -maxdepth 4 -name '*.proto')  
-  protoc \
+  buf protoc \
     -I=. \
     -I=$COSMOS_SDK_DIR/third_party/proto \
     -I=$COSMOS_SDK_DIR/proto \
     --gocosmos_out=Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types,Mgoogle/protobuf/empty.proto=github.com/gogo/protobuf/types,plugins=interfacetype+grpc,paths=source_relative:. \
-    --grpc-gateway_out .\
-    --grpc-gateway_opt logtostderr=true \
-    --grpc-gateway_opt paths=Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types,Mgoogle/protobuf/empty.proto=github.com/gogo/protobuf/types,paths=source_relative \
     $proto_files
-done 
-
+done
 
 
