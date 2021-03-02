@@ -15,7 +15,7 @@ oraid start --p2p.pex false --p2p.persistent_peers ""
 
 ```bash
 pex	= true
-unconditional-peer-ids = validator node id
+unconditional_peer_ids = validator node id
 persistent_peers	= validator node, optionally other vpn sentry nodes
 private_peer_ids	= validator node id
 addr_book_strict = false

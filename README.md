@@ -9,14 +9,8 @@ docker-compose exec protoc ash
 # first time
 go get ./...
 
-# check protobuf lint
-make proto-lint
-
 # build protobuf templates
-make proto-gen PROTO_DIR=x/provider/types/
-make proto-gen PROTO_DIR=x/airequest/types/
-make proto-gen PROTO_DIR=x/websocket/types/
-make proto-gen PROTO_DIR=x/airesult/types/
+make proto-gen
 
 # exit the container
 exit
@@ -90,23 +84,28 @@ oraid query airesult fullreq <request-id>
 
 ```
 
-
-## Build protobuf and do lint check
-```bash
-docker-compose exec protoc ash
-
-# first time
-go get ./...
-
-# check protobuf lint
-make proto-lint
-
-# build protobuf templates
-make proto-gen PROTO_DIR=x/websocket/types/
-```
-
 ## Run test
 `make test-method PACKAGE=github.com/oraichain/orai/x/airequest/keeper METHOD=TestCalucateMol`
 
 ## Build docker image
 `docker build -t orai/orai:0.15-alpine -f Dockerfile.prod .`
+
+## Development with oraivisor
+
+```bash
+ln -s /workspace/oraivisor/build/oraivisor /usr/bin/oraivisor
+mkdir -p /workspace/.oraid/oraivisor/genesis/bin
+ln -s /workspace/build/oraid /workspace/.oraid/oraivisor/genesis/bin/oraid
+DAEMON_NAME=oraid DAEMON_HOME=/workspace/.oraid oraivisor start
+```
+
+## Create swagger documentation
+
+```bash
+# go to proto
+docker-compose exec proto bash
+make proto-swagger
+# then create static file
+go get github.com/rakyll/statik
+statik -src doc/swagger-ui/ -dest doc -f
+```
