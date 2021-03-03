@@ -1,0 +1,24 @@
+FROM golang:1.15-alpine3.12 AS go-builder
+
+# this comes from standard alpine nightly file
+#  https://github.com/rust-lang/docker-rust-nightly/blob/master/alpine3.12/Dockerfile
+# with some changes to support our toolchain, etc
+RUN set -eux; apk add --no-cache ca-certificates build-base;
+RUN apk add make git upx
+# NOTE: add these to run with LEDGER_ENABLED=true
+# RUN apk add libusb-dev linux-headers
+
+WORKDIR /code
+COPY oraivisor /code
+
+RUN make build
+
+# make size smaller
+RUN go get github.com/pwaller/goupx
+RUN goupx /code/build/oraivisor
+
+# ----- Update oraivisor from mainnet-alpine ---------------------------------------------------
+FROM orai/orai:mainnet-alpine
+
+# copy binaries
+COPY --from=go-builder /code/build/oraivisor /usr/bin
