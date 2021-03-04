@@ -60,6 +60,12 @@ RUST_BACKTRACE=1 cargo unit-test -- --exact contract::tests::increment --show-ou
 ./scripts/deploy-contract.sh smart-contracts/testcase-price/artifacts/testcase_price.wasm "testcase-price 1" '{"ai_data_source":"datasource_eth","testcase":"testcase_price"}' [code_id]
 # if not, then don't add the [code-id] field, it will give an error because the smart contract has not had a code id yet.
 
+# query a data source through cli
+oraid query wasm contract-state smart $CONTRACT '{"get":{"input":""}}'
+
+# query wasm through lcd
+curl <url>/wasm/v1beta1/contract/<contract-address>/smart/<json-string-encoded-in-base64>
+
 ```
 
 ## Some basic commands to test with the node

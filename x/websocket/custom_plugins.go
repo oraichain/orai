@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -45,6 +46,7 @@ func (oracleQueryPlugin OracleQueryPlugin) Custom(ctx sdk.Context, query json.Ra
 	resp, err := oracleQueryPlugin.client.Do(req)
 
 	if err != nil {
+		oracleQueryPlugin.staking.Logger(ctx).Error(fmt.Sprintf("response error: %v\n", err))
 		return ModuleCdc.LegacyAmino.MarshalJSON(map[string]string{"error": err.Error()})
 	}
 
