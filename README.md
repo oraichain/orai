@@ -94,7 +94,10 @@ oraid query airesult fullreq <request-id>
 `make test-method PACKAGE=github.com/oraichain/orai/x/airequest/keeper METHOD=TestCalucateMol`
 
 ## Build docker image
-`docker build -t orai/orai:0.15-alpine -f Dockerfile.prod .`
+
+development `docker build -t orai/orai:alpine-wasm .`  
+production `docker build -t orai/orai:0.18-alpine -f Dockerfile.prod .`  
+oraivisor-upgrade `docker build -t orai/orai:mainnet-alpine-0.1 -f Dockerfile.oraivisor .`  
 
 ## Development with oraivisor
 
