@@ -40,7 +40,7 @@ pub fn handle<S: Storage, A: Api, Q: Querier>(
 pub fn try_update_datasource<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     info: MessageInfo,
-    name: String,
+    name: Vec<String>,
 ) -> Result<HandleResponse, ContractError> {
     let api = &deps.api;
     config(&mut deps.storage).update(|mut state| -> Result<_, ContractError> {
@@ -56,7 +56,7 @@ pub fn try_update_datasource<S: Storage, A: Api, Q: Querier>(
 pub fn try_update_testcase<S: Storage, A: Api, Q: Querier>(
     deps: &mut Extern<S, A, Q>,
     info: MessageInfo,
-    name: String,
+    name: Vec<String>,
 ) -> Result<HandleResponse, ContractError> {
     let api = &deps.api;
     config(&mut deps.storage).update(|mut state| -> Result<_, ContractError> {
@@ -81,12 +81,16 @@ pub fn query<S: Storage, A: Api, Q: Querier>(
     }
 }
 
-fn query_datasource<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> StdResult<String> {
+fn query_datasource<S: Storage, A: Api, Q: Querier>(
+    deps: &Extern<S, A, Q>,
+) -> StdResult<Vec<String>> {
     let state = config_read(&deps.storage).load()?;
     Ok(state.ai_data_source)
 }
 
-fn query_testcase<S: Storage, A: Api, Q: Querier>(deps: &Extern<S, A, Q>) -> StdResult<String> {
+fn query_testcase<S: Storage, A: Api, Q: Querier>(
+    deps: &Extern<S, A, Q>,
+) -> StdResult<Vec<String>> {
     let state = config_read(&deps.storage).load()?;
     Ok(state.testcase)
 }
@@ -95,40 +99,18 @@ fn query_aggregation<S: Storage, A: Api, Q: Querier>(
     _deps: &Extern<S, A, Q>,
     results: Vec<String>,
 ) -> StdResult<String> {
-    let mut sum: i32 = 0;
-    let mut floating_sum: i32 = 0;
-    let mut count = 0;
-    for input in results {
-        // get first item from iterator
-        let mut iter = input.split('.');
-        let first = iter.next();
-        let last = iter.next();
-        // will panic instead for forward error with ?
-        let number: i32 = first.unwrap().parse().unwrap();
-        let mut floating: i32 = 0;
-        if last.is_some() {
-            let mut last_part = last.unwrap().to_owned();
-            if last_part.len() < 2 {
-                last_part.push_str("0");
-            } else if last_part.len() > 2 {
-                last_part = last_part[..2].to_string();
-            }
-            floating = last_part.parse().unwrap();
-        }
-        sum += number;
-        floating_sum += floating;
-        count += 1;
-    }
-
-    // no results found, return empty
-    if count == 0 {
+    if results.len() <= 0 {
         return Ok(String::new());
     }
-
-    sum = sum / count;
-    floating_sum = floating_sum / count;
-    let final_result = format!("{}.{}", sum, floating_sum);
-
+    let mut final_result = String::from("");
+    // final result syntax: a-b-c-d-e-f
+    for input in results {
+        let temp_input = &input[..];
+        final_result.push_str(temp_input);
+        final_result.push('-');
+    }
+    // remove the last dash symbol to complete the string
+    final_result.pop();
     Ok(final_result)
 }
 
@@ -142,9 +124,21 @@ mod tests {
     fn proper_initialization() {
         let mut deps = mock_dependencies(&[]);
 
+        // init data source
+        let mut data_sources = Vec::new();
+        data_sources.push(String::from("classification"));
+        data_sources.push(String::from("cv009"));
+
+        let ds_temp = vec!["classification", "cv009"];
+        let ds_temp2 = vec!["classification_ds", "cv009"];
+
+        // init test case
+        let mut test_cases = Vec::new();
+        test_cases.push(String::from("classification_testcase"));
+
         let msg = InitMsg {
-            ai_data_source: "datasource_eth".to_string(),
-            testcase: "testcase_price".to_string(),
+            ai_data_source: data_sources,
+            testcase: test_cases,
         };
         let info = mock_info("creator", &coins(1000, "earth"));
 
@@ -154,31 +148,8 @@ mod tests {
 
         // it worked, let's query the state
         let res = query(&deps, mock_env(), QueryMsg::GetDatasource {}).unwrap();
-        let value: String = from_binary(&res).unwrap();
-        assert_eq!("datasource_eth", value);
-    }
-
-    #[test]
-    fn update_datasource() {
-        let mut deps = mock_dependencies(&coins(2, "token"));
-
-        let msg = InitMsg {
-            ai_data_source: "datasource_eth".to_string(),
-            testcase: "testcase_price".to_string(),
-        };
-        let info = mock_info("creator", &coins(2, "token"));
-        let _res = init(&mut deps, mock_env(), info, msg).unwrap();
-
-        // beneficiary can release it
-        let info = mock_info("creator", &coins(2, "token"));
-        let msg = HandleMsg::UpdateDatasource {
-            name: "datasource_btc".to_string(),
-        };
-        let _res = handle(&mut deps, mock_env(), info, msg).unwrap();
-
-        // should increase counter by 1
-        let res = query(&deps, mock_env(), QueryMsg::GetDatasource {}).unwrap();
-        let value: String = from_binary(&res).unwrap();
-        assert_eq!("datasource_btc", value);
+        let value: Vec<String> = from_binary(&res).unwrap();
+        assert_eq!(ds_temp, value);
+        assert_ne!(ds_temp2, value);
     }
 }

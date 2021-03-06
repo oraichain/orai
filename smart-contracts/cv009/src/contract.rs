@@ -32,21 +32,22 @@ pub fn query<S: Storage, A: Api, Q: Querier>(
     msg: QueryMsg,
 ) -> StdResult<Binary> {
     match msg {
-        QueryMsg::Get { input } => to_binary(&classify_image(deps, input)?),
+        QueryMsg::Get { input } => to_binary(&query_data(deps, input)?),
     }
 }
 
-fn classify_image<S: Storage, A: Api, Q: Querier>(
+fn query_data<S: Storage, A: Api, Q: Querier>(
     deps: &Extern<S, A, Q>,
     input: String,
 ) -> StdResult<String> {
     // create specialquery with default empty string
     let req = SpecialQuery::Fetch {
-        url: "http://192.168.1.47:5000/short_classification".to_string(),
+        url: "http://192.168.1.47:5000/cv009".to_string(),
         body: input.to_string(),
         method: "POST".to_string(),
     }
     .into();
     let response: Binary = deps.querier.custom_query(&req)?;
-    Ok(String::from_utf8(response.to_vec()).unwrap())
+    let data = String::from_utf8(response.to_vec()).unwrap();
+    Ok(data)
 }

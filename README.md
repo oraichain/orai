@@ -66,6 +66,8 @@ oraid query wasm contract-state smart $CONTRACT '{"get":{"input":""}}'
 # query wasm through lcd
 curl <url>/wasm/v1beta1/contract/<contract-address>/smart/<json-string-encoded-in-base64>
 
+oraid query wasm contract-state smart orai16at0lzgx3slnqlgvcc7r79056f5wkuczenn09k '{"test":{"input":"{\"image\":\"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfx__RoRYzLDgXDiJxYGxLihJC4zoqV3V0xg&usqp=CAU\",\"model\":\"inception_v3\",\"name\":\"test_image\"}","output":"a","contract":"orai1aysde07zjurpp99jgl4xa7vskr8xnlcfkedkd9"}}'
+
 ```
 
 ## Some basic commands to test with the node
@@ -84,6 +86,11 @@ Init smart contracts and create an AI request
 
 # open another terminal and run
 oraid tx airequest set-aireq oscript_eth "5" "6" 30000orai 1 --from $USER --chain-id Oraichain -y
+
+# interact with the AI services 
+oraid tx airequest set-aireq classification_oscript '{"image":"https://encrypted-tbn0.gstati
+c.com/images?q=tbn:ANd9GcSfx__RoRYzLDgXDiJxYGxLihJC4zoqV3V0xg&usqp=CAU","model":"inception_v3","name":"te
+st_image"}' "6" 30000orai 1 --from $USER --chain-id Oraichain -y
 
 # Check if the AI request has finished executing
 oraid query airesult fullreq <request-id>

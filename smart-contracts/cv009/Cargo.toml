@@ -1,0 +1,40 @@
+[package]
+authors = ["Le Duc Pham <ducphamle212@gmail.com>"]
+edition = "2018"
+name = "cv009"
+version = "0.1.0"
+
+exclude = [
+  # Those files are rust-optimizer artifacts. You might want to commit them for convenience but they should not be part of the source code publication.
+  "contract.wasm",
+  "hash.txt",
+]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[profile.release]
+codegen-units = 1
+debug = false
+debug-assertions = false
+incremental = false
+lto = true
+opt-level = 3
+overflow-checks = true
+panic = 'abort'
+rpath = false
+
+[features]
+# for more explicit tests, cargo test --features=backtraces
+backtraces = ["cosmwasm-std/backtraces"]
+
+[dependencies]
+cosmwasm-std = {version = "0.11.0"}
+schemars = "0.7"
+serde = {version = "1.0.103", default-features = false, features = ["derive"]}
+thiserror = {version = "1.0.21"}
+
+[dev-dependencies]
+cosmwasm-schema = {version = "0.11.0"}

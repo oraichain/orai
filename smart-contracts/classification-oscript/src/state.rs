@@ -8,8 +8,8 @@ pub static CONFIG_KEY: &[u8] = b"config";
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct State {
-    pub ai_data_source: String,
-    pub testcase: String,
+    pub ai_data_source: Vec<String>,
+    pub testcase: Vec<String>,
     pub owner: CanonicalAddr, // if need check update
 }
 
