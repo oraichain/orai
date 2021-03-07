@@ -42,7 +42,7 @@ fn classify_image<S: Storage, A: Api, Q: Querier>(
 ) -> StdResult<String> {
     // create specialquery with default empty string
     let req = SpecialQuery::Fetch {
-        url: "http://192.168.1.47:5000/short_classification".to_string(),
+        url: "http://209.97.154.247:5000/short_classification".to_string(),
         body: input.to_string(),
         method: "POST".to_string(),
     }

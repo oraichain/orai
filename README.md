@@ -88,9 +88,7 @@ Init smart contracts and create an AI request
 oraid tx airequest set-aireq oscript_eth "5" "6" 30000orai 1 --from $USER --chain-id Oraichain -y
 
 # interact with the AI services 
-oraid tx airequest set-aireq classification_oscript '{"image":"https://encrypted-tbn0.gstati
-c.com/images?q=tbn:ANd9GcSfx__RoRYzLDgXDiJxYGxLihJC4zoqV3V0xg&usqp=CAU","model":"inception_v3","name":"te
-st_image"}' "6" 30000orai 1 --from $USER --chain-id Oraichain -y
+oraid tx airequest set-aireq classification_oscript '{"image":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfx__RoRYzLDgXDiJxYGxLihJC4zoqV3V0xg&usqp=CAU","model":"inception_v3","name":"test_image"}' "6" 30000orai 1 --from $USER --chain-id Oraichain -y
 
 # Check if the AI request has finished executing
 oraid query airesult fullreq <request-id>

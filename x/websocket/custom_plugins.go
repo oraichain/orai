@@ -65,8 +65,6 @@ func (oracleQueryPlugin OracleQueryPlugin) Custom(ctx sdk.Context, query json.Ra
 		return []byte{}, err
 	}
 
-	oracleQueryPlugin.staking.Logger(ctx).Error(fmt.Sprintf("content in string: %v\n", string(contents)))
-
 	// convert the content to struct to verify the status code
 	response := OracleResponsePlugin{}
 	err = json.Unmarshal(contents, &response)

@@ -55,7 +55,7 @@ fn classification_testcase<S: Storage, A: Api, Q: Querier>(
     // basic validation for the data source result
     // create specialquery with to handle the data source
     let req = SpecialQuery::Fetch {
-        url: "http://192.168.1.47:5001/testcase_classification".to_string(),
+        url: "http://209.97.154.247:5001/testcase_classification".to_string(),
         body: data_source.to_string(),
         method: "POST".to_string(),
     }
