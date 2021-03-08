@@ -84,8 +84,7 @@ Init smart contracts and create an AI request. To run the script, your current d
 
 ./scripts/deploy_ai_services.sh <list-of-datasource-names> <list-of-testcase-names> <oscript-name> <datasource-init-input> <testcase-input> <script-indexing> <passphrase>
 
-Eg: ./scripts/deploy_ai_services.sh classification,cv009 classification_testcase classificat
-ion_oscript '' '' 1 123456789
+Eg: ./scripts/deploy_ai_services.sh classification,cv009 classification_testcase classification_oscript '' '' '' 1 123456789
 
 # open another terminal and run
 oraid tx airequest set-aireq oscript_eth "5" "6" 30000orai 1 --from $USER --chain-id Oraichain -y
