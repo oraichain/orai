@@ -202,8 +202,8 @@ func GetCmdEditOracleScript() *cobra.Command {
 // GetCmdEditTestCase is the CLI command for sending a EditTestCase transaction
 func GetCmdEditTestCase() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-testcase [name] [contract] [description]",
-		Short: "Set a new ai request test case into the system",
+		Use:   "edit-testcase [old-name] [new-name] [contract] [description]",
+		Short: "Edit an existing test case in the system",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)

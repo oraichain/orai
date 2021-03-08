@@ -78,11 +78,14 @@ Run websocket as background process
 echo <passphrase> | oraid tx websocket subscribe --max-try 10 --from $USER --gas="auto" --gas-adjustment="1.2" --chain-id=Oraichain -y
 ```
 
-Init smart contracts and create an AI request
+Init smart contracts and create an AI request. To run the script, your current dir must contain the smart-contracts/ directory that already have wasm files built. The directory name with the wasm file should also be consistent. Eg: dir name: classification, then the wasm file is classification.wasm
 
 ```bash
 
-./scripts/basic.sh <passphrase>
+./scripts/deploy_ai_services.sh <list-of-datasource-names> <list-of-testcase-names> <oscript-name> <datasource-init-input> <testcase-input> <script-indexing> <passphrase>
+
+Eg: ./scripts/deploy_ai_services.sh classification,cv009 classification_testcase classificat
+ion_oscript '' '' 1 123456789
 
 # open another terminal and run
 oraid tx airequest set-aireq oscript_eth "5" "6" 30000orai 1 --from $USER --chain-id Oraichain -y
