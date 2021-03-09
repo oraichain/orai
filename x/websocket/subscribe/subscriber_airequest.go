@@ -116,21 +116,23 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 				},
 			})
 
+			dataSourceResult := types.NewDataSourceResult(aiDataSource, []byte{}, types.ResultSuccess)
+			// By default, we consider returning null as failure. If any datasource does not follow this rule then it should not be used by any oracle scripts. We dont return error here since the error relates to the external scripts, not the node.
 			if err != nil {
-				subscriber.log.Info(":skull: failed to execute test case 1st loop: %s", err.Error())
-				return nil, err
-			}
-			result := string(outTestCase.Data)
-
-			subscriber.log.Info("result after running test case: ", result)
-
-			dataSourceResult := types.NewDataSourceResult(aiDataSource, outTestCase.Data, types.ResultSuccess)
-
-			// By default, we consider returning null as failure. If any datasource does not follow this rule then it should not be used by any oracle scripts.
-			if len(outTestCase.Data) == 0 || result == "null" {
+				subscriber.log.Info(":skull: failed to execute test case, due to error: %s", err.Error())
 				// change status to fail so the datasource cannot be rewarded afterwards
 				dataSourceResult.Status = types.ResultFailure
 				dataSourceResult.Result = []byte(types.FailedResponseTc)
+			} else {
+				// remove all quotes at start and begin
+				result := strings.Trim(string(outTestCase.Data), QuoteString)
+				fmt.Println("result after running test case: ", result)
+				if result == "null" || len(outTestCase.Data) == 0 {
+					dataSourceResult.Status = types.ResultFailure
+					dataSourceResult.Result = []byte(types.FailedResponseTc)
+				} else {
+					dataSourceResult.Result = []byte(result)
+				}
 			}
 			// append an data source result into the list
 			dataSourceResultsTest = append(dataSourceResultsTest, dataSourceResult)
@@ -148,29 +150,29 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 
 		var dataSourceResult *types.DataSourceResult
 		if dataSourceResultTest.GetStatus() == types.ResultSuccess {
-
 			outDataSource, err := queryClient.DataSourceContract(ctx, &types.QueryDataSourceContract{
 				Name: dataSourceResultTest.GetName(),
 				Request: &types.RequestDataSource{
 					Input: inputStr,
 				},
 			})
+			// By default, we consider returning null as failure. If any datasource does not follow this rule then it should not be used by any oracle scripts.
+			dataSourceResult = types.NewDataSourceResult(dataSourceResultTest.GetName(), []byte{}, types.ResultSuccess)
 			if err != nil {
 				subscriber.log.Error(":skull: failed to execute data source script: %s", err.Error())
-				return nil, err
-			}
-			// remove all quote at start and begine
-			result := strings.Trim(string(outDataSource.Data), QuoteString)
-
-			subscriber.log.Info("star: result from data sources: ", result)
-			// By default, we consider returning null as failure. If any datasource does not follow this rule then it should not be used by any oracle scripts.
-			dataSourceResult = types.NewDataSourceResult(dataSourceResultTest.GetName(), []byte(result), types.ResultSuccess)
-			if len(result) == 0 {
 				// change status to fail so the datasource cannot be rewarded afterwards
 				dataSourceResult.Status = types.ResultFailure
 				dataSourceResult.Result = []byte(types.FailedResponseDs)
 			} else {
-				resultArr = append(resultArr, result)
+				// remove all quote at start and begin
+				result := strings.Trim(string(outDataSource.Data), QuoteString)
+				if len(outDataSource.Data) == 0 || result == "null" {
+					// change status to fail so the datasource cannot be rewarded afterwards
+					dataSourceResult.Status = types.ResultFailure
+					dataSourceResult.Result = []byte(types.FailedResponseDs)
+				} else {
+					resultArr = append(resultArr, result)
+				}
 			}
 		} else {
 			dataSourceResult = types.NewDataSourceResult(dataSourceResultTest.GetName(), []byte(dataSourceResultTest.GetResult()), types.ResultFailure)
@@ -196,7 +198,6 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 		msgReport.AggregatedResult = []byte(types.FailedResponseOs)
 		msgReport.ResultStatus = types.ResultFailure
 	} else {
-
 		query := &types.QueryOracleScriptContract{
 			Name: oscriptName,
 			Request: &types.RequestOracleScript{
@@ -208,10 +209,15 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 
 		if err != nil {
 			subscriber.log.Error(":skull: failed to aggregate results: %s", err.Error())
-			return nil, err
+			// do not return error since this is the error from the script side
+			msgReport.AggregatedResult = []byte(types.FailedResponseOs + ": " + err.Error())
+			msgReport.ResultStatus = types.ResultFailure
+			return msgReport, nil
 		}
-		subscriber.log.Info("final result from oScript: %s", string(outOScript.Data))
-		msgReport.AggregatedResult = outOScript.Data
+		// remove all quote at start and begin
+		result := strings.Trim(string(outOScript.Data), QuoteString)
+		subscriber.log.Info("final result from oScript: %s", result)
+		msgReport.AggregatedResult = []byte(result)
 	}
 
 	// TODO: check aggregated result value of the oracle script to verify if it fails or success

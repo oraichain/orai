@@ -58,8 +58,8 @@ func (m msgServer) EditAIDataSource(goCtx context.Context, msg *types.MsgEditAID
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if m.keeper.HasDataSource(ctx, msg.NewName) {
-		return nil, sdkerrors.Wrap(types.ErrDataSourceNameExists, "Name already exists")
+	if !m.keeper.HasDataSource(ctx, msg.OldName) {
+		return nil, sdkerrors.Wrap(types.ErrDataSourceNotFound, "Data source is not found")
 	}
 
 	aiDataSource, err := m.keeper.GetAIDataSource(ctx, msg.OldName)
@@ -146,8 +146,8 @@ func (m msgServer) EditOracleScript(goCtx context.Context, msg *types.MsgEditOra
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if m.keeper.HasDataSource(ctx, msg.NewName) {
-		return nil, sdkerrors.Wrap(types.ErrOracleScriptNameExists, "Name already exists")
+	if !m.keeper.HasOracleScript(ctx, msg.OldName) {
+		return nil, sdkerrors.Wrap(types.ErrOracleScriptNotFound, "Oracle script does not exist")
 	}
 
 	// Validate the oScript inputs
@@ -235,8 +235,8 @@ func (m msgServer) EditTestCase(goCtx context.Context, msg *types.MsgEditTestCas
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	if m.keeper.HasTestCase(ctx, msg.NewName) {
-		return nil, sdkerrors.Wrap(types.ErrTestCaseNameExists, "Name already exists")
+	if !m.keeper.HasTestCase(ctx, msg.NewName) {
+		return nil, sdkerrors.Wrap(types.ErrTestCaseNotFound, "Test case does not exist")
 	}
 
 	testCase, err := m.keeper.GetTestCase(ctx, msg.OldName)

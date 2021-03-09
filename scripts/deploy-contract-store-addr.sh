@@ -15,6 +15,8 @@ then
     code_id=$(echo $store_ret | jq -r '.logs[0].events[0].attributes[] | select(.key | contains("code_id")).value')
 fi 
 
+echo "init value: $init"
+
 # echo "oraid tx wasm instantiate $code_id '$init' --from $USER --label '$label' --gas auto --gas-adjustment 1.2 --chain-id=$CHAIN_ID -y"
 # quote string with "" with escape content inside which contains " characters
 (echo $PASSPHRASE;echo $PASSPHRASE) | oraid tx wasm instantiate $code_id "$init" --from $USER --label "$label" --gas auto --gas-adjustment 1.2 --chain-id=$CHAIN_ID -y

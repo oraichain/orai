@@ -58,6 +58,14 @@ RUST_BACKTRACE=1 cargo unit-test -- --exact contract::tests::increment --show-ou
 ./scripts/deploy-contract.sh smart-contracts/testcase-price/artifacts/testcase_price.wasm "testcase-price 1" '{"ai_data_source":"datasource_eth","testcase":"testcase_price"}' [code_id]
 # if not, then don't add the [code-id] field, it will give an error because the smart contract has not had a code id yet.
 
+# query a data source through cli
+oraid query wasm contract-state smart $CONTRACT '{"get":{"input":""}}'
+
+# query wasm through lcd
+curl <url>/wasm/v1beta1/contract/<contract-address>/smart/<json-string-encoded-in-base64>
+
+oraid query wasm contract-state smart orai16at0lzgx3slnqlgvcc7r79056f5wkuczenn09k '{"test":{"input":"{\"image\":\"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfx__RoRYzLDgXDiJxYGxLihJC4zoqV3V0xg&usqp=CAU\",\"model\":\"inception_v3\",\"name\":\"test_image\"}","output":"a","contract":"orai1aysde07zjurpp99jgl4xa7vskr8xnlcfkedkd9"}}'
+
 ```
 
 ## Some basic commands to test with the node
@@ -68,14 +76,19 @@ Run websocket as background process
 echo <passphrase> | oraid tx websocket subscribe --max-try 10 --from $USER --gas="auto" --gas-adjustment="1.2" --chain-id=Oraichain -y
 ```
 
-Init smart contracts and create an AI request
+Init smart contracts and create an AI request. To run the script, your current dir must contain the smart-contracts/ directory that already have wasm files built. The directory name with the wasm file should also be consistent. Eg: dir name: classification, then the wasm file is classification.wasm
 
 ```bash
 
-./scripts/basic.sh <passphrase>
+./scripts/deploy_ai_services.sh <list-of-datasource-names> <list-of-testcase-names> <oscript-name> <datasource-init-input> <testcase-input> <script-indexing> <passphrase>
+
+Eg: ./scripts/deploy_ai_services.sh classification,cv009 classification_testcase classification_oscript '' '' '' 1 123456789
 
 # open another terminal and run
 oraid tx airequest set-aireq oscript_eth "5" "6" 30000orai 1 --from $USER --chain-id Oraichain -y
+
+# interact with the AI services 
+oraid tx airequest set-aireq classification_oscript '{"image":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfx__RoRYzLDgXDiJxYGxLihJC4zoqV3V0xg&usqp=CAU","model":"inception_v3","name":"test_image"}' "6" 30000orai 1 --from $USER --chain-id Oraichain -y
 
 # Check if the AI request has finished executing
 oraid query airesult fullreq <request-id>
