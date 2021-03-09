@@ -42,8 +42,6 @@ docker-compose exec -d orai ash -c "echo $KEYRING_PASS | oraid tx websocket subs
 ```bash
 # go to rust-optimizer container
 docker-compose exec rust bash
-cd play-smartc
-optimize.sh .
 # similarly, build other smart contracts
 cd datasource-eth
 optimize.sh .
