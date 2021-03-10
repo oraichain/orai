@@ -12,9 +12,17 @@
         "fetch": {
           "type": "object",
           "required": [
+            "body",
+            "method",
             "url"
           ],
           "properties": {
+            "body": {
+              "type": "string"
+            },
+            "method": {
+              "type": "string"
+            },
             "url": {
               "type": "string"
             }

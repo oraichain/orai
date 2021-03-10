@@ -5,11 +5,19 @@
     {
       "type": "object",
       "required": [
-        "get_price"
+        "get"
       ],
       "properties": {
-        "get_price": {
-          "type": "object"
+        "get": {
+          "type": "object",
+          "required": [
+            "input"
+          ],
+          "properties": {
+            "input": {
+              "type": "string"
+            }
+          }
         }
       }
     }
