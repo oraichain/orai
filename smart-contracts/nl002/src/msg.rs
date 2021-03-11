@@ -19,6 +19,17 @@ pub enum QueryMsg {
 #[serde(rename_all = "snake_case")]
 /// An implementation of QueryRequest::Custom to show this works and can be extended in the contract
 pub enum SpecialQuery {
-    Fetch { url: String },
+    Fetch {
+        url: String,
+        method: String,
+        body: String,
+    },
 }
 impl CustomQuery for SpecialQuery {}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub struct QueryResponse {
+    status: String,
+    data: String,
+}
