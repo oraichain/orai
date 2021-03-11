@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
@@ -20,12 +19,6 @@ type OracleQueryPlugin struct {
 	client  *http.Client
 	bank    bankkeeper.ViewKeeper
 	staking stakingkeeper.Keeper
-}
-
-// OracleResponsePlugin is used for storing the oracle response
-type OracleResponsePlugin struct {
-	ResponseCode string          `json:"code"`
-	Data         json.RawMessage `json:"data"`
 }
 
 func (oracleQueryPlugin OracleQueryPlugin) Custom(ctx sdk.Context, query json.RawMessage) ([]byte, error) {
@@ -64,28 +57,9 @@ func (oracleQueryPlugin OracleQueryPlugin) Custom(ctx sdk.Context, query json.Ra
 		// return empty bytes to show that the response content has error
 		return []byte{}, err
 	}
-
-	// convert the content to struct to verify the status code
-	response := OracleResponsePlugin{}
-	err = json.Unmarshal(contents, &response)
-	if err != nil {
-		oracleQueryPlugin.staking.Logger(ctx).Error(fmt.Sprintf("the response content does not match the required structure: %v\n", err))
-		// return empty bytes to show that the response content has error
-		return []byte{}, err
-	}
-
-	// check response code and data length
-	codeInt, err := strconv.Atoi(response.ResponseCode)
-	if err != nil || (response.ResponseCode != "200" && codeInt != 200 && response.ResponseCode != "sucess") || len(response.Data) == 0 {
-
-		// bad case we dont care about the error, just return empty content, as long it is Binary compatible
-		oracleQueryPlugin.staking.Logger(ctx).Error(fmt.Sprintf("the status code is not correct, or the response does not contain any data\n"))
-		return []byte{}, fmt.Errorf("the status code is not correct, or the response does not contain any data")
-	}
-	// remove double quotes from the response data
-	responseUnquote, _ := strconv.Unquote(string(response.Data))
 	// return the actual content of the oracle response
-	responseBytes, err := ModuleCdc.LegacyAmino.MarshalJSON([]byte(responseUnquote))
+	responseBytes, err := ModuleCdc.LegacyAmino.MarshalJSON([]byte(contents))
+	fmt.Println("content: ", string(contents))
 	if err != nil {
 		oracleQueryPlugin.staking.Logger(ctx).Error(fmt.Sprintf("cannot marshal the response data with error: %v\n", err))
 		return []byte(fmt.Sprintf("cannot marshal the response data with error: %v\n", err)), err
