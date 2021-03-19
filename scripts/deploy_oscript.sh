@@ -11,7 +11,8 @@ OS=${3:-classification_oscript}
 OS_DS=''
 OS_TC=''
 NONCE=${5:-1}
-PASS=${6:-123456789}
+DIR_PATH=${6:-$PWD}
+PASS=${7:-123456789}
 
 # add double quotes in the list of data sources
 for ((i=0; i<${#DS[@]}; i++));
@@ -31,7 +32,7 @@ OS_TC=${OS_TC::-1}
 
 OS_INPUT=${4:-'{"ai_data_source":['$OS_DS'],"testcase":['$OS_TC']}'}
 
-sh $PWD/scripts/deploy-contract-store-addr.sh $PWD/smart-contracts/$OS/artifacts/$OS.wasm "$OS $NONCE" "$OS_INPUT" $PASS
+sh $PWD/scripts/deploy-contract-store-addr.sh $DIR_PATH/smart-contracts/$OS/artifacts/$OS.wasm "$OS $NONCE" "$OS_INPUT" $PASS
 
 # check if the oracle script exists or not
 oraid query provider oscript $OS 2> is_exist.txt

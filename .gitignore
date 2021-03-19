@@ -52,6 +52,7 @@ contract_tests/*
 .oraicli/
 .oraid/
 .wasmd/
+oraiwasm/
 .registry_cache/
 .ash_history
 .bash_history

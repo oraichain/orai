@@ -5,12 +5,13 @@ IFS=',' read -r -a TC <<< "$1"
 TC=${TC:-classification_testcase}
 TC_INPUT=${2:-''}
 NONCE=${3:-1}
-PASS=${4:-123456789}
+DIR_PATH=${4:-$PWD}
+PASS=${5:-123456789}
 
 # deploy smart contract test case and create test case
 for i in "${TC[@]}"
 do
-    sh $PWD/scripts/deploy-contract-store-addr.sh $PWD/smart-contracts/$i/artifacts/$i.wasm "$i $NONCE" "$TC_INPUT" $PASS
+    sh $PWD/scripts/deploy-contract-store-addr.sh $DIR_PATH/smart-contracts/$i/artifacts/$i.wasm "$i $NONCE" "$TC_INPUT" $PASS
 
     # check if the test case exists or not
     oraid query provider tcase $i 2> is_exist.txt

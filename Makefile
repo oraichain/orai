@@ -74,6 +74,7 @@ watch:
 
 build:
 	BUILD_TAGS=muslc make go-build
+	cp build/oraid /bin
 
 go-build: go.sum
 ifeq ($(OS),Windows_NT)

@@ -21,12 +21,6 @@ type OracleQueryPlugin struct {
 	staking stakingkeeper.Keeper
 }
 
-// OracleResponsePlugin is used for storing the oracle response
-type OracleResponsePlugin struct {
-	ResponseCode string          `json:"code"`
-	Data         json.RawMessage `json:"data"`
-}
-
 func (oracleQueryPlugin OracleQueryPlugin) Custom(ctx sdk.Context, query json.RawMessage) ([]byte, error) {
 	var request types.Request
 

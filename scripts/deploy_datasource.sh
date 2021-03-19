@@ -5,14 +5,15 @@ IFS=',' read -r -a DS <<< "$1"
 DS=${DS:-classification}
 DS_INPUT=${2:-''}
 NONCE=${3:-1}
-PASS=${4:-123456789}
+DIR_PATH=${4:-$PWD}
+PASS=${5:-123456789}
 
 echo "data sources: ${DS[@]}"
 
 # deploy smart contract data source and create data source
 for i in "${DS[@]}"
 do
-    sh $PWD/scripts/deploy-contract-store-addr.sh $PWD/smart-contracts/$i/artifacts/$i.wasm "$i $NONCE" "$DS_INPUT" $PASS
+    sh $PWD/scripts/deploy-contract-store-addr.sh $DIR_PATH/smart-contracts/$i/artifacts/$i.wasm "$i $NONCE" "$DS_INPUT" $PASS
 
     # check if the data source exists or not
     oraid query provider dsource $i 2> is_exist.txt

@@ -55,11 +55,11 @@ RUST_BACKTRACE=1 cargo unit-test -- --exact contract::tests::increment --show-ou
 
 # can using automated deployment
 # if the smart contract has been stored using oraid tx wasm store, then use the below command with suitable code id
-./scripts/deploy-contract.sh smart-contracts/testcase-price/artifacts/testcase_price.wasm "testcase-price 1" '{"ai_data_source":"datasource_eth","testcase":"testcase_price"}' [code_id]
+./scripts/deploy-contract.sh smart-contracts/testcase-price/artifacts/testcase_price.wasm "testcase-price 1" '{"ai_data_source":["datasource_eth"],"testcase":["testcase_price"]}' [code_id]
 # if not, then don't add the [code-id] field, it will give an error because the smart contract has not had a code id yet.
 
 # query a data source through cli
-oraid query wasm contract-state smart $CONTRACT '{"get":{"input":""}}'
+oraid query wasm contract-state smart $CONTRACT '{"get":{"input":"{\"image\":\"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfx__RoRYzLDgXDiJxYGxLihJC4zoqV3V0xg&usqp=CAU\",\"model\":\"inception_v3\",\"name\":\"test_image\"}"}}'
 
 # query wasm through lcd
 curl <url>/wasm/v1beta1/contract/<contract-address>/smart/<json-string-encoded-in-base64>
@@ -80,9 +80,9 @@ Init smart contracts and create an AI request. To run the script, your current d
 
 ```bash
 
-./scripts/deploy_ai_services.sh <list-of-datasource-names> <list-of-testcase-names> <oscript-name> <datasource-init-input> <testcase-input> <script-indexing> <passphrase>
+./scripts/deploy_ai_services.sh <list-of-datasource-names> <list-of-testcase-names> <oscript-name> <datasource-init-input> <testcase-input> <script-indexing> <path to the oraiwasm directory> <passphrase>
 
-Eg: ./scripts/deploy_ai_services.sh classification,cv009 classification_testcase classification_oscript '' '' '' 1 123456789
+Eg: ./scripts/deploy_ai_services.sh classification,cv009 classification_testcase classification_oscript '' '' '{"ai_data_source":["classification","cv009"],"testcase":["classification_testcase"]}' 1 /workspace/oraiwasm 123456789
 
 # open another terminal and run
 oraid tx airequest set-aireq oscript_eth "5" "6" 30000orai 1 --from $USER --chain-id Oraichain -y
@@ -94,6 +94,8 @@ oraid tx airequest set-aireq classification_oscript '{"image":"https://encrypted
 oraid query airesult fullreq <request-id>
 
 ```
+
+Most of the time, the initial inputs for data sources and test cases are unecessary. However, you must set the input json for the oracle script with data source and test case information.
 
 ## Run test
 `make test-method PACKAGE=github.com/oraichain/orai/x/airequest/keeper METHOD=TestCalucateMol`
