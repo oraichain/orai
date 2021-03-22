@@ -213,6 +213,12 @@ func (k *Querier) QueryMinFees(goCtx context.Context, req *types.MinFeesReq) (*t
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	if req.OracleScriptName == "min_gas_prices" && req.ValNum <= 0 {
+		return &types.MinFeesRes{
+			MinFees: ctx.MinGasPrices().String(),
+		}, nil
+	}
+
 	// id of the request
 	_, err := k.keeper.GetOracleScript(ctx, req.OracleScriptName)
 	if err != nil {
