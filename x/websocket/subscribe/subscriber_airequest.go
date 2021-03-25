@@ -27,8 +27,26 @@ func (subscriber *Subscriber) submitReport(msgReport *types.MsgCreateReport) (er
 		subscriber.log.Error(":exploding_head: Failed to validate basic with error: %s", err.Error())
 		return err
 	}
-
+	// collect gas prices to create a new report
+	minGasPrices := subscriber.config.Txf.GasPrices().String()
+	// if the validator does not specify gas prices then we collect from the api get min gas prices
+	if minGasPrices == "" {
+		minGasPrices, err = getMinGasPrices()
+		if err != nil {
+			subscriber.log.Error(":exploding_head: Failed to collect the minimum gas prices of your node to create a new report with error: %s", err.Error())
+			return err
+		}
+		// test parsing the gas prices to prevent panic
+		_, err = sdk.ParseDecCoins(minGasPrices)
+		if err != nil {
+			subscriber.log.Error(":exploding_head: Invalid syntax for the minimum gas prices. Expected orai, got error: %s", err.Error())
+			return err
+		}
+	}
 	txf := subscriber.newTxFactory("websocket")
+	// add gas prices to pay for the report
+	txf = txf.WithGasPrices(minGasPrices)
+	txf = txf.WithGasAdjustment(subscriber.config.Txf.GasAdjustment())
 	for try := uint64(1); try <= subscriber.config.MaxTry; try++ {
 		subscriber.log.Info(":e-mail: Try to broadcast report transaction(%d/%d)", try, subscriber.config.MaxTry)
 		err = tx.BroadcastTx(*subscriber.cliCtx, txf, msgReport)
