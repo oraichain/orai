@@ -145,12 +145,7 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 				// remove all quotes at start and begin
 				result := strings.Trim(string(outTestCase.Data), QuoteString)
 				fmt.Println("result after running test case: ", result)
-				if result == "null" || len(outTestCase.Data) == 0 {
-					dataSourceResult.Status = types.ResultFailure
-					dataSourceResult.Result = []byte(types.FailedResponseTc)
-				} else {
-					dataSourceResult.Result = []byte(result)
-				}
+				dataSourceResult.Result = []byte(result)
 			}
 			// append an data source result into the list
 			dataSourceResultsTest = append(dataSourceResultsTest, dataSourceResult)
@@ -189,6 +184,7 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 					dataSourceResult.Status = types.ResultFailure
 					dataSourceResult.Result = []byte(types.FailedResponseDs)
 				} else {
+					dataSourceResult.Result = []byte(result)
 					resultArr = append(resultArr, result)
 				}
 			}

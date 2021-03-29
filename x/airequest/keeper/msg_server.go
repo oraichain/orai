@@ -30,6 +30,11 @@ func (k msgServer) CreateAIRequest(goCtx context.Context, msg *types.MsgSetAIReq
 		return nil, types.ErrOScriptNotFound
 	}
 
+	// validate if the request id exists or not
+	if k.keeper.HasAIRequest(ctx, msg.RequestID) {
+		return nil, sdkerrors.Wrap(types.ErrRequestInvalid, "The request id already exists")
+	}
+
 	validators, err := k.keeper.RandomValidators(ctx, int(msg.ValidatorCount), []byte(msg.RequestID))
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrCannotRandomValidators, err.Error())

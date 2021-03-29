@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"fmt"
 	"testing"
 
 	airequestkeeper "github.com/oraichain/orai/x/airequest/keeper"
@@ -31,6 +32,7 @@ func TestResolveRequestsFromReports(t *testing.T) {
 	valConsPk1 := PKS[0]
 	valConsPk2 := PKS[1]
 	valConsPk3 := PKS[2]
+	valConsPk4 := PKS[4]
 
 	// init sim app
 	app := simapp.Setup(false)
@@ -52,9 +54,12 @@ func TestResolveRequestsFromReports(t *testing.T) {
 	tstaking.Commission = stakingtypes.NewCommissionRates(sdk.NewDecWithPrec(10, 2), sdk.NewDecWithPrec(5, 1), sdk.NewDec(0))
 	tstaking.CreateValidator(valAddrs[2], valConsPk3, sdk.NewInt(150000000), true)
 
+	tstaking.Commission = stakingtypes.NewCommissionRates(sdk.NewDecWithPrec(10, 2), sdk.NewDecWithPrec(5, 1), sdk.NewDec(0))
+	tstaking.CreateValidator(valAddrs[3], valConsPk4, sdk.NewInt(300000000), true)
+
 	providerKeeper := providerkeeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName))
 	airequestKeeper := airequestkeeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName), app.StakingKeeper, app.BankKeeper, nil)
-	websocketKeeper := websocketkeeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, nil, app.StakingKeeper)
+	websocketKeeper := websocketkeeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, nil, app.StakingKeeper, airequestKeeper)
 
 	// init keeper to run custom allocate tokens
 	// here we borrow staking module to store the reward in the replacement of airesult
@@ -104,7 +109,7 @@ func TestResolveRequestsFromReports(t *testing.T) {
 	tcResult2 := websockettypes.NewTestCaseResult(firstTestCase.Name, dsResults)
 	tcResults := []*websockettypes.TestCaseResult{tcResult1, tcResult2}
 
-	// init reporter
+	// init reporter with validator 0
 	reporter := websockettypes.NewReporter(addrs[0], "reporter", valAddrs[0])
 
 	// init report
@@ -115,9 +120,26 @@ func TestResolveRequestsFromReports(t *testing.T) {
 	require.NoError(t, err)
 
 	reward := airesulttypes.DefaultReward(1)
-	testKeeper.Keeper.ResolveRequestsFromReports(ctx, report, reward, 1, 60)
+	isValid, _ := testKeeper.Keeper.ResolveRequestsFromReports(ctx, report, reward, 1, 60)
 
-	// Remember that we are using coins, so the values will be truncated along the way. When applying the equations in the medium post, remember to truncate the final result.
-	require.Equal(t, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(21))), reward.ProviderFees)
-	require.Equal(t, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(8))), reward.ValidatorFees)
+	// if it's validator 0 then true
+	require.Equal(t, true, isValid)
+	fmt.Println("validator status: ", testKeeper.StakingKeeper.Validator(ctx, valAddrs[0]).GetStatus().String())
+	fmt.Println("reward: ", reward.GetValidators())
+
+	// init reporter with validator 0
+	reporter = websockettypes.NewReporter(addrs[0], "reporter", valAddrs[3])
+
+	// init report
+	report = websockettypes.NewReport(id, dsResults, tcResults, 1, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(29))), []byte{0x50}, reporter, "")
+
+	// verify report
+	err = testKeeper.WebSocketKeeper.AddReport(ctx, id, report)
+	require.NoError(t, err)
+
+	reward = airesulttypes.DefaultReward(1)
+	isValid, _ = testKeeper.Keeper.ResolveRequestsFromReports(ctx, report, reward, 1, 60)
+
+	// if it's validator 3 then should be false
+	require.Equal(t, false, isValid)
 }

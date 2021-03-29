@@ -419,7 +419,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	)
 
 	app.websocketKeeper = websocket.NewKeeper(
-		appCodec, keys[websocket.StoreKey], &app.wasmKeeper, app.providerKeeper, app.stakingKeeper,
+		appCodec, keys[websocket.StoreKey], &app.wasmKeeper, app.providerKeeper, app.stakingKeeper, app.airequestKeeper,
 	)
 
 	app.airesultKeeper = airesult.NewKeeper(
@@ -707,7 +707,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 }
 
 func (app *OraichainApp) upgradeHandler() {
-	// app.upgradeKeeper.SetUpgradeHandler("ai-oracle-v7", func(ctx sdk.Context, plan upgradetypes.Plan) {
-	// 	// upgrade changes here
-	// })
+	app.upgradeKeeper.SetUpgradeHandler("v0.20.2", func(ctx sdk.Context, plan upgradetypes.Plan) {
+		// upgrade changes here
+	})
 }
