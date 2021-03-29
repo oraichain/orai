@@ -12,7 +12,7 @@ func (k Keeper) ResolveResult(ctx sdk.Context, rep *aioracle.Report, valCount in
 	id := rep.GetRequestID()
 	// get a new validator object for the result object.
 	valAddress := rep.GetReporter().GetValidator()
-	validator := k.NewValidator(valAddress, k.StakingKeeper.Validator(ctx, valAddress).GetConsensusPower(), "active")
+	validator := k.NewValidator(valAddress, k.StakingKeeper.Validator(ctx, valAddress).GetConsensusPower(), k.StakingKeeper.Validator(ctx, valAddress).GetStatus().String())
 
 	if !k.HasResult(ctx, id) {
 		// if the the request only needs a validator to return a result from the report then it's finished

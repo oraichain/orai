@@ -29,6 +29,11 @@ func (k msgServer) CreateAIOracle(goCtx context.Context, msg *types.MsgSetAIOrac
 		return nil, sdkerrors.Wrap(types.ErrCannotRandomValidators, err.Error())
 	}
 
+	// validate if the request id exists or not
+	if k.keeper.HasAIOracle(ctx, msg.RequestID) {
+		return nil, sdkerrors.Wrap(types.ErrRequestInvalid, "The request id already exists")
+	}
+
 	// we can safely parse fees to coins since we have validated it in the Msg already
 	providedFees, _ := sdk.ParseCoinsNormalized(msg.Fees)
 

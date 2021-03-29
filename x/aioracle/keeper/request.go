@@ -73,27 +73,23 @@ func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *types.Report, r
 		return false, 0
 	}
 
-	// collect data source owners that have their data sources executed to reward
-	for _, dataSourceResult := range rep.GetDataSourceResults() {
-		if dataSourceResult.GetStatus() == k.GetKeyResultSuccess() {
+	// // collect data source owners that have their data sources executed to reward
+	// for _, dataSourceResult := range rep.GetDataSourceResults() {
+	// 	if dataSourceResult.GetStatus() == k.webSocketKeeper.GetKeyResultSuccess() {
+	// 		dataSource, _ := k.providerKeeper.GetAIDataSource(ctx, dataSourceResult.GetName())
+	// 		reward.DataSources = append(reward.DataSources, *dataSource)
+	// 		reward.ProviderFees = reward.ProviderFees.Add(dataSource.GetFees()...)
+	// 	}
+	// }
 
-			// reward.ProviderFees = reward.ProviderFees.Add(dataSource.GetFees()...)
-		}
-	}
-
-	// collect data source owners that have their data sources executed to reward
+	// // collect data source owners that have their data sources executed to reward
 	// for _, testCaseResult := range rep.GetTestCaseResults() {
+	// 	testCase, _ := k.providerKeeper.GetTestCase(ctx, testCaseResult.GetName())
+	// 	reward.TestCases = append(reward.TestCases, *testCase)
 	// 	reward.ProviderFees = reward.ProviderFees.Add(testCase.GetFees()...)
 	// }
 	// change reward ratio to the ratio of validator
-	// 0.4 by default, 2 decimals for percentage
 	rewardRatio := k.GetParam(ctx, types.KeyAIOracleRewardPercentages)
-	if rewardRatio < 0 {
-		rewardRatio = 0
-	}
-	if rewardRatio > 1 {
-		rewardRatio = 1
-	}
 
 	// reward = 1 - oracle reward percentage × (data source fees + test case fees)
 	valFees, _ := sdk.NewDecCoinsFromCoins(reward.ProviderFees...).MulDec(sdk.NewDec(int64(rewardRatio))).TruncateDecimal()
@@ -101,7 +97,11 @@ func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *types.Report, r
 	reward.ValidatorFees = reward.ValidatorFees.Add(valFees...)
 	// store information into the reward struct to reward these entities in the next begin block
 	valAddress := rep.GetReporter().GetValidator()
-	validator := k.NewValidator(valAddress, k.StakingKeeper.Validator(ctx, valAddress).GetConsensusPower(), "active")
+
+	// collect validator current status
+	val := k.StakingKeeper.Validator(ctx, valAddress)
+	// create a new validator wrapper and append to reward obj
+	validator := k.NewValidator(valAddress, val.GetConsensusPower(), val.GetStatus().String())
 	reward.Validators = append(reward.Validators, *validator)
 	reward.TotalPower += validator.GetVotingPower()
 
@@ -123,15 +123,16 @@ func (k Keeper) validateBasic(ctx sdk.Context, req *types.AIOracle, rep *types.R
 		return false
 	}
 
-	// // Count the total number of data source results to see if it matches the requested data sources
-	// if len(rep.GetDataSourceResults()) != len(req.GetAiDataSources()) {
-	// 	k.Logger(ctx).Error("data source result length is different")
-	// 	return false
-	// }
+	// Check if validator exists and active
+	_, isExist := k.StakingKeeper.GetValidator(ctx, rep.GetReporter().GetValidator())
+	if !isExist {
+		k.Logger(ctx).Error(fmt.Sprintf("error in validating the report: validator does not exist"))
+		return false
+	}
 
-	// // Count the total number of test case results to see if it matches the requested test cases
-	// if len(rep.GetTestCaseResults()) != len(req.GetTestCases()) {
-	// 	k.Logger(ctx).Error("test case result length is different")
+	// // check if validator is bonded or not
+	// if isBonded := validator.IsBonded(); !isBonded {
+	// 	k.Logger(ctx).Error(fmt.Sprintf("error in validating the report: validator is not bonded, cannot send reports to receive rewards"))
 	// 	return false
 	// }
 

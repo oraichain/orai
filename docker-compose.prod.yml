@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   orai:
-    image: orai/orai:0.17-alpine
+    image: orai/orai:0.20.1-alpine
     tty: true
     ulimits:
       nofile:
