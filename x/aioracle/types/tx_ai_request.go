@@ -16,12 +16,15 @@ func (msg *MsgSetAIOracleReq) ValidateBasic() error {
 	// if msg.Owner.Empty() {
 	// 	return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Owner.String())
 	// }
-	if msg.Contract.Empty() {
+	if len(msg.Contract) == 0 || msg.ValidatorCount <= 0 {
 		return sdkerrors.Wrap(ErrRequestInvalid, "Name or / and validator count cannot be empty")
 	}
 	_, err := sdk.ParseCoinsNormalized(msg.Fees)
 	if err != nil {
 		return sdkerrors.Wrap(ErrRequestFeesInvalid, err.Error())
+	}
+	if len(msg.Fees) == 0 {
+		return sdkerrors.Wrap(ErrRequestFeesInvalid, "The fee format is not correct")
 	}
 	return nil
 }
