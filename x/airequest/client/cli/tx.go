@@ -29,7 +29,7 @@ func GetTxCmd() *cobra.Command {
 // GetCmdSetAIRequest is the CLI command for sending a SetAIRequest transaction
 func GetCmdSetAIRequest() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-aireq [oracle-script-name] [input] [expected-output] [transaction-fees] [validator-count]",
+		Use:   "set-aireq [oracle-script-name] [input] [expected-output] [request-fees] [validator-count]",
 		Short: "Set a new ai request and set result into the system",
 		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {

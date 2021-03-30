@@ -1,19 +1,10 @@
 package types
 
 import (
-	"regexp"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	provider "github.com/oraichain/orai/x/provider/types"
 )
-
-var (
-	reporterNameLen = 20000  // 20KB
-	msgLen          = 200000 // 200KB
-)
-
-// regex allow only alphabet, numeric and underscore characters
-var isStringAlphabetic = regexp.MustCompile(`^[a-zA-Z0-9_]*$`).MatchString
 
 // Route should return the name of the module
 func (msg *MsgCreateReport) Route() string { return RouterKey }
@@ -24,7 +15,7 @@ func (msg *MsgCreateReport) Type() string { return "create_report" }
 // ValidateBasic runs stateless checks on the message
 func (msg *MsgCreateReport) ValidateBasic() error {
 	reporter := msg.GetReporter()
-	if reporter.GetAddress().Empty() || len(reporter.GetName()) == 0 || !isStringAlphabetic(reporter.GetName()) || len(reporter.GetName()) >= reporterNameLen {
+	if reporter.GetAddress().Empty() || len(reporter.GetName()) == 0 || !provider.IsStringAlphabetic(reporter.GetName()) || len(reporter.GetName()) >= ReporterNameLen {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, reporter.String())
 	} else if len(msg.GetRequestID()) == 0 || reporter.Validator.Empty() {
 		return sdkerrors.Wrap(ErrMsgReportInvalid, "Request ID / validator address cannot be empty")
@@ -46,13 +37,16 @@ func (msg *MsgCreateReport) ValidateBasic() error {
 		aggregatedResultSize := len(msg.AggregatedResult)
 		requestIdSize := len(msg.RequestID)
 		finalLen := dsResultSize + tcResultSize + aggregatedResultSize + requestIdSize
-		if finalLen >= msgLen {
+		if finalLen >= MsgLen {
 			return sdkerrors.Wrap(ErrMsgReportInvalid, "Size of the report should not be larger than 200KB")
 		}
 
 		_, err := sdk.ParseCoinsNormalized(msg.Fees.String())
 		if err != nil {
 			return sdkerrors.Wrap(ErrReportFeeTypeInvalid, err.Error())
+		}
+		if len(msg.Fees.String()) == 0 {
+			return sdkerrors.Wrap(ErrReportFeeTypeInvalid, "The fee format is not correct")
 		}
 		return nil
 	}

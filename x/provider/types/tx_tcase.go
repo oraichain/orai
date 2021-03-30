@@ -29,7 +29,7 @@ func (msg *MsgCreateTestCase) ValidateBasic() error {
 	if len(msg.Name) == 0 || len(msg.Contract) == 0 {
 		return sdkerrors.Wrap(ErrEmpty, "Name or/and contract address cannot be empty")
 	}
-	if !isStringAlphabetic(msg.Name) || !isStringAlphabetic(msg.Contract) || !isStringAlphabetic(msg.Description) {
+	if !IsStringAlphabetic(msg.Name) || !IsStringAlphabetic(msg.Contract) || !IsStringAlphabetic(msg.Description) {
 		return sdkerrors.Wrap(ErrCannotSetOracleScript, "Input contains invalid characters")
 	}
 
@@ -77,7 +77,7 @@ func (msg MsgEditTestCase) ValidateBasic() error {
 	if len(msg.OldName) == 0 || len(msg.Contract) == 0 || len(msg.NewName) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Name and/or Contract cannot be empty")
 	}
-	if !isStringAlphabetic(msg.OldName) || !isStringAlphabetic(msg.NewName) || !isStringAlphabetic(msg.Contract) || !isStringAlphabetic(msg.Description) {
+	if !IsStringAlphabetic(msg.OldName) || !IsStringAlphabetic(msg.NewName) || !IsStringAlphabetic(msg.Contract) || !IsStringAlphabetic(msg.Description) {
 		return sdkerrors.Wrap(ErrCannotSetOracleScript, "Input contains invalid characters")
 	}
 

@@ -29,7 +29,7 @@ func (msg *MsgCreateOracleScript) ValidateBasic() error {
 	if len(msg.Name) == 0 || len(msg.Contract) == 0 {
 		return sdkerrors.Wrap(ErrCannotSetOracleScript, "Name and/or Contract cannot be empty")
 	}
-	if !isStringAlphabetic(msg.Name) || !isStringAlphabetic(msg.Contract) || !isStringAlphabetic(msg.Description) {
+	if !IsStringAlphabetic(msg.Name) || !IsStringAlphabetic(msg.Contract) || !IsStringAlphabetic(msg.Description) {
 		return sdkerrors.Wrap(ErrCannotSetOracleScript, "Input contains invalid characters")
 	}
 
@@ -57,7 +57,7 @@ func validateDSourcesTCases(dSources, tCases []string) error {
 		if len(dSource) == 0 {
 			return sdkerrors.Wrap(ErrCannotSetOracleScript, "data source inputs of oracle script cannot be empty")
 		}
-		if !isStringAlphabetic(dSource) {
+		if !IsStringAlphabetic(dSource) {
 			return sdkerrors.Wrap(ErrCannotSetOracleScript, "Input data source contains invalid characters")
 		}
 	}
@@ -66,7 +66,7 @@ func validateDSourcesTCases(dSources, tCases []string) error {
 		if len(tCase) == 0 {
 			return sdkerrors.Wrap(ErrCannotSetOracleScript, "test case inputs of oracle script cannot be empty")
 		}
-		if !isStringAlphabetic(tCase) {
+		if !IsStringAlphabetic(tCase) {
 			return sdkerrors.Wrap(ErrCannotSetOracleScript, "Input test case contains invalid characters")
 		}
 	}
@@ -106,7 +106,7 @@ func (msg *MsgEditOracleScript) ValidateBasic() error {
 	if len(msg.OldName) == 0 || len(msg.Contract) == 0 || len(msg.NewName) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Name and/or Contract cannot be empty")
 	}
-	if !isStringAlphabetic(msg.OldName) || !isStringAlphabetic(msg.NewName) || !isStringAlphabetic(msg.Contract) || !isStringAlphabetic(msg.Description) {
+	if !IsStringAlphabetic(msg.OldName) || !IsStringAlphabetic(msg.NewName) || !IsStringAlphabetic(msg.Contract) || !IsStringAlphabetic(msg.Description) {
 		return sdkerrors.Wrap(ErrCannotSetOracleScript, "Input contains invalid characters")
 	}
 

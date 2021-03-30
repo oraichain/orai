@@ -1,10 +1,9 @@
 package types
 
 import (
-	"regexp"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	provider "github.com/oraichain/orai/x/provider/types"
 )
 
 // Route should return the name of the module
@@ -22,18 +21,15 @@ func (msg *MsgSetAIRequest) ValidateBasic() error {
 		return sdkerrors.Wrap(ErrRequestInvalid, "Name or / and validator count cannot be empty")
 	}
 	// regex allow only alphabet, numeric and underscore characters
-	isStringAlphabetic := regexp.MustCompile(`^[a-zA-Z0-9_]*$`).MatchString
-	if !isStringAlphabetic(msg.OracleScriptName) {
+	if !provider.IsStringAlphabetic(msg.OracleScriptName) {
 		return sdkerrors.Wrap(ErrRequestInvalid, "The oracle script name contains invalid characters")
 	}
 	_, err := sdk.ParseCoinsNormalized(msg.Fees)
 	if err != nil {
 		return sdkerrors.Wrap(ErrRequestFeesInvalid, err.Error())
 	}
-
-	// threshold for the size of the request
-	if len(msg.ExpectedOutput)+len(msg.Input) > MaximumRequestBytesThreshold {
-		return sdkerrors.Wrap(ErrRequestInvalid, "The request is too large")
+	if len(msg.Fees) == 0 {
+		return sdkerrors.Wrap(ErrRequestFeesInvalid, "The fee format is not correct")
 	}
 	return nil
 }
