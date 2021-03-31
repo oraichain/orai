@@ -34,8 +34,27 @@ func (k msgServer) CreateAIOracle(goCtx context.Context, msg *types.MsgSetAIOrac
 		return nil, sdkerrors.Wrap(types.ErrRequestInvalid, "The request id already exists")
 	}
 
+	// check size of the request
+	maxBytes := int(k.keeper.GetParam(ctx, types.KeyMaximumAIOracleReqBytes))
+	// threshold for the size of the request
+	if len(msg.Input) > maxBytes {
+		return nil, sdkerrors.Wrap(types.ErrRequestInvalid, "The request is too large")
+	}
+
 	// we can safely parse fees to coins since we have validated it in the Msg already
 	providedFees, _ := sdk.ParseCoinsNormalized(msg.Fees)
+
+	// requiredFees, err := k.keeper.GetMinimumFees(ctx, aiDataSources, testCases, len(validators), k.keeper.providerKeeper.GetOracleScriptRewardPercentageParam(ctx))
+	// if err != nil {
+	// 	return nil, sdkerrors.Wrap(err, "Error getting minimum fees from oracle script")
+	// }
+	// k.keeper.Logger(ctx).Info(fmt.Sprintf("required fees needed: %v\n", requiredFees))
+
+	// // If the total fee is larger than the fee provided by the user then we return error
+	// if requiredFees.IsAnyGT(providedFees) {
+	// 	k.keeper.Logger(ctx).Error(fmt.Sprintf("Your payment fees is less than required\n"))
+	// 	return nil, sdkerrors.Wrap(types.ErrNeedMoreFees, fmt.Sprintf("Fees given: %v, where fees required is: %v", providedFees, requiredFees))
+	// }
 
 	// check if the account has enough spendable coins
 	spendableCoins := k.keeper.BankKeeper.SpendableCoins(ctx, msg.Creator)

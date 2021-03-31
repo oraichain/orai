@@ -1,7 +1,8 @@
 #!/usr/bin/make -f
 
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
-VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
+#VERSION := $(shell echo $(shell git describe --always) | sed 's/^v//')
+VERSION := v0.20.3
 COMMIT := $(shell git log -1 --format='%H')
 LEDGER_ENABLED ?= false
 GOMOD_FLAGS ?= -mod=readonly
