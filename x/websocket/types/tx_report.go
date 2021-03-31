@@ -45,9 +45,6 @@ func (msg *MsgCreateReport) ValidateBasic() error {
 		if err != nil {
 			return sdkerrors.Wrap(ErrReportFeeTypeInvalid, err.Error())
 		}
-		if len(msg.Fees.String()) == 0 {
-			return sdkerrors.Wrap(ErrReportFeeTypeInvalid, "The fee format is not correct")
-		}
 		return nil
 	}
 }
