@@ -31,10 +31,10 @@ oraid start --rpc.laddr tcp://0.0.0.0:26657 --log_level error
 oraivisor start --rpc.laddr tcp://0.0.0.0:26657 --log_level error
 
 # start websocket subscribe for processing event log in another terminal
-oraid tx websocket subscribe --max-try 10 --from $USER --gas="auto" --gas-adjustment="1.5" --chain-id=Oraichain -y
+oraid tx websocket subscribe --max-try 10 --from $USER --gas="auto" --gas-adjustment="1.5" --chain-id=$CHAIN_ID -y
 
 # run as a background process
-docker-compose exec -d orai ash -c "echo $KEYRING_PASS | oraid tx websocket subscribe --max-try 10 --from $USER --gas="auto" --gas-adjustment="1.5" --chain-id=Oraichain -y"
+docker-compose exec -d orai ash -c "echo $KEYRING_PASS | oraid tx websocket subscribe --max-try 10 --from $USER --gas="auto" --gas-adjustment="1.5" --chain-id=$CHAIN_ID -y"
 ```
 
 ## Build smart contract and interact with it
@@ -73,7 +73,7 @@ oraid query wasm contract-state smart orai16at0lzgx3slnqlgvcc7r79056f5wkuczenn09
 Run websocket as background process
 
 ```bash
-echo <passphrase> | oraid tx websocket subscribe --max-try 10 --from $USER --gas="auto" --gas-adjustment="1.5" --chain-id=Oraichain -y
+echo <passphrase> | oraid tx websocket subscribe --max-try 10 --from $USER --gas="auto" --gas-adjustment="1.5" --chain-id=$CHAIN_ID -y
 ```
 
 Init smart contracts and create an AI request. To run the script, your current dir must contain the smart-contracts/ directory that already have wasm files built. The directory name with the wasm file should also be consistent. Eg: dir name: classification, then the wasm file is classification.wasm
@@ -85,10 +85,10 @@ Init smart contracts and create an AI request. To run the script, your current d
 Eg: ./scripts/deploy_ai_services.sh classification,cv009 classification_testcase classification_oscript '' '' '{"ai_data_source":["classification","cv009"],"testcase":["classification_testcase"]}' 1 /workspace/oraiwasm 123456789
 
 # open another terminal and run
-oraid tx airequest set-aireq oscript_price "5" "6" 30000orai 1 --from $USER --chain-id Oraichain -y
+oraid tx airequest set-aireq oscript_price "5" "6" 30000orai 1 --from $USER --chain-id $CHAIN_ID -y
 
 # interact with the AI services 
-oraid tx airequest set-aireq classification_oscript '{"image":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfx__RoRYzLDgXDiJxYGxLihJC4zoqV3V0xg&usqp=CAU","model":"inception_v3","name":"test_image"}' "6" 30000orai 1 --from $USER --chain-id Oraichain -y
+oraid tx airequest set-aireq classification_oscript '{"image":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfx__RoRYzLDgXDiJxYGxLihJC4zoqV3V0xg&usqp=CAU","model":"inception_v3","name":"test_image"}' "6" 30000orai 1 --from $USER --chain-id $CHAIN_ID -y
 
 # Check if the AI request has finished executing
 oraid query airesult fullreq <request-id>
