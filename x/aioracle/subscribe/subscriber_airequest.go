@@ -16,7 +16,11 @@ const (
 	JoinString  = `-`
 )
 
+<<<<<<< HEAD:x/aioracle/subscribe/subscriber_airequest.go
 func (subscriber *Subscriber) handleAIOracleLog(queryClient types.QueryClient, ev *sdk.StringEvent) (*types.MsgSetAIOracleRes, error) {
+=======
+func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, ev *sdk.StringEvent) (*types.MsgCreateReport, error) {
+>>>>>>> c757530... add estimated fees for a report:x/websocket/subscribe/subscriber_airequest.go
 	subscriber.log.Info(":delivery_truck: Processing incoming request event before checking validators")
 
 	attrMap := GetAttributeMap(ev.GetAttributes())
