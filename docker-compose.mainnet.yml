@@ -2,8 +2,7 @@ version: '3.3'
 services:
   orai:
     container_name: orai_node
-    image: orai/orai:mainnet-alpine
-    working_dir: /workspace
+    image: orai/orai:mainnet-alpine    
     tty: true
     ports:
       - 1317:1317

@@ -8,7 +8,7 @@ message Fetch {
     option (gogoproto.goproto_stringer) = true;    
     string url = 1 [(gogoproto.moretags) = "json:\"url\""];
     string method = 2 [(gogoproto.moretags) = "json:\"method,omitempty\""]; 
-    string authorization = 3 [(gogoproto.moretags) = "json:\"authorization,omitempty\""]; 
+    repeated string headers = 3 [(gogoproto.moretags) = "json:\"headers,omitempty\""]; 
     string body = 4 [(gogoproto.moretags) = "json:\"body,omitempty\""]; 
 }
 
