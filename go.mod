@@ -3,8 +3,8 @@ module github.com/oraichain/orai
 go 1.15
 
 require (
-	github.com/CosmWasm/wasmd v0.15.0
-	github.com/cosmos/cosmos-sdk v0.41.3
+	github.com/CosmWasm/wasmd v0.15.1
+	github.com/cosmos/cosmos-sdk v0.42.3
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/cosmtrek/air v1.21.2 // indirect
 	github.com/creack/pty v1.1.11 // indirect
@@ -23,11 +23,11 @@ require (
 	github.com/segmentio/ksuid v1.0.3
 	github.com/snikch/goodman v0.0.0-20171125024755-10e37e294daa
 	github.com/spf13/cast v1.3.1
-	github.com/spf13/cobra v1.1.1
+	github.com/spf13/cobra v1.1.3
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0
-	github.com/tendermint/tendermint v0.34.7
+	github.com/tendermint/tendermint v0.34.8
 	github.com/tendermint/tm-db v0.6.4
 	golang.org/x/sync v0.0.0-20201207232520-09787c993a3a
 	golang.org/x/sys v0.0.0-20210220050731-9a76102bfb43 // indirect
