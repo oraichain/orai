@@ -38,8 +38,13 @@ func (oracleQueryPlugin OracleQueryPlugin) Custom(ctx sdk.Context, query json.Ra
 	req, err := http.NewRequest(request.Fetch.Method, request.Fetch.Url, r)
 
 	// authorization header
-	if request.Fetch.Authorization != "" {
-		req.Header.Add("Authorization", request.Fetch.Authorization)
+	if request.Fetch.Headers != nil {
+		for _, header := range request.Fetch.Headers {
+			index := strings.Index(header, ":")
+			if index != -1 {
+				req.Header.Add(header[:index], strings.TrimSpace(header[index:]))
+			}
+		}
 	}
 
 	// call request
