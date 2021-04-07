@@ -37,12 +37,12 @@ func (oracleQueryPlugin OracleQueryPlugin) Custom(ctx sdk.Context, query json.Ra
 	r := strings.NewReader(request.Fetch.Body)
 	req, err := http.NewRequest(request.Fetch.Method, request.Fetch.Url, r)
 
-	// authorization header
+	// accumulating headers
 	if request.Fetch.Headers != nil {
 		for _, header := range request.Fetch.Headers {
 			index := strings.Index(header, ":")
 			if index != -1 {
-				req.Header.Add(header[:index], strings.TrimSpace(header[index:]))
+				req.Header.Add(header[:index], strings.TrimSpace(header[index+1:]))
 			}
 		}
 	}
@@ -62,11 +62,14 @@ func (oracleQueryPlugin OracleQueryPlugin) Custom(ctx sdk.Context, query json.Ra
 		// return empty bytes to show that the response content has error
 		return []byte{}, err
 	}
+
+	// encode bytes to base64 for protobuf
 	responseBytes, err := ModuleCdc.Amino.MarshalJSON(contents)
 	if err != nil {
 		oracleQueryPlugin.staking.Logger(ctx).Error(fmt.Sprintf("cannot marshal the response data with error: %v\n", err))
 		return []byte(fmt.Sprintf("cannot marshal the response data with error: %v\n", err)), err
 	}
+
 	return responseBytes, nil
 }
 

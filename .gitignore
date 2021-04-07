@@ -57,7 +57,7 @@ oraiwasm/
 .ash_history
 .bash_history
 .cache/
-smart-contracts/**/artifacts/
+smart-contracts
 libwasmvm_muslc.a
 .vscode-server
 .gitconfig
