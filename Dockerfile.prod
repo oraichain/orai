@@ -20,9 +20,8 @@ RUN make build LEDGER_ENABLED=false BUILD_TAGS=muslc GOMOD_FLAGS=
 RUN cd oraivisor && make build
 
 # make size smaller
-RUN go get github.com/pwaller/goupx
-RUN goupx /code/build/oraid
-RUN goupx /code/oraivisor/build/oraivisor
+RUN upx --best --lzma /code/build/oraid
+RUN upx --best --lzma /code/oraivisor/build/oraivisor
 
 # --------------------------------------------------------
 FROM alpine:3.12
