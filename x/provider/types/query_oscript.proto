@@ -24,8 +24,8 @@ message OracleScriptInfoRes {
     string contract = 3;
     string description = 4;
     repeated cosmos.base.v1beta1.Coin fees = 5 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "json:\"fees\""];
-    repeated string d_sources = 6 [(gogoproto.moretags) = "json:\"data_sources\""];
-    repeated string t_cases = 7 [(gogoproto.moretags) = "json:\"test_cases\""];
+    repeated string d_sources = 6 [(gogoproto.jsontag) = "data_sources,omitempty"];
+    repeated string t_cases = 7 [(gogoproto.jsontag) = "test_cases,omitempty"];
 }
 
 // ListOracleScriptsReq is the request type for the Query/ListOracleScripts RPC method
@@ -43,11 +43,11 @@ message ListOracleScriptsRes {
 
 // ListOracleScriptsReq is the request type for the Query/ListOracleScripts RPC method
 message MinFeesReq {
-    string OracleScriptName = 1 [(gogoproto.moretags) = "json:\"oscript_name\""];        
-	int64 ValNum            = 2 [(gogoproto.moretags) = "json:\"val_num\""];     
+    string OracleScriptName = 1 [(gogoproto.jsontag) = "oscript_name,omitempty"];        
+	int64 ValNum            = 2 [(gogoproto.jsontag) = "val_num,omitempty"];     
 }
 
 // ListOracleScriptsRes is the response type for the Query/ListOracleScripts RPC method
 message MinFeesRes {
-    string minFees = 1 [(gogoproto.moretags) = "json:\"minimum_fees\""];    
+    string minFees = 1 [(gogoproto.jsontag) = "minimum_fees,omitempty"];    
 }

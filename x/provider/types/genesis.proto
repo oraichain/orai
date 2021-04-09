@@ -19,6 +19,6 @@ message GenesisState {
 // Params defines the set of wasm parameters.
 message Params {
     option (gogoproto.goproto_stringer) = false;
-    uint64 oracle_script_reward_percentage = 1 [(gogoproto.moretags) = "json:\"oscript_reward_percentage\""];
+    uint64 oracle_script_reward_percentage = 1 [(gogoproto.jsontag) = "oscript_reward_percentage,omitempty"];
     uint64 maximum_code_bytes = 2;
 }

@@ -13,7 +13,7 @@ message MsgSetAIRequest {
   // Owner is the address who is allowed to make further changes to the data source.
   bytes creator = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress",  (gogoproto.moretags) = "json:\"request_creator\""];
   int64 validator_count = 5;
-  string fees = 6 [(gogoproto.moretags) = "json:\"transaction_fee\""];
+  string fees = 6 [(gogoproto.jsontag) = "transaction_fee,omitempty"];
   bytes input = 7 [ (gogoproto.moretags) = "json:\"request_input\""];
   bytes expected_output = 8 [ (gogoproto.moretags) = "json:\"expected_output\""];
 }
@@ -25,7 +25,7 @@ message MsgSetAIRequestRes{
   // Owner is the address who is allowed to make further changes to the data source.
   bytes creator = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress",  (gogoproto.moretags) = "json:\"request_creator\""];
   int64 validator_count = 5;
-  string fees = 6 [(gogoproto.moretags) = "json:\"transaction_fee\""];
+  string fees = 6 [(gogoproto.jsontag) = "transaction_fee,omitempty"];
   bytes input = 7 [ (gogoproto.moretags) = "json:\"request_input\""];
   bytes expected_output = 8 [ (gogoproto.moretags) = "json:\"expected_output\""];
 }

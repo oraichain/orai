@@ -5,8 +5,8 @@ option go_package = "github.com/oraichain/orai/x/websocket/types";
 
 message DataSourceResult {
   option (gogoproto.goproto_stringer) = true;  
-  string name = 1 [(gogoproto.moretags) = "json:\"data_source\""];
+  string name = 1 [(gogoproto.jsontag) = "data_source,omitempty"];
   bytes result = 2 ;  
-  string status = 3 [(gogoproto.moretags) = "json:\"result_status\""];
+  string status = 3 [(gogoproto.jsontag) = "result_status,omitempty"];
   
 }

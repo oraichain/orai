@@ -12,7 +12,7 @@ message MsgCreateOracleScript {
   string contract = 3;
   // Owner is the address who is allowed to make further changes to the oracle script.
   bytes owner = 4 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  string fees = 5 [(gogoproto.moretags) = "json:\"transaction_fee\""];
+  string fees = 5 [(gogoproto.jsontag) = "transaction_fee,omitempty"];
   repeated string data_sources = 6;
   repeated string test_cases = 7;
 }
@@ -23,7 +23,7 @@ message MsgCreateOracleScriptRes{
   string contract = 3;
   // Owner is the address who is allowed to make further changes to the oracle script.
   bytes owner = 4 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  string fees = 5 [(gogoproto.moretags) = "json:\"transaction_fee\""];
+  string fees = 5 [(gogoproto.jsontag) = "transaction_fee,omitempty"];
   repeated string data_sources = 6;
   repeated string test_cases = 7;
 }
@@ -36,7 +36,7 @@ message MsgEditOracleScript {
   string contract = 4;
   // Owner is the address who is allowed to make further changes to the oracle script.
   bytes owner = 5 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  string fees = 6 [(gogoproto.moretags) = "json:\"transaction_fee\""];
+  string fees = 6 [(gogoproto.jsontag) = "transaction_fee,omitempty"];
   repeated string data_sources = 7;
   repeated string test_cases = 8;
 }
@@ -47,7 +47,7 @@ message MsgEditOracleScriptRes{
   string contract = 3;
   // Owner is the address who is allowed to make further changes to the oracle script.
   bytes owner = 4 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  string fees = 5 [(gogoproto.moretags) = "json:\"transaction_fee\""];
+  string fees = 5 [(gogoproto.jsontag) = "transaction_fee,omitempty"];
   repeated string data_sources = 6;
   repeated string test_cases = 7;
 }

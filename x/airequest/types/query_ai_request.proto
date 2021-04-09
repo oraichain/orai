@@ -43,5 +43,5 @@ message QueryAIRequestIDsReq {
 // QueryAIRequestIDsRes is the response type for the Query/QueryAIRequestIDs RPC method
 message QueryAIRequestIDsRes {
     option (gogoproto.goproto_stringer) = true;
-    repeated string request_ids = 1 [(gogoproto.moretags) = "json:\"request_ids\""];
+    repeated string request_ids = 1 [(gogoproto.jsontag) = "request_ids,omitempty"];
 }

@@ -13,7 +13,7 @@ message Reward {
   repeated oraichain.orai.provider.AIDataSource data_sources = 2 [(gogoproto.nullable) = false];
   repeated oraichain.orai.provider.TestCase test_cases = 3 [(gogoproto.nullable) = false];
   int64 block_height = 4;
-  int64 total_power = 5 [(gogoproto.moretags) = "json:\"total_voting_power\""];
+  int64 total_power = 5 [(gogoproto.jsontag) = "total_voting_power,omitempty"];
   repeated cosmos.base.v1beta1.Coin provider_fees = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "json:\"provider_fees\""];
   repeated cosmos.base.v1beta1.Coin validator_fees = 7 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "json:\"validator_fees\""];
 }

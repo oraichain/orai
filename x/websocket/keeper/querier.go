@@ -21,20 +21,6 @@ func NewQuerier(keeper *Keeper) *Querier {
 
 var _ types.QueryServer = &Querier{}
 
-// OracleContract implements the Query/DataSourceInfo gRPC method
-func (k *Querier) OracleContract(goCtx context.Context, req *types.QueryOracleContract) (*types.ResponseContract, error) {
-	if req == nil {
-		return nil, status.Error(codes.InvalidArgument, "empty request")
-	}
-
-	ctx := sdk.UnwrapSDKContext(goCtx)
-	contractReq := k.keeper.cdc.MustMarshalJSON(req.Request)
-	result, err := k.keeper.QueryContract(ctx, req.Contract, contractReq)
-	return &types.ResponseContract{
-		Data: result,
-	}, err
-}
-
 // DataSourceContract implements the Query/DataSourceInfo gRPC method
 func (k *Querier) DataSourceContract(goCtx context.Context, req *types.QueryDataSourceContract) (*types.ResponseContract, error) {
 	if req == nil {
@@ -42,21 +28,11 @@ func (k *Querier) DataSourceContract(goCtx context.Context, req *types.QueryData
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	datasource, err := k.keeper.providerKeeper.GetAIDataSource(ctx, req.Name)
-	if err != nil {
-		// already wrapped at providerKeeper
-		return nil, err
-	}
-
-	datasourceContract, err := sdk.AccAddressFromBech32(datasource.Contract)
-	if err != nil {
-		return nil, err
-	}
 
 	contractReq := k.keeper.cdc.MustMarshalJSON(&types.QueryDataSourceSmartContract{
 		Get: req.Request,
 	})
-	result, err := k.keeper.QueryContract(ctx, datasourceContract, contractReq)
+	result, err := k.keeper.QueryContract(ctx, req.Contract, contractReq)
 	return &types.ResponseContract{
 		Data: result,
 	}, err
@@ -69,34 +45,12 @@ func (k *Querier) TestCaseContract(goCtx context.Context, req *types.QueryTestCa
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	testcase, err := k.keeper.providerKeeper.GetTestCase(ctx, req.Name)
-	if err != nil {
-		return nil, err
-	}
 
-	datasource, err := k.keeper.providerKeeper.GetAIDataSource(ctx, req.DataSourceName)
-	if err != nil {
-		// already wrapped at providerKeeper
-		return nil, err
-	}
-
-	testCaseContract, err := sdk.AccAddressFromBech32(testcase.Contract)
-	if err != nil {
-		return nil, err
-	}
-
-	// re-bind
-	if req.Request.Contract.Empty() {
-		req.Request.Contract, err = sdk.AccAddressFromBech32(datasource.Contract)
-		if err != nil {
-			return nil, err
-		}
-	}
 	contractReq := k.keeper.cdc.MustMarshalJSON(&types.QueryTestCaseSmartContract{
 		Test: req.Request,
 	})
 
-	result, err := k.keeper.QueryContract(ctx, testCaseContract, contractReq)
+	result, err := k.keeper.QueryContract(ctx, req.Contract, contractReq)
 	return &types.ResponseContract{
 		Data: result,
 	}, err
@@ -109,22 +63,48 @@ func (k *Querier) OracleScriptContract(goCtx context.Context, req *types.QueryOr
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	oscript, err := k.keeper.providerKeeper.GetOracleScript(ctx, req.Name)
-	if err != nil {
-		// already wrapped at providerKeeper
-		return nil, err
-	}
-
-	oscriptContract, err := sdk.AccAddressFromBech32(oscript.Contract)
-	if err != nil {
-		return nil, err
-	}
 
 	contractReq := k.keeper.cdc.MustMarshalJSON(&types.QueryOracleScriptSmartContract{
 		Aggregate: req.Request,
 	})
 
-	result, err := k.keeper.QueryContract(ctx, oscriptContract, contractReq)
+	result, err := k.keeper.QueryContract(ctx, req.Contract, contractReq)
+	return &types.ResponseContract{
+		Data: result,
+	}, err
+}
+
+// DataSourceEntries implements the Query/DataSourceInfo gRPC method
+func (k *Querier) DataSourceEntries(goCtx context.Context, req *types.QueryDataSourceEntriesContract) (*types.ResponseContract, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	contractReq := k.keeper.cdc.MustMarshalJSON(&types.QueryDataSourceEntriesSmartContract{
+		GetDataSources: req.Request,
+	})
+
+	result, err := k.keeper.QueryContract(ctx, req.Contract, contractReq)
+	return &types.ResponseContract{
+		Data: result,
+	}, err
+}
+
+// TestCaseEntries implements the Query/DataSourceInfo gRPC method
+func (k *Querier) TestCaseEntries(goCtx context.Context, req *types.QueryTestCaseEntriesContract) (*types.ResponseContract, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	contractReq := k.keeper.cdc.MustMarshalJSON(&types.QueryTestCaseEntriesSmartContract{
+		GetTestCases: req.Request,
+	})
+
+	result, err := k.keeper.QueryContract(ctx, req.Contract, contractReq)
 	return &types.ResponseContract{
 		Data: result,
 	}, err

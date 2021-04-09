@@ -68,7 +68,9 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 
 	subscriber.log.Info(":delivery_truck: Processing incoming request event")
 
-	var requestID, oscriptName, inputStr, expectedOutputStr string
+	var requestID, inputStr, expectedOutputStr string
+	var oscriptContractAddr sdk.AccAddress = nil
+	var err error = nil
 
 	if val, ok := attrMap[aiRequest.AttributeRequestID]; ok {
 		requestID = val[0]
@@ -76,7 +78,10 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, aiRequest.AttributeRequestID)
 	}
 	if val, ok := attrMap[aiRequest.AttributeOracleScriptName]; ok {
-		oscriptName = val[0]
+		oscriptContractAddr, err = sdk.AccAddressFromBech32(val[0])
+		if err != nil {
+			return nil, err
+		}
 	} else {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, aiRequest.AttributeOracleScriptName)
 	}
@@ -108,8 +113,7 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 		for _, aiDataSource := range aiDataSources {
 			// collect test case result from the script
 			outTestCase, err := queryClient.TestCaseContract(ctx, &types.QueryTestCaseContract{
-				Name:           testCase,
-				DataSourceName: aiDataSource,
+				Contract: oscriptContractAddr,
 				Request: &types.RequestTestCase{
 					Input:  inputStr,
 					Output: expectedOutputStr,
@@ -151,7 +155,7 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 		var dataSourceResult *types.DataSourceResult
 		if dataSourceResultTest.GetStatus() == types.ResultSuccess {
 			outDataSource, err := queryClient.DataSourceContract(ctx, &types.QueryDataSourceContract{
-				Name: dataSourceResultTest.GetName(),
+				Contract: oscriptContractAddr,
 				Request: &types.RequestDataSource{
 					Input: inputStr,
 				},
@@ -199,7 +203,7 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 		msgReport.ResultStatus = types.ResultFailure
 	} else {
 		query := &types.QueryOracleScriptContract{
-			Name: oscriptName,
+			Contract: oscriptContractAddr,
 			Request: &types.RequestOracleScript{
 				Results: resultArr,
 			},

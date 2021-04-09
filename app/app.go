@@ -419,7 +419,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	)
 
 	app.websocketKeeper = websocket.NewKeeper(
-		appCodec, keys[websocket.StoreKey], &app.wasmKeeper, app.providerKeeper, app.stakingKeeper,
+		appCodec, keys[websocket.StoreKey], &app.wasmKeeper, app.stakingKeeper,
 	)
 
 	app.airesultKeeper = airesult.NewKeeper(

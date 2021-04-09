@@ -14,7 +14,7 @@ message Validator {
 
 message ValResult {
   option (gogoproto.goproto_stringer) = true;   
-  Validator validator = 1 [(gogoproto.moretags) = "json:\"validator\""];
-  bytes result = 2 [(gogoproto.moretags) = "json:\"result\""];
-  string resultStatus = 3 [(gogoproto.moretags) = "json:\"result_status\""]; // fail or success
+  Validator validator = 1 [(gogoproto.jsontag) = "validator,omitempty"];
+  bytes result = 2 [(gogoproto.jsontag) = "result,omitempty"];
+  string resultStatus = 3 [(gogoproto.jsontag) = "result_status,omitempty"]; // fail or success
 }

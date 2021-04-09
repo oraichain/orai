@@ -12,7 +12,7 @@ message MsgCreateAIDataSource {
   string contract = 3;
   // Owner is the address who is allowed to make further changes to the data source.
   bytes owner = 4 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  string fees = 5 [(gogoproto.moretags) = "json:\"transaction_fee\""];
+  string fees = 5 [(gogoproto.jsontag) = "transaction_fee,omitempty"];
 }
 // MsgCreateAIDataSourceRes returns store result data.
 message MsgCreateAIDataSourceRes{
@@ -21,7 +21,7 @@ message MsgCreateAIDataSourceRes{
   string contract = 3;
   // Owner is the address who is allowed to make further changes to the data source.
   bytes owner = 4 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  string fees = 5 [(gogoproto.moretags) = "json:\"transaction_fee\""];
+  string fees = 5 [(gogoproto.jsontag) = "transaction_fee,omitempty"];
 }
 
 // MsgEditAIDataSource edit data source metadata onto Oraichain
@@ -32,7 +32,7 @@ message MsgEditAIDataSource {
   string contract = 4;
   // Owner is the address who is allowed to make further changes to the data source.
   bytes owner = 5 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  string fees = 6 [(gogoproto.moretags) = "json:\"transaction_fee\""];
+  string fees = 6 [(gogoproto.jsontag) = "transaction_fee,omitempty"];
 }
 // MsgEditAIDataSourceRes returns edit result data.
 message MsgEditAIDataSourceRes{
@@ -41,5 +41,5 @@ message MsgEditAIDataSourceRes{
   string contract = 3;
   // Owner is the address who is allowed to make further changes to the data source.
   bytes owner = 4 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  string fees = 5 [(gogoproto.moretags) = "json:\"transaction_fee\""];
+  string fees = 5 [(gogoproto.jsontag) = "transaction_fee,omitempty"];
 }

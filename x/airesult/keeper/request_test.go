@@ -54,7 +54,7 @@ func TestResolveRequestsFromReports(t *testing.T) {
 
 	providerKeeper := providerkeeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName))
 	airequestKeeper := airequestkeeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName), app.StakingKeeper, app.BankKeeper, nil)
-	websocketKeeper := websocketkeeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, nil, app.StakingKeeper)
+	websocketKeeper := websocketkeeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, app.StakingKeeper)
 
 	// init keeper to run custom allocate tokens
 	// here we borrow staking module to store the reward in the replacement of airesult

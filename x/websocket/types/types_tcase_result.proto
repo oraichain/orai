@@ -7,6 +7,6 @@ option go_package = "github.com/oraichain/orai/x/websocket/types";
 
 message TestCaseResult {
   option (gogoproto.goproto_stringer) = true;  
-  string name = 1 [(gogoproto.moretags) = "json:\"test_case\""];
+  string name = 1 [(gogoproto.jsontag) = "test_case,omitempty"];
   repeated DataSourceResult DataSourceResults = 2 [(gogoproto.moretags) = "json:\"data_source_result\"", (gogoproto.customname) = "DataSourceResults"];	  
 }

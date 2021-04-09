@@ -26,65 +26,22 @@ func GetQueryCmd() *cobra.Command {
 	}
 
 	queryCmd.AddCommand(
-		GetCmdQueryOracleInfo(),
 		GetCmdQueryDataSourceContract(),
 		GetCmdQueryTestCaseContract(),
 		GetCmdQueryOScriptContract(),
+		GetCmdQueryTestCaseEntries(),
+		GetCmdQueryDataSourceEntries(),
 	)
 
 	return queryCmd
 }
 
-// GetCmdQueryOracleInfo lists data source code uploaded
-func GetCmdQueryOracleInfo() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "oracle [contract] [url]",
-		Short: "query an oracle smart contract",
-		Args:  cobra.ExactArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientQueryContext(cmd)
-			if err != nil {
-				return err
-			}
-
-			contract := args[0]
-
-			queryClient := types.NewQueryClient(clientCtx)
-
-			contractAddr, err := sdk.AccAddressFromBech32(contract)
-			if err != nil {
-				return err
-			}
-
-			res, err := queryClient.OracleContract(
-				context.Background(),
-				&types.QueryOracleContract{
-					Contract: contractAddr,
-					Request: &types.Request{
-						Fetch: &types.Fetch{
-							Url: args[1],
-						},
-					},
-				},
-			)
-
-			if err != nil {
-				return err
-			}
-
-			return clientCtx.PrintBytes(append(res.Data, LineBreak))
-		},
-	}
-	flags.AddQueryFlagsToCmd(cmd)
-	return cmd
-}
-
 // GetCmdQueryDataSourceContract lists data source code uploaded
 func GetCmdQueryDataSourceContract() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "dsource [name] [input]",
+		Use:   "dsource [address] [entrypoint] [input]",
 		Short: "query an datasource smart contract",
-		Args:  cobra.RangeArgs(1, 2),
+		Args:  cobra.RangeArgs(2, 3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
@@ -92,16 +49,28 @@ func GetCmdQueryDataSourceContract() *cobra.Command {
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
-			input := ""
-			if len(args) > 1 {
-				input = args[1]
+			contractAddr, err := sdk.AccAddressFromBech32(args[0])
+			if err != nil {
+				return err
 			}
+
+			var entrypoint types.EntryPoint
+			if err := clientCtx.JSONMarshaler.UnmarshalJSON([]byte(args[1]), &entrypoint); err != nil {
+				return err
+			}
+
+			input := ""
+			if len(args) > 2 {
+				input = args[2]
+			}
+
 			res, err := queryClient.DataSourceContract(
 				context.Background(),
 				&types.QueryDataSourceContract{
-					Name: args[0],
+					Contract: contractAddr,
 					Request: &types.RequestDataSource{
-						Input: input,
+						Dsource: &entrypoint,
+						Input:   input,
 					},
 				},
 			)
@@ -120,7 +89,7 @@ func GetCmdQueryDataSourceContract() *cobra.Command {
 // GetCmdQueryTestCaseContract lists data source code uploaded
 func GetCmdQueryTestCaseContract() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "tcase [name] [dsource] [input] [output]",
+		Use:   "tcase [address] [entrypoint] [input] [output]",
 		Short: "query an testcase smart contract",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -130,13 +99,22 @@ func GetCmdQueryTestCaseContract() *cobra.Command {
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
+			contractAddr, err := sdk.AccAddressFromBech32(args[0])
+			if err != nil {
+				return err
+			}
+
+			var entrypoint types.EntryPoint
+			if err := clientCtx.JSONMarshaler.UnmarshalJSON([]byte(args[1]), &entrypoint); err != nil {
+				return err
+			}
 
 			res, err := queryClient.TestCaseContract(
 				context.Background(),
 				&types.QueryTestCaseContract{
-					Name:           args[0],
-					DataSourceName: args[1],
+					Contract: contractAddr,
 					Request: &types.RequestTestCase{
+						Tcase:  &entrypoint,
 						Input:  args[2],
 						Output: args[3],
 					},
@@ -157,7 +135,7 @@ func GetCmdQueryTestCaseContract() *cobra.Command {
 // GetCmdQueryOScriptContract lists data source code uploaded
 func GetCmdQueryOScriptContract() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "oscript [name] [results...]",
+		Use:   "oscript [address] [results...]",
 		Short: "query an oscript smart contract",
 		Args:  cobra.MinimumNArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -167,15 +145,93 @@ func GetCmdQueryOScriptContract() *cobra.Command {
 			}
 
 			queryClient := types.NewQueryClient(clientCtx)
+			contractAddr, err := sdk.AccAddressFromBech32(args[0])
+			if err != nil {
+				return err
+			}
 
 			query := &types.QueryOracleScriptContract{
-				Name: args[0],
+				Contract: contractAddr,
 				Request: &types.RequestOracleScript{
 					Results: args[1:],
 				},
 			}
 			fmt.Printf("query :%v\n", query)
 			res, err := queryClient.OracleScriptContract(context.Background(), query)
+
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintBytes(append(res.Data, LineBreak))
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+// GetCmdQueryDataSourceEntries lists data source entries
+func GetCmdQueryDataSourceEntries() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "get_dsources [address]",
+		Short: "query data source entries from smart contract",
+		Args:  cobra.RangeArgs(1, 2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			contractAddr, err := sdk.AccAddressFromBech32(args[0])
+			if err != nil {
+				return err
+			}
+
+			res, err := queryClient.DataSourceEntries(
+				context.Background(),
+				&types.QueryDataSourceEntriesContract{
+					Contract: contractAddr,
+					Request:  &types.EmptyParams{},
+				},
+			)
+
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintBytes(append(res.Data, LineBreak))
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+// GetCmdQueryTestCaseEntries lists data source entries
+func GetCmdQueryTestCaseEntries() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "get_tcases [address]",
+		Short: "query test case entries from smart contract",
+		Args:  cobra.RangeArgs(1, 2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			contractAddr, err := sdk.AccAddressFromBech32(args[0])
+			if err != nil {
+				return err
+			}
+
+			res, err := queryClient.TestCaseEntries(
+				context.Background(),
+				&types.QueryTestCaseEntriesContract{
+					Contract: contractAddr,
+					Request:  &types.EmptyParams{},
+				},
+			)
 
 			if err != nil {
 				return err

@@ -12,7 +12,7 @@ message MsgCreateTestCase {
   string contract = 3;
   // Owner is the address who is allowed to make further changes to the test case.
   bytes owner = 4 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  string fees = 5 [(gogoproto.moretags) = "json:\"transaction_fee\""];
+  string fees = 5 [(gogoproto.jsontag) = "transaction_fee,omitempty"];
 }
 // MsgCreateTestCaseRes returns store result data.
 message MsgCreateTestCaseRes{
@@ -21,7 +21,7 @@ message MsgCreateTestCaseRes{
   string contract = 3;
   // Owner is the address who is allowed to make further changes to the test case.
   bytes owner = 4 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  string fees = 5 [(gogoproto.moretags) = "json:\"transaction_fee\""];
+  string fees = 5 [(gogoproto.jsontag) = "transaction_fee,omitempty"];
 }
 
 // MsgEditTestCase edit test case metadata onto Oraichain
@@ -32,7 +32,7 @@ message MsgEditTestCase {
   string contract = 4;
   // Owner is the address who is allowed to make further changes to the test case.
   bytes owner = 5 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  string fees = 6 [(gogoproto.moretags) = "json:\"transaction_fee\""];
+  string fees = 6 [(gogoproto.jsontag) = "transaction_fee,omitempty"];
 }
 // MsgEditTestCaseRes returns edit result data.
 message MsgEditTestCaseRes{
@@ -41,5 +41,5 @@ message MsgEditTestCaseRes{
   string contract = 3;
   // Owner is the address who is allowed to make further changes to the test case.
   bytes owner = 4 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-  string fees = 5 [(gogoproto.moretags) = "json:\"transaction_fee\""];
+  string fees = 5 [(gogoproto.jsontag) = "transaction_fee,omitempty"];
 }
