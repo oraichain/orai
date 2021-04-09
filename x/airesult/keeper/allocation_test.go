@@ -18,7 +18,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking/teststaking"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	airesulttypes "github.com/oraichain/orai/x/airesult/types"
-	providertypes "github.com/oraichain/orai/x/provider/types"
+
 	websockettypes "github.com/oraichain/orai/x/websocket/types"
 )
 
@@ -114,10 +114,10 @@ func TestAllocateTokensToManyValidators(t *testing.T) {
 
 	// init keeper to run custom allocate tokens
 	// here we borrow staking module to store the reward in the replacement of airesult
-	k := keeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName), app.StakingKeeper, nil, app.BankKeeper, app.DistrKeeper, app.AccountKeeper, nil, airequestKeeper, types.FeeCollectorName)
+	k := keeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName), app.StakingKeeper, app.BankKeeper, app.DistrKeeper, app.AccountKeeper, nil, airequestKeeper, types.FeeCollectorName)
 
 	// wrap keeper in a test keeper for test functions
-	testKeeper := keeper.NewTestKeeper(*k, app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName), app.StakingKeeper, nil, app.BankKeeper, app.DistrKeeper, app.AccountKeeper, nil, airequestKeeper, types.FeeCollectorName)
+	testKeeper := keeper.NewTestKeeper(*k, app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName), app.StakingKeeper, app.BankKeeper, app.DistrKeeper, app.AccountKeeper, nil, airequestKeeper, types.FeeCollectorName)
 
 	id := ksuid.New().String()
 	testKeeper.AiRequestKeeper.SetAIRequest(ctx, id, &airequest.AIRequest{RequestID: id})
@@ -129,30 +129,6 @@ func TestAllocateTokensToManyValidators(t *testing.T) {
 
 	// init reward
 	reward := airesulttypes.DefaultReward(0)
-
-	// init data sources
-	firstDataSource := providertypes.NewAIDataSource("first data source", "abc", addrs[0], sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5))), "none")
-	secondDataSource := providertypes.NewAIDataSource("2nd data source", "abc", addrs[1], sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5))), "none")
-	thirdDataSource := providertypes.NewAIDataSource("3rd data source", "abc", addrs[2], sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(3))), "none")
-
-	// since there are three validators, we need to loop 3 times to add data sources
-	for i := 0; i < 3; i++ {
-		reward.DataSources = append(reward.DataSources, *firstDataSource)
-		reward.DataSources = append(reward.DataSources, *secondDataSource)
-		reward.DataSources = append(reward.DataSources, *thirdDataSource)
-	}
-
-	// init test cases
-	firstTestCase := providertypes.NewTestCase("1st test case", "abc", addrs[3], sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(4))), "none")
-	secondTestCase := providertypes.NewTestCase("2nd test case", "abc", addrs[4], sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(4))), "none")
-
-	for i := 0; i < 3; i++ {
-		reward.TestCases = append(reward.TestCases, *firstTestCase)
-		reward.TestCases = append(reward.TestCases, *secondTestCase)
-	}
-
-	// add provider fees
-	reward.ProviderFees = reward.ProviderFees.Add(firstDataSource.GetFees()...).Add(secondDataSource.Fees...).Add(thirdDataSource.Fees...).Add(firstTestCase.Fees...).Add(secondTestCase.Fees...)
 
 	// set validators
 	rewardRatio := sdk.NewDec(int64(1)).Sub(sdk.NewDecWithPrec(int64(60), 2))

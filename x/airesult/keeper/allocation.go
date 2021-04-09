@@ -7,7 +7,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	"github.com/oraichain/orai/x/provider"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
@@ -34,41 +33,41 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, block
 	remaining := reward
 	hasNeg := false
 
-	//Allocate non-community pool tokens to active validators weighted by voting power.
-	// reward for test cases that contribute
-	for _, testCase := range rewardObj.TestCases {
+	// //Allocate non-community pool tokens to active validators weighted by voting power.
+	// // reward for test cases that contribute
+	// for _, testCase := range rewardObj.TestCases {
 
-		// safesub to prevent panic
-		remaining, hasNeg = remaining.SafeSub(sdk.NewDecCoinsFromCoins(testCase.GetFees()...))
-		if hasNeg {
-			k.Logger(ctx).Error(fmt.Sprintf("not enough balance to reward test case :%v, \n", testCase.GetName()))
-			return
-		}
+	// 	// safesub to prevent panic
+	// 	remaining, hasNeg = remaining.SafeSub(sdk.NewDecCoinsFromCoins(testCase.GetFees()...))
+	// 	if hasNeg {
+	// 		k.Logger(ctx).Error(fmt.Sprintf("not enough balance to reward test case :%v, \n", testCase.GetName()))
+	// 		return
+	// 	}
 
-		// send coins to test case owner addresses
-		temp := k.bankKeeper.GetBalance(ctx, testCase.GetOwner(), provider.Denom)
-		k.bankKeeper.SendCoinsFromModuleToAccount(ctx, k.feeCollectorName, testCase.GetOwner(), testCase.GetFees())
-		rewardCollected := k.bankKeeper.GetBalance(ctx, testCase.GetOwner(), provider.Denom).Sub(temp)
-		k.Logger(ctx).Info(fmt.Sprintf("Reward collected for the following address %v - %v\n", testCase.GetOwner().String(), rewardCollected))
-	}
+	// 	// send coins to test case owner addresses
+	// 	temp := k.bankKeeper.GetBalance(ctx, testCase.GetOwner(), websocket.Denom)
+	// 	k.bankKeeper.SendCoinsFromModuleToAccount(ctx, k.feeCollectorName, testCase.GetOwner(), testCase.GetFees())
+	// 	rewardCollected := k.bankKeeper.GetBalance(ctx, testCase.GetOwner(), websocket.Denom).Sub(temp)
+	// 	k.Logger(ctx).Info(fmt.Sprintf("Reward collected for the following address %v - %v\n", testCase.GetOwner().String(), rewardCollected))
+	// }
 
-	// reward for test cases that contribute
-	for _, dataSource := range rewardObj.DataSources {
+	// // reward for test cases that contribute
+	// for _, dataSource := range rewardObj.DataSources {
 
-		// safesub to prevent panic
-		remaining, hasNeg = remaining.SafeSub(sdk.NewDecCoinsFromCoins(dataSource.GetFees()...))
-		if hasNeg {
-			k.Logger(ctx).Error(fmt.Sprintf("not enough balance to reward data source :%v, \n", dataSource.GetName()))
-			return
-		}
+	// 	// safesub to prevent panic
+	// 	remaining, hasNeg = remaining.SafeSub(sdk.NewDecCoinsFromCoins(dataSource.GetFees()...))
+	// 	if hasNeg {
+	// 		k.Logger(ctx).Error(fmt.Sprintf("not enough balance to reward data source :%v, \n", dataSource.GetName()))
+	// 		return
+	// 	}
 
-		// send coins to data source owner addresses
-		temp := k.bankKeeper.GetBalance(ctx, dataSource.GetOwner(), provider.Denom)
-		k.bankKeeper.SendCoinsFromModuleToAccount(ctx, k.feeCollectorName, dataSource.GetOwner(), dataSource.GetFees())
-		rewardCollected := k.bankKeeper.GetBalance(ctx, dataSource.GetOwner(), provider.Denom).Sub(temp)
-		k.Logger(ctx).Info(fmt.Sprintf("Reward collected for the following address %v - %v\n", dataSource.GetOwner().String(), rewardCollected))
+	// 	// send coins to data source owner addresses
+	// 	temp := k.bankKeeper.GetBalance(ctx, dataSource.GetOwner(), websocket.Denom)
+	// 	k.bankKeeper.SendCoinsFromModuleToAccount(ctx, k.feeCollectorName, dataSource.GetOwner(), dataSource.GetFees())
+	// 	rewardCollected := k.bankKeeper.GetBalance(ctx, dataSource.GetOwner(), websocket.Denom).Sub(temp)
+	// 	k.Logger(ctx).Info(fmt.Sprintf("Reward collected for the following address %v - %v\n", dataSource.GetOwner().String(), rewardCollected))
 
-	}
+	// }
 	// reward for the validators that contribute in the ai request test
 	// transfer collected fees to the distribution module account to distribute the oracle rewards to the validators. Note that if we transfer all the transaction fees, then other modules won't be able to handle allocation
 

@@ -23,11 +23,11 @@ service Query {
         
     }
 
-    rpc DataSourceEntries (QueryDataSourceEntriesContract) returns (ResponseContract) {
+    rpc DataSourceEntries (QueryDataSourceEntriesContract) returns (ResponseEntryPointContract) {
         
     }
 
-    rpc TestCaseEntries (QueryTestCaseEntriesContract) returns (ResponseContract) {
+    rpc TestCaseEntries (QueryTestCaseEntriesContract) returns (ResponseEntryPointContract) {
         
     }
 }

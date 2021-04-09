@@ -20,7 +20,7 @@ const (
 	AttributeRequestValidator = "request_validator"
 	AttributeRequestCreator   = "request_creator"
 	// Attributes for oracle script
-	AttributeOracleScriptName      = "oscript_name"
+	AttributeContract              = "contract"
 	AttributeRequestImageHash      = "request_image_hash"
 	AttributeRequestImageName      = "request_image_name"
 	AttributeRequestValidatorCount = "request_validator_count"

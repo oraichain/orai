@@ -7,6 +7,8 @@ import (
 )
 
 const (
+	Denom = "orai"
+
 	// ModuleName is the name of the module
 	ModuleName = "websocket"
 

@@ -77,13 +77,13 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 	} else {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, aiRequest.AttributeRequestID)
 	}
-	if val, ok := attrMap[aiRequest.AttributeOracleScriptName]; ok {
+	if val, ok := attrMap[aiRequest.AttributeContract]; ok {
 		oscriptContractAddr, err = sdk.AccAddressFromBech32(val[0])
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, aiRequest.AttributeOracleScriptName)
+		return nil, sdkerrors.Wrap(sdkerrors.ErrKeyNotFound, aiRequest.AttributeContract)
 	}
 	if val, ok := attrMap[aiRequest.AttributeRequestInput]; ok {
 		inputStr = val[0]
@@ -97,8 +97,25 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 	}
 
 	// collect ai data sources and test cases from the ai request event.
-	aiDataSources := attrMap[aiRequest.AttributeRequestDSources]
-	testCases := attrMap[aiRequest.AttributeRequestTCases]
+	ctx := context.Background()
+
+	aiDataSources, err := queryClient.DataSourceEntries(ctx, &types.QueryDataSourceEntriesContract{
+		Contract: oscriptContractAddr,
+		Request:  &types.EmptyParams{},
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	testCases, err := queryClient.DataSourceEntries(ctx, &types.QueryDataSourceEntriesContract{
+		Contract: oscriptContractAddr,
+		Request:  &types.EmptyParams{},
+	})
+
+	if err != nil {
+		return nil, err
+	}
 
 	// create data source results to store in the report
 	var dataSourceResultsTest []*types.DataSourceResult
@@ -107,14 +124,14 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 	var resultArr = []string{}
 
 	// we have different test cases, so we need to loop through them
-	ctx := context.Background()
-	for _, testCase := range testCases {
+	for _, testCase := range testCases.Data {
 		//put the results from the data sources into the test case to verify if they are good enough
-		for _, aiDataSource := range aiDataSources {
+		for _, aiDataSource := range aiDataSources.Data {
 			// collect test case result from the script
 			outTestCase, err := queryClient.TestCaseContract(ctx, &types.QueryTestCaseContract{
 				Contract: oscriptContractAddr,
 				Request: &types.RequestTestCase{
+					Tcase:  testCase,
 					Input:  inputStr,
 					Output: expectedOutputStr,
 				},
@@ -157,11 +174,12 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 			outDataSource, err := queryClient.DataSourceContract(ctx, &types.QueryDataSourceContract{
 				Contract: oscriptContractAddr,
 				Request: &types.RequestDataSource{
-					Input: inputStr,
+					Dsource: dataSourceResultTest.GetEntryPoint(),
+					Input:   inputStr,
 				},
 			})
 			// By default, we consider returning null as failure. If any datasource does not follow this rule then it should not be used by any oracle scripts.
-			dataSourceResult = types.NewDataSourceResult(dataSourceResultTest.GetName(), []byte{}, types.ResultSuccess)
+			dataSourceResult = types.NewDataSourceResult(dataSourceResultTest.GetEntryPoint(), []byte{}, types.ResultSuccess)
 			if err != nil {
 				subscriber.log.Error(":skull: failed to execute data source script: %s", err.Error())
 				// change status to fail so the datasource cannot be rewarded afterwards
@@ -179,7 +197,7 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 				}
 			}
 		} else {
-			dataSourceResult = types.NewDataSourceResult(dataSourceResultTest.GetName(), []byte(dataSourceResultTest.GetResult()), types.ResultFailure)
+			dataSourceResult = types.NewDataSourceResult(dataSourceResultTest.GetEntryPoint(), []byte(dataSourceResultTest.GetResult()), types.ResultFailure)
 		}
 		// append an data source result into the list
 		dataSourceResults = append(dataSourceResults, dataSourceResult)

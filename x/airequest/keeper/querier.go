@@ -39,10 +39,9 @@ func (k *Querier) QueryAIRequest(goCtx context.Context, req *types.QueryAIReques
 	}
 
 	return types.NewQueryAIRequestRes(
-		aiRequest.GetRequestID(), aiRequest.GetOracleScriptName(),
+		aiRequest.GetRequestID(), aiRequest.GetContract(),
 		aiRequest.GetCreator(), aiRequest.GetFees(),
 		aiRequest.GetValidators(), aiRequest.GetBlockHeight(),
-		aiRequest.GetAiDataSources(), aiRequest.GetTestCases(),
 		aiRequest.GetInput(), aiRequest.GetExpectedOutput(),
 	), nil
 }

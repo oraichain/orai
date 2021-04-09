@@ -23,7 +23,6 @@ import (
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
 	aiRequest "github.com/oraichain/orai/x/airequest/types"
 	airesult "github.com/oraichain/orai/x/airesult/types"
-	provider "github.com/oraichain/orai/x/provider/types"
 	websocket "github.com/oraichain/orai/x/websocket/types"
 )
 
@@ -43,7 +42,7 @@ func NewDefaultGenesisState(cdc codec.JSONMarshaler) GenesisState {
 	slashingGenesis := slashing.DefaultGenesisState()
 	// Override the genesis parameters.
 	authGenesis.Params.TxSizeCostPerByte = 5
-	stakingGenesis.Params.BondDenom = provider.Denom
+	stakingGenesis.Params.BondDenom = websocket.Denom
 	stakingGenesis.Params.HistoricalEntries = 1000
 
 	// TODO: testnet figures only
@@ -53,11 +52,11 @@ func NewDefaultGenesisState(cdc codec.JSONMarshaler) GenesisState {
 	distrGenesis.Params.BaseProposerReward = sdk.NewDecWithPrec(1, 2)  // 1%
 	distrGenesis.Params.BonusProposerReward = sdk.NewDecWithPrec(4, 2) // 4%
 	mintGenesis.Params.BlocksPerYear = 6311200                         // target 5-second block time
-	mintGenesis.Params.MintDenom = provider.Denom
-	govGenesis.DepositParams.MinDeposit = sdk.NewCoins(sdk.NewCoin(provider.Denom, sdk.TokensFromConsensusPower(10)))
+	mintGenesis.Params.MintDenom = websocket.Denom
+	govGenesis.DepositParams.MinDeposit = sdk.NewCoins(sdk.NewCoin(websocket.Denom, sdk.TokensFromConsensusPower(10)))
 	// TODO: testing
 	govGenesis.VotingParams.VotingPeriod = time.Minute * 2 // test for 10 mins voting period
-	crisisGenesis.ConstantFee = sdk.NewCoin(provider.Denom, sdk.TokensFromConsensusPower(10))
+	crisisGenesis.ConstantFee = sdk.NewCoin(websocket.Denom, sdk.TokensFromConsensusPower(10))
 	slashingGenesis.Params.SignedBlocksWindow = 30000                         // approximately 1 day
 	slashingGenesis.Params.MinSignedPerWindow = sdk.NewDecWithPrec(5, 2)      // 5%
 	slashingGenesis.Params.DowntimeJailDuration = 60 * 10 * time.Second       // 10 minutes
@@ -78,7 +77,6 @@ func NewDefaultGenesisState(cdc codec.JSONMarshaler) GenesisState {
 	genesisState[ibctransfertypes.ModuleName] = cdc.MustMarshalJSON(ibctransfertypes.DefaultGenesisState())
 	genesisState[slashing.ModuleName] = cdc.MustMarshalJSON(slashingGenesis)
 	genesisState[evidence.ModuleName] = cdc.MustMarshalJSON(evidence.DefaultGenesisState())
-	genesisState[provider.ModuleName] = cdc.MustMarshalJSON(provider.DefaultGenesisState())
 	genesisState[aiRequest.ModuleName] = cdc.MustMarshalJSON(aiRequest.DefaultGenesisState())
 	genesisState[websocket.ModuleName] = cdc.MustMarshalJSON(websocket.DefaultGenesisState())
 	genesisState[airesult.ModuleName] = cdc.MustMarshalJSON(airesult.DefaultGenesisState())

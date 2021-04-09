@@ -3,7 +3,6 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	airequest "github.com/oraichain/orai/x/airequest/types"
-	provider "github.com/oraichain/orai/x/provider/types"
 	websocket "github.com/oraichain/orai/x/websocket/types"
 )
 
@@ -43,8 +42,6 @@ func NewQueryRewardRes(
 // NewReward is a constructor for the reward struct
 func NewReward(
 	validators []websocket.Validator,
-	dataSources []provider.AIDataSource,
-	testCases []provider.TestCase,
 	blockHeight int64,
 	totalVotingPower int64,
 	providerFees sdk.Coins,
@@ -52,8 +49,6 @@ func NewReward(
 ) *Reward {
 	return &Reward{
 		Validators:    validators,
-		DataSources:   dataSources,
-		TestCases:     testCases,
 		BlockHeight:   blockHeight,
 		TotalPower:    totalVotingPower,
 		ProviderFees:  providerFees,
@@ -65,12 +60,10 @@ func NewReward(
 func DefaultReward(blockHeight int64) *Reward {
 	return &Reward{
 		Validators:    make([]websocket.Validator, 0),
-		DataSources:   make([]provider.AIDataSource, 0),
-		TestCases:     make([]provider.TestCase, 0),
 		BlockHeight:   blockHeight,
 		TotalPower:    int64(0),
-		ProviderFees:  sdk.NewCoins(sdk.NewCoin(provider.Denom, sdk.NewInt(int64(0)))),
-		ValidatorFees: sdk.NewCoins(sdk.NewCoin(provider.Denom, sdk.NewInt(int64(0)))),
+		ProviderFees:  sdk.NewCoins(sdk.NewCoin(websocket.Denom, sdk.NewInt(int64(0)))),
+		ValidatorFees: sdk.NewCoins(sdk.NewCoin(websocket.Denom, sdk.NewInt(int64(0)))),
 	}
 }
 

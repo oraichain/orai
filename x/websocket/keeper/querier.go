@@ -75,7 +75,7 @@ func (k *Querier) OracleScriptContract(goCtx context.Context, req *types.QueryOr
 }
 
 // DataSourceEntries implements the Query/DataSourceInfo gRPC method
-func (k *Querier) DataSourceEntries(goCtx context.Context, req *types.QueryDataSourceEntriesContract) (*types.ResponseContract, error) {
+func (k *Querier) DataSourceEntries(goCtx context.Context, req *types.QueryDataSourceEntriesContract) (*types.ResponseEntryPointContract, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -87,13 +87,19 @@ func (k *Querier) DataSourceEntries(goCtx context.Context, req *types.QueryDataS
 	})
 
 	result, err := k.keeper.QueryContract(ctx, req.Contract, contractReq)
-	return &types.ResponseContract{
-		Data: result,
+	if err != nil {
+		return nil, err
+	}
+	var entries []*types.EntryPoint
+	err = types.ModuleCdc.Amino.UnmarshalJSON(result, &entries)
+
+	return &types.ResponseEntryPointContract{
+		Data: entries,
 	}, err
 }
 
 // TestCaseEntries implements the Query/DataSourceInfo gRPC method
-func (k *Querier) TestCaseEntries(goCtx context.Context, req *types.QueryTestCaseEntriesContract) (*types.ResponseContract, error) {
+func (k *Querier) TestCaseEntries(goCtx context.Context, req *types.QueryTestCaseEntriesContract) (*types.ResponseEntryPointContract, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
@@ -105,7 +111,13 @@ func (k *Querier) TestCaseEntries(goCtx context.Context, req *types.QueryTestCas
 	})
 
 	result, err := k.keeper.QueryContract(ctx, req.Contract, contractReq)
-	return &types.ResponseContract{
-		Data: result,
+	if err != nil {
+		return nil, err
+	}
+	var entries []*types.EntryPoint
+	err = types.ModuleCdc.Amino.UnmarshalJSON(result, &entries)
+
+	return &types.ResponseEntryPointContract{
+		Data: entries,
 	}, err
 }

@@ -38,24 +38,24 @@ func NewReporter(addr sdk.AccAddress, name string, valAddr sdk.ValAddress) *Repo
 
 // NewDataSourceResult is the constructor of the data source result struct
 func NewDataSourceResult(
-	name string,
+	entrypoint *EntryPoint,
 	result []byte,
 	status string,
 ) *DataSourceResult {
 	return &DataSourceResult{
-		Name:   name,
-		Result: result,
-		Status: status,
+		EntryPoint: entrypoint,
+		Result:     result,
+		Status:     status,
 	}
 }
 
 // NewTestCaseResult is the constructor of the test case result struct
 func NewTestCaseResult(
-	name string,
+	entrypoint *EntryPoint,
 	dataSourceResults []*DataSourceResult,
 ) *TestCaseResult {
 	return &TestCaseResult{
-		Name:              name,
+		EntryPoint:        entrypoint,
 		DataSourceResults: dataSourceResults,
 	}
 }

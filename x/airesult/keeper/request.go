@@ -36,21 +36,19 @@ func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *websocket.Repor
 	// collect data source owners that have their data sources executed to reward
 	for _, dataSourceResult := range rep.GetDataSourceResults() {
 		if dataSourceResult.GetStatus() == k.webSocketKeeper.GetKeyResultSuccess() {
-			dataSource, _ := k.providerKeeper.GetAIDataSource(ctx, dataSourceResult.GetName())
-			reward.DataSources = append(reward.DataSources, *dataSource)
-			reward.ProviderFees = reward.ProviderFees.Add(dataSource.GetFees()...)
+
+			// reward.ProviderFees = reward.ProviderFees.Add(dataSource.GetFees()...)
 		}
 	}
 
 	// collect data source owners that have their data sources executed to reward
-	for _, testCaseResult := range rep.GetTestCaseResults() {
-		testCase, _ := k.providerKeeper.GetTestCase(ctx, testCaseResult.GetName())
-		reward.TestCases = append(reward.TestCases, *testCase)
-		reward.ProviderFees = reward.ProviderFees.Add(testCase.GetFees()...)
-	}
+	// for _, testCaseResult := range rep.GetTestCaseResults() {
+	// 	reward.ProviderFees = reward.ProviderFees.Add(testCase.GetFees()...)
+	// }
 	// change reward ratio to the ratio of validator
 	// 0.6 by default, 2 decimals for percentage
-	percentageDec := k.providerKeeper.GetPercentageDec(rewardPercentage)
+	percentageDec := sdk.NewDec(70)
+	// percentageDec := k.providerKeeper.GetPercentageDec(rewardPercentage)
 	rewardRatio := sdk.NewDecWithPrec(int64(100), 2).Sub(percentageDec)
 
 	// reward = 1 - oracle reward percentage × (data source fees + test case fees)
@@ -81,17 +79,17 @@ func (k Keeper) validateBasic(ctx sdk.Context, req *airequest.AIRequest, rep *we
 		return false
 	}
 
-	// Count the total number of data source results to see if it matches the requested data sources
-	if len(rep.GetDataSourceResults()) != len(req.GetAiDataSources()) {
-		k.Logger(ctx).Error("data source result length is different")
-		return false
-	}
+	// // Count the total number of data source results to see if it matches the requested data sources
+	// if len(rep.GetDataSourceResults()) != len(req.GetAiDataSources()) {
+	// 	k.Logger(ctx).Error("data source result length is different")
+	// 	return false
+	// }
 
-	// Count the total number of test case results to see if it matches the requested test cases
-	if len(rep.GetTestCaseResults()) != len(req.GetTestCases()) {
-		k.Logger(ctx).Error("test case result length is different")
-		return false
-	}
+	// // Count the total number of test case results to see if it matches the requested test cases
+	// if len(rep.GetTestCaseResults()) != len(req.GetTestCases()) {
+	// 	k.Logger(ctx).Error("test case result length is different")
+	// 	return false
+	// }
 
 	// TODO
 	err := k.webSocketKeeper.ValidateReport(ctx, rep.GetReporter(), req)

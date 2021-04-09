@@ -24,8 +24,8 @@ func (gs *GenesisState) Validate() error {
 		if record.Creator == nil {
 			return fmt.Errorf("invalid AIRequests: Owner: %s. Error: Missing Creator", record.Creator)
 		}
-		if record.OracleScriptName == "" {
-			return fmt.Errorf("invalid AIRequests: Owner: %s. Error: Missing Oracle Script Name", record.OracleScriptName)
+		if record.Contract.Empty() {
+			return fmt.Errorf("invalid AIRequests: Owner: %s. Error: Missing Oracle Script Contract")
 		}
 		// if record.Fees.Empty() {
 		// 	return fmt.Errorf("invalid AIRequests: Owner: %s. Error: Missing Fees", record.Fees)

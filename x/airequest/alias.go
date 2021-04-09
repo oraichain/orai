@@ -17,7 +17,7 @@ const (
 	AttributeRequestDSources       = types.AttributeRequestDSources
 	AttributeRequestTCases         = types.AttributeRequestTCases
 	AttributeRequestID             = types.AttributeRequestID
-	AttributeOracleScriptName      = types.AttributeOracleScriptName
+	AttributeContract              = types.AttributeContract
 	AttributeRequestCreator        = types.AttributeRequestCreator
 	AttributeRequestValidatorCount = types.AttributeRequestValidatorCount
 	AttributeRequestInput          = types.AttributeRequestInput

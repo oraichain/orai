@@ -99,3 +99,8 @@ message ResponseContract {
   option (gogoproto.goproto_stringer) = true;    
   bytes data = 1 [(gogoproto.jsontag) = "data,omitempty"];    
 }
+
+message ResponseEntryPointContract {
+  option (gogoproto.goproto_stringer) = true;    
+  repeated EntryPoint data = 1 [(gogoproto.jsontag) = "data,omitempty"];    
+}

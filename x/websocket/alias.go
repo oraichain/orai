@@ -7,6 +7,7 @@ import (
 )
 
 const (
+	Denom             = types.Denom
 	ModuleName        = types.ModuleName
 	RouterKey         = types.RouterKey
 	StoreKey          = types.StoreKey

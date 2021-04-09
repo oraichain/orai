@@ -5,7 +5,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/oraichain/orai/x/provider"
+	"github.com/oraichain/orai/x/websocket/types"
 	"github.com/tendermint/tendermint/libs/log"
 )
 
@@ -27,6 +27,6 @@ func DefaultWebSocketConfig() *WebSocketConfig {
 		MaxTry:           5,
 		AllowLogLevel:    log.AllowInfo(),
 		ErrExit:          false,
-		Fees:             sdk.NewCoins(sdk.NewCoin(provider.Denom, sdk.NewInt(int64(5000)))),
+		Fees:             sdk.NewCoins(sdk.NewCoin(types.Denom, sdk.NewInt(int64(5000)))),
 	}
 }

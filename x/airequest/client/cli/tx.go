@@ -6,6 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/oraichain/orai/x/airequest/types"
 	"github.com/segmentio/ksuid"
 	"github.com/spf13/cobra"
@@ -44,7 +45,12 @@ func GetCmdSetAIRequest() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgSetAIRequest(ksuid.New().String(), args[0], clientCtx.GetFromAddress(), args[3], int64(valCount), []byte(args[1]), []byte(args[2]))
+			contractAddr, err := sdk.AccAddressFromBech32(args[0])
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgSetAIRequest(ksuid.New().String(), contractAddr, clientCtx.GetFromAddress(), args[3], int64(valCount), []byte(args[1]), []byte(args[2]))
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err

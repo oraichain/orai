@@ -91,8 +91,6 @@ import (
 	"github.com/oraichain/orai/x/airesult"
 	"github.com/oraichain/orai/x/websocket"
 
-	"github.com/oraichain/orai/x/provider"
-
 	// unnamed import of statik for swagger UI support
 	_ "github.com/oraichain/orai/doc/statik"
 )
@@ -102,7 +100,7 @@ const appName = "Oraichain"
 // We pull these out so we can set them with LDFLAGS in the Makefile
 var (
 	NodeDir      = ".oraid"
-	Bech32Prefix = provider.Denom
+	Bech32Prefix = websocket.Denom
 
 	// If EnabledSpecificProposals is "", and this is "true", then enable all x/wasm proposals.
 	// If EnabledSpecificProposals is "", and this is not "true", then disable all x/wasm proposals.
@@ -175,7 +173,6 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		provider.AppModuleBasic{},
 		airequest.AppModuleBasic{},
 		websocket.AppModuleBasic{},
 		airesult.AppModuleBasic{},
@@ -236,7 +233,6 @@ type OraichainApp struct {
 	wasmKeeper       wasm.Keeper
 
 	// custom modules here
-	providerKeeper  *provider.Keeper
 	airequestKeeper *airequest.Keeper
 	websocketKeeper *websocket.Keeper
 	airesultKeeper  *airesult.Keeper
@@ -271,7 +267,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		wasm.StoreKey, provider.StoreKey, airequest.StoreKey, websocket.StoreKey, airesult.StoreKey,
+		wasm.StoreKey, airequest.StoreKey, websocket.StoreKey, airesult.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -410,12 +406,8 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	)
 	/****  Module Options ****/
 
-	app.providerKeeper = provider.NewKeeper(
-		appCodec, keys[provider.StoreKey], &app.wasmKeeper, app.getSubspace(provider.ModuleName),
-	)
-
 	app.airequestKeeper = airequest.NewKeeper(
-		appCodec, keys[airequest.StoreKey], &app.wasmKeeper, app.getSubspace(airequest.ModuleName), app.stakingKeeper, app.bankKeeper, app.providerKeeper,
+		appCodec, keys[airequest.StoreKey], &app.wasmKeeper, app.getSubspace(airequest.ModuleName), app.stakingKeeper, app.bankKeeper,
 	)
 
 	app.websocketKeeper = websocket.NewKeeper(
@@ -427,7 +419,6 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		&app.wasmKeeper,
 		app.getSubspace(airesult.ModuleName),
 		app.stakingKeeper,
-		app.providerKeeper,
 		app.bankKeeper,
 		app.distrKeeper,
 		app.accountKeeper,
@@ -462,7 +453,6 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		evidence.NewAppModule(app.evidenceKeeper),
 		ibc.NewAppModule(app.ibcKeeper),
 		params.NewAppModule(app.paramsKeeper),
-		provider.NewAppModule(appCodec, app.providerKeeper),
 		airequest.NewAppModule(appCodec, app.airequestKeeper),
 		websocket.NewAppModule(appCodec, app.websocketKeeper, &app.stakingKeeper),
 		airesult.NewAppModule(appCodec, app.airesultKeeper),
@@ -490,7 +480,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		capabilitytypes.ModuleName, authtypes.ModuleName, banktypes.ModuleName, distrtypes.ModuleName, stakingtypes.ModuleName,
 		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
 		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
-		wasm.ModuleName, provider.ModuleName, airequest.ModuleName, websocket.ModuleName, airesult.ModuleName,
+		wasm.ModuleName, airequest.ModuleName, websocket.ModuleName, airesult.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
@@ -699,7 +689,6 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
-	paramsKeeper.Subspace(provider.ModuleName)
 	paramsKeeper.Subspace(airequest.ModuleName)
 	paramsKeeper.Subspace(airesult.ModuleName)
 

@@ -13,7 +13,6 @@ import (
 	staking "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/oraichain/orai/x/airequest"
 	"github.com/oraichain/orai/x/airesult/types"
-	"github.com/oraichain/orai/x/provider"
 	"github.com/oraichain/orai/x/websocket"
 	"github.com/tendermint/tendermint/libs/log"
 )
@@ -26,7 +25,6 @@ type (
 		wasmKeeper       *wasm.Keeper
 		paramSpace       params.Subspace
 		stakingKeeper    staking.Keeper
-		providerKeeper   *provider.Keeper
 		webSocketKeeper  *websocket.Keeper
 		aiRequestKeeper  *airequest.Keeper
 		bankKeeper       bank.Keeper
@@ -43,7 +41,6 @@ type (
 		WasmKeeper       *wasm.Keeper
 		ParamSpace       params.Subspace
 		StakingKeeper    staking.Keeper
-		ProviderKeeper   *provider.Keeper
 		WebSocketKeeper  *websocket.Keeper
 		AiRequestKeeper  *airequest.Keeper
 		BankKeeper       bank.Keeper
@@ -54,7 +51,7 @@ type (
 )
 
 // NewKeeper creates a airequest keeper
-func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, subspace params.Subspace, stakingKeeper staking.Keeper, providerKeeper *provider.Keeper, bankKeeper bank.Keeper, distrKeeper distr.Keeper, authKeeper auth.AccountKeeper, webSocketKeeper *websocket.Keeper, aiRequestKeeper *airequest.Keeper, feeCollectorName string) *Keeper {
+func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, subspace params.Subspace, stakingKeeper staking.Keeper, bankKeeper bank.Keeper, distrKeeper distr.Keeper, authKeeper auth.AccountKeeper, webSocketKeeper *websocket.Keeper, aiRequestKeeper *airequest.Keeper, feeCollectorName string) *Keeper {
 	if !subspace.HasKeyTable() {
 		// register parameters of the airequest module into the param space
 		subspace = subspace.WithKeyTable(types.ParamKeyTable())
@@ -65,7 +62,6 @@ func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, s
 		wasmKeeper:       wasmKeeper,
 		paramSpace:       subspace,
 		stakingKeeper:    stakingKeeper,
-		providerKeeper:   providerKeeper,
 		bankKeeper:       bankKeeper,
 		distrKeeper:      distrKeeper,
 		authKeeper:       authKeeper,
@@ -76,7 +72,7 @@ func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, s
 }
 
 // NewTestKeeper creates a airequest keeper for testing
-func NewTestKeeper(keeper Keeper, cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, subspace params.Subspace, stakingKeeper staking.Keeper, providerKeeper *provider.Keeper, bankKeeper bank.Keeper, distrKeeper distr.Keeper, authKeeper auth.AccountKeeper, webSocketKeeper *websocket.Keeper, aiRequestKeeper *airequest.Keeper, feeCollectorName string) *TestKeeper {
+func NewTestKeeper(keeper Keeper, cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, subspace params.Subspace, stakingKeeper staking.Keeper, bankKeeper bank.Keeper, distrKeeper distr.Keeper, authKeeper auth.AccountKeeper, webSocketKeeper *websocket.Keeper, aiRequestKeeper *airequest.Keeper, feeCollectorName string) *TestKeeper {
 	if !subspace.HasKeyTable() {
 		// register parameters of the airequest module into the param space
 		subspace = subspace.WithKeyTable(types.ParamKeyTable())
@@ -88,7 +84,6 @@ func NewTestKeeper(keeper Keeper, cdc codec.Marshaler, key sdk.StoreKey, wasmKee
 		WasmKeeper:       wasmKeeper,
 		ParamSpace:       subspace,
 		StakingKeeper:    stakingKeeper,
-		ProviderKeeper:   providerKeeper,
 		BankKeeper:       bankKeeper,
 		DistrKeeper:      distrKeeper,
 		AuthKeeper:       authKeeper,

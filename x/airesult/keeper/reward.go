@@ -45,7 +45,7 @@ func (k Keeper) ProcessReward(ctx sdk.Context) {
 	reward := types.DefaultReward(blockHeight)
 
 	// get param reward percentage oracle
-	rewardPercentage := k.providerKeeper.GetOracleScriptRewardPercentageParam(ctx)
+	rewardPercentage := int64(70)
 	// Collect all the reports in the current block to get all the information for the reward
 	for _, report := range k.webSocketKeeper.GetReportsBlockHeight(ctx, blockHeight) {
 		isValid, valCount := k.ResolveRequestsFromReports(ctx, &report, reward, blockHeight, rewardPercentage)

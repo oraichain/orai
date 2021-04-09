@@ -5,7 +5,6 @@ import (
 
 	airequestkeeper "github.com/oraichain/orai/x/airequest/keeper"
 	"github.com/oraichain/orai/x/airesult/keeper"
-	providerkeeper "github.com/oraichain/orai/x/provider/keeper"
 	websocketkeeper "github.com/oraichain/orai/x/websocket/keeper"
 	websockettypes "github.com/oraichain/orai/x/websocket/types"
 	"github.com/segmentio/ksuid"
@@ -28,13 +27,6 @@ func TestResolveResult(t *testing.T) {
 	valConsPk2 := PKS[1]
 	valConsPk3 := PKS[2]
 
-	firstDsName := "firstDs"
-	secondDsName := "secondDs"
-	thirdDsName := "thirdDs"
-
-	firstTcName := "firstTc"
-	secondTcName := "secondTc"
-
 	// init sim app
 	app := simapp.Setup(false)
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
@@ -55,26 +47,25 @@ func TestResolveResult(t *testing.T) {
 	tstaking.Commission = stakingtypes.NewCommissionRates(sdk.NewDecWithPrec(10, 2), sdk.NewDecWithPrec(5, 1), sdk.NewDec(0))
 	tstaking.CreateValidator(valAddrs[2], valConsPk3, sdk.NewInt(150000000), true)
 
-	providerKeeper := providerkeeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName))
 	airequestKeeper := airequestkeeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName), app.StakingKeeper, app.BankKeeper, nil)
 	websocketKeeper := websocketkeeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, app.StakingKeeper)
 
 	// init keeper to run custom allocate tokens
 	// here we borrow staking module to store the reward in the replacement of airesult
-	k := keeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName), app.StakingKeeper, providerKeeper, app.BankKeeper, app.DistrKeeper, app.AccountKeeper, websocketKeeper, airequestKeeper, types.FeeCollectorName)
+	k := keeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName), app.StakingKeeper, app.BankKeeper, app.DistrKeeper, app.AccountKeeper, websocketKeeper, airequestKeeper, types.FeeCollectorName)
 
 	// wrap keeper in a test keeper for test functions
-	testKeeper := keeper.NewTestKeeper(*k, app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName), app.StakingKeeper, providerKeeper, app.BankKeeper, app.DistrKeeper, app.AccountKeeper, websocketKeeper, airequestKeeper, types.FeeCollectorName)
+	testKeeper := keeper.NewTestKeeper(*k, app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName), app.StakingKeeper, app.BankKeeper, app.DistrKeeper, app.AccountKeeper, websocketKeeper, airequestKeeper, types.FeeCollectorName)
 
 	// init data source results
-	dsResult1 := websockettypes.NewDataSourceResult(firstDsName, []byte{0x50}, "success")
-	dsResult2 := websockettypes.NewDataSourceResult(secondDsName, []byte{0x50}, "success")
-	dsResult3 := websockettypes.NewDataSourceResult(thirdDsName, []byte{0x50}, "success")
+	dsResult1 := websockettypes.NewDataSourceResult(&websockettypes.EntryPoint{}, []byte{0x50}, "success")
+	dsResult2 := websockettypes.NewDataSourceResult(&websockettypes.EntryPoint{}, []byte{0x50}, "success")
+	dsResult3 := websockettypes.NewDataSourceResult(&websockettypes.EntryPoint{}, []byte{0x50}, "success")
 	dsResults := []*websockettypes.DataSourceResult{dsResult1, dsResult2, dsResult3}
 
 	// init test case results
-	tcResult1 := websockettypes.NewTestCaseResult(firstTcName, dsResults)
-	tcResult2 := websockettypes.NewTestCaseResult(secondTcName, dsResults)
+	tcResult1 := websockettypes.NewTestCaseResult(&websockettypes.EntryPoint{}, dsResults)
+	tcResult2 := websockettypes.NewTestCaseResult(&websockettypes.EntryPoint{}, dsResults)
 	tcResults := []*websockettypes.TestCaseResult{tcResult1, tcResult2}
 
 	// init reporter

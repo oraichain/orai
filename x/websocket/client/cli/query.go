@@ -200,7 +200,7 @@ func GetCmdQueryDataSourceEntries() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintBytes(append(res.Data, LineBreak))
+			return clientCtx.PrintProto(res)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
@@ -237,7 +237,7 @@ func GetCmdQueryTestCaseEntries() *cobra.Command {
 				return err
 			}
 
-			return clientCtx.PrintBytes(append(res.Data, LineBreak))
+			return clientCtx.PrintProto(res)
 		},
 	}
 	flags.AddQueryFlagsToCmd(cmd)
