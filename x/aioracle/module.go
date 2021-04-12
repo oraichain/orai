@@ -25,8 +25,9 @@ import (
 )
 
 var (
-	_ module.AppModule      = AppModule{}
-	_ module.AppModuleBasic = AppModuleBasic{}
+	_             module.AppModule      = AppModule{}
+	_             module.AppModuleBasic = AppModuleBasic{}
+	clientContext                       = &client.Context{}
 )
 
 // ----------------------------------------------------------------------------
@@ -77,6 +78,7 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONMarshaler, config client.TxE
 
 // RegisterRESTRoutes registers the capability module's REST service handlers.
 func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
+	clientContext = &clientCtx
 	rest.RegisterRoutes(clientCtx, rtr)
 }
 
@@ -165,7 +167,13 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json
 // BeginBlock executes all ABCI BeginBlock logic respective to the capability module.
 func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
 	am.keeper.ResolveRngSeed(ctx, req)
-	am.keeper.ExecuteAIOracles(ctx, req)
+	//fmt.Println("client context from address: ", client.GetClientContextFromCmd(am.GetTxCmd()).GetFromAddress())
+	validator, err := am.getValidatorAddress(*clientContext, ctx)
+	if err != nil {
+		ctx.Logger().Error(fmt.Sprintf("cannot collect validator address from tendermint with error: %v", err))
+	} else {
+		am.keeper.ExecuteAIOracles(ctx, req, validator)
+	}
 	//am.keeper.AllocateTokens(ctx, req.GetLastCommitInfo().Votes, ctx.BlockHeight())
 }
 
@@ -174,4 +182,23 @@ func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
 func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
 	//am.keeper.ProcessReward(ctx)
 	return []abci.ValidatorUpdate{}
+}
+
+func (am AppModule) getValidatorAddress(clientCtx client.Context, ctx sdk.Context) (sdk.ValAddress, error) {
+	node, err := clientCtx.GetNode()
+	if err != nil {
+		return nil, err
+	}
+
+	status, err := node.Status(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("validator from bech: ", status.ValidatorInfo.Address)
+	consAddr, err := sdk.ConsAddressFromHex(status.ValidatorInfo.Address.String())
+	if err != nil {
+		return nil, err
+	}
+	validator := am.keeper.StakingKeeper.ValidatorByConsAddr(ctx, consAddr)
+	return validator.GetOperator(), nil
 }

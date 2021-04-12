@@ -3,7 +3,6 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/oraichain/orai/x/aioracle/types"
@@ -120,23 +119,23 @@ func containsVal(vals []sdk.ValAddress, target sdk.ValAddress) bool {
 	return false
 }
 
-func (k *Keeper) ExecuteAIOracles(ctx sdk.Context, req abci.RequestBeginBlock) {
+func (k *Keeper) ExecuteAIOracles(ctx sdk.Context, req abci.RequestBeginBlock, valAddress sdk.ValAddress) {
 	aiOracles := k.GetAIOraclesBlockHeight(ctx)
 	if len(aiOracles) == 0 {
 		return
 	}
-
-	//clientCtx := client.Context{}
-
-	clientCtx := ctx.Value(client.ClientContextKey).(*client.Context)
-	fmt.Println("client ctx: ", clientCtx.GetFromAddress())
-
+	fmt.Println("validator: ", valAddress.String())
 	// querier to interact with the wasm contract
 	querier := NewQuerier(k)
 	goCtx := sdk.WrapSDKContext(ctx)
 
 	// execute each ai oracle request
 	for _, aiOracle := range aiOracles {
+		// if the ai oracle request does not include the validator address, then we skip
+		if !isValidator(aiOracle.GetValidators(), valAddress) {
+			fmt.Println("is not validator")
+			continue
+		}
 		var dataSourceResults []*types.DataSourceResult
 		var resultArr = []string{}
 		// collect list entries to get entry length
@@ -184,4 +183,15 @@ func (k *Keeper) ExecuteAIOracles(ctx sdk.Context, req abci.RequestBeginBlock) {
 		ctx.Logger().Info(fmt.Sprintf("Oracle script final result: %v", aggregatedResult))
 		// report := types.NewReport(aiOracle.GetRequestID(), dataSourceResults, nil, ctx.BlockHeight(), aggregatedResult.Data, types.NewReporter())
 	}
+}
+
+func isValidator(vals []sdk.ValAddress, valAddr sdk.ValAddress) bool {
+	for _, val := range vals {
+		fmt.Println("validator: ", val)
+		fmt.Println("wanted validator: ", valAddr)
+		if val.Equals(valAddr) {
+			return true
+		}
+	}
+	return false
 }
