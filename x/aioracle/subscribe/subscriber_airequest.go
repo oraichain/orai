@@ -16,11 +16,7 @@ const (
 	JoinString  = `-`
 )
 
-<<<<<<< HEAD:x/aioracle/subscribe/subscriber_airequest.go
 func (subscriber *Subscriber) handleAIOracleLog(queryClient types.QueryClient, ev *sdk.StringEvent) (*types.MsgSetAIOracleRes, error) {
-=======
-func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, ev *sdk.StringEvent) (*types.MsgCreateReport, error) {
->>>>>>> c757530... add estimated fees for a report:x/websocket/subscribe/subscriber_airequest.go
 	subscriber.log.Info(":delivery_truck: Processing incoming request event before checking validators")
 
 	attrMap := GetAttributeMap(ev.GetAttributes())
@@ -182,7 +178,8 @@ func (subscriber *Subscriber) handleAIRequestLog(queryClient types.QueryClient, 
 		subscriber.cliCtx.GetFromAddress(), subscriber.cliCtx.GetFromName(),
 		sdk.ValAddress(subscriber.cliCtx.GetFromAddress()),
 	)
-	_ = []byte(strings.Join(resultArr, JoinString))
+	final := []byte(strings.Join(resultArr, JoinString))
+	fmt.Println("final result: ", final)
 	// msgReport := types.NewMsgCreateReport(
 	// 	requestID, dataSourceResults,
 	// 	testCaseResults, reporter,
