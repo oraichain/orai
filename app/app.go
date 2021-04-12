@@ -87,9 +87,7 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	"github.com/oraichain/orai/x/airequest"
-	"github.com/oraichain/orai/x/airesult"
-	"github.com/oraichain/orai/x/websocket"
+	"github.com/oraichain/orai/x/aioracle"
 
 	// unnamed import of statik for swagger UI support
 	_ "github.com/oraichain/orai/doc/statik"
@@ -100,7 +98,7 @@ const appName = "Oraichain"
 // We pull these out so we can set them with LDFLAGS in the Makefile
 var (
 	NodeDir      = ".oraid"
-	Bech32Prefix = websocket.Denom
+	Bech32Prefix = aioracle.Denom
 
 	// If EnabledSpecificProposals is "", and this is "true", then enable all x/wasm proposals.
 	// If EnabledSpecificProposals is "", and this is not "true", then disable all x/wasm proposals.
@@ -173,9 +171,7 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		airequest.AppModuleBasic{},
-		websocket.AppModuleBasic{},
-		airesult.AppModuleBasic{},
+		aioracle.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -233,9 +229,7 @@ type OraichainApp struct {
 	wasmKeeper       wasm.Keeper
 
 	// custom modules here
-	airequestKeeper *airequest.Keeper
-	websocketKeeper *websocket.Keeper
-	airesultKeeper  *airesult.Keeper
+	aioracleKeeper *aioracle.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -267,7 +261,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		wasm.StoreKey, airequest.StoreKey, websocket.StoreKey, airesult.StoreKey,
+		wasm.StoreKey, aioracle.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -386,7 +380,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		wasmConfig,
 		supportedFeatures,
 		nil,
-		websocket.CreateQueryPlugins(app.bankKeeper, app.stakingKeeper),
+		aioracle.CreateQueryPlugins(app.bankKeeper, app.stakingKeeper),
 	)
 
 	// The gov proposal types can be individually enabled
@@ -406,24 +400,14 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	)
 	/****  Module Options ****/
 
-	app.airequestKeeper = airequest.NewKeeper(
-		appCodec, keys[airequest.StoreKey], &app.wasmKeeper, app.getSubspace(airequest.ModuleName), app.stakingKeeper, app.bankKeeper,
-	)
-
-	app.websocketKeeper = websocket.NewKeeper(
-		appCodec, keys[websocket.StoreKey], &app.wasmKeeper, app.stakingKeeper,
-	)
-
-	app.airesultKeeper = airesult.NewKeeper(
-		appCodec, keys[airesult.StoreKey],
+	app.aioracleKeeper = aioracle.NewKeeper(
+		appCodec, keys[aioracle.StoreKey],
 		&app.wasmKeeper,
-		app.getSubspace(airesult.ModuleName),
+		app.getSubspace(aioracle.ModuleName),
 		app.stakingKeeper,
 		app.bankKeeper,
-		app.distrKeeper,
 		app.accountKeeper,
-		app.websocketKeeper,
-		app.airequestKeeper,
+		app.distrKeeper,
 		authtypes.FeeCollectorName,
 	)
 
@@ -453,9 +437,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		evidence.NewAppModule(app.evidenceKeeper),
 		ibc.NewAppModule(app.ibcKeeper),
 		params.NewAppModule(app.paramsKeeper),
-		airequest.NewAppModule(appCodec, app.airequestKeeper),
-		websocket.NewAppModule(appCodec, app.websocketKeeper, &app.stakingKeeper),
-		airesult.NewAppModule(appCodec, app.airesultKeeper),
+		aioracle.NewAppModule(appCodec, app.aioracleKeeper),
 		transferModule,
 	)
 
@@ -464,10 +446,10 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	// CanWithdrawInvariant invariant.
 	// NOTE: staking module is required if HistoricalEntries param > 0
 	app.mm.SetOrderBeginBlockers(
-		upgradetypes.ModuleName, minttypes.ModuleName, airequest.ModuleName, airesult.ModuleName, distrtypes.ModuleName, slashingtypes.ModuleName,
+		upgradetypes.ModuleName, minttypes.ModuleName, aioracle.ModuleName, distrtypes.ModuleName, slashingtypes.ModuleName,
 		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
 	)
-	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, airesult.ModuleName, stakingtypes.ModuleName)
+	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, aioracle.ModuleName, stakingtypes.ModuleName)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
@@ -480,7 +462,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		capabilitytypes.ModuleName, authtypes.ModuleName, banktypes.ModuleName, distrtypes.ModuleName, stakingtypes.ModuleName,
 		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
 		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
-		wasm.ModuleName, airequest.ModuleName, websocket.ModuleName, airesult.ModuleName,
+		wasm.ModuleName, aioracle.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
@@ -689,8 +671,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
-	paramsKeeper.Subspace(airequest.ModuleName)
-	paramsKeeper.Subspace(airesult.ModuleName)
+	paramsKeeper.Subspace(aioracle.ModuleName)
 
 	return paramsKeeper
 }

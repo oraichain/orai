@@ -15,6 +15,7 @@ do
     -I=$COSMOS_SDK_DIR/third_party/proto \
     -I=$COSMOS_SDK_DIR/proto \
     --gocosmos_out=Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types,Mgoogle/protobuf/empty.proto=github.com/gogo/protobuf/types,plugins=interfacetype+grpc,paths=source_relative:. \
+    --grpc-gateway_out=Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types,Mgoogle/protobuf/empty.proto=github.com/gogo/protobuf/types,paths=source_relative:. \
     $proto_files
 done
 
