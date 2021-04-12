@@ -11,7 +11,7 @@ import (
 )
 
 // AllocateTokens allocates the tokens to the validators that participate in the AI request handling
-func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, blockHeight int64) {
+func (k *Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, blockHeight int64) {
 	// get reward from the previous block
 	rewardObj, err := k.GetReward(ctx, blockHeight-1)
 	// If there's no reward in the previous block, then we do not handle
@@ -27,7 +27,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, block
 	// append those coins into the fee collector to get ready allocating them to the distr module.
 	err = k.BankKeeper.AddCoins(ctx, feeCollector.GetAddress(), feesCollected)
 	if err != nil {
-		k.Logger(ctx).Error(fmt.Sprintf("error adding coins using bank keeper: %v\n", err.Error()))
+		k.Logger(ctx).Error(fmt.Sprintf("error adding coins using bank *Keeper: %v\n", err.Error()))
 		return
 	}
 	remaining := reward
@@ -112,7 +112,7 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, block
 }
 
 // // DirectAllocateTokens allocates the tokens to the validators, data sources and test cases that participate in the AI request handling directly using coins from the requester account
-// func (k Keeper) DirectAllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo) {
+// func (k *Keeper) DirectAllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo) {
 // 	reports := k.aioracleKeeper.GetReportsBlockHeight(ctx, ctx.BlockHeight()-int64(1))
 
 // 	// TODO: instead of directly allocating tokens like this which is insecure, we get the total fees and then put it back to the fee collector. By doing this, we make sure that the total fee is enough to allocate for all using the fee collector.

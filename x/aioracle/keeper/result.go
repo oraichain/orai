@@ -7,7 +7,7 @@ import (
 )
 
 // ResolveResult aggregates the results from the reports before storing it into the blockchain
-func (k Keeper) ResolveResult(ctx sdk.Context, rep *aioracle.Report, valCount int, totalReportPercentage uint64) {
+func (k *Keeper) ResolveResult(ctx sdk.Context, rep *aioracle.Report, valCount int, totalReportPercentage uint64) {
 
 	id := rep.GetRequestID()
 	// get a new validator object for the result object.
@@ -54,13 +54,13 @@ func (k Keeper) ResolveResult(ctx sdk.Context, rep *aioracle.Report, valCount in
 }
 
 // HasResult checks if a given request has result or not
-func (k Keeper) HasResult(ctx sdk.Context, reqID string) bool {
+func (k *Keeper) HasResult(ctx sdk.Context, reqID string) bool {
 	store := ctx.KVStore(k.StoreKey)
 	return store.Has(types.ResultStoreKey(reqID))
 }
 
 // GetResult returns the result of a given request
-func (k Keeper) GetResult(ctx sdk.Context, reqID string) (*types.AIOracleResult, error) {
+func (k *Keeper) GetResult(ctx sdk.Context, reqID string) (*types.AIOracleResult, error) {
 	store := ctx.KVStore(k.StoreKey)
 	var result types.AIOracleResult
 	err := k.Cdc.UnmarshalBinaryBare(store.Get(types.ResultStoreKey(reqID)), &result)
@@ -71,7 +71,7 @@ func (k Keeper) GetResult(ctx sdk.Context, reqID string) (*types.AIOracleResult,
 }
 
 // SetResult allows users to set a result into the store
-func (k Keeper) SetResult(ctx sdk.Context, reqID string, result *types.AIOracleResult) error {
+func (k *Keeper) SetResult(ctx sdk.Context, reqID string, result *types.AIOracleResult) error {
 	store := ctx.KVStore(k.StoreKey)
 
 	bz, err := k.Cdc.MarshalBinaryBare(result)

@@ -8,14 +8,14 @@ import (
 )
 
 // SetReward saves the reward to the storage without performing validation.
-func (k Keeper) SetReward(ctx sdk.Context, rew *types.Reward) error {
+func (k *Keeper) SetReward(ctx sdk.Context, rew *types.Reward) error {
 	bz, err := k.Cdc.MarshalBinaryBare(rew)
 	ctx.KVStore(k.StoreKey).Set(types.RewardStoreKey(rew.BlockHeight), bz)
 	return err
 }
 
 // GetReward retrieves a specific reward given a block height
-func (k Keeper) GetReward(ctx sdk.Context, blockHeight int64) (*types.Reward, error) {
+func (k *Keeper) GetReward(ctx sdk.Context, blockHeight int64) (*types.Reward, error) {
 	store := ctx.KVStore(k.StoreKey)
 	// check if there exists a reward in that block height or not
 	hasReward := store.Has(types.RewardStoreKey(blockHeight))
@@ -35,7 +35,7 @@ func (k Keeper) GetReward(ctx sdk.Context, blockHeight int64) (*types.Reward, er
 }
 
 // ProcessReward collects all the information needed to create a new Reward object
-func (k Keeper) ProcessReward(ctx sdk.Context) {
+func (k *Keeper) ProcessReward(ctx sdk.Context) {
 	reports := k.GetReportsBlockHeight(ctx)
 	// if there's no report from any validators, we skip
 	if len(reports) == 0 {
@@ -44,10 +44,9 @@ func (k Keeper) ProcessReward(ctx sdk.Context) {
 	reward := types.DefaultReward(ctx.BlockHeight())
 
 	// get param reward percentage oracle
-	rewardPercentage := int64(70)
 	// Collect all the reports in the current block to get all the information for the reward
 	for _, report := range reports {
-		isValid, valCount := k.ResolveRequestsFromReports(ctx, &report, reward, rewardPercentage)
+		isValid, valCount := k.ResolveRequestsFromReports(ctx, &report, reward)
 		// if we can resolve the requests from the reports successfully, we resolve its result
 		if isValid {
 			// collect param for the the total reports needed to be considered finished

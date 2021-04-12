@@ -13,7 +13,7 @@ import (
 )
 
 // RandomValidators random a set of validators (currently not based on the voting power) to execute the oracle script
-func (k Keeper) RandomValidators(ctx sdk.Context, size int, nonce []byte) ([]sdk.ValAddress, error) {
+func (k *Keeper) RandomValidators(ctx sdk.Context, size int, nonce []byte) ([]sdk.ValAddress, error) {
 	maxValidatorSize := 0
 	totalPowers := int64(0)
 	// count the total current validator
@@ -62,7 +62,7 @@ func (k Keeper) RandomValidators(ctx sdk.Context, size int, nonce []byte) ([]sdk
 // 	return quotient.Uint64()
 // }
 
-func (k Keeper) createValSamplingList(ctx sdk.Context, maxValidatorSize int) (valOperators []sdk.ValAddress) {
+func (k *Keeper) createValSamplingList(ctx sdk.Context, maxValidatorSize int) (valOperators []sdk.ValAddress) {
 	var curVotingP int64
 	var prevVotingP int64
 	specialIndex := 0 // this index stores the first validator that has equal index to the next val

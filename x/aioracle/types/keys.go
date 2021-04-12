@@ -7,7 +7,7 @@ const (
 	ModuleName = "aioracle"
 
 	// Denom is the coin denom used for the module
-	Denom = "uorai"
+	Denom = "orai"
 
 	// StoreKey to be used when creating the KVStore
 	StoreKey = ModuleName

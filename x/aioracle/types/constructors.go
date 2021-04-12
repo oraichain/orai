@@ -137,7 +137,6 @@ func NewReport(
 	dataSourceResults []*DataSourceResult,
 	testCaseResults []*TestCaseResult,
 	blockHeight int64,
-	fees sdk.Coins,
 	aggregatedResult []byte,
 	reporter *Reporter,
 	status string,
@@ -148,7 +147,6 @@ func NewReport(
 		DataSourceResults: dataSourceResults,
 		TestCaseResults:   testCaseResults,
 		BlockHeight:       blockHeight,
-		Fees:              fees,
 		AggregatedResult:  aggregatedResult,
 		ResultStatus:      status,
 	}

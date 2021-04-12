@@ -55,7 +55,7 @@ func (k *Keeper) Logger(ctx sdk.Context) log.Logger {
 }
 
 // DefaultValResult is a default constructor for the validator result
-func (k Keeper) DefaultValResult() *types.ValResult {
+func (k *Keeper) DefaultValResult() *types.ValResult {
 	return &types.ValResult{
 		Validator: &types.Validator{},
 		Result:    []byte{},
@@ -63,12 +63,12 @@ func (k Keeper) DefaultValResult() *types.ValResult {
 }
 
 // GetKeyResultSuccess is a getter to collect the result success key for validator result verification using by other modules.
-func (k Keeper) GetKeyResultSuccess() string {
+func (k *Keeper) GetKeyResultSuccess() string {
 	return types.ResultSuccess
 }
 
 // NewValResult is a wrapper function of the aioracle module that allow others to initiate a new valresult entity through the keeper
-func (k Keeper) NewValResult(val *types.Validator, result []byte, status string) *types.ValResult {
+func (k *Keeper) NewValResult(val *types.Validator, result []byte, status string) *types.ValResult {
 	return &types.ValResult{
 		Validator:    val,
 		Result:       result,
@@ -77,12 +77,12 @@ func (k Keeper) NewValResult(val *types.Validator, result []byte, status string)
 }
 
 // GetValidator return a specific validator given a validator address
-func (k Keeper) GetValidator(ctx sdk.Context, valAddress sdk.ValAddress) stakingtypes.ValidatorI {
+func (k *Keeper) GetValidator(ctx sdk.Context, valAddress sdk.ValAddress) stakingtypes.ValidatorI {
 	return k.StakingKeeper.Validator(ctx, valAddress)
 }
 
 // NewValidator is a wrapper function of the aioracle module that allow others to initiate a new validator entity through the keeper
-func (k Keeper) NewValidator(address sdk.ValAddress, votingPower int64, status string) *types.Validator {
+func (k *Keeper) NewValidator(address sdk.ValAddress, votingPower int64, status string) *types.Validator {
 	return &types.Validator{
 		Address:     address,
 		VotingPower: votingPower,

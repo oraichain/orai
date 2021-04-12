@@ -8,7 +8,7 @@ import (
 )
 
 // GetAIOracle returns the information of an AI request
-func (k Keeper) GetAIOracle(ctx sdk.Context, id string) (*types.AIOracle, error) {
+func (k *Keeper) GetAIOracle(ctx sdk.Context, id string) (*types.AIOracle, error) {
 	store := ctx.KVStore(k.StoreKey)
 	hasAIOracle := store.Has(types.RequestStoreKey(id))
 	var err error
@@ -22,13 +22,13 @@ func (k Keeper) GetAIOracle(ctx sdk.Context, id string) (*types.AIOracle, error)
 }
 
 // HasAIOracle checks if there exists an ai request given an id
-func (k Keeper) HasAIOracle(ctx sdk.Context, id string) bool {
+func (k *Keeper) HasAIOracle(ctx sdk.Context, id string) bool {
 	store := ctx.KVStore(k.StoreKey)
 	return store.Has(types.RequestStoreKey(id))
 }
 
 // SetAIOracle allows users to set a oScript into the store
-func (k Keeper) SetAIOracle(ctx sdk.Context, id string, request *types.AIOracle) {
+func (k *Keeper) SetAIOracle(ctx sdk.Context, id string, request *types.AIOracle) {
 	store := ctx.KVStore(k.StoreKey)
 	bz, err := k.Cdc.MarshalBinaryBare(request)
 	if err != nil {
@@ -38,7 +38,7 @@ func (k Keeper) SetAIOracle(ctx sdk.Context, id string, request *types.AIOracle)
 }
 
 // GetAIOracleIDIter get an iterator of all key-value pairs in the store
-func (k Keeper) GetAIOracleIDIter(ctx sdk.Context) sdk.Iterator {
+func (k *Keeper) GetAIOracleIDIter(ctx sdk.Context) sdk.Iterator {
 	store := ctx.KVStore(k.StoreKey)
 	return sdk.KVStorePrefixIterator(store, types.RequeststoreKeyPrefixAll())
 }
@@ -49,8 +49,23 @@ func (k *Keeper) GetPaginatedAIOracles(ctx sdk.Context, page, limit uint) sdk.It
 	return sdk.KVStorePrefixIteratorPaginated(store, types.RequeststoreKeyPrefixAll(), page, limit)
 }
 
+// GetAIOraclesBlockHeight returns all ai oracle requests for the given block height, or nil if there is none for validators to execute.
+func (k *Keeper) GetAIOraclesBlockHeight(ctx sdk.Context) (aiOracles []types.AIOracle) {
+	iterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.StoreKey), types.RequeststoreKeyPrefixAll())
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var req types.AIOracle
+		k.Cdc.MustUnmarshalBinaryBare(iterator.Value(), &req)
+		// check if block height is equal or not
+		if req.GetBlockHeight() == ctx.BlockHeight()-1 {
+			aiOracles = append(aiOracles, req)
+		}
+	}
+	return aiOracles
+}
+
 // ResolveExpiredRequest handles requests that have been expired
-func (k Keeper) ResolveExpiredRequest(ctx sdk.Context, reqID string) {
+func (k *Keeper) ResolveExpiredRequest(ctx sdk.Context, reqID string) {
 	// hard code the result first if the request does not have a result
 	if !k.HasResult(ctx, reqID) {
 		valResults := make([]types.ValResult, 0)
@@ -64,7 +79,7 @@ func (k Keeper) ResolveExpiredRequest(ctx sdk.Context, reqID string) {
 }
 
 // ResolveRequestsFromReports handles the reports received in a block to group all the validators, data source owners and test case owners
-func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *types.Report, reward *types.Reward, rewardPercentage int64) (bool, int) {
+func (k *Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *types.Report, reward *types.Reward) (bool, int) {
 
 	req, _ := k.GetAIOracle(ctx, rep.GetRequestID())
 	validation := k.validateBasic(ctx, req, rep, ctx.BlockHeight())
@@ -109,7 +124,7 @@ func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *types.Report, r
 	return true, len(req.GetValidators())
 }
 
-func (k Keeper) validateBasic(ctx sdk.Context, req *types.AIOracle, rep *types.Report, blockHeight int64) bool {
+func (k *Keeper) validateBasic(ctx sdk.Context, req *types.AIOracle, rep *types.Report, blockHeight int64) bool {
 	// if the request has been expired
 	// if req.GetBlockHeight()+int64(k.GetParam(ctx, types.KeyExpirationCount)) < blockHeight {
 	// 	//TODO: NEED TO HANDLE THE EXPIRED REQUEST.
