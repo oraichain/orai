@@ -2,7 +2,6 @@ package aioracle
 
 import (
 	"github.com/oraichain/orai/x/aioracle/keeper"
-	"github.com/oraichain/orai/x/aioracle/subscribe"
 	"github.com/oraichain/orai/x/aioracle/types"
 )
 
@@ -35,7 +34,6 @@ var (
 	RequestKeyPrefix     = types.RequestKeyPrefix
 	ErrRequestNotFound   = types.ErrRequestNotFound
 	NewAIOracle          = types.NewAIOracle
-	NewSubscriber        = subscribe.NewSubscriber
 	ResultKeyPrefix      = types.ResultKeyPrefix
 	RewardKeyPrefix      = types.RewardKeyPrefix
 	ReportKeyPrefix      = types.ReportKeyPrefix
@@ -46,7 +44,5 @@ type (
 	MsgSetAIOracleReq = types.MsgSetAIOracleReq
 	AIOracle          = types.AIOracle
 	GenesisState      = types.GenesisState
-	Subscriber        = subscribe.Subscriber
 	Report            = types.Report
-	AIOracleConfig    = subscribe.AIOracleConfig
 )

@@ -6,7 +6,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/oraichain/orai/x/aioracle/types"
-	abci "github.com/tendermint/tendermint/abci/types"
 )
 
 // HasReport checks if the report of this ID triple exists in the storage.
@@ -20,7 +19,7 @@ func (k *Keeper) SetReport(ctx sdk.Context, id string, rep *types.Report) error 
 	if err != nil {
 		return err
 	}
-	ctx.KVStore(k.StoreKey).Set(types.ReportStoreKey(id, string(rep.Reporter.Validator[:])), bz)
+	ctx.KVStore(k.StoreKey).Set(types.ReportStoreKey(id, string(rep.GetValidatorAddress()[:])), bz)
 	return nil
 }
 
@@ -101,9 +100,9 @@ func (k *Keeper) GetAllReports(ctx sdk.Context) (reports []types.Report) {
 }
 
 // ValidateReport validates if the report is valid to get rewards
-func (k *Keeper) ValidateReport(ctx sdk.Context, reporter *types.Reporter, req *types.AIOracle) error {
+func (k *Keeper) ValidateReport(ctx sdk.Context, valAddress sdk.ValAddress, req *types.AIOracle) error {
 	// Check if the validator is in the requested list of validators
-	if !containsVal(req.GetValidators(), reporter.GetValidator()) {
+	if !containsVal(req.GetValidators(), valAddress) {
 		return sdkerrors.Wrap(types.ErrValidatorNotFound, fmt.Sprintln("failed to find the requested validator"))
 	}
 	return nil
@@ -119,7 +118,7 @@ func containsVal(vals []sdk.ValAddress, target sdk.ValAddress) bool {
 	return false
 }
 
-func (k *Keeper) ExecuteAIOracles(ctx sdk.Context, req abci.RequestBeginBlock, valAddress sdk.ValAddress) {
+func (k *Keeper) ExecuteAIOracles(ctx sdk.Context, valAddress sdk.ValAddress) {
 	aiOracles := k.GetAIOraclesBlockHeight(ctx)
 	if len(aiOracles) == 0 {
 		return
@@ -171,6 +170,8 @@ func (k *Keeper) ExecuteAIOracles(ctx sdk.Context, req abci.RequestBeginBlock, v
 			// append an data source result into the list
 			dataSourceResults = append(dataSourceResults, dataSourceResult)
 		}
+
+		ctx.Logger().Info(fmt.Sprintf("results collected from the data sources: %v", resultArr))
 		aggregatedResult, err := querier.OracleScriptContract(goCtx, &types.QueryOracleScriptContract{
 			Contract: aiOracle.GetContract(),
 			Request: &types.RequestOracleScript{
@@ -181,7 +182,12 @@ func (k *Keeper) ExecuteAIOracles(ctx sdk.Context, req abci.RequestBeginBlock, v
 			ctx.Logger().Error(fmt.Sprintf("Cannot execute oracle script contract %v with error: %v", aiOracle.GetContract(), err))
 		}
 		ctx.Logger().Info(fmt.Sprintf("Oracle script final result: %v", aggregatedResult))
-		// report := types.NewReport(aiOracle.GetRequestID(), dataSourceResults, nil, ctx.BlockHeight(), aggregatedResult.Data, types.NewReporter())
+		// store report into blockchain as proof for executing AI requests
+		report := types.NewReport(aiOracle.GetRequestID(), dataSourceResults, ctx.BlockHeight(), aggregatedResult.Data, valAddress, k.StakingKeeper.Validator(ctx, valAddress).GetStatus().String())
+		err = k.SetReport(ctx, aiOracle.GetRequestID(), report)
+		if err != nil {
+			ctx.Logger().Error(fmt.Sprintf("Cannot store report with request id %v of validator %v with error: %v", aiOracle.GetRequestID(), valAddress.String(), err))
+		}
 	}
 }
 

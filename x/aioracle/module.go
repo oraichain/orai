@@ -172,7 +172,7 @@ func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
 	if err != nil {
 		ctx.Logger().Error(fmt.Sprintf("cannot collect validator address from tendermint with error: %v", err))
 	} else {
-		am.keeper.ExecuteAIOracles(ctx, req, validator)
+		am.keeper.ExecuteAIOracles(ctx, validator)
 	}
 	//am.keeper.AllocateTokens(ctx, req.GetLastCommitInfo().Votes, ctx.BlockHeight())
 }
@@ -180,7 +180,7 @@ func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
 // EndBlock executes all ABCI EndBlock logic respective to the capability module. It
 // returns no validator updates.
 func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	//am.keeper.ProcessReward(ctx)
+	am.keeper.ProcessReward(ctx)
 	return []abci.ValidatorUpdate{}
 }
 

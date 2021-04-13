@@ -11,7 +11,7 @@ func (k *Keeper) ResolveResult(ctx sdk.Context, rep *aioracle.Report, valCount i
 
 	id := rep.GetRequestID()
 	// get a new validator object for the result object.
-	valAddress := rep.GetReporter().GetValidator()
+	valAddress := rep.GetValidatorAddress()
 	validator := k.NewValidator(valAddress, k.StakingKeeper.Validator(ctx, valAddress).GetConsensusPower(), k.StakingKeeper.Validator(ctx, valAddress).GetStatus().String())
 
 	if !k.HasResult(ctx, id) {

@@ -135,29 +135,18 @@ func DefaultReward(blockHeight int64) *Reward {
 func NewReport(
 	requestID string,
 	dataSourceResults []*DataSourceResult,
-	testCaseResults []*TestCaseResult,
 	blockHeight int64,
 	aggregatedResult []byte,
-	reporter *Reporter,
+	valAddress sdk.ValAddress,
 	status string,
 ) *Report {
 	return &Report{
 		RequestID:         requestID,
-		Reporter:          reporter,
+		ValidatorAddress:  valAddress,
 		DataSourceResults: dataSourceResults,
-		TestCaseResults:   testCaseResults,
 		BlockHeight:       blockHeight,
 		AggregatedResult:  aggregatedResult,
 		ResultStatus:      status,
-	}
-}
-
-// NewReporter is the constructor of the Reporter struct
-func NewReporter(addr sdk.AccAddress, name string, valAddr sdk.ValAddress) *Reporter {
-	return &Reporter{
-		Address:   addr,
-		Name:      name,
-		Validator: valAddr,
 	}
 }
 

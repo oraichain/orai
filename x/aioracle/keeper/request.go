@@ -110,13 +110,10 @@ func (k *Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *types.Report, 
 	valFees, _ := sdk.NewDecCoinsFromCoins(reward.ProviderFees...).MulDec(sdk.NewDec(int64(rewardRatio))).TruncateDecimal()
 	// add validator fees into the total fees of all validators
 	reward.ValidatorFees = reward.ValidatorFees.Add(valFees...)
-	// store information into the reward struct to reward these entities in the next begin block
-	valAddress := rep.GetReporter().GetValidator()
-
 	// collect validator current status
-	val := k.StakingKeeper.Validator(ctx, valAddress)
+	val := k.StakingKeeper.Validator(ctx, rep.GetValidatorAddress())
 	// create a new validator wrapper and append to reward obj
-	validator := k.NewValidator(valAddress, val.GetConsensusPower(), val.GetStatus().String())
+	validator := k.NewValidator(rep.GetValidatorAddress(), val.GetConsensusPower(), val.GetStatus().String())
 	reward.Validators = append(reward.Validators, *validator)
 	reward.TotalPower += validator.GetVotingPower()
 
@@ -139,7 +136,7 @@ func (k *Keeper) validateBasic(ctx sdk.Context, req *types.AIOracle, rep *types.
 	}
 
 	// Check if validator exists and active
-	_, isExist := k.StakingKeeper.GetValidator(ctx, rep.GetReporter().GetValidator())
+	_, isExist := k.StakingKeeper.GetValidator(ctx, rep.GetValidatorAddress())
 	if !isExist {
 		k.Logger(ctx).Error(fmt.Sprintf("error in validating the report: validator does not exist"))
 		return false
@@ -152,7 +149,7 @@ func (k *Keeper) validateBasic(ctx sdk.Context, req *types.AIOracle, rep *types.
 	// }
 
 	// TODO
-	err := k.ValidateReport(ctx, rep.GetReporter(), req)
+	err := k.ValidateReport(ctx, rep.GetValidatorAddress(), req)
 	if err != nil {
 		k.Logger(ctx).Error(fmt.Sprintf("error in validating the report: %v\n", err.Error()))
 		return false
