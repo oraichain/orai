@@ -88,26 +88,18 @@ func (k *Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *types.Report, 
 		return false, 0
 	}
 
-	// // collect data source owners that have their data sources executed to reward
-	// for _, dataSourceResult := range rep.GetDataSourceResults() {
-	// 	if dataSourceResult.GetStatus() == k.webSocketKeeper.GetKeyResultSuccess() {
-	// 		dataSource, _ := k.providerKeeper.GetAIDataSource(ctx, dataSourceResult.GetName())
-	// 		reward.DataSources = append(reward.DataSources, *dataSource)
-	// 		reward.ProviderFees = reward.ProviderFees.Add(dataSource.GetFees()...)
-	// 	}
-	// }
-
-	// // collect data source owners that have their data sources executed to reward
-	// for _, testCaseResult := range rep.GetTestCaseResults() {
-	// 	testCase, _ := k.providerKeeper.GetTestCase(ctx, testCaseResult.GetName())
-	// 	reward.TestCases = append(reward.TestCases, *testCase)
-	// 	reward.ProviderFees = reward.ProviderFees.Add(testCase.GetFees()...)
-	// }
+	// collect data source owners that have their data sources executed to reward
+	for _, dataSourceResult := range rep.GetDataSourceResults() {
+		if dataSourceResult.GetStatus() == k.GetKeyResultSuccess() {
+			reward.DatasourceResults = append(reward.DatasourceResults, dataSourceResult)
+			reward.ProviderFees = reward.ProviderFees.Add(dataSourceResult.GetEntryPoint().GetProviderFees()...)
+		}
+	}
 	// change reward ratio to the ratio of validator
 	rewardRatio := k.GetParam(ctx, types.KeyAIOracleRewardPercentages)
-
+	//rewardRatio := 40
 	// reward = 1 - oracle reward percentage × (data source fees + test case fees)
-	valFees, _ := sdk.NewDecCoinsFromCoins(reward.ProviderFees...).MulDec(sdk.NewDec(int64(rewardRatio))).TruncateDecimal()
+	valFees, _ := sdk.NewDecCoinsFromCoins(reward.ProviderFees...).MulDec(sdk.NewDecWithPrec(int64(rewardRatio), 2)).TruncateDecimal()
 	// add validator fees into the total fees of all validators
 	reward.ValidatorFees = reward.ValidatorFees.Add(valFees...)
 	// collect validator current status

@@ -7,6 +7,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution/types"
+	"github.com/oraichain/orai/x/aioracle/types"
+	aioracle "github.com/oraichain/orai/x/aioracle/types"
 	abci "github.com/tendermint/tendermint/abci/types"
 )
 
@@ -33,42 +35,25 @@ func (k *Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, bloc
 	remaining := reward
 	hasNeg := false
 
-	// //Allocate non-community pool tokens to active validators weighted by voting power.
-	// // reward for test cases that contribute
-	// for _, testCase := range rewardObj.TestCases {
+	// reward for data sources that contribute
+	for _, dataSourceResult := range rewardObj.DatasourceResults {
+		providerFees := dataSourceResult.GetEntryPoint().GetProviderFees()
+		owner := dataSourceResult.GetEntryPoint().GetOwner()
+		// safesub to prevent panic
+		remaining, hasNeg = remaining.SafeSub(sdk.NewDecCoinsFromCoins(providerFees...))
+		if hasNeg {
+			k.Logger(ctx).Error(fmt.Sprintf("not enough balance to reward data source with URL:%v, \n", dataSourceResult.GetEntryPoint().GetUrl()))
+			return
+		}
 
-	// 	// safesub to prevent panic
-	// 	remaining, hasNeg = remaining.SafeSub(sdk.NewDecCoinsFromCoins(testCase.GetFees()...))
-	// 	if hasNeg {
-	// 		k.Logger(ctx).Error(fmt.Sprintf("not enough balance to reward test case :%v, \n", testCase.GetName()))
-	// 		return
-	// 	}
+		// send coins to data source owner addresses
+		temp := k.BankKeeper.GetBalance(ctx, owner, types.Denom)
+		k.BankKeeper.SendCoinsFromModuleToAccount(ctx, k.FeeCollectorName, owner, providerFees)
+		rewardCollected := k.BankKeeper.GetBalance(ctx, owner, aioracle.Denom).Sub(temp)
+		k.Logger(ctx).Info(fmt.Sprintf("Reward collected for the following address %v - %v\n", owner.String(), rewardCollected))
 
-	// 	// send coins to test case owner addresses
-	// 	temp := k.bankKeeper.GetBalance(ctx, testCase.GetOwner(), aioracle.Denom)
-	// 	k.bankKeeper.SendCoinsFromModuleToAccount(ctx, k.feeCollectorName, testCase.GetOwner(), testCase.GetFees())
-	// 	rewardCollected := k.bankKeeper.GetBalance(ctx, testCase.GetOwner(), aioracle.Denom).Sub(temp)
-	// 	k.Logger(ctx).Info(fmt.Sprintf("Reward collected for the following address %v - %v\n", testCase.GetOwner().String(), rewardCollected))
-	// }
-
-	// // reward for test cases that contribute
-	// for _, dataSource := range rewardObj.DataSources {
-
-	// 	// safesub to prevent panic
-	// 	remaining, hasNeg = remaining.SafeSub(sdk.NewDecCoinsFromCoins(dataSource.GetFees()...))
-	// 	if hasNeg {
-	// 		k.Logger(ctx).Error(fmt.Sprintf("not enough balance to reward data source :%v, \n", dataSource.GetName()))
-	// 		return
-	// 	}
-
-	// 	// send coins to data source owner addresses
-	// 	temp := k.bankKeeper.GetBalance(ctx, dataSource.GetOwner(), aioracle.Denom)
-	// 	k.bankKeeper.SendCoinsFromModuleToAccount(ctx, k.feeCollectorName, dataSource.GetOwner(), dataSource.GetFees())
-	// 	rewardCollected := k.bankKeeper.GetBalance(ctx, dataSource.GetOwner(), aioracle.Denom).Sub(temp)
-	// 	k.Logger(ctx).Info(fmt.Sprintf("Reward collected for the following address %v - %v\n", dataSource.GetOwner().String(), rewardCollected))
-
-	// }
-	// reward for the validators that contribute in the ai request test
+	}
+	//reward for the validators that contribute in the ai request test
 	// transfer collected fees to the distribution module account to distribute the oracle rewards to the validators. Note that if we transfer all the transaction fees, then other modules won't be able to handle allocation
 
 	decValLen := sdk.NewDec(int64(len(rewardObj.Validators)))
@@ -110,29 +95,3 @@ func (k *Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, bloc
 	k.DistrKeeper.SetFeePool(ctx, feePool)
 	k.Logger(ctx).Info("finish allocating tokens")
 }
-
-// // DirectAllocateTokens allocates the tokens to the validators, data sources and test cases that participate in the AI request handling directly using coins from the requester account
-// func (k *Keeper) DirectAllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo) {
-// 	reports := k.aioracleKeeper.GetReportsBlockHeight(ctx, ctx.BlockHeight()-int64(1))
-
-// 	// TODO: instead of directly allocating tokens like this which is insecure, we get the total fees and then put it back to the fee collector. By doing this, we make sure that the total fee is enough to allocate for all using the fee collector.
-// 	for _, report := range reports {
-// 		request, err := k.Getaioracle(ctx, report.GetRequestID())
-// 		if err != nil {
-// 			return
-// 		}
-// 		// at this stage, the validator has run all the test cases and data sources to produce a valid report. This must be checked before => assume we have enough
-// 		for _, dSource := range request.AIDataSources {
-// 			// the creator will directly pays the data source provider
-// 			k.bankKeeper.SendCoins(ctx, request.Creator, dSource.GetOwner(), dSource.GetFees())
-// 		}
-
-// 		for _, testCase := range request.TestCases {
-// 			// the creator will directly pays the data source provider
-// 			k.bankKeeper.SendCoins(ctx, request.Creator, testCase.GetOwner(), testCase.GetFees())
-// 		}
-
-// 		// Allocate tokens directly to the validator that creates a report using the fees given in the report
-// 		k.distrKeeper.AllocateTokensToValidator(ctx, k.stakingKeeper.Validator(ctx, report.GetValidator()), sdk.NewDecCoinsFromCoins(report.GetFees()...))
-// 	}
-// }

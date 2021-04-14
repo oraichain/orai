@@ -111,24 +111,27 @@ func NewReward(
 	totalVotingPower int64,
 	providerFees sdk.Coins,
 	validatorFees sdk.Coins,
+	dataSourceResults []*DataSourceResult,
 ) *Reward {
 	return &Reward{
-		Validators:    validators,
-		BlockHeight:   blockHeight,
-		TotalPower:    totalVotingPower,
-		ProviderFees:  providerFees,
-		ValidatorFees: validatorFees,
+		Validators:        validators,
+		BlockHeight:       blockHeight,
+		TotalPower:        totalVotingPower,
+		ProviderFees:      providerFees,
+		ValidatorFees:     validatorFees,
+		DatasourceResults: dataSourceResults,
 	}
 }
 
 // DefaultReward is a default value init for the reward struct
 func DefaultReward(blockHeight int64) *Reward {
 	return &Reward{
-		Validators:    make([]Validator, 0),
-		BlockHeight:   blockHeight,
-		TotalPower:    int64(0),
-		ProviderFees:  sdk.NewCoins(sdk.NewCoin(Denom, sdk.NewInt(int64(0)))),
-		ValidatorFees: sdk.NewCoins(sdk.NewCoin(Denom, sdk.NewInt(int64(0)))),
+		Validators:        make([]Validator, 0),
+		BlockHeight:       blockHeight,
+		TotalPower:        int64(0),
+		ProviderFees:      sdk.NewCoins(sdk.NewCoin(Denom, sdk.NewInt(int64(0)))),
+		ValidatorFees:     sdk.NewCoins(sdk.NewCoin(Denom, sdk.NewInt(int64(0)))),
+		DatasourceResults: []*DataSourceResult{},
 	}
 }
 

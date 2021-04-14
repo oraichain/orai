@@ -19,7 +19,9 @@ message AIOracle {
 message EntryPoint{
   option (gogoproto.goproto_stringer) = true;    
   string url = 1 [(gogoproto.jsontag) = "url,omitempty"];
-  repeated string headers = 2 [(gogoproto.jsontag) = "headers,omitempty,omitempty"];     
+  repeated string headers = 2 [(gogoproto.jsontag) = "headers,omitempty,omitempty"];    
+  bytes owner = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"]; 
+  repeated cosmos.base.v1beta1.Coin provider_fees = 4 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.jsontag) = "provider_fees,omitempty,omitempty"];
 }
 
 message DataSourceResult {
@@ -50,10 +52,11 @@ message AIOracleResult {
 message Reward {
   option (gogoproto.goproto_stringer) = true;
   repeated oraichain.orai.aioracle.Validator validators = 1 [(gogoproto.nullable) = false];  
-  int64 block_height = 4;
-  int64 total_power = 5 [(gogoproto.jsontag) = "total_voting_power,omitempty"];
-  repeated cosmos.base.v1beta1.Coin provider_fees = 6 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "json:\"provider_fees\""];
-  repeated cosmos.base.v1beta1.Coin validator_fees = 7 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "json:\"validator_fees\""];
+  int64 block_height = 2;
+  int64 total_power = 3 [(gogoproto.jsontag) = "total_voting_power,omitempty"];
+  repeated cosmos.base.v1beta1.Coin provider_fees = 4 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "json:\"provider_fees\""];
+  repeated cosmos.base.v1beta1.Coin validator_fees = 5 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "json:\"validator_fees\""];
+  repeated DataSourceResult datasource_results = 6;
 }
 
 message TestCaseResult {
