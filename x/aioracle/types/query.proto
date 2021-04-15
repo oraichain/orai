@@ -110,11 +110,10 @@ message RequestDataSource {
   string input = 2 [(gogoproto.jsontag) = "input,omitempty"];  
 }
 
-message RequestTestCase {  
-  option (gogoproto.goproto_stringer) = true;    
-  EntryPoint tcase = 1 [(gogoproto.jsontag) = "tcase,omitempty"];  
-  string input = 2 [(gogoproto.jsontag) = "input,omitempty"];  
-  string output = 3 [(gogoproto.jsontag) = "output,omitempty"];  
+message RequestTestCase {
+  option (gogoproto.goproto_stringer) = true;
+  EntryPoint tcase = 1 [(gogoproto.jsontag) = "tcase,omitempty"];
+  EntryPoint input = 2 [(gogoproto.jsontag) = "dsource,omitempty"];  
 }
 
 message RequestOracleScript {

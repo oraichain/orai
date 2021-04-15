@@ -34,7 +34,7 @@ func GetQueryCmd() *cobra.Command {
 		GetCmdQueryAIOracle(),
 		GetCmdAIOracleIDs(),
 		GetCmdQueryDataSourceContract(),
-		GetCmdQueryTestCaseContract(),
+		//GetCmdQueryTestCaseContract(),
 		GetCmdQueryOScriptContract(),
 		GetCmdQueryTestCaseEntries(),
 		GetCmdQueryDataSourceEntries(),
@@ -172,51 +172,51 @@ func GetCmdQueryDataSourceContract() *cobra.Command {
 	return cmd
 }
 
-// GetCmdQueryTestCaseContract lists data source code uploaded
-func GetCmdQueryTestCaseContract() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "tcase [address] [entrypoint] [input] [output]",
-		Short: "query an testcase smart contract",
-		Args:  cobra.ExactArgs(4),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx, err := client.GetClientQueryContext(cmd)
-			if err != nil {
-				return err
-			}
+// // GetCmdQueryTestCaseContract lists data source code uploaded
+// func GetCmdQueryTestCaseContract() *cobra.Command {
+// 	cmd := &cobra.Command{
+// 		Use:   "tcase [address] [entrypoint] [input] [output]",
+// 		Short: "query an testcase smart contract",
+// 		Args:  cobra.ExactArgs(4),
+// 		RunE: func(cmd *cobra.Command, args []string) error {
+// 			clientCtx, err := client.GetClientQueryContext(cmd)
+// 			if err != nil {
+// 				return err
+// 			}
 
-			queryClient := types.NewQueryClient(clientCtx)
-			contractAddr, err := sdk.AccAddressFromBech32(args[0])
-			if err != nil {
-				return err
-			}
+// 			queryClient := types.NewQueryClient(clientCtx)
+// 			contractAddr, err := sdk.AccAddressFromBech32(args[0])
+// 			if err != nil {
+// 				return err
+// 			}
 
-			var entrypoint types.EntryPoint
-			if err := clientCtx.JSONMarshaler.UnmarshalJSON([]byte(args[1]), &entrypoint); err != nil {
-				return err
-			}
+// 			var entrypoint types.EntryPoint
+// 			if err := clientCtx.JSONMarshaler.UnmarshalJSON([]byte(args[1]), &entrypoint); err != nil {
+// 				return err
+// 			}
 
-			res, err := queryClient.TestCaseContract(
-				context.Background(),
-				&types.QueryTestCaseContract{
-					Contract: contractAddr,
-					Request: &types.RequestTestCase{
-						Tcase:  &entrypoint,
-						Input:  args[2],
-						Output: args[3],
-					},
-				},
-			)
+// 			res, err := queryClient.TestCaseContract(
+// 				context.Background(),
+// 				&types.QueryTestCaseContract{
+// 					Contract: contractAddr,
+// 					Request: &types.RequestTestCase{
+// 						Tcase:  &entrypoint,
+// 						Input:  args[2],
+// 						Output: args[3],
+// 					},
+// 				},
+// 			)
 
-			if err != nil {
-				return err
-			}
+// 			if err != nil {
+// 				return err
+// 			}
 
-			return clientCtx.PrintBytes(append(res.Data, LineBreak))
-		},
-	}
-	flags.AddQueryFlagsToCmd(cmd)
-	return cmd
-}
+// 			return clientCtx.PrintBytes(append(res.Data, LineBreak))
+// 		},
+// 	}
+// 	flags.AddQueryFlagsToCmd(cmd)
+// 	return cmd
+// }
 
 // GetCmdQueryOScriptContract lists data source code uploaded
 func GetCmdQueryOScriptContract() *cobra.Command {

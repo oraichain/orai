@@ -26,7 +26,8 @@ message MsgSetAIOracleReq {
   bytes creator = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress",  (gogoproto.moretags) = "json:\"request_creator\""];
   int64 validator_count = 5;
   string fees = 6 [(gogoproto.jsontag) = "transaction_fee,omitempty"];
-  bytes input = 7 [ (gogoproto.moretags) = "json:\"request_input\""];
+  bytes input = 7;
+  bool test_only = 8;
 }
 // MsgSetAIOracleRes returns store result data.
 message MsgSetAIOracleRes{
@@ -37,5 +38,6 @@ message MsgSetAIOracleRes{
   bytes creator = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress",  (gogoproto.moretags) = "json:\"request_creator\""];
   int64 validator_count = 5;
   string fees = 6 [(gogoproto.jsontag) = "transaction_fee,omitempty"];
-  bytes input = 7 [ (gogoproto.moretags) = "json:\"request_input\""];
+  bytes input = 7;
+  bool test_only = 8;
 }

@@ -73,8 +73,8 @@ var (
 	// ReportKeyPrefix sets a prefix for a report key
 	ReportKeyPrefix = "rp"
 
-	// ReporterKeyPrefix sets a prefix for a reporter key
-	ReporterKeyPrefix = "rer"
+	// TestCaseReportKeyPrefix sets a prefix for a report key
+	TestCaseReportKeyPrefix = "tcrp"
 
 	// StrategyKeyPrefix sets a prefix for a strategy key
 	StrategyKeyPrefix = "st"
@@ -84,6 +84,9 @@ var (
 
 	// RewardKeyPrefix sets a prefix for a reward key
 	RewardKeyPrefix = "rw"
+
+	// TestCaseRewardKeyPrefix sets a prefix for a test case reward key
+	TestCaseRewardKeyPrefix = "tcrw"
 )
 
 // RequestStoreKey returns the key to retrieve a specfic request from the store.
@@ -123,9 +126,21 @@ func ReportStoreKeyPrefixAll() []byte {
 	return []byte(ReportKeyPrefix)
 }
 
-// ReportStoreKeyString returns the key to retrieve a specfic report from the store.
-func ReportStoreKeyString(valAddress []byte, requestID string) string {
-	return ReportKeyPrefix + string(valAddress[:]) + requestID
+// TestCaseReportStoreKey returns the key to retrieve a specfic report from the store.
+func TestCaseReportStoreKey(requestID string, valAddress string) []byte {
+	// buf := append([]byte(ReportKeyPrefix), valAddress...)
+	// buf = append(buf, []byte(requestID)...)
+	return []byte(TestCaseReportKeyPrefix + requestID + valAddress)
+}
+
+// TestCaseReportStoreKeyPrefix returns the prefix of report key (used to iterate all the reports of a request)
+func TestCaseReportStoreKeyPrefix(requestID string) []byte {
+	return []byte(TestCaseReportKeyPrefix + requestID)
+}
+
+// ReportStoreKeyPrefixAll returns the prefix of report key (used to iterate all the reports of all requests)
+func TestCaseReportStoreKeyPrefixAll() []byte {
+	return []byte(TestCaseReportKeyPrefix)
 }
 
 // ResultStoreKey returns the key to retrieve a specfic result from the store.

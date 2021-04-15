@@ -64,86 +64,111 @@ func (k *Keeper) GetAIOraclesBlockHeight(ctx sdk.Context) (aiOracles []types.AIO
 	return aiOracles
 }
 
-// ResolveExpiredRequest handles requests that have been expired
-func (k *Keeper) ResolveExpiredRequest(ctx sdk.Context, reqID string) {
-	// hard code the result first if the request does not have a result
-	if !k.HasResult(ctx, reqID) {
-		valResults := make([]types.ValResult, 0)
-		k.SetResult(ctx, reqID, types.NewAIOracleResult(reqID, valResults, types.RequestStatusExpired))
-	} else {
-		// if already has result then we change the request status to expired
-		result, _ := k.GetResult(ctx, reqID)
-		result.Status = types.RequestStatusExpired
-		k.SetResult(ctx, reqID, result)
-	}
-}
+// // ResolveExpiredRequest handles requests that have been expired
+// func (k *Keeper) ResolveExpiredRequest(ctx sdk.Context, reqID string) {
+// 	// hard code the result first if the request does not have a result
+// 	if !k.HasResult(ctx, reqID) {
+// 		valResults := make([]types.ValResult, 0)
+// 		k.SetResult(ctx, reqID, types.NewAIOracleResult(reqID, valResults, types.RequestStatusExpired))
+// 	} else {
+// 		// if already has result then we change the request status to expired
+// 		result, _ := k.GetResult(ctx, reqID)
+// 		result.Status = types.RequestStatusExpired
+// 		k.SetResult(ctx, reqID, result)
+// 	}
+// }
 
 // ResolveRequestsFromReports handles the reports received in a block to group all the validators, data source owners and test case owners
 func (k *Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *types.Report, reward *types.Reward) (bool, int) {
 
-	req, _ := k.GetAIOracle(ctx, rep.GetRequestID())
-	validation := k.validateBasic(ctx, req, rep, ctx.BlockHeight())
+	req, _ := k.GetAIOracle(ctx, rep.BaseReport.GetRequestId())
+	validation := k.validateReportBasic(ctx, req, rep, ctx.BlockHeight())
 	// if the report cannot pass the validation basic then we skip the rest
 	if !validation {
 		return false, 0
 	}
 
+	// this temp var is used to calculate validator fees. Cannot use reward provider fees since it will be stacked by other functions we handle
+	var providerFees sdk.Coins
 	// collect data source owners that have their data sources executed to reward
 	for _, dataSourceResult := range rep.GetDataSourceResults() {
 		if dataSourceResult.GetStatus() == k.GetKeyResultSuccess() {
-			reward.DatasourceResults = append(reward.DatasourceResults, dataSourceResult)
-			reward.ProviderFees = reward.ProviderFees.Add(dataSourceResult.GetEntryPoint().GetProviderFees()...)
+			reward.Results = append(reward.Results, dataSourceResult)
+			reward.BaseReward.ProviderFees = reward.BaseReward.ProviderFees.Add(dataSourceResult.GetEntryPoint().GetProviderFees()...)
+			providerFees = providerFees.Add(dataSourceResult.GetEntryPoint().GetProviderFees()...)
 		}
 	}
-	// change reward ratio to the ratio of validator
-	rewardRatio := k.GetParam(ctx, types.KeyAIOracleRewardPercentages)
-	//rewardRatio := 40
-	// reward = 1 - oracle reward percentage × (data source fees + test case fees)
-	valFees, _ := sdk.NewDecCoinsFromCoins(reward.ProviderFees...).MulDec(sdk.NewDecWithPrec(int64(rewardRatio), 2)).TruncateDecimal()
 	// add validator fees into the total fees of all validators
-	reward.ValidatorFees = reward.ValidatorFees.Add(valFees...)
+	reward.BaseReward.ValidatorFees = reward.BaseReward.ValidatorFees.Add(k.CalculateValidatorFees(ctx, providerFees)...)
 	// collect validator current status
-	val := k.StakingKeeper.Validator(ctx, rep.GetValidatorAddress())
+	val := k.StakingKeeper.Validator(ctx, rep.BaseReport.GetValidatorAddress())
 	// create a new validator wrapper and append to reward obj
-	validator := k.NewValidator(rep.GetValidatorAddress(), val.GetConsensusPower(), val.GetStatus().String())
-	reward.Validators = append(reward.Validators, *validator)
-	reward.TotalPower += validator.GetVotingPower()
+	reward.BaseReward.Validators = append(reward.BaseReward.Validators, *k.NewValidator(rep.BaseReport.GetValidatorAddress(), val.GetConsensusPower(), val.GetStatus().String()))
+	reward.BaseReward.TotalPower += val.GetConsensusPower()
 
 	// return boolean and length of validator list to resolve result
 	return true, len(req.GetValidators())
 }
 
-func (k *Keeper) validateBasic(ctx sdk.Context, req *types.AIOracle, rep *types.Report, blockHeight int64) bool {
-	// if the request has been expired
-	// if req.GetBlockHeight()+int64(k.GetParam(ctx, types.KeyExpirationCount)) < blockHeight {
-	// 	//TODO: NEED TO HANDLE THE EXPIRED REQUEST.
-	// 	fmt.Println("Request has been expired")
-	// 	k.ResolveExpiredRequest(ctx, req.GetRequestID())
-	// 	return false
-	// }
-
+func (k *Keeper) validateReportBasic(ctx sdk.Context, req *types.AIOracle, rep *types.Report, blockHeight int64) bool {
 	if rep.ResultStatus == types.ResultFailure {
 		k.Logger(ctx).Error("result status is fail")
 		return false
 	}
-
 	// Check if validator exists and active
-	_, isExist := k.StakingKeeper.GetValidator(ctx, rep.GetValidatorAddress())
+	_, isExist := k.StakingKeeper.GetValidator(ctx, rep.BaseReport.GetValidatorAddress())
 	if !isExist {
 		k.Logger(ctx).Error(fmt.Sprintf("error in validating the report: validator does not exist"))
 		return false
 	}
+	if !k.ContainsVal(req.GetValidators(), rep.GetBaseReport().GetValidatorAddress()) {
+		k.Logger(ctx).Error(fmt.Sprintf("Validator %v does not exist in the list of request validators", rep.GetBaseReport().GetValidatorAddress().String()))
+		return false
+	}
+	return true
+}
 
-	// // check if validator is bonded or not
-	// if isBonded := validator.IsBonded(); !isBonded {
-	// 	k.Logger(ctx).Error(fmt.Sprintf("error in validating the report: validator is not bonded, cannot send reports to receive rewards"))
-	// 	return false
-	// }
+// ResolveRequestsFromTestCaseReports handles the test case reports received in a block to group all the validators, data source owners and test case owners
+func (k *Keeper) ResolveRequestsFromTestCaseReports(ctx sdk.Context, rep *types.TestCaseReport, reward *types.Reward) {
 
-	// TODO
-	err := k.ValidateReport(ctx, rep.GetValidatorAddress(), req)
-	if err != nil {
-		k.Logger(ctx).Error(fmt.Sprintf("error in validating the report: %v\n", err.Error()))
+	req, _ := k.GetAIOracle(ctx, rep.BaseReport.GetRequestId())
+	validation := k.validateTestCaseReportBasic(ctx, req, rep, ctx.BlockHeight())
+	// if the report cannot pass the validation basic then we skip the rest
+	if !validation {
+		return
+	}
+
+	// this temp var is used to calculate validator fees. Cannot use reward provider fees since it will be stacked by other functions we handle
+	var providerFees sdk.Coins
+	// collect data source owners that have their data sources executed to reward
+	for _, result := range rep.GetResultsWithTestCase() {
+		for _, tcResult := range result.GetTestCaseResults() {
+			if tcResult.Status == types.ResultSuccess {
+				reward.BaseReward.ProviderFees = reward.BaseReward.ProviderFees.Add(tcResult.GetEntryPoint().GetProviderFees()...)
+				reward.Results = append(reward.Results)
+				providerFees = providerFees.Add(tcResult.GetEntryPoint().GetProviderFees()...)
+			}
+		}
+	}
+	// add validator fees into the total fees of all validators
+	reward.BaseReward.ValidatorFees = reward.BaseReward.ValidatorFees.Add(k.CalculateValidatorFees(ctx, providerFees)...)
+	// collect validator current status
+	val := k.StakingKeeper.Validator(ctx, rep.BaseReport.GetValidatorAddress())
+	// create a new validator wrapper and append to reward obj
+	reward.BaseReward.Validators = append(reward.BaseReward.Validators, *k.NewValidator(rep.BaseReport.GetValidatorAddress(), val.GetConsensusPower(), val.GetStatus().String()))
+	reward.BaseReward.TotalPower += val.GetConsensusPower()
+	return
+}
+
+func (k *Keeper) validateTestCaseReportBasic(ctx sdk.Context, req *types.AIOracle, rep *types.TestCaseReport, blockHeight int64) bool {
+	// Check if validator exists and active
+	_, isExist := k.StakingKeeper.GetValidator(ctx, rep.BaseReport.GetValidatorAddress())
+	if !isExist {
+		k.Logger(ctx).Error(fmt.Sprintf("error in validating the report: validator does not exist"))
+		return false
+	}
+	if !k.ContainsVal(req.GetValidators(), rep.GetBaseReport().GetValidatorAddress()) {
+		k.Logger(ctx).Error(fmt.Sprintf("Validator %v does not exist in the list of request validators", rep.GetBaseReport().GetValidatorAddress().String()))
 		return false
 	}
 	return true

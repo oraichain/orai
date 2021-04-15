@@ -94,3 +94,15 @@ func (k *Keeper) NewValidator(address sdk.ValAddress, votingPower int64, status 
 func (k *Keeper) QueryContract(ctx sdk.Context, contractAddr sdk.AccAddress, req []byte) ([]byte, error) {
 	return k.WasmKeeper.QuerySmart(ctx, contractAddr, req)
 }
+
+func (k *Keeper) CalculateValidatorFees(ctx sdk.Context, providerFees sdk.Coins) sdk.Coins {
+	// change reward ratio to the ratio of validator
+	rewardRatio := uint64(40)
+	if rewardRatio < uint64(0) || rewardRatio > uint64(1) {
+		rewardRatio = types.DefaultOracleRewardPercentages
+	}
+	//rewardRatio := 40
+	// reward = 1 - oracle reward percentage × test case fees
+	valFees, _ := sdk.NewDecCoinsFromCoins(providerFees...).MulDec(sdk.NewDecWithPrec(int64(rewardRatio), 2)).TruncateDecimal()
+	return valFees
+}

@@ -30,9 +30,9 @@ func GetTxCmd() *cobra.Command {
 // GetCmdSetAIOracle is the CLI command for sending a SetAIOracle transaction
 func GetCmdSetAIOracle() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "set-orai [contract-address] [input] [request-fees] [validator-count]",
-		Short: "Set a new ai oracle request and set result into the system",
-		Args:  cobra.ExactArgs(4),
+		Use:   "set-orai [contract-address] [input] [request-fees] [validator-count] [test-only]",
+		Short: "Set a new ai oracle request and set result into the system, test only should be either true or false",
+		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -50,7 +50,12 @@ func GetCmdSetAIOracle() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgSetAIOracleReq(ksuid.New().String(), contractAddr, clientCtx.GetFromAddress(), args[2], int64(valCount), []byte(args[1]))
+			testOnly, err := strconv.ParseBool(args[4])
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgSetAIOracleReq(ksuid.New().String(), contractAddr, clientCtx.GetFromAddress(), args[2], int64(valCount), []byte(args[1]), testOnly)
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err

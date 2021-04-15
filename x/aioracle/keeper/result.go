@@ -9,9 +9,9 @@ import (
 // ResolveResult aggregates the results from the reports before storing it into the blockchain
 func (k *Keeper) ResolveResult(ctx sdk.Context, rep *aioracle.Report, valCount int, totalReportPercentage uint64) {
 
-	id := rep.GetRequestID()
+	id := rep.BaseReport.GetRequestId()
 	// get a new validator object for the result object.
-	valAddress := rep.GetValidatorAddress()
+	valAddress := rep.BaseReport.GetValidatorAddress()
 	validator := k.NewValidator(valAddress, k.StakingKeeper.Validator(ctx, valAddress).GetConsensusPower(), k.StakingKeeper.Validator(ctx, valAddress).GetStatus().String())
 
 	if !k.HasResult(ctx, id) {

@@ -13,6 +13,7 @@ func NewAIOracle(
 	blockHeight int64,
 	fees sdk.Coins,
 	input []byte,
+	testOnly bool,
 ) *AIOracle {
 	return &AIOracle{
 		RequestID:   requestID,
@@ -22,11 +23,12 @@ func NewAIOracle(
 		BlockHeight: blockHeight,
 		Fees:        fees,
 		Input:       input,
+		TestOnly:    testOnly,
 	}
 }
 
 // NewMsgSetAIOracleReq is a constructor function for NewMsgSetAIOracle
-func NewMsgSetAIOracleReq(requestID string, contract sdk.AccAddress, creator sdk.AccAddress, fees string, valCount int64, input []byte) *MsgSetAIOracleReq {
+func NewMsgSetAIOracleReq(requestID string, contract sdk.AccAddress, creator sdk.AccAddress, fees string, valCount int64, input []byte, testOnly bool) *MsgSetAIOracleReq {
 	return &MsgSetAIOracleReq{
 		RequestID:      requestID,
 		Contract:       contract,
@@ -34,11 +36,12 @@ func NewMsgSetAIOracleReq(requestID string, contract sdk.AccAddress, creator sdk
 		ValidatorCount: valCount,
 		Fees:           fees,
 		Input:          input,
+		TestOnly:       testOnly,
 	}
 }
 
 // NewMsgSetAIOracleRes is a constructor function for NewMsgSetAIOracleRes
-func NewMsgSetAIOracleRes(requestID string, contract sdk.AccAddress, creator sdk.AccAddress, fees string, valCount int64, input []byte) *MsgSetAIOracleRes {
+func NewMsgSetAIOracleRes(requestID string, contract sdk.AccAddress, creator sdk.AccAddress, fees string, valCount int64, input []byte, testOnly bool) *MsgSetAIOracleRes {
 	return &MsgSetAIOracleRes{
 		RequestID:      requestID,
 		Contract:       contract,
@@ -46,6 +49,7 @@ func NewMsgSetAIOracleRes(requestID string, contract sdk.AccAddress, creator sdk
 		ValidatorCount: valCount,
 		Fees:           fees,
 		Input:          input,
+		TestOnly:       testOnly,
 	}
 }
 
@@ -111,70 +115,105 @@ func NewReward(
 	totalVotingPower int64,
 	providerFees sdk.Coins,
 	validatorFees sdk.Coins,
-	dataSourceResults []*DataSourceResult,
+	results []*Result,
 ) *Reward {
 	return &Reward{
-		Validators:        validators,
-		BlockHeight:       blockHeight,
-		TotalPower:        totalVotingPower,
-		ProviderFees:      providerFees,
-		ValidatorFees:     validatorFees,
-		DatasourceResults: dataSourceResults,
+		BaseReward: &BaseReward{
+			Validators:    validators,
+			BlockHeight:   blockHeight,
+			TotalPower:    totalVotingPower,
+			ProviderFees:  providerFees,
+			ValidatorFees: validatorFees,
+		},
+		Results: results,
 	}
 }
 
 // DefaultReward is a default value init for the reward struct
 func DefaultReward(blockHeight int64) *Reward {
 	return &Reward{
-		Validators:        make([]Validator, 0),
-		BlockHeight:       blockHeight,
-		TotalPower:        int64(0),
-		ProviderFees:      sdk.NewCoins(sdk.NewCoin(Denom, sdk.NewInt(int64(0)))),
-		ValidatorFees:     sdk.NewCoins(sdk.NewCoin(Denom, sdk.NewInt(int64(0)))),
-		DatasourceResults: []*DataSourceResult{},
+		BaseReward: &BaseReward{
+			Validators:    make([]Validator, 0),
+			BlockHeight:   blockHeight,
+			TotalPower:    int64(0),
+			ProviderFees:  sdk.NewCoins(sdk.NewCoin(Denom, sdk.NewInt(int64(0)))),
+			ValidatorFees: sdk.NewCoins(sdk.NewCoin(Denom, sdk.NewInt(int64(0)))),
+		},
+		Results: []*Result{},
 	}
 }
 
 func NewReport(
 	requestID string,
-	dataSourceResults []*DataSourceResult,
+	dataSourceResults []*Result,
 	blockHeight int64,
 	aggregatedResult []byte,
 	valAddress sdk.ValAddress,
 	status string,
 ) *Report {
 	return &Report{
-		RequestID:         requestID,
-		ValidatorAddress:  valAddress,
+		BaseReport: &BaseReport{
+			RequestId:        requestID,
+			ValidatorAddress: valAddress,
+			BlockHeight:      blockHeight,
+		},
 		DataSourceResults: dataSourceResults,
-		BlockHeight:       blockHeight,
 		AggregatedResult:  aggregatedResult,
 		ResultStatus:      status,
 	}
 }
 
-// NewDataSourceResult is the constructor of the data source result struct
-func NewDataSourceResult(
+func NewTestCaseReport(
+	requestID string,
+	results []*ResultWithTestCase,
+	blockHeight int64,
+	valAddress sdk.ValAddress,
+) *TestCaseReport {
+	return &TestCaseReport{
+		BaseReport: &BaseReport{
+			RequestId:        requestID,
+			ValidatorAddress: valAddress,
+			BlockHeight:      blockHeight,
+		},
+		ResultsWithTestCase: results,
+	}
+}
+
+// NewResult is the constructor of the result struct
+func NewResult(
 	entryPoint *EntryPoint,
 	result []byte,
 	status string,
-) *DataSourceResult {
-	return &DataSourceResult{
+) *Result {
+	return &Result{
 		EntryPoint: entryPoint,
 		Result:     result,
 		Status:     status,
 	}
 }
 
-// NewTestCaseResult is the constructor of the test case result struct
-func NewTestCaseResult(
+// NewResultWithTestCase is the constructor of the result with test case struct
+func NewResultWithTestCase(
 	entryPoint *EntryPoint,
-	dataSourceResults []*DataSourceResult,
+	result []*Result,
 	status string,
-) *TestCaseResult {
-	return &TestCaseResult{
-		EntryPoint:        entryPoint,
-		DataSourceResults: dataSourceResults,
-		Status:            status,
+) *ResultWithTestCase {
+	return &ResultWithTestCase{
+		EntryPoint:      entryPoint,
+		TestCaseResults: result,
+		Status:          status,
 	}
 }
+
+// // NewTestCaseResult is the constructor of the test case result struct
+// func NewTestCaseResult(
+// 	entryPoint *EntryPoint,
+// 	dataSourceResults []*Result,
+// 	status string,
+// ) *TestCaseResult {
+// 	return &TestCaseResult{
+// 		EntryPoint:        entryPoint,
+// 		DataSourceResults: dataSourceResults,
+// 		Status:            status,
+// 	}
+// }
