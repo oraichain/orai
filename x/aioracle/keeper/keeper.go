@@ -97,7 +97,7 @@ func (k *Keeper) QueryContract(ctx sdk.Context, contractAddr sdk.AccAddress, req
 
 func (k *Keeper) CalculateValidatorFees(ctx sdk.Context, providerFees sdk.Coins) sdk.Coins {
 	// change reward ratio to the ratio of validator
-	rewardRatio := uint64(40)
+	rewardRatio := k.GetParam(ctx, types.KeyAIOracleRewardPercentages)
 	if rewardRatio < uint64(0) || rewardRatio > uint64(1) {
 		rewardRatio = types.DefaultOracleRewardPercentages
 	}
