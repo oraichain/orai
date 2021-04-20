@@ -2,8 +2,7 @@ version: '3.3'
 services:
   orai:
     image: orai/orai:alpine-wasm
-    working_dir: /workspace
-    tty: true    
+    tty: true
     ulimits:
       nofile:
         soft: 65536
@@ -21,9 +20,3 @@ services:
     volumes:
       - ./:/workspace
       - ./smart-contracts:/workspace/oraiwasm
-
-  proto:
-    image: cosmwasm/prototools-docker
-    tty: true
-    volumes:
-      - ./:/work
