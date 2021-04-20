@@ -193,7 +193,7 @@ func (am AppModule) getValidatorAddress(clientCtx client.Context, ctx sdk.Contex
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("validator from bech: ", status.ValidatorInfo.Address)
+	// fmt.Println("validator from bech: ", status.ValidatorInfo.Address)
 	consAddr, err := sdk.ConsAddressFromHex(status.ValidatorInfo.Address.String())
 	if err != nil {
 		return nil, err

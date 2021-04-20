@@ -3,19 +3,14 @@
 ```bash
 docker-compose up -d
 
-# enter protoc container and generate the proto files
-docker-compose exec protoc ash
+# enter orai container and generate the proto files
+docker-compose exec orai bash
 
 # first time
-go get ./...
+go get -d ./...
 
 # build protobuf templates
 make proto-gen
-
-# exit the container
-exit
-
-docker-compose exec orai ash
 
 # wget https://github.com/CosmWasm/wasmvm/releases/download/v0.13.0/libwasmvm_muslc.a -O /lib/libwasmvm_muslc.a
 make build GOMOD_FLAGS=
@@ -87,7 +82,7 @@ Eg: ./scripts/deploy_ai_services.sh classification,cv009 classification_testcase
 # open another terminal and run
 oraid tx airequest set-aireq oscript_price "5" "6" 30000orai 1 --from $USER --chain-id $CHAIN_ID -y
 
-# interact with the AI services 
+# interact with the AI services
 oraid tx airequest set-aireq classification_oscript '{"image":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfx__RoRYzLDgXDiJxYGxLihJC4zoqV3V0xg&usqp=CAU","model":"inception_v3","name":"test_image"}' "6" 30000orai 1 --from $USER --chain-id $CHAIN_ID -y
 
 # Check if the AI request has finished executing
@@ -98,13 +93,14 @@ oraid query airesult fullreq <request-id>
 Most of the time, the initial inputs for data sources and test cases are unecessary. However, you must set the input json for the oracle script with data source and test case information.
 
 ## Run test
+
 `make test-method PACKAGE=github.com/oraichain/orai/x/airequest/keeper METHOD=TestCalucateMol`
 
 ## Build docker image
 
 development `docker build -t orai/orai:alpine-wasm .`  
 production `docker build -t orai/orai:0.18-alpine -f Dockerfile.prod .`  
-oraivisor-upgrade `docker build -t orai/orai:mainnet-alpine-0.1 -f Dockerfile.oraivisor .`  
+oraivisor-upgrade `docker build -t orai/orai:mainnet-alpine-0.1 -f Dockerfile.oraivisor .`
 
 ## Development with oraivisor
 
@@ -118,8 +114,7 @@ DAEMON_NAME=oraid DAEMON_HOME=/ oraivisor start
 ## Create swagger documentation
 
 ```bash
-# go to proto
-docker-compose exec proto bash
+# build swagger
 make proto-swagger
 # then create static file
 go get github.com/rakyll/statik
