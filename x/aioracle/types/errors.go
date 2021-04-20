@@ -27,4 +27,5 @@ var (
 	ErrMsgReportInvalid       = sdkerrors.Register(ModuleName, 18, "The msg create report is invalid")
 	ErrBlockHeightInvalid     = sdkerrors.Register(ModuleName, 19, "The block height is invalid")
 	ErrRewardNotfound         = sdkerrors.Register(ModuleName, 20, "The reward of the given block height is not found")
+	ErrQueryMinFees           = sdkerrors.Register(ModuleName, 21, "Cannot collect minimum fees of an ai oracle contract")
 )

@@ -53,6 +53,16 @@ service Query {
     rpc QueryReward (QueryRewardReq) returns (QueryRewardRes) {
         option (google.api.http).get = "/aioracle/reward/{block_height}";
     }
+
+    // QueryMinFees gets the min fees of oracle script contract
+    rpc QueryMinFees (MinFeesReq) returns (MinFeesRes) {
+        option (google.api.http).get = "/aioracle/min-fees";
+    }
+
+    // QueryMinGasPrices gets the min gas prices of a validator
+    rpc QueryMinGasPrices (MinGasPricesReq) returns (MinGasPricesRes) {
+        option (google.api.http).get = "/aioracle/min-gas-prices";
+    }
 }
 
 // QueryAIOracleReq is the request type for the Query/QueryAIOracle RPC method
@@ -207,4 +217,25 @@ message QueryFullOracleRes {
   AIOracle ai_oracle = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "AIOracle", (gogoproto.moretags) = "json:\"ai_oracle\""];
   repeated Report reports = 2 [(gogoproto.nullable) = false, (gogoproto.moretags) = "json:\"reports\""];
   AIOracleResult result = 3 [(gogoproto.nullable) = false, (gogoproto.moretags) = "json:\"ai_result\""];
+}
+
+// MinFeesReq is the request type for the Query/QueryMinFees RPC method
+message MinFeesReq {
+  string contract_addr = 1;        
+	int64 val_num = 2;
+  bool test_only = 3;
+}
+
+// MinFeesRes is the response type for the Query/QueryMinFees RPC method
+message MinFeesRes {
+  string minimum_fees = 1;
+}
+
+// MinGasPricesReq is the request type for the Query/QueryMinGasPrices RPC method
+message MinGasPricesReq {   
+}
+
+// MinGasPricesRes is the response type for the Query/QueryMinGasPrices RPC method
+message MinGasPricesRes {
+  string min_gas_prices = 1;
 }

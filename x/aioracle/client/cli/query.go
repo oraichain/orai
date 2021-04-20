@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/oraichain/orai/x/aioracle/types"
 	"github.com/spf13/cobra"
@@ -14,10 +15,11 @@ import (
 )
 
 const (
-	flagPage   = "page"
-	flagLimit  = "limit"
-	flagValNum = "val_num"
-	LineBreak  = byte('\n')
+	flagPage     = "page"
+	flagLimit    = "limit"
+	flagValNum   = "val-num"
+	flagTestOnly = "test-only"
+	LineBreak    = byte('\n')
 )
 
 func GetQueryCmd() *cobra.Command {
@@ -40,6 +42,7 @@ func GetQueryCmd() *cobra.Command {
 		GetCmdQueryDataSourceEntries(),
 		GetCmdQueryFullRequest(),
 		GetCmdReward(),
+		GetCmdQueryMinFees(),
 	)
 	return queryCmd
 }
@@ -388,6 +391,49 @@ func GetCmdReward() *cobra.Command {
 			return cliCtx.PrintProto(res)
 		},
 	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+// GetCmdQueryMinFees queries a the minimum fees of an ai oracle request
+func GetCmdQueryMinFees() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "minfees [contract-addr] [1] [true/false]",
+		Short: "query the min fees",
+		Args:  cobra.ExactArgs(3),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			valNum, err := strconv.Atoi(args[1])
+			if err != nil {
+				return err
+			}
+
+			testOnly, err := strconv.ParseBool(args[2])
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(clientCtx)
+			res, err := queryClient.QueryMinFees(
+				context.Background(),
+				&types.MinFeesReq{
+					ContractAddr: args[0],
+					ValNum:       int64(valNum),
+					TestOnly:     testOnly,
+				},
+			)
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
 	flags.AddQueryFlagsToCmd(cmd)
 	return cmd
 }

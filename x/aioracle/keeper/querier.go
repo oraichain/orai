@@ -215,3 +215,36 @@ func (k *Querier) QueryReward(goCtx context.Context, req *types.QueryRewardReq) 
 
 	return types.NewQueryRewardRes(*reward), nil
 }
+
+// QueryMinFees allows user to check the minimum fees for a request that they are going to spend
+func (k *Querier) QueryMinFees(goCtx context.Context, req *types.MinFeesReq) (*types.MinFeesRes, error) {
+
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	contractAddr, err := sdk.AccAddressFromBech32(req.GetContractAddr())
+	if err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrOScriptNotFound, err.Error())
+	}
+
+	minFees, err := k.keeper.calculateMinimumFees(ctx, req.GetTestOnly(), contractAddr, int(req.GetValNum()))
+	if err != nil {
+		return nil, sdkerrors.Wrapf(types.ErrQueryMinFees, err.Error())
+	}
+
+	return &types.MinFeesRes{
+		MinimumFees: minFees.String(),
+	}, nil
+}
+
+func (k *Querier) QueryMinGasPrices(goCtx context.Context, req *types.MinGasPricesReq) (*types.MinGasPricesRes, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	return &types.MinGasPricesRes{
+		MinGasPrices: ctx.MinGasPrices().String(),
+	}, nil
+}

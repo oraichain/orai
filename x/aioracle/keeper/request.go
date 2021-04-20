@@ -110,24 +110,6 @@ func (k *Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *types.Report, 
 	return true, len(req.GetValidators())
 }
 
-func (k *Keeper) validateReportBasic(ctx sdk.Context, req *types.AIOracle, rep *types.Report, blockHeight int64) bool {
-	if rep.ResultStatus == types.ResultFailure {
-		k.Logger(ctx).Error("result status is fail")
-		return false
-	}
-	// Check if validator exists and active
-	_, isExist := k.StakingKeeper.GetValidator(ctx, rep.BaseReport.GetValidatorAddress())
-	if !isExist {
-		k.Logger(ctx).Error(fmt.Sprintf("error in validating the report: validator does not exist"))
-		return false
-	}
-	if !k.ContainsVal(req.GetValidators(), rep.GetBaseReport().GetValidatorAddress()) {
-		k.Logger(ctx).Error(fmt.Sprintf("Validator %v does not exist in the list of request validators", rep.GetBaseReport().GetValidatorAddress().String()))
-		return false
-	}
-	return true
-}
-
 // ResolveRequestsFromTestCaseReports handles the test case reports received in a block to group all the validators, data source owners and test case owners
 func (k *Keeper) ResolveRequestsFromTestCaseReports(ctx sdk.Context, rep *types.TestCaseReport, reward *types.Reward) {
 
@@ -158,18 +140,4 @@ func (k *Keeper) ResolveRequestsFromTestCaseReports(ctx sdk.Context, rep *types.
 	reward.BaseReward.Validators = append(reward.BaseReward.Validators, *k.NewValidator(rep.BaseReport.GetValidatorAddress(), val.GetConsensusPower(), val.GetStatus().String()))
 	reward.BaseReward.TotalPower += val.GetConsensusPower()
 	return
-}
-
-func (k *Keeper) validateTestCaseReportBasic(ctx sdk.Context, req *types.AIOracle, rep *types.TestCaseReport, blockHeight int64) bool {
-	// Check if validator exists and active
-	_, isExist := k.StakingKeeper.GetValidator(ctx, rep.BaseReport.GetValidatorAddress())
-	if !isExist {
-		k.Logger(ctx).Error(fmt.Sprintf("error in validating the report: validator does not exist"))
-		return false
-	}
-	if !k.ContainsVal(req.GetValidators(), rep.GetBaseReport().GetValidatorAddress()) {
-		k.Logger(ctx).Error(fmt.Sprintf("Validator %v does not exist in the list of request validators", rep.GetBaseReport().GetValidatorAddress().String()))
-		return false
-	}
-	return true
 }
