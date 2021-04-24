@@ -55,7 +55,7 @@ func GetCmdSetAIOracle() *cobra.Command {
 				return err
 			}
 
-			msg := types.NewMsgSetAIOracleReq(ksuid.New().String(), contractAddr, clientCtx.GetFromAddress(), args[2], int64(valCount), []byte(args[1]), testOnly)
+			msg := types.NewMsgSetAIOracleReq(ksuid.New().String(), contractAddr.String(), clientCtx.GetFromAddress().String(), args[2], int64(valCount), []byte(args[1]), testOnly)
 			err = msg.ValidateBasic()
 			if err != nil {
 				return err

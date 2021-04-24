@@ -21,9 +21,8 @@ service Msg {
 message MsgSetAIOracleReq {
   option (gogoproto.goproto_stringer) = true;
   string request_id = 1 [(gogoproto.customname) = "RequestID"];
-  bytes contract = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress", (gogoproto.moretags) = "json:\"contract\""]; 
-  // Owner is the address who is allowed to make further changes to the data source.
-  bytes creator = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress",  (gogoproto.moretags) = "json:\"request_creator\""];
+  string contract = 2;
+  string creator = 3;
   int64 validator_count = 5;
   string fees = 6 [(gogoproto.jsontag) = "transaction_fee,omitempty"];
   bytes input = 7;
@@ -33,9 +32,8 @@ message MsgSetAIOracleReq {
 message MsgSetAIOracleRes{
   option (gogoproto.goproto_stringer) = true;
   string request_id = 1 [(gogoproto.customname) = "RequestID"];
-  bytes contract = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress", (gogoproto.moretags) = "json:\"contract\""]; 
-  // Owner is the address who is allowed to make further changes to the data source.
-  bytes creator = 3 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress",  (gogoproto.moretags) = "json:\"request_creator\""];
+  string contract = 2;
+  string creator = 3;
   int64 validator_count = 5;
   string fees = 6 [(gogoproto.jsontag) = "transaction_fee,omitempty"];
   bytes input = 7;

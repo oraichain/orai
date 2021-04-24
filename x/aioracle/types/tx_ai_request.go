@@ -19,6 +19,14 @@ func (msg *MsgSetAIOracleReq) ValidateBasic() error {
 	if len(msg.Contract) == 0 || msg.ValidatorCount <= 0 {
 		return sdkerrors.Wrap(ErrRequestInvalid, "Name or / and validator count cannot be empty")
 	}
+	_, err := sdk.AccAddressFromBech32(msg.Contract)
+	if err != nil {
+		return sdkerrors.Wrap(ErrRequestInvalid, "Contract address is invalid")
+	}
+	_, err = sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		return sdkerrors.Wrap(ErrRequestInvalid, "creator address is invalid")
+	}
 	fees, err := sdk.ParseCoinsNormalized(msg.Fees)
 	if err != nil {
 		return sdkerrors.Wrap(ErrRequestFeesInvalid, err.Error())
@@ -36,5 +44,9 @@ func (msg *MsgSetAIOracleReq) GetSignBytes() []byte {
 
 // GetSigners defines whose signature is required
 func (msg *MsgSetAIOracleReq) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{msg.Creator}
+	creator, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		return nil
+	}
+	return []sdk.AccAddress{creator}
 }

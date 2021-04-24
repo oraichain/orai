@@ -28,7 +28,9 @@ func (k msgServer) CreateAIOracle(goCtx context.Context, msg *types.MsgSetAIOrac
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrCannotRandomValidators, err.Error())
 	}
-
+	// we can safely parse to acc address because we have validated them
+	contract, _ := sdk.AccAddressFromBech32(msg.Contract)
+	creator, _ := sdk.AccAddressFromBech32(msg.Creator)
 	// validate if the request id exists or not
 	if k.keeper.HasAIOracle(ctx, msg.RequestID) {
 		return nil, sdkerrors.Wrap(types.ErrRequestInvalid, "The request id already exists")
@@ -44,7 +46,7 @@ func (k msgServer) CreateAIOracle(goCtx context.Context, msg *types.MsgSetAIOrac
 	// we can safely parse fees to coins since we have validated it in the Msg already
 	providedFees, _ := sdk.ParseCoinsNormalized(msg.Fees)
 
-	requiredFees, err := k.keeper.calculateMinimumFees(ctx, msg.TestOnly, msg.Contract, len(validators))
+	requiredFees, err := k.keeper.calculateMinimumFees(ctx, msg.TestOnly, contract, len(validators))
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, "Error getting minimum fees from oracle script")
 	}
@@ -59,7 +61,7 @@ func (k msgServer) CreateAIOracle(goCtx context.Context, msg *types.MsgSetAIOrac
 	}
 
 	// check if the account has enough spendable coins
-	spendableCoins := k.keeper.BankKeeper.SpendableCoins(ctx, msg.Creator)
+	spendableCoins := k.keeper.BankKeeper.SpendableCoins(ctx, creator)
 	// If the total fee is larger or equal to the spendable coins of the user then we return error
 	if providedFees.IsAnyGTE(spendableCoins) {
 		k.keeper.Logger(ctx).Error(fmt.Sprintf("Your account has run out of tokens to create the AI Request\n"))
@@ -67,13 +69,13 @@ func (k msgServer) CreateAIOracle(goCtx context.Context, msg *types.MsgSetAIOrac
 	}
 
 	// substract coins in the creator wallet to charge fees
-	err = k.keeper.BankKeeper.SubtractCoins(ctx, msg.Creator, providedFees)
+	err = k.keeper.BankKeeper.SubtractCoins(ctx, creator, providedFees)
 	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrNeedMoreFees, "Your account has run out of tokens to create the AI Request, or there is something wrong")
+		return nil, sdkerrors.Wrap(types.ErrNeedMoreFees, fmt.Sprintf("Your account has run out of tokens to create the AI Request, or there is something wrong with error: %v", err))
 	}
 
 	// set a new request with the aggregated result into blockchain
-	request := types.NewAIOracle(msg.RequestID, msg.Contract, msg.Creator, validators, ctx.BlockHeight(), providedFees, msg.Input, msg.TestOnly)
+	request := types.NewAIOracle(msg.RequestID, contract, creator, validators, ctx.BlockHeight(), providedFees, msg.Input, msg.TestOnly)
 
 	k.keeper.SetAIOracle(ctx, request.RequestID, request)
 
@@ -83,7 +85,7 @@ func (k msgServer) CreateAIOracle(goCtx context.Context, msg *types.MsgSetAIOrac
 	event = event.AppendAttributes(
 		sdk.NewAttribute(types.AttributeRequestID, string(request.RequestID[:])),
 		sdk.NewAttribute(types.AttributeContract, request.Contract.String()),
-		sdk.NewAttribute(types.AttributeRequestCreator, msg.Creator.String()),
+		sdk.NewAttribute(types.AttributeRequestCreator, creator.String()),
 		sdk.NewAttribute(types.AttributeRequestValidatorCount, fmt.Sprint(msg.ValidatorCount)),
 		sdk.NewAttribute(types.AttributeRequestInput, string(msg.Input)),
 	)
@@ -97,8 +99,8 @@ func (k msgServer) CreateAIOracle(goCtx context.Context, msg *types.MsgSetAIOrac
 	ctx.EventManager().EmitEvent(event)
 
 	return types.NewMsgSetAIOracleRes(
-		request.GetRequestID(), request.GetContract(),
-		request.GetCreator(), request.GetFees().String(), msg.GetValidatorCount(),
+		request.GetRequestID(), msg.GetContract(),
+		msg.GetCreator(), request.GetFees().String(), msg.GetValidatorCount(),
 		request.GetInput(), request.GetTestOnly(),
 	), nil
 }

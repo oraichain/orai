@@ -28,7 +28,7 @@ func NewAIOracle(
 }
 
 // NewMsgSetAIOracleReq is a constructor function for NewMsgSetAIOracle
-func NewMsgSetAIOracleReq(requestID string, contract sdk.AccAddress, creator sdk.AccAddress, fees string, valCount int64, input []byte, testOnly bool) *MsgSetAIOracleReq {
+func NewMsgSetAIOracleReq(requestID string, contract, creator, fees string, valCount int64, input []byte, testOnly bool) *MsgSetAIOracleReq {
 	return &MsgSetAIOracleReq{
 		RequestID:      requestID,
 		Contract:       contract,
@@ -41,7 +41,7 @@ func NewMsgSetAIOracleReq(requestID string, contract sdk.AccAddress, creator sdk
 }
 
 // NewMsgSetAIOracleRes is a constructor function for NewMsgSetAIOracleRes
-func NewMsgSetAIOracleRes(requestID string, contract sdk.AccAddress, creator sdk.AccAddress, fees string, valCount int64, input []byte, testOnly bool) *MsgSetAIOracleRes {
+func NewMsgSetAIOracleRes(requestID string, contract, creator, fees string, valCount int64, input []byte, testOnly bool) *MsgSetAIOracleRes {
 	return &MsgSetAIOracleRes{
 		RequestID:      requestID,
 		Contract:       contract,
