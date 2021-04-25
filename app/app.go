@@ -677,7 +677,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 }
 
 func (app *OraichainApp) upgradeHandler() {
-	app.upgradeKeeper.SetUpgradeHandler("v0.20.2", func(ctx sdk.Context, plan upgradetypes.Plan) {
+	app.upgradeKeeper.SetUpgradeHandler("v0.3.1", func(ctx sdk.Context, plan upgradetypes.Plan) {
 		// upgrade changes here
 	})
 }

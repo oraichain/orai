@@ -17,6 +17,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/oraichain/orai/x/aioracle/client/cli"
 	"github.com/oraichain/orai/x/aioracle/client/rest"
@@ -168,9 +169,7 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json
 func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
 	am.keeper.ResolveRngSeed(ctx, req)
 	validator, err := am.getValidatorAddress(*clientContext, ctx)
-	if err != nil {
-		ctx.Logger().Error(fmt.Sprintf("cannot collect validator address from tendermint with error: %v", err))
-	} else {
+	if err == nil {
 		am.keeper.ExecuteAIOracles(ctx, validator)
 	}
 	am.keeper.AllocateTokens(ctx, req.GetLastCommitInfo().Votes, ctx.BlockHeight())
@@ -198,5 +197,8 @@ func (am AppModule) getValidatorAddress(clientCtx client.Context, ctx sdk.Contex
 		return nil, err
 	}
 	validator := am.keeper.StakingKeeper.ValidatorByConsAddr(ctx, consAddr)
-	return validator.GetOperator(), nil
+	if validator != nil {
+		return validator.GetOperator(), nil
+	}
+	return nil, sdkerrors.Wrap(types.ErrCannotFindValidator, "Cannot find validator by consensus address")
 }
