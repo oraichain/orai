@@ -1,0 +1,41 @@
+syntax = "proto3";
+package oraichain.orai.airequest;
+//import "cosmos/base/v1beta1/coin.proto";
+import "gogoproto/gogo.proto";
+option go_package = "github.com/oraichain/orai/x/airequest/types";
+import "google/api/annotations.proto";
+
+// Msg defines the airequest Msg service.
+service Msg {
+  // Create a new AI request
+  rpc CreateAIRequest(MsgSetAIRequestReq) returns (MsgSetAIRequestRes) {
+    option (google.api.http) = {
+      // The `parent` captures the parent resource name, such as "shelves/1".
+      post: "/airequest/req"
+      body: "*"
+    };
+  };
+}
+
+// MsgSetAIRequest submit ai request metadata onto Oraichain
+message MsgSetAIRequestReq {
+  option (gogoproto.goproto_stringer) = true;
+  string request_id = 1 [(gogoproto.customname) = "RequestID"];
+  string contract = 2;
+  string creator = 3;
+  int64 validator_count = 5;
+  string fees = 6 [(gogoproto.jsontag) = "transaction_fee,omitempty"];
+  bytes input = 7;
+  bool test_only = 8;
+}
+// MsgSetAIRequestRes returns store result data.
+message MsgSetAIRequestRes{
+  option (gogoproto.goproto_stringer) = true;
+  string request_id = 1 [(gogoproto.customname) = "RequestID"];
+  string contract = 2;
+  string creator = 3;
+  int64 validator_count = 5;
+  string fees = 6 [(gogoproto.jsontag) = "transaction_fee,omitempty"];
+  bytes input = 7;
+  bool test_only = 8;
+}

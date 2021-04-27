@@ -21,7 +21,7 @@ import (
 	mint "github.com/cosmos/cosmos-sdk/x/mint/types"
 	slashing "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
-	aioracletypes "github.com/oraichain/orai/x/aioracle/types"
+	aiRequesttypes "github.com/oraichain/orai/x/airequest/types"
 )
 
 // GenesisState default state for the application
@@ -40,7 +40,7 @@ func NewDefaultGenesisState(cdc codec.JSONMarshaler) GenesisState {
 	slashingGenesis := slashing.DefaultGenesisState()
 	// Override the genesis parameters.
 	authGenesis.Params.TxSizeCostPerByte = 5
-	stakingGenesis.Params.BondDenom = aioracletypes.Denom
+	stakingGenesis.Params.BondDenom = aiRequesttypes.Denom
 	stakingGenesis.Params.HistoricalEntries = 1000
 
 	// TODO: testnet figures only
@@ -50,11 +50,11 @@ func NewDefaultGenesisState(cdc codec.JSONMarshaler) GenesisState {
 	distrGenesis.Params.BaseProposerReward = sdk.NewDecWithPrec(1, 2)  // 1%
 	distrGenesis.Params.BonusProposerReward = sdk.NewDecWithPrec(4, 2) // 4%
 	mintGenesis.Params.BlocksPerYear = 6311200                         // target 5-second block time
-	mintGenesis.Params.MintDenom = aioracletypes.Denom
-	govGenesis.DepositParams.MinDeposit = sdk.NewCoins(sdk.NewCoin(aioracletypes.Denom, sdk.TokensFromConsensusPower(10)))
+	mintGenesis.Params.MintDenom = aiRequesttypes.Denom
+	govGenesis.DepositParams.MinDeposit = sdk.NewCoins(sdk.NewCoin(aiRequesttypes.Denom, sdk.TokensFromConsensusPower(10)))
 	// TODO: testing
 	govGenesis.VotingParams.VotingPeriod = time.Minute * 2 // test for 10 mins voting period
-	crisisGenesis.ConstantFee = sdk.NewCoin(aioracletypes.Denom, sdk.TokensFromConsensusPower(10))
+	crisisGenesis.ConstantFee = sdk.NewCoin(aiRequesttypes.Denom, sdk.TokensFromConsensusPower(10))
 	slashingGenesis.Params.SignedBlocksWindow = 30000                         // approximately 1 day
 	slashingGenesis.Params.MinSignedPerWindow = sdk.NewDecWithPrec(5, 2)      // 5%
 	slashingGenesis.Params.DowntimeJailDuration = 60 * 10 * time.Second       // 10 minutes
@@ -75,7 +75,7 @@ func NewDefaultGenesisState(cdc codec.JSONMarshaler) GenesisState {
 	genesisState[ibctransfertypes.ModuleName] = cdc.MustMarshalJSON(ibctransfertypes.DefaultGenesisState())
 	genesisState[slashing.ModuleName] = cdc.MustMarshalJSON(slashingGenesis)
 	genesisState[evidence.ModuleName] = cdc.MustMarshalJSON(evidence.DefaultGenesisState())
-	genesisState[aioracletypes.ModuleName] = cdc.MustMarshalJSON(aioracletypes.DefaultGenesisState())
+	genesisState[aiRequesttypes.ModuleName] = cdc.MustMarshalJSON(aiRequesttypes.DefaultGenesisState())
 	genesisState[wasm.ModuleName] = cdc.MustMarshalJSON(&wasm.GenesisState{
 		Params: wasm.DefaultParams(),
 	})
