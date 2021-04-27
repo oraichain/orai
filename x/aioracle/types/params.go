@@ -44,7 +44,7 @@ func NewParams(maximumReqBytes, maximumResBytes, rewardPercentages, reportsPerce
 
 // String implements the stringer interface for Params.
 func (p Params) String() string {
-	return fmt.Sprintf(`params:  MaximumAiOracleRequestBytes: %d MaximumAiOracleRequestBytes: %d RewardAiOraclePercentages: %d ReportsPercentages`, p.MaximumAiOracleRequestBytes, p.MaximumAiOracleRequestBytes, p.RewardAiOraclePercentages, p.ReportsPercentages)
+	return fmt.Sprintf(`params:  MaximumAiOracleRequestBytes: %d MaximumAiOracleRequestBytes: %d RewardAiOraclePercentages: %d ReportsPercentages: %d`, p.MaximumAiOracleRequestBytes, p.MaximumAiOracleRequestBytes, p.RewardAiOraclePercentages, p.ReportsPercentages)
 }
 
 // ParamSetPairs - Implements params.ParamSet

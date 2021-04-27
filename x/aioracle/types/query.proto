@@ -63,6 +63,11 @@ service Query {
     rpc QueryMinGasPrices (MinGasPricesReq) returns (MinGasPricesRes) {
         option (google.api.http).get = "/aioracle/min-gas-prices";
     }
+
+    // Parameters queries the staking parameters.
+    rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+      option (google.api.http).get = "/cosmos/aioracle/v1beta1/params";
+    }
 }
 
 // QueryAIOracleReq is the request type for the Query/QueryAIOracle RPC method
@@ -238,4 +243,13 @@ message MinGasPricesReq {
 // MinGasPricesRes is the response type for the Query/QueryMinGasPrices RPC method
 message MinGasPricesRes {
   string min_gas_prices = 1;
+}
+
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params holds all the parameters of this module.
+  Params params = 1 [(gogoproto.nullable) = false];
 }

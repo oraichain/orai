@@ -48,11 +48,8 @@ func (k msgServer) CreateAIOracle(goCtx context.Context, msg *types.MsgSetAIOrac
 
 	requiredFees, err := k.keeper.calculateMinimumFees(ctx, msg.TestOnly, contract, len(validators))
 	if err != nil {
-		return nil, sdkerrors.Wrap(err, "Error getting minimum fees from oracle script")
+		return nil, sdkerrors.Wrap(types.ErrQueryMinFees, fmt.Sprintf("Error getting minimum fees from oracle script with err: %v", err))
 	}
-	k.keeper.Logger(ctx).Info(fmt.Sprintf("provider fees: %v\n", providedFees))
-	k.keeper.Logger(ctx).Info(fmt.Sprintf("required fees needed: %v\n", requiredFees))
-	k.keeper.Logger(ctx).Info(fmt.Sprintf("is required fees larger than provided fees: %v\n", requiredFees.IsAnyGT(providedFees)))
 
 	// If the total fee is larger than the fee provided by the user then we return error
 	if requiredFees.IsAnyGT(providedFees) {
@@ -127,7 +124,7 @@ func (k *Keeper) calculateMinimumFees(ctx sdk.Context, isTestOnly bool, contract
 			return nil, err
 		}
 	}
-	var minFees sdk.Coins
+	minFees := sdk.Coins{}
 	for _, entry := range entries.GetData() {
 		minFees = minFees.Add(entry.GetProviderFees()...)
 	}

@@ -88,6 +88,7 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	"github.com/oraichain/orai/x/aioracle"
+	aioracletypes "github.com/oraichain/orai/x/aioracle/types"
 
 	// unnamed import of statik for swagger UI support
 	_ "github.com/oraichain/orai/doc/statik"
@@ -677,7 +678,11 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 }
 
 func (app *OraichainApp) upgradeHandler() {
-	app.upgradeKeeper.SetUpgradeHandler("v0.3.1", func(ctx sdk.Context, plan upgradetypes.Plan) {
+	app.upgradeKeeper.SetUpgradeHandler("v0.3.10", func(ctx sdk.Context, plan upgradetypes.Plan) {
 		// upgrade changes here
+		app.aioracleKeeper.SetParam(ctx, aioracletypes.KeyMaximumAIOracleReqBytes, aioracletypes.DefaultOracleReqBytesThreshold)
+		app.aioracleKeeper.SetParam(ctx, aioracletypes.KeyMaximumAIOracleResBytes, aioracletypes.DefaultOracleResBytesThreshold)
+		app.aioracleKeeper.SetParam(ctx, aioracletypes.KeyAIOracleRewardPercentages, aioracletypes.DefaultOracleRewardPercentages)
+		app.aioracleKeeper.SetParam(ctx, aioracletypes.KeyReportPercentages, aioracletypes.DefaultReportPercentages)
 	})
 }

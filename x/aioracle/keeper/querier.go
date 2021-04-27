@@ -248,3 +248,10 @@ func (k *Querier) QueryMinGasPrices(goCtx context.Context, req *types.MinGasPric
 		MinGasPrices: ctx.MinGasPrices().String(),
 	}, nil
 }
+
+// Params queries the staking parameters
+func (k *Querier) Params(c context.Context, _ *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
+	ctx := sdk.UnwrapSDKContext(c)
+	params := k.keeper.GetParams(ctx)
+	return &types.QueryParamsResponse{Params: params}, nil
+}
