@@ -91,12 +91,14 @@ func NewAIRequestResult(
 func NewQueryFullRequestRes(
 	AIRequest AIRequest,
 	reports []Report,
+	tcReports []TestCaseReport,
 	result AIRequestResult,
 ) *QueryFullOracleRes {
 	return &QueryFullOracleRes{
-		AIRequest: AIRequest,
-		Reports:   reports,
-		Result:    result,
+		AIRequest:       AIRequest,
+		Reports:         reports,
+		TestcaseReports: tcReports,
+		Result:          result,
 	}
 }
 
@@ -150,12 +152,14 @@ func NewReport(
 	aggregatedResult []byte,
 	valAddress sdk.ValAddress,
 	status string,
+	fees sdk.Coins,
 ) *Report {
 	return &Report{
 		BaseReport: &BaseReport{
 			RequestId:        requestID,
 			ValidatorAddress: valAddress,
 			BlockHeight:      blockHeight,
+			Fees:             fees,
 		},
 		DataSourceResults: dataSourceResults,
 		AggregatedResult:  aggregatedResult,
@@ -168,12 +172,14 @@ func NewTestCaseReport(
 	results []*ResultWithTestCase,
 	blockHeight int64,
 	valAddress sdk.ValAddress,
+	fees sdk.Coins,
 ) *TestCaseReport {
 	return &TestCaseReport{
 		BaseReport: &BaseReport{
 			RequestId:        requestID,
 			ValidatorAddress: valAddress,
 			BlockHeight:      blockHeight,
+			Fees:             fees,
 		},
 		ResultsWithTestCase: results,
 	}

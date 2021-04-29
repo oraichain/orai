@@ -28,9 +28,7 @@ func DefaultGenesisState() *GenesisState {
 func ExportGenesis(ctx sdk.Context, k *Keeper) (data *GenesisState) {
 	// TODO: Define logic for exporting state
 	return &types.GenesisState{
-		AIRequests:       []types.AIRequest{},
-		Reports:          []types.Report{},
-		AIRequestResults: []types.AIRequestResult{},
-		Params:           k.GetParams(ctx),
+		AIRequests: []types.AIRequest{},
+		Params:     k.GetParams(ctx),
 	}
 }

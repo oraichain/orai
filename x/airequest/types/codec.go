@@ -19,6 +19,8 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations(
 		(*sdk.Msg)(nil),
 		&MsgSetAIRequestReq{},
+		&MsgCreateReport{},
+		&MsgCreateTestCaseReport{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

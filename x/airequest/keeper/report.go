@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	"encoding/json"
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -10,6 +11,11 @@ import (
 // HasReport checks if the report of this ID triple exists in the storage.
 func (k *Keeper) HasReport(ctx sdk.Context, id string, val sdk.ValAddress) bool {
 	return ctx.KVStore(k.StoreKey).Has(types.ReportStoreKey(id, string(val[:])))
+}
+
+// HasTestCaseReport checks if the test case report of this ID triple exists in the storage.
+func (k *Keeper) HasTestCaseReport(ctx sdk.Context, id string, val sdk.ValAddress) bool {
+	return ctx.KVStore(k.StoreKey).Has(types.TestCaseReportStoreKey(id, string(val[:])))
 }
 
 // SetReport saves the report to the storage without performing validation.
@@ -32,27 +38,9 @@ func (k *Keeper) SetTestCaseReport(ctx sdk.Context, id string, rep *types.TestCa
 	return nil
 }
 
-// AddReport performs sanity checks and adds a new batch from one validator to one request
-// to the store. Note that we expect each validator to report to all raw data requests at once.
-func (k *Keeper) AddReport(ctx sdk.Context, rid string, rep *types.Report) error {
-
-	k.SetReport(ctx, rid, rep)
-	return nil
-}
-
 // GetReportIterator returns the iterator for all reports of the given request ID.
 func (k *Keeper) GetReportIterator(ctx sdk.Context, rid string) sdk.Iterator {
 	return sdk.KVStorePrefixIterator(ctx.KVStore(k.StoreKey), types.ReportStoreKeyPrefix(rid))
-}
-
-// GetReportCount returns the number of reports for the given request ID.
-func (k *Keeper) GetReportCount(ctx sdk.Context, rid string) (count uint64) {
-	iterator := k.GetReportIterator(ctx, rid)
-	defer iterator.Close()
-	for ; iterator.Valid(); iterator.Next() {
-		count++
-	}
-	return count
 }
 
 // GetReports returns all reports for the given request ID, or nil if there is none.
@@ -61,6 +49,18 @@ func (k *Keeper) GetReports(ctx sdk.Context, rid string) (reports []types.Report
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var rep types.Report
+		k.Cdc.MustUnmarshalBinaryBare(iterator.Value(), &rep)
+		reports = append(reports, rep)
+	}
+	return reports
+}
+
+// GetTestCaseReports returns test case all reports for the given request ID, or nil if there is none.
+func (k *Keeper) GetTestCaseReports(ctx sdk.Context, rid string) (reports []types.TestCaseReport) {
+	iterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.StoreKey), types.TestCaseReportStoreKeyPrefix(rid))
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var rep types.TestCaseReport
 		k.Cdc.MustUnmarshalBinaryBare(iterator.Value(), &rep)
 		reports = append(reports, rep)
 	}
@@ -93,32 +93,6 @@ func (k *Keeper) GetTestCaseReportsBlockHeight(ctx sdk.Context) (reports []types
 		if rep.BaseReport.GetBlockHeight() == ctx.BlockHeight() {
 			reports = append(reports, rep)
 		}
-	}
-	return reports
-}
-
-// DeleteReports removes all reports for the given request ID.
-func (k *Keeper) DeleteReports(ctx sdk.Context, rid string) {
-	var keys [][]byte
-	iterator := k.GetReportIterator(ctx, rid)
-	defer iterator.Close()
-	for ; iterator.Valid(); iterator.Next() {
-		keys = append(keys, iterator.Key())
-	}
-	for _, key := range keys {
-		ctx.KVStore(k.StoreKey).Delete(key)
-	}
-}
-
-// GetAllReports returns all the reports of every requests ever
-func (k *Keeper) GetAllReports(ctx sdk.Context) (reports []types.Report) {
-	iterator := sdk.KVStorePrefixIterator(ctx.KVStore(k.StoreKey), types.ReportStoreKeyPrefixAll())
-
-	defer iterator.Close()
-	for ; iterator.Valid(); iterator.Next() {
-		var rep types.Report
-		k.Cdc.MustUnmarshalBinaryBare(iterator.Value(), &rep)
-		reports = append(reports, rep)
 	}
 	return reports
 }
@@ -208,6 +182,9 @@ func (k *Keeper) executeAIRequest(ctx sdk.Context, aiRequest types.AIRequest, va
 		dataSourceResults = append(dataSourceResults, dataSourceResult)
 	}
 
+	// store report into blockchain as proof for executing AI requests
+	report := types.NewReport(aiRequest.GetRequestID(), dataSourceResults, ctx.BlockHeight(), []byte{}, valAddress, types.ResultSuccess, sdk.NewCoins(sdk.NewCoin(types.Denom, sdk.NewInt(0))))
+
 	ctx.Logger().Info(fmt.Sprintf("results collected from the data sources: %v", resultArr))
 	aggregatedResult, err := querier.OracleScriptContract(goCtx, &types.QueryOracleScriptContract{
 		Contract: aiRequest.GetContract(),
@@ -217,33 +194,40 @@ func (k *Keeper) executeAIRequest(ctx sdk.Context, aiRequest types.AIRequest, va
 	})
 	if err != nil {
 		ctx.Logger().Error(fmt.Sprintf("Cannot execute oracle script contract %v with error: %v", aiRequest.GetContract(), err))
+		report.AggregatedResult = []byte(types.FailedResponseOs)
+		report.ResultStatus = types.ResultFailure
+	} else {
+		report.AggregatedResult = aggregatedResult.Data
 	}
 	ctx.Logger().Info(fmt.Sprintf("Oracle script final result: %v", aggregatedResult))
-	// store report into blockchain as proof for executing AI requests
-	report := types.NewReport(aiRequest.GetRequestID(), dataSourceResults, ctx.BlockHeight(), aggregatedResult.Data, valAddress, types.ResultSuccess)
-
+	reportBytes, err := json.Marshal(report)
+	if err != nil {
+		ctx.Logger().Error(fmt.Sprintf("Cannot marshal report %v with error: %v", report, err))
+	}
 	// verify basic report information to make sure the report is stored in a valid manner
 	if k.validateReportBasic(ctx, &aiRequest, report, report.BaseReport.GetBlockHeight()) {
-		err = k.SetReport(ctx, aiRequest.GetRequestID(), report)
-		if err != nil {
-			ctx.Logger().Error(fmt.Sprintf("Cannot store report with request id %v of validator %v with error: %v", aiRequest.GetRequestID(), valAddress.String(), err))
-		}
-		ctx.Logger().Info(fmt.Sprintf("finish handling the AI oracles with report: %v", report))
+		event := sdk.NewEvent(types.EventTypeReportWithData)
+		event = event.AppendAttributes(
+			sdk.NewAttribute(types.AttributeReport, string(reportBytes[:])),
+		)
+		ctx.EventManager().Events().AppendEvent(event)
+		ctx.EventManager().EmitEvent(event)
+		ctx.Logger().Info(fmt.Sprintf("Finish handling the AI oracles with report: %v", report))
 	}
 }
 
-func (k *Keeper) validateBasic(ctx sdk.Context, req *types.AIRequest, rep *types.Report, blockHeight int64) bool {
+func (k *Keeper) validateBasic(ctx sdk.Context, req *types.AIRequest, rep *types.BaseReport) bool {
 	// Check if validator exists and active
-	_, isExist := k.StakingKeeper.GetValidator(ctx, rep.BaseReport.GetValidatorAddress())
+	_, isExist := k.StakingKeeper.GetValidator(ctx, rep.GetValidatorAddress())
 	if !isExist {
 		k.Logger(ctx).Error(fmt.Sprintf("error in validating the report: validator does not exist"))
 		return false
 	}
-	if !k.ContainsVal(req.GetValidators(), rep.BaseReport.GetValidatorAddress()) {
-		k.Logger(ctx).Error(fmt.Sprintf("Validator %v does not exist in the list of request validators", rep.BaseReport.GetValidatorAddress().String()))
+	if !k.ContainsVal(req.GetValidators(), rep.GetValidatorAddress()) {
+		k.Logger(ctx).Error(fmt.Sprintf("Validator %v does not exist in the list of request validators", rep.GetValidatorAddress().String()))
 		return false
 	}
-	if len(rep.BaseReport.GetValidatorAddress()) <= 0 || len(rep.BaseReport.GetRequestId()) <= 0 || rep.BaseReport.GetBlockHeight() <= 0 {
+	if len(rep.GetValidatorAddress()) <= 0 || len(rep.GetRequestId()) <= 0 || rep.GetBlockHeight() <= 0 {
 		k.Logger(ctx).Error(fmt.Sprintf("Report basic information is invalid: %v", rep))
 		return false
 	}
@@ -251,10 +235,6 @@ func (k *Keeper) validateBasic(ctx sdk.Context, req *types.AIRequest, rep *types
 }
 
 func (k *Keeper) validateReportBasic(ctx sdk.Context, req *types.AIRequest, rep *types.Report, blockHeight int64) bool {
-	if rep.ResultStatus == types.ResultFailure {
-		k.Logger(ctx).Error("result status is fail")
-		return false
-	}
 	if len(rep.GetDataSourceResults()) <= 0 || len(rep.GetAggregatedResult()) <= 0 {
 		k.Logger(ctx).Error(fmt.Sprintf("Report results are invalid: %v", rep))
 		return false
@@ -274,6 +254,7 @@ func (k *Keeper) validateReportBasic(ctx sdk.Context, req *types.AIRequest, rep 
 	aggregatedResultSize := len(rep.GetAggregatedResult())
 	finalLen := dsResultSize + aggregatedResultSize
 	responseBytes := k.GetParam(ctx, types.KeyMaximumAIRequestResBytes)
+	//responseBytes := uint64(400000000000000)
 	if responseBytes < uint64(0) || responseBytes > uint64(1) {
 		responseBytes = types.DefaultOracleResBytesThreshold
 	}
@@ -283,7 +264,7 @@ func (k *Keeper) validateReportBasic(ctx sdk.Context, req *types.AIRequest, rep 
 		return false
 	}
 
-	return k.validateBasic(ctx, req, rep, blockHeight)
+	return k.validateBasic(ctx, req, rep.BaseReport)
 }
 
 func (k *Keeper) executeAIRequestTestOnly(ctx sdk.Context, aiRequest types.AIRequest, valAddress sdk.ValAddress) {
@@ -344,13 +325,19 @@ func (k *Keeper) executeAIRequestTestOnly(ctx sdk.Context, aiRequest types.AIReq
 		resultsWithTc = append(resultsWithTc, resultWithTc)
 	}
 	// store report into blockchain as proof for executing AI requests
-	report := types.NewTestCaseReport(aiRequest.GetRequestID(), resultsWithTc, ctx.BlockHeight(), valAddress)
+	report := types.NewTestCaseReport(aiRequest.GetRequestID(), resultsWithTc, ctx.BlockHeight(), valAddress, sdk.NewCoins(sdk.NewCoin(types.Denom, sdk.NewInt(0))))
+	reportBytes, err := json.Marshal(report)
+	if err != nil {
+		ctx.Logger().Error(fmt.Sprintf("Cannot marshal report %v with error: %v", report, err))
+	}
 	if k.validateTestCaseReportBasic(ctx, &aiRequest, report, report.BaseReport.GetBlockHeight()) {
-		err = k.SetTestCaseReport(ctx, aiRequest.GetRequestID(), report)
-		if err != nil {
-			ctx.Logger().Error(fmt.Sprintf("Cannot store report with request id %v of validator %v with error: %v", aiRequest.GetRequestID(), valAddress.String(), err))
-		}
-		ctx.Logger().Info(fmt.Sprintf("finish handling the test AI oracles with report: %v", report))
+		event := sdk.NewEvent(types.EventTypeTestCaseReportWithData)
+		event = event.AppendAttributes(
+			sdk.NewAttribute(types.AttributeTestCaseReport, string(reportBytes[:])),
+		)
+		ctx.EventManager().Events().AppendEvent(event)
+		ctx.EventManager().EmitEvent(event)
+		ctx.Logger().Info(fmt.Sprintf("Finish handling the test AI oracles with report: %v", report))
 	}
 }
 
@@ -370,6 +357,7 @@ func (k *Keeper) validateTestCaseReportBasic(ctx sdk.Context, req *types.AIReque
 		}
 	}
 	responseBytes := k.GetParam(ctx, types.KeyMaximumAIRequestResBytes)
+	//responseBytes := uint64(400000000000000)
 	if responseBytes < uint64(0) || responseBytes > uint64(1) {
 		responseBytes = types.DefaultOracleResBytesThreshold
 	}
@@ -378,5 +366,5 @@ func (k *Keeper) validateTestCaseReportBasic(ctx sdk.Context, req *types.AIReque
 		k.Logger(ctx).Error(fmt.Sprintf("Report result size: %v cannot be larger than %v", tcResultSize, int(responseBytes)))
 		return false
 	}
-	return true
+	return k.validateBasic(ctx, req, rep.BaseReport)
 }

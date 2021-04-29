@@ -36,7 +36,9 @@ message BaseReport {
   option (gogoproto.goproto_stringer) = true;    
   string request_id = 1 [(gogoproto.jsontag) = "request_id,omitempty"];
   int64 block_height = 3 [(gogoproto.jsontag) = "block_height,omitempty"];
+  repeated cosmos.base.v1beta1.Coin fees = 4 [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins", (gogoproto.moretags) = "json:\"report_fee\""];
   bytes validator_address = 5 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.ValAddress",(gogoproto.jsontag) = "validator_address,omitempty"];
+
 }
 
 // Report stores the result of the data source when validator executes it

@@ -183,8 +183,19 @@ func (k *Querier) QueryFullRequest(goCtx context.Context, req *types.QueryFullOr
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrRequestNotFound, err.Error())
 	}
+	if request.TestOnly {
+
+	}
 	// collect all the reports of a given request id
 	reports := k.keeper.GetReports(ctx, id)
+	if len(reports) == 0 {
+		reports = []types.Report{}
+	}
+	// collect all the reports of a given request id
+	tcReports := k.keeper.GetTestCaseReports(ctx, id)
+	if len(tcReports) == 0 {
+		tcReports = []types.TestCaseReport{}
+	}
 
 	// collect the result of a given request id
 
@@ -194,7 +205,7 @@ func (k *Querier) QueryFullRequest(goCtx context.Context, req *types.QueryFullOr
 		result = types.NewAIRequestResult(id, nil, types.RequestStatusPending)
 	}
 
-	return types.NewQueryFullRequestRes(*request, reports, *result), nil
+	return types.NewQueryFullRequestRes(*request, reports, tcReports, *result), nil
 }
 
 // QueryReward implements the Query/QueryReward gRPC method

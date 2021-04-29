@@ -3,10 +3,8 @@ package types
 // DefaultGenesisState - default GenesisState used by Cosmos Hub
 func DefaultGenesisState() *GenesisState {
 	return &GenesisState{
-		AIRequests:       []AIRequest{},
-		Reports:          []Report{},
-		AIRequestResults: []AIRequestResult{},
-		Params:           DefaultParams(),
+		AIRequests: []AIRequest{},
+		Params:     DefaultParams(),
 
 		// TODO: Fill out according to your genesis state, these values will be initialized but empty
 	}

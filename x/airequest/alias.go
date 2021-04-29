@@ -40,9 +40,11 @@ var (
 )
 
 type (
-	Keeper             = keeper.Keeper
-	MsgSetAIRequestReq = types.MsgSetAIRequestReq
-	AIRequest          = types.AIRequest
-	GenesisState       = types.GenesisState
-	Report             = types.Report
+	Keeper                  = keeper.Keeper
+	MsgSetAIRequestReq      = types.MsgSetAIRequestReq
+	MsgCreateReport         = types.MsgCreateReport
+	MsgCreateTestCaseReport = types.MsgCreateTestCaseReport
+	AIRequest               = types.AIRequest
+	GenesisState            = types.GenesisState
+	Report                  = types.Report
 )

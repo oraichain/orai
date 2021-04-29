@@ -37,12 +37,6 @@ func (k *Keeper) SetAIRequest(ctx sdk.Context, id string, request *types.AIReque
 	store.Set(types.RequestStoreKey(id), bz)
 }
 
-// GetAIRequestIDIter get an iterator of all key-value pairs in the store
-func (k *Keeper) GetAIRequestIDIter(ctx sdk.Context) sdk.Iterator {
-	store := ctx.KVStore(k.StoreKey)
-	return sdk.KVStorePrefixIterator(store, types.RequeststoreKeyPrefixAll())
-}
-
 // GetPaginatedAIRequests get an iterator of paginated key-value pairs in the store
 func (k *Keeper) GetPaginatedAIRequests(ctx sdk.Context, page, limit uint) sdk.Iterator {
 	store := ctx.KVStore(k.StoreKey)
@@ -92,7 +86,7 @@ func (k *Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *types.Report, 
 	var providerFees sdk.Coins
 	// collect data source owners that have their data sources executed to reward
 	for _, dataSourceResult := range rep.GetDataSourceResults() {
-		if dataSourceResult.GetStatus() == k.GetKeyResultSuccess() {
+		if dataSourceResult.GetStatus() == types.ResultSuccess {
 			reward.Results = append(reward.Results, dataSourceResult)
 			reward.BaseReward.ProviderFees = reward.BaseReward.ProviderFees.Add(dataSourceResult.GetEntryPoint().GetProviderFees()...)
 			providerFees = providerFees.Add(dataSourceResult.GetEntryPoint().GetProviderFees()...)
@@ -127,7 +121,7 @@ func (k *Keeper) ResolveRequestsFromTestCaseReports(ctx sdk.Context, rep *types.
 		for _, tcResult := range result.GetTestCaseResults() {
 			if tcResult.Status == types.ResultSuccess {
 				reward.BaseReward.ProviderFees = reward.BaseReward.ProviderFees.Add(tcResult.GetEntryPoint().GetProviderFees()...)
-				reward.Results = append(reward.Results)
+				reward.Results = append(reward.Results, tcResult)
 				providerFees = providerFees.Add(tcResult.GetEntryPoint().GetProviderFees()...)
 			}
 		}

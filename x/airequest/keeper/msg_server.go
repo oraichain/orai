@@ -7,6 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/oraichain/orai/x/airequest/types"
+	airequest "github.com/oraichain/orai/x/airequest/types"
 )
 
 type msgServer struct {
@@ -134,4 +135,86 @@ func (k *Keeper) calculateMinimumFees(ctx sdk.Context, isTestOnly bool, contract
 	// since there are more than 1 validator, we need to multiply those fees
 	minFees, _ = sdk.NewDecCoinsFromCoins(minFees...).MulDec(sdk.NewDec(int64(numVal))).TruncateDecimal()
 	return minFees, nil
+}
+
+// this handler will be triggered when the websocket create a MsgCreateReport
+func (m msgServer) CreateReport(goCtx context.Context, msg *types.MsgCreateReport) (*types.MsgCreateReportRes, error) {
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if m.keeper.HasReport(ctx, msg.BaseReport.GetRequestId(), msg.BaseReport.GetValidatorAddress()) {
+		return nil, fmt.Errorf("Error: Validator already reported")
+	}
+
+	request, err := m.keeper.GetAIRequest(ctx, msg.BaseReport.GetRequestId())
+	if err != nil {
+		return nil, fmt.Errorf("Error: Cannot find AI request")
+	}
+
+	if m.keeper.ValidateReport(ctx, msg.BaseReport.GetValidatorAddress(), request) != nil {
+		return nil, fmt.Errorf("Error: cannot find reporter in the AI request")
+	}
+
+	report := types.NewReport(msg.BaseReport.GetRequestId(), msg.DataSourceResults, ctx.BlockHeight(), msg.AggregatedResult, msg.BaseReport.GetValidatorAddress(), msg.ResultStatus, msg.BaseReport.GetFees())
+
+	// call keeper
+	err = m.keeper.SetReport(ctx, msg.BaseReport.GetRequestId(), report)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgCreateReportRes{
+		BaseReport: &airequest.BaseReport{
+			RequestId:        msg.BaseReport.GetRequestId(),
+			ValidatorAddress: msg.BaseReport.ValidatorAddress,
+			Fees:             msg.BaseReport.Fees,
+		},
+		DataSourceResults: msg.GetDataSourceResults(),
+		AggregatedResult:  msg.GetAggregatedResult(),
+		ResultStatus:      msg.GetResultStatus(),
+	}, nil
+}
+
+// this handler will be triggered when the websocket create a MsgCreateReport
+func (m msgServer) CreateTestCaseReport(goCtx context.Context, msg *types.MsgCreateTestCaseReport) (*types.MsgCreateTestCaseReportRes, error) {
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	if m.keeper.HasTestCaseReport(ctx, msg.BaseReport.GetRequestId(), msg.BaseReport.GetValidatorAddress()) {
+		return nil, fmt.Errorf("Error: Validator already reported")
+	}
+
+	request, err := m.keeper.GetAIRequest(ctx, msg.BaseReport.GetRequestId())
+	if err != nil {
+		return nil, fmt.Errorf("Error: Cannot find AI request")
+	}
+
+	if m.keeper.ValidateReport(ctx, msg.BaseReport.GetValidatorAddress(), request) != nil {
+		return nil, fmt.Errorf("Error: cannot find reporter in the AI request")
+	}
+
+	report := types.NewTestCaseReport(msg.BaseReport.GetRequestId(), msg.GetResultsWithTestCase(), ctx.BlockHeight(), msg.BaseReport.GetValidatorAddress(), msg.BaseReport.GetFees())
+
+	// call keeper
+	err = m.keeper.SetTestCaseReport(ctx, msg.BaseReport.GetRequestId(), report)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgCreateTestCaseReportRes{
+		BaseReport: &airequest.BaseReport{
+			RequestId:        msg.BaseReport.GetRequestId(),
+			ValidatorAddress: msg.BaseReport.ValidatorAddress,
+			Fees:             msg.BaseReport.Fees,
+		},
+		ResultsWithTestCase: msg.GetResultsWithTestCase(),
+	}, nil
+}
+
+// ValidateReport validates if the report is valid to get rewards
+func (k Keeper) ValidateReport(ctx sdk.Context, val sdk.ValAddress, req *airequest.AIRequest) error {
+	// Check if the validator is in the requested list of validators
+	if !k.ContainsVal(req.GetValidators(), val) {
+		return sdkerrors.Wrap(types.ErrValidatorNotFound, fmt.Sprintln("failed to find the requested validator"))
+	}
+	return nil
 }

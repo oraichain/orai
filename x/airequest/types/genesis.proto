@@ -9,7 +9,7 @@ option go_package = "github.com/oraichain/orai/x/airequest/types";
 // GenesisState defines the capability module's genesis state.
 message GenesisState {
     repeated AIRequest ai_oracles = 1 [(gogoproto.nullable) = false, (gogoproto.customname) = "AIRequests", (gogoproto.moretags) = "json:\"ai_oracles\""];
-    repeated Report Reports = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "Reports", (gogoproto.moretags) = "json:\"validator_report\""];
+    repeated BaseReport BaseReports = 2 [(gogoproto.nullable) = false, (gogoproto.customname) = "Reports", (gogoproto.moretags) = "json:\"validator_report\""];
     repeated AIRequestResult ai_oracle_results = 3 [(gogoproto.nullable) = false, (gogoproto.customname) = "AIRequestResults", (gogoproto.moretags) = "json:\"ai_results\""];
     Params params = 4 [(gogoproto.nullable) = false];
 }

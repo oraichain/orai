@@ -34,7 +34,7 @@ func TestGetReportsBlockHeight(t *testing.T) {
 	dsResults := []*aiRequesttypes.Result{dsResult1, dsResult2, dsResult3}
 
 	// init report
-	report := types.NewReport(id, dsResults, 0, []byte{0x50}, nil, "")
+	report := types.NewReport(id, dsResults, 0, []byte{0x50}, nil, "", nil)
 
 	// verify report
 	err := testKeeper.SetReport(ctx, id, report)

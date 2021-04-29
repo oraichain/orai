@@ -1,6 +1,7 @@
 package keeper_test
 
 import (
+	"fmt"
 	"testing"
 
 	aiRequestkeeper "github.com/oraichain/orai/x/airequest/keeper"
@@ -67,10 +68,10 @@ func TestResolveRequestsFromReports(t *testing.T) {
 	dsResults := []*aiRequesttypes.Result{dsResult1, dsResult2, dsResult3}
 
 	// init report
-	report := types.NewReport(id, dsResults, 1, []byte{0x50}, valAddrs[0], "")
+	report := types.NewReport(id, dsResults, 1, []byte{0x50}, valAddrs[0], types.ResultSuccess, nil)
 
 	// verify report
-	err := testKeeper.AddReport(ctx, id, report)
+	err := testKeeper.SetReport(ctx, id, report)
 	require.NoError(t, err)
 
 	reward := aiRequesttypes.DefaultReward(1)
@@ -135,7 +136,7 @@ func TestResolveTestCaseRequestsFromReports(t *testing.T) {
 	dsResults := []*aiRequesttypes.ResultWithTestCase{dsResult, dsResult}
 
 	// init report
-	report := types.NewTestCaseReport(id, dsResults, 1, valAddrs[0])
+	report := types.NewTestCaseReport(id, dsResults, 1, valAddrs[0], nil)
 
 	// verify report
 	err := testKeeper.SetTestCaseReport(ctx, id, report)
@@ -200,23 +201,34 @@ func TestResolveBothRequestsFromReports(t *testing.T) {
 	tcResult3 := aiRequesttypes.NewResult(&aiRequesttypes.EntryPoint{ProviderFees: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(3)))}, []byte{0x50}, types.ResultSuccess)
 	tcResults := []*aiRequesttypes.Result{tcResult1, tcResult2, tcResult3}
 	dsResult := aiRequesttypes.NewResultWithTestCase(&aiRequesttypes.EntryPoint{ProviderFees: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5)))}, tcResults, types.ResultSuccess)
-	dsResults := []*aiRequesttypes.ResultWithTestCase{dsResult, dsResult}
+	tcResultFinal := []*aiRequesttypes.ResultWithTestCase{dsResult, dsResult}
 
 	// init data source results
 	dsResult1 := aiRequesttypes.NewResult(&aiRequesttypes.EntryPoint{ProviderFees: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5)))}, []byte{0x50}, types.ResultSuccess)
 	dsResult2 := aiRequesttypes.NewResult(&aiRequesttypes.EntryPoint{ProviderFees: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5)))}, []byte{0x50}, types.ResultSuccess)
 	dsResult3 := aiRequesttypes.NewResult(&aiRequesttypes.EntryPoint{ProviderFees: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(3)))}, []byte{0x50}, types.ResultSuccess)
-	dsResultss := []*aiRequesttypes.Result{dsResult1, dsResult2, dsResult3}
+	dsResults := []*aiRequesttypes.Result{dsResult1, dsResult2, dsResult3}
+
+	require.Equal(t, 3, len(dsResults))
+	require.Equal(t, 2, len(tcResultFinal))
+
+	count := 0
+	for _, _ = range tcResultFinal {
+		for _, _ = range tcResults {
+			count++
+		}
+	}
+	require.Equal(t, 6, count)
 
 	// init report
-	report := types.NewReport(id, dsResultss, 1, []byte{0x50}, valAddrs[0], "")
+	report := types.NewReport(id, dsResults, 1, []byte{0x50}, valAddrs[0], types.ResultFailure, nil)
 
 	// verify report
-	err := testKeeper.AddReport(ctx, id, report)
+	err := testKeeper.SetReport(ctx, id, report)
 	require.NoError(t, err)
 
 	// init report
-	tcReport := types.NewTestCaseReport(id, dsResults, 1, valAddrs[0])
+	tcReport := types.NewTestCaseReport(id, tcResultFinal, 1, valAddrs[0], nil)
 
 	// verify report
 	err = testKeeper.SetTestCaseReport(ctx, id, tcReport)
@@ -226,9 +238,18 @@ func TestResolveBothRequestsFromReports(t *testing.T) {
 	testKeeper.ResolveRequestsFromReports(ctx, report, reward)
 	testKeeper.ResolveRequestsFromTestCaseReports(ctx, tcReport, reward)
 
+	fmt.Println("reward: ", len(reward.Results))
+	require.Equal(t, 9, len(reward.Results))
+
+	var totalFees sdk.Coins
+	for _, result := range reward.Results {
+		t.Logf("result fees: %v", result.EntryPoint.ProviderFees)
+		totalFees = totalFees.Add(result.EntryPoint.ProviderFees...)
+	}
+
 	// Remember that we are using coins, so the values will be truncated along the way. When applying the equations in the medium post, remember to truncate the final result.
 	t.Logf("provider fees: %v\n", reward.BaseReward.ProviderFees)
 	t.Logf("validator fees: %v\n", reward.BaseReward.ValidatorFees)
-	require.Equal(t, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(39))), reward.BaseReward.ProviderFees)
+	require.Equal(t, totalFees, reward.BaseReward.ProviderFees)
 	require.Equal(t, sdk.NewCoins(sdk.NewCoin("stake", sdk.NewInt(15))), reward.BaseReward.ValidatorFees)
 }

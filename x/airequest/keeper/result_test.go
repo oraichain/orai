@@ -56,10 +56,10 @@ func TestResolveResult(t *testing.T) {
 
 	// init report
 	id := ksuid.New().String()
-	report := types.NewReport(id, dsResults, 1, []byte{0x50}, valAddrs[0], types.ResultSuccess)
+	report := types.NewReport(id, dsResults, 1, []byte{0x50}, valAddrs[0], types.ResultSuccess, nil)
 
 	// verify report
-	err := testKeeper.AddReport(ctx, id, report)
+	err := testKeeper.SetReport(ctx, id, report)
 	require.NoError(t, err)
 
 	// test result with 2 validators aka two reports, total 70% reports to finish
@@ -84,10 +84,10 @@ func TestResolveResult(t *testing.T) {
 	require.Equal(t, "finished", result.Status)
 
 	id = ksuid.New().String()
-	report = types.NewReport(id, dsResults, 1, []byte{0x50}, valAddrs[0], types.ResultSuccess)
+	report = types.NewReport(id, dsResults, 1, []byte{0x50}, valAddrs[0], types.ResultSuccess, nil)
 
 	// verify report
-	err = testKeeper.AddReport(ctx, id, report)
+	err = testKeeper.SetReport(ctx, id, report)
 	require.NoError(t, err)
 
 	testKeeper.ResolveResult(ctx, report, 1, 70)
