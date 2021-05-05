@@ -6,7 +6,6 @@ require (
 	github.com/CosmWasm/wasmd v0.15.1
 	github.com/cosmos/cosmos-sdk v0.42.3
 	github.com/cosmos/go-bip39 v1.0.0
-	github.com/cosmtrek/air v1.27.2 // indirect
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.4.3
 	github.com/gorilla/mux v1.8.0
