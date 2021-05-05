@@ -13,12 +13,12 @@ import (
 )
 
 // AllocateTokens allocates the tokens to the validators that participate in the AI request handling
-func (k *Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, blockHeight int64) {
+func (k *Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, blockHeight int64) bool {
 	// get reward from the previous block
 	rewardObj, err := k.GetReward(ctx, blockHeight-1)
 	// If there's no reward in the previous block, then we do not handle
 	if err != nil || rewardObj.BaseReward.BlockHeight == int64(-1) {
-		return
+		return false
 	}
 
 	// retrieve fee collector module account to prepare token allocation1
@@ -30,7 +30,7 @@ func (k *Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, bloc
 	err = k.BankKeeper.AddCoins(ctx, feeCollector.GetAddress(), feesCollected)
 	if err != nil {
 		k.Logger(ctx).Error(fmt.Sprintf("error adding coins using bank *Keeper: %v\n", err.Error()))
-		return
+		return false
 	}
 	remaining := reward
 	hasNeg := false
@@ -43,7 +43,7 @@ func (k *Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, bloc
 		remaining, hasNeg = remaining.SafeSub(sdk.NewDecCoinsFromCoins(providerFees...))
 		if hasNeg {
 			k.Logger(ctx).Error(fmt.Sprintf("not enough balance to reward provider with URL:%v, \n", result.GetEntryPoint().GetUrl()))
-			return
+			return false
 		}
 
 		// send coins to data source owner addresses
@@ -62,7 +62,7 @@ func (k *Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, bloc
 	// fix check division by zero, no validator or zero total power
 	if decValLen.IsZero() || decValLen.IsZero() {
 		k.Logger(ctx).Error(fmt.Sprintf("total power zero\n"))
-		return
+		return false
 	}
 
 	for _, val := range rewardObj.BaseReward.Validators {
@@ -74,14 +74,14 @@ func (k *Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, bloc
 		remaining, hasNeg = remaining.SafeSub(valRewardDec)
 		if hasNeg {
 			k.Logger(ctx).Error(fmt.Sprintf("not enough balance to reward validator :%v, \n", val.GetAddress()))
-			return
+			return false
 		}
 
 		valRewardInt, _ := valRewardDec.TruncateDecimal()
 		err = k.BankKeeper.SendCoinsFromModuleToModule(ctx, k.FeeCollectorName, distr.ModuleName, valRewardInt)
 		if err != nil {
 			k.Logger(ctx).Error(fmt.Sprintf("error in sending coins from fee collector to distrution module: %v\n", err.Error()))
-			return
+			return false
 		}
 		// allocate tokens to validator with a specific commission
 		k.DistrKeeper.AllocateTokensToValidator(ctx, k.StakingKeeper.Validator(ctx, val.GetAddress()), valRewardDec)
@@ -97,4 +97,6 @@ func (k *Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, bloc
 	feePool.CommunityPool = feePool.CommunityPool.Add(remaining...)
 	k.DistrKeeper.SetFeePool(ctx, feePool)
 	k.Logger(ctx).Info("finish allocating tokens")
+
+	return true
 }

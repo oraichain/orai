@@ -10,14 +10,15 @@ import (
 // GetAIOracle returns the information of an AI request
 func (k *Keeper) GetAIOracle(ctx sdk.Context, id string) (*types.AIOracle, error) {
 	store := ctx.KVStore(k.StoreKey)
-	hasAIOracle := store.Has(types.RequestStoreKey(id))
-	var err error
-	if !hasAIOracle {
-		err = fmt.Errorf("")
-		return nil, err
+	requestStoreKey := types.RequestStoreKey(id)
+
+	requestItem := store.Get(requestStoreKey)
+	if requestItem == nil {
+		return nil, fmt.Errorf("no request item at key: %s", requestStoreKey)
 	}
+
 	result := &types.AIOracle{}
-	err = k.Cdc.UnmarshalBinaryBare(store.Get(types.RequestStoreKey(id)), result)
+	err := k.Cdc.UnmarshalBinaryBare(requestItem, result)
 	return result, err
 }
 
@@ -33,8 +34,9 @@ func (k *Keeper) SetAIOracle(ctx sdk.Context, id string, request *types.AIOracle
 	bz, err := k.Cdc.MarshalBinaryBare(request)
 	if err != nil {
 		k.Logger(ctx).Error(fmt.Sprintf("error: %v\n", err.Error()))
+	} else {
+		store.Set(types.RequestStoreKey(id), bz)
 	}
-	store.Set(types.RequestStoreKey(id), bz)
 }
 
 // GetAIOracleIDIter get an iterator of all key-value pairs in the store
@@ -55,33 +57,22 @@ func (k *Keeper) GetAIOraclesBlockHeight(ctx sdk.Context) (aiOracles []types.AIO
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var req types.AIOracle
-		k.Cdc.MustUnmarshalBinaryBare(iterator.Value(), &req)
+		err := k.Cdc.UnmarshalBinaryBare(iterator.Value(), &req)
 		// check if block height is equal or not
-		if req.GetBlockHeight() == ctx.BlockHeight()-1 {
+		if err == nil && req.GetBlockHeight() == ctx.BlockHeight()-1 {
 			aiOracles = append(aiOracles, req)
 		}
 	}
 	return aiOracles
 }
 
-// // ResolveExpiredRequest handles requests that have been expired
-// func (k *Keeper) ResolveExpiredRequest(ctx sdk.Context, reqID string) {
-// 	// hard code the result first if the request does not have a result
-// 	if !k.HasResult(ctx, reqID) {
-// 		valResults := make([]types.ValResult, 0)
-// 		k.SetResult(ctx, reqID, types.NewAIOracleResult(reqID, valResults, types.RequestStatusExpired))
-// 	} else {
-// 		// if already has result then we change the request status to expired
-// 		result, _ := k.GetResult(ctx, reqID)
-// 		result.Status = types.RequestStatusExpired
-// 		k.SetResult(ctx, reqID, result)
-// 	}
-// }
-
 // ResolveRequestsFromReports handles the reports received in a block to group all the validators, data source owners and test case owners
 func (k *Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *types.Report, reward *types.Reward) (bool, int) {
 
-	req, _ := k.GetAIOracle(ctx, rep.BaseReport.GetRequestId())
+	req, err := k.GetAIOracle(ctx, rep.BaseReport.GetRequestId())
+	if err != nil {
+		return false, 0
+	}
 	validation := k.validateReportBasic(ctx, req, rep, ctx.BlockHeight())
 	// if the report cannot pass the validation basic then we skip the rest
 	if !validation {
@@ -111,13 +102,16 @@ func (k *Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *types.Report, 
 }
 
 // ResolveRequestsFromTestCaseReports handles the test case reports received in a block to group all the validators, data source owners and test case owners
-func (k *Keeper) ResolveRequestsFromTestCaseReports(ctx sdk.Context, rep *types.TestCaseReport, reward *types.Reward) {
+func (k *Keeper) ResolveRequestsFromTestCaseReports(ctx sdk.Context, rep *types.TestCaseReport, reward *types.Reward) bool {
 
-	req, _ := k.GetAIOracle(ctx, rep.BaseReport.GetRequestId())
+	req, err := k.GetAIOracle(ctx, rep.BaseReport.GetRequestId())
+	if err != nil {
+		return false
+	}
 	validation := k.validateTestCaseReportBasic(ctx, req, rep, ctx.BlockHeight())
 	// if the report cannot pass the validation basic then we skip the rest
 	if !validation {
-		return
+		return false
 	}
 
 	// this temp var is used to calculate validator fees. Cannot use reward provider fees since it will be stacked by other functions we handle
@@ -139,5 +133,5 @@ func (k *Keeper) ResolveRequestsFromTestCaseReports(ctx sdk.Context, rep *types.
 	// create a new validator wrapper and append to reward obj
 	reward.BaseReward.Validators = append(reward.BaseReward.Validators, *k.NewValidator(rep.BaseReport.GetValidatorAddress(), val.GetConsensusPower(), val.GetStatus().String()))
 	reward.BaseReward.TotalPower += val.GetConsensusPower()
-	return
+	return true
 }

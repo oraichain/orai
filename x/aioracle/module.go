@@ -125,7 +125,7 @@ func (am AppModule) Name() string {
 
 // Route returns the capability module's message routing key.
 func (am AppModule) Route() sdk.Route {
-	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper))
+	return sdk.NewRoute(types.RouterKey, NewHandler(am.querier))
 }
 
 // QuerierRoute returns the capability module's query routing key.
@@ -140,7 +140,7 @@ func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sd
 // RegisterServices registers a GRPC query service to respond to the
 // module-specific GRPC queries.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
+	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.querier))
 	types.RegisterQueryServer(cfg.QueryServer(), am.querier)
 }
 
@@ -170,7 +170,7 @@ func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
 	am.keeper.ResolveRngSeed(ctx, req)
 	validator, err := am.getValidatorAddress(*clientContext, ctx)
 	if err == nil {
-		am.keeper.ExecuteAIOracles(ctx, validator)
+		am.querier.ExecuteAIOracles(ctx, validator)
 	}
 	am.keeper.AllocateTokens(ctx, req.GetLastCommitInfo().Votes, ctx.BlockHeight())
 }

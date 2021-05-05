@@ -21,17 +21,13 @@ func (k *Keeper) GetReward(ctx sdk.Context, blockHeight int64) (*types.Reward, e
 	store := ctx.KVStore(k.StoreKey)
 	rewardKey := types.RewardStoreKey(blockHeight)
 	// check if there exists a reward in that block height or not
-	if rewardKey == nil {
-		return nil, fmt.Errorf("no reward store key at block height: %d", blockHeight)
-	}
-
 	rewardItem := store.Get(rewardKey)
 	if rewardItem == nil {
 		return nil, fmt.Errorf("no reward item at key: %s", rewardKey)
 	}
-	var reward types.Reward
-	err := k.Cdc.UnmarshalBinaryBare(rewardItem, &reward)
-	return &reward, err
+	reward := &types.Reward{}
+	err := k.Cdc.UnmarshalBinaryBare(rewardItem, reward)
+	return reward, err
 }
 
 // ProcessReward collects all the information needed to create a new Reward object

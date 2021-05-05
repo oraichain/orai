@@ -10,13 +10,13 @@ import (
 )
 
 type msgServer struct {
-	keeper *Keeper
+	querier *Querier
 }
 
 // NewMsgServerImpl returns an implementation of the bank MsgServer interface
 // for the provided Keeper.
-func NewMsgServerImpl(keeper *Keeper) types.MsgServer {
-	return &msgServer{keeper: keeper}
+func NewMsgServerImpl(querier *Querier) types.MsgServer {
+	return &msgServer{querier: querier}
 }
 
 var _ types.MsgServer = msgServer{}
@@ -24,7 +24,7 @@ var _ types.MsgServer = msgServer{}
 func (k msgServer) CreateAIOracle(goCtx context.Context, msg *types.MsgSetAIOracleReq) (*types.MsgSetAIOracleRes, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	validators, err := k.keeper.RandomValidators(ctx, int(msg.ValidatorCount), []byte(msg.RequestID))
+	validators, err := k.querier.keeper.RandomValidators(ctx, int(msg.ValidatorCount), []byte(msg.RequestID))
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrCannotRandomValidators, err.Error())
 	}
@@ -32,12 +32,12 @@ func (k msgServer) CreateAIOracle(goCtx context.Context, msg *types.MsgSetAIOrac
 	contract, _ := sdk.AccAddressFromBech32(msg.Contract)
 	creator, _ := sdk.AccAddressFromBech32(msg.Creator)
 	// validate if the request id exists or not
-	if k.keeper.HasAIOracle(ctx, msg.RequestID) {
+	if k.querier.keeper.HasAIOracle(ctx, msg.RequestID) {
 		return nil, sdkerrors.Wrap(types.ErrRequestInvalid, "The request id already exists")
 	}
 
 	// check size of the request
-	maxBytes := int(k.keeper.GetParam(ctx, types.KeyMaximumAIOracleReqBytes))
+	maxBytes := int(k.querier.keeper.GetParam(ctx, types.KeyMaximumAIOracleReqBytes))
 	// threshold for the size of the request
 	if len(msg.Input) > maxBytes {
 		return nil, sdkerrors.Wrap(types.ErrRequestInvalid, "The request is too large")
@@ -46,27 +46,27 @@ func (k msgServer) CreateAIOracle(goCtx context.Context, msg *types.MsgSetAIOrac
 	// we can safely parse fees to coins since we have validated it in the Msg already
 	providedFees, _ := sdk.ParseCoinsNormalized(msg.Fees)
 
-	requiredFees, err := k.keeper.calculateMinimumFees(ctx, msg.TestOnly, contract, len(validators))
+	requiredFees, err := k.querier.calculateMinimumFees(ctx, msg.TestOnly, contract, len(validators))
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrQueryMinFees, fmt.Sprintf("Error getting minimum fees from oracle script with err: %v", err))
 	}
 
 	// If the total fee is larger than the fee provided by the user then we return error
 	if requiredFees.IsAnyGT(providedFees) {
-		k.keeper.Logger(ctx).Error(fmt.Sprintf("Your payment fees is less than required\n"))
+		k.querier.keeper.Logger(ctx).Error(fmt.Sprintf("Your payment fees is less than required\n"))
 		return nil, sdkerrors.Wrap(types.ErrNeedMoreFees, fmt.Sprintf("Fees given: %v, where fees required is: %v", providedFees, requiredFees))
 	}
 
 	// check if the account has enough spendable coins
-	spendableCoins := k.keeper.BankKeeper.SpendableCoins(ctx, creator)
+	spendableCoins := k.querier.keeper.BankKeeper.SpendableCoins(ctx, creator)
 	// If the total fee is larger or equal to the spendable coins of the user then we return error
 	if providedFees.IsAnyGTE(spendableCoins) {
-		k.keeper.Logger(ctx).Error(fmt.Sprintf("Your account has run out of tokens to create the AI Request\n"))
+		k.querier.keeper.Logger(ctx).Error(fmt.Sprintf("Your account has run out of tokens to create the AI Request\n"))
 		return nil, sdkerrors.Wrap(types.ErrNeedMoreFees, "Your account has run out of tokens to create the AI Request")
 	}
 
 	// substract coins in the creator wallet to charge fees
-	err = k.keeper.BankKeeper.SubtractCoins(ctx, creator, providedFees)
+	err = k.querier.keeper.BankKeeper.SubtractCoins(ctx, creator, providedFees)
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrNeedMoreFees, fmt.Sprintf("Your account has run out of tokens to create the AI Request, or there is something wrong with error: %v", err))
 	}
@@ -74,7 +74,7 @@ func (k msgServer) CreateAIOracle(goCtx context.Context, msg *types.MsgSetAIOrac
 	// set a new request with the aggregated result into blockchain
 	request := types.NewAIOracle(msg.RequestID, contract, creator, validators, ctx.BlockHeight(), providedFees, msg.Input, msg.TestOnly)
 
-	k.keeper.SetAIOracle(ctx, request.RequestID, request)
+	k.querier.keeper.SetAIOracle(ctx, request.RequestID, request)
 
 	// TODO: Define your msg events
 	// Emit an event describing a data request and asked validators.
@@ -100,37 +100,4 @@ func (k msgServer) CreateAIOracle(goCtx context.Context, msg *types.MsgSetAIOrac
 		msg.GetCreator(), request.GetFees().String(), msg.GetValidatorCount(),
 		request.GetInput(), request.GetTestOnly(),
 	), nil
-}
-
-func (k *Keeper) calculateMinimumFees(ctx sdk.Context, isTestOnly bool, contractAddr sdk.AccAddress, numVal int) (sdk.Coins, error) {
-	querier := NewQuerier(k)
-	goCtx := sdk.WrapSDKContext(ctx)
-	entries := &types.ResponseEntryPointContract{}
-	var err error
-	if isTestOnly {
-		entries, err = querier.TestCaseEntries(goCtx, &types.QueryTestCaseEntriesContract{
-			Contract: contractAddr,
-			Request:  &types.EmptyParams{},
-		})
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		entries, err = querier.DataSourceEntries(goCtx, &types.QueryDataSourceEntriesContract{
-			Contract: contractAddr,
-			Request:  &types.EmptyParams{},
-		})
-		if err != nil {
-			return nil, err
-		}
-	}
-	minFees := sdk.Coins{}
-	for _, entry := range entries.GetData() {
-		minFees = minFees.Add(entry.GetProviderFees()...)
-	}
-	valFees := k.CalculateValidatorFees(ctx, minFees)
-	minFees = minFees.Add(valFees...)
-	// since there are more than 1 validator, we need to multiply those fees
-	minFees, _ = sdk.NewDecCoinsFromCoins(minFees...).MulDec(sdk.NewDec(int64(numVal))).TruncateDecimal()
-	return minFees, nil
 }
