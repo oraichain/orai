@@ -95,4 +95,5 @@ func TestResolveResult(t *testing.T) {
 	result, err = testKeeper.GetResult(ctx, id)
 	t.Logf("result after resolve with 1 validator: %v\n", result.Status)
 	require.Equal(t, "finished", result.Status)
+
 }

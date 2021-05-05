@@ -10,31 +10,28 @@ import (
 // SetReward saves the reward to the storage without performing validation.
 func (k *Keeper) SetReward(ctx sdk.Context, rew *types.Reward) error {
 	bz, err := k.Cdc.MarshalBinaryBare(rew)
-	ctx.KVStore(k.StoreKey).Set(types.RewardStoreKey(rew.BaseReward.BlockHeight), bz)
+	if err == nil {
+		ctx.KVStore(k.StoreKey).Set(types.RewardStoreKey(rew.BaseReward.BlockHeight), bz)
+	}
 	return err
 }
 
 // GetReward retrieves a specific reward given a block height
 func (k *Keeper) GetReward(ctx sdk.Context, blockHeight int64) (*types.Reward, error) {
 	store := ctx.KVStore(k.StoreKey)
+	rewardKey := types.RewardStoreKey(blockHeight)
 	// check if there exists a reward in that block height or not
-	hasReward := store.Has(types.RewardStoreKey(blockHeight))
-	var err error
-	if !hasReward {
-		err = fmt.Errorf("")
-		return nil, err
+	if rewardKey == nil {
+		return nil, fmt.Errorf("no reward store key at block height: %d", blockHeight)
+	}
+
+	rewardItem := store.Get(rewardKey)
+	if rewardItem == nil {
+		return nil, fmt.Errorf("no reward item at key: %s", rewardKey)
 	}
 	var reward types.Reward
-	err = k.Cdc.UnmarshalBinaryBare(store.Get(types.RewardStoreKey(blockHeight)), &reward)
-	if err != nil {
-		return &types.Reward{
-			BaseReward: &types.BaseReward{
-				BlockHeight: int64(-1),
-			},
-			Results: []*types.Result{},
-		}, err
-	}
-	return &reward, nil
+	err := k.Cdc.UnmarshalBinaryBare(rewardItem, &reward)
+	return &reward, err
 }
 
 // ProcessReward collects all the information needed to create a new Reward object
