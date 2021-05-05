@@ -8,6 +8,8 @@ import (
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
+	store "github.com/cosmos/cosmos-sdk/store/types"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
@@ -86,7 +88,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	"github.com/oraichain/orai/x/airequest"
 	aiRequesttypes "github.com/oraichain/orai/x/airequest/types"
 
@@ -247,6 +248,11 @@ type OraichainApp struct {
 func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool,
 	skipUpgradeHeights map[int64]bool, homePath string, invCheckPeriod uint, enabledProposals []wasm.ProposalType,
 	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp)) *OraichainApp {
+
+	baseAppOptions = append(baseAppOptions, upgradeLoader(100, &store.StoreUpgrades{
+		Added:   []string{"aioracle"},
+		Deleted: []string{"airequest", "airesult", "provider", "websocket"},
+	}))
 
 	encodingConfig := MakeEncodingConfig()
 	appCodec, legacyAmino := encodingConfig.Marshaler, encodingConfig.Amino
@@ -680,9 +686,24 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 func (app *OraichainApp) upgradeHandler() {
 	app.upgradeKeeper.SetUpgradeHandler("v0.3.0", func(ctx sdk.Context, plan upgradetypes.Plan) {
 		// upgrade changes here
+		// storeUpgrades := &store.StoreUpgrades{
+		// 	Added:   []string{"aioracle"},
+		// 	Deleted: []string{"airequest", "airesult", "provider"},
+		// }
+		// app.useUpgradeLoader(100, storeUpgrades)
 		app.aiRequestKeeper.SetParam(ctx, aiRequesttypes.KeyMaximumAIRequestReqBytes, aiRequesttypes.DefaultOracleReqBytesThreshold)
 		app.aiRequestKeeper.SetParam(ctx, aiRequesttypes.KeyMaximumAIRequestResBytes, aiRequesttypes.DefaultOracleResBytesThreshold)
 		app.aiRequestKeeper.SetParam(ctx, aiRequesttypes.KeyAIRequestRewardPercentages, aiRequesttypes.DefaultOracleRewardPercentages)
 		app.aiRequestKeeper.SetParam(ctx, aiRequesttypes.KeyReportPercentages, aiRequesttypes.DefaultReportPercentages)
 	})
+}
+
+// func (app *OraichainApp) useUpgradeLoader(height int64, upgrades *store.StoreUpgrades) {
+// 	app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(height, upgrades))
+// }
+
+func upgradeLoader(height int64, upgrades *store.StoreUpgrades) func(*baseapp.BaseApp) {
+	return func(app *baseapp.BaseApp) {
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(height, upgrades))
+	}
 }

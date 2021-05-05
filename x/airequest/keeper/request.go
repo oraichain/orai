@@ -37,6 +37,15 @@ func (k *Keeper) SetAIRequest(ctx sdk.Context, id string, request *types.AIReque
 	store.Set(types.RequestStoreKey(id), bz)
 }
 
+func (k *Keeper) DeleteAIRequests(ctx sdk.Context) {
+	store := ctx.KVStore(k.StoreKey)
+	iterator := sdk.KVStorePrefixIterator(store, types.RequeststoreKeyPrefixAll())
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		store.Delete(iterator.Value())
+	}
+}
+
 // GetPaginatedAIRequests get an iterator of paginated key-value pairs in the store
 func (k *Keeper) GetPaginatedAIRequests(ctx sdk.Context, page, limit uint) sdk.Iterator {
 	store := ctx.KVStore(k.StoreKey)

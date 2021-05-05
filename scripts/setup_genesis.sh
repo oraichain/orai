@@ -20,9 +20,9 @@ oraid init --chain-id $CHAIN_ID "$MONIKER"
 ## Workraround for https://github.com/cosmos/cosmos-sdk/issues/8251
 (echo "$PASSWORD"; echo "$PASSWORD") | oraid gentx $USER "$AMOUNT" --chain-id=$CHAIN_ID --amount="$AMOUNT" -y
 
-#oraid collect-gentxs
+oraid collect-gentxs
 
-#oraid validate-genesis
+oraid validate-genesis
 
 # cat $PWD/.oraid/config/genesis.json | jq .app_state.genutil.gen_txs[0] -c > "$MONIKER"_validators.txt
 

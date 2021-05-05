@@ -4,7 +4,7 @@ import "strconv"
 
 const (
 	// ModuleName is the name of the module
-	ModuleName = "airequest"
+	ModuleName = "aioracle"
 
 	// Denom is the coin denom used for the module
 	Denom = "orai"

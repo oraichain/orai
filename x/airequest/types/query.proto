@@ -47,7 +47,7 @@ service Query {
 
     // QueryFullOracleReq gets the ai result meta data
     rpc QueryFullRequest (QueryFullOracleReq) returns (QueryFullOracleRes) {
-        option (google.api.http).get = "/airequest/fullreq/{request_id}";
+        option (google.api.http).get = "/airequest/fullorai/{request_id}";
     }
     // QueryReward gets the reward given a block height
     rpc QueryReward (QueryRewardReq) returns (QueryRewardRes) {
