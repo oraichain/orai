@@ -2,10 +2,10 @@
 
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 #VERSION := $(shell echo $(shell git describe --always) | sed 's/^v//')
-VERSION := v0.3.10
+VERSION := v0.3.0
 COMMIT := $(shell git log -1 --format='%H')
 LEDGER_ENABLED ?= false
-GOMOD_FLAGS ?= -mod=readonly
+GOMOD_FLAGS ?=
 SDK_PACK := $(shell go list -m github.com/cosmos/cosmos-sdk | sed  's/ /\@/g')
 
 # for dockerized protobuf tools

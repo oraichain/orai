@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -184,8 +185,19 @@ func (k *Querier) QueryFullRequest(goCtx context.Context, req *types.QueryFullOr
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.ErrRequestNotFound, err.Error())
 	}
+	if request.TestOnly {
+
+	}
 	// collect all the reports of a given request id
 	reports := k.keeper.GetReports(ctx, id)
+	if len(reports) == 0 {
+		reports = []types.Report{}
+	}
+	// collect all the reports of a given request id
+	tcReports := k.keeper.GetTestCaseReports(ctx, id)
+	if len(tcReports) == 0 {
+		tcReports = []types.TestCaseReport{}
+	}
 
 	// collect the result of a given request id
 
@@ -195,7 +207,7 @@ func (k *Querier) QueryFullRequest(goCtx context.Context, req *types.QueryFullOr
 		result = types.NewAIOracleResult(id, nil, types.RequestStatusPending)
 	}
 
-	return types.NewQueryFullRequestRes(*request, reports, *result), nil
+	return types.NewQueryFullRequestRes(*request, reports, tcReports, *result), nil
 }
 
 // QueryReward implements the Query/QueryReward gRPC method
@@ -290,10 +302,21 @@ func (k *Querier) Params(c context.Context, _ *types.QueryParamsRequest) (*types
 	return &types.QueryParamsResponse{Params: params}, nil
 }
 
-// ExecuteAIOracles used for internal module calls
+// containsVal returns whether the given slice of validators contains the target validator.
+func (k *Querier) ContainsVal(vals []sdk.ValAddress, target sdk.ValAddress) bool {
+	for _, val := range vals {
+		if val.Equals(target) {
+			return true
+		}
+	}
+	return false
+}
+
 func (k *Querier) ExecuteAIOracles(ctx sdk.Context, valAddress sdk.ValAddress) {
 	aiOracles := k.keeper.GetAIOraclesBlockHeight(ctx)
-
+	if len(aiOracles) == 0 {
+		return
+	}
 	// execute each ai oracle request
 	for _, aiOracle := range aiOracles {
 		// if the ai oracle request does not include the validator address, then we skip
@@ -354,6 +377,9 @@ func (k *Querier) executeAIOracle(ctx sdk.Context, aiOracle types.AIOracle, valA
 		dataSourceResults = append(dataSourceResults, dataSourceResult)
 	}
 
+	// store report into blockchain as proof for executing AI requests
+	report := types.NewReport(aiOracle.GetRequestID(), dataSourceResults, ctx.BlockHeight(), []byte{}, valAddress, types.ResultSuccess, sdk.NewCoins(sdk.NewCoin(types.Denom, sdk.NewInt(0))))
+
 	ctx.Logger().Info(fmt.Sprintf("results collected from the data sources: %v", resultArr))
 	aggregatedResult, err := k.OracleScriptContract(goCtx, &types.QueryOracleScriptContract{
 		Contract: aiOracle.GetContract(),
@@ -363,24 +389,77 @@ func (k *Querier) executeAIOracle(ctx sdk.Context, aiOracle types.AIOracle, valA
 	})
 	if err != nil {
 		ctx.Logger().Error(fmt.Sprintf("Cannot execute oracle script contract %v with error: %v", aiOracle.GetContract(), err))
+		report.AggregatedResult = []byte(types.FailedResponseOs)
+		report.ResultStatus = types.ResultFailure
+	} else {
+		report.AggregatedResult = aggregatedResult.Data
 	}
 	ctx.Logger().Info(fmt.Sprintf("Oracle script final result: %v", aggregatedResult))
-	// store report into blockchain as proof for executing AI requests
-	report := types.NewReport(aiOracle.GetRequestID(), dataSourceResults, ctx.BlockHeight(), aggregatedResult.Data, valAddress, types.ResultSuccess)
-
-	// verify basic report information to make sure the report is stored in a valid manner
-	if k.keeper.validateReportBasic(ctx, &aiOracle, report, report.BaseReport.GetBlockHeight()) {
-		err = k.keeper.SetReport(ctx, aiOracle.GetRequestID(), report)
-		if err != nil {
-			ctx.Logger().Error(fmt.Sprintf("Cannot store report with request id %v of validator %v with error: %v", aiOracle.GetRequestID(), valAddress.String(), err))
-		}
-		ctx.Logger().Info(fmt.Sprintf("finish handling the AI oracles with report: %v", report))
+	reportBytes, err := json.Marshal(report)
+	if err != nil {
+		ctx.Logger().Error(fmt.Sprintf("Cannot marshal report %v with error: %v", report, err))
 	}
+	// verify basic report information to make sure the report is stored in a valid manner
+	if k.validateReportBasic(ctx, &aiOracle, report, report.BaseReport.GetBlockHeight()) {
+		event := sdk.NewEvent(types.EventTypeReportWithData)
+		event = event.AppendAttributes(
+			sdk.NewAttribute(types.AttributeReport, string(reportBytes[:])),
+		)
+		ctx.EventManager().Events().AppendEvent(event)
+		ctx.EventManager().EmitEvent(event)
+		ctx.Logger().Info(fmt.Sprintf("Finish handling the AI oracles with report: %v", report))
+	}
+}
+
+func (k *Querier) validateBasic(ctx sdk.Context, req *types.AIOracle, rep *types.BaseReport) bool {
+	// Check if validator exists and active
+	_, isExist := k.keeper.StakingKeeper.GetValidator(ctx, rep.GetValidatorAddress())
+	if !isExist {
+		k.keeper.Logger(ctx).Error(fmt.Sprintf("error in validating the report: validator does not exist"))
+		return false
+	}
+	if !k.ContainsVal(req.GetValidators(), rep.GetValidatorAddress()) {
+		k.keeper.Logger(ctx).Error(fmt.Sprintf("Validator %v does not exist in the list of request validators", rep.GetValidatorAddress().String()))
+		return false
+	}
+	if len(rep.GetValidatorAddress()) <= 0 || len(rep.GetRequestId()) <= 0 || rep.GetBlockHeight() <= 0 {
+		k.keeper.Logger(ctx).Error(fmt.Sprintf("Report basic information is invalid: %v", rep))
+		return false
+	}
+	return true
+}
+
+func (k *Querier) validateReportBasic(ctx sdk.Context, req *types.AIOracle, rep *types.Report, blockHeight int64) bool {
+	if len(rep.GetDataSourceResults()) <= 0 || len(rep.GetAggregatedResult()) <= 0 {
+		k.keeper.Logger(ctx).Error(fmt.Sprintf("Report results are invalid: %v", rep))
+		return false
+	}
+	if rep.GetResultStatus() != types.ResultFailure && rep.GetResultStatus() != types.ResultSuccess {
+		k.keeper.Logger(ctx).Error(fmt.Sprintf("Report result status is invalid: %v", rep.GetResultStatus()))
+		return false
+	}
+	var dsResultSize int
+	for _, dsResult := range rep.GetDataSourceResults() {
+		if dsResult.GetStatus() != types.ResultFailure && dsResult.GetStatus() != types.ResultSuccess {
+			k.keeper.Logger(ctx).Error(fmt.Sprintf("Data source result status is invalid: %v", dsResult.GetStatus()))
+			return false
+		}
+		dsResultSize += len(dsResult.Result)
+	}
+	aggregatedResultSize := len(rep.GetAggregatedResult())
+	finalLen := dsResultSize + aggregatedResultSize
+	responseBytes := k.keeper.GetParam(ctx, types.KeyMaximumAIOracleResBytes)
+
+	if finalLen >= int(responseBytes) {
+		k.keeper.Logger(ctx).Error(fmt.Sprintf("Report result size: %v cannot be larger than %v", finalLen, responseBytes))
+		return false
+	}
+
+	return k.validateBasic(ctx, req, rep.BaseReport)
 }
 
 func (k *Querier) executeAIOracleTestOnly(ctx sdk.Context, aiOracle types.AIOracle, valAddress sdk.ValAddress) {
 	// querier to interact with the wasm contract
-
 	goCtx := sdk.WrapSDKContext(ctx)
 	var resultsWithTc []*types.ResultWithTestCase
 	// collect list entries to get entry length
@@ -436,12 +515,51 @@ func (k *Querier) executeAIOracleTestOnly(ctx sdk.Context, aiOracle types.AIOrac
 		resultsWithTc = append(resultsWithTc, resultWithTc)
 	}
 	// store report into blockchain as proof for executing AI requests
-	report := types.NewTestCaseReport(aiOracle.GetRequestID(), resultsWithTc, ctx.BlockHeight(), valAddress)
-	if k.keeper.validateTestCaseReportBasic(ctx, &aiOracle, report, report.BaseReport.GetBlockHeight()) {
-		err = k.keeper.SetTestCaseReport(ctx, aiOracle.GetRequestID(), report)
-		if err != nil {
-			ctx.Logger().Error(fmt.Sprintf("Cannot store report with request id %v of validator %v with error: %v", aiOracle.GetRequestID(), valAddress.String(), err))
-		}
-		ctx.Logger().Info(fmt.Sprintf("finish handling the test AI oracles with report: %v", report))
+	report := types.NewTestCaseReport(aiOracle.GetRequestID(), resultsWithTc, ctx.BlockHeight(), valAddress, sdk.NewCoins(sdk.NewCoin(types.Denom, sdk.NewInt(0))))
+	reportBytes, err := json.Marshal(report)
+	if err != nil {
+		ctx.Logger().Error(fmt.Sprintf("Cannot marshal report %v with error: %v", report, err))
 	}
+	if k.validateTestCaseReportBasic(ctx, &aiOracle, report, report.BaseReport.GetBlockHeight()) {
+		event := sdk.NewEvent(types.EventTypeReportWithData)
+		event = event.AppendAttributes(
+			sdk.NewAttribute(types.AttributeTestCaseReport, string(reportBytes[:])),
+		)
+		ctx.EventManager().Events().AppendEvent(event)
+		ctx.EventManager().EmitEvent(event)
+		ctx.Logger().Info(fmt.Sprintf("Finish handling the test AI oracles with report: %v", report))
+	}
+}
+
+func (k *Querier) validateTestCaseReportBasic(ctx sdk.Context, req *types.AIOracle, rep *types.TestCaseReport, blockHeight int64) bool {
+	if len(rep.GetResultsWithTestCase()) <= 0 {
+		k.keeper.Logger(ctx).Error(fmt.Sprintf("Report results are invalid: %v", rep))
+		return false
+	}
+	var tcResultSize int
+	for _, result := range rep.GetResultsWithTestCase() {
+		for _, tcResult := range result.GetTestCaseResults() {
+			if tcResult.GetStatus() != types.ResultFailure && tcResult.GetStatus() != types.ResultSuccess {
+				k.keeper.Logger(ctx).Error(fmt.Sprintf("Report result status is invalid: %v", tcResult.GetStatus()))
+				return false
+			}
+			tcResultSize += len(tcResult.GetResult())
+		}
+	}
+	responseBytes := k.keeper.GetParam(ctx, types.KeyMaximumAIOracleResBytes)
+
+	if tcResultSize >= int(responseBytes) {
+		k.keeper.Logger(ctx).Error(fmt.Sprintf("Report result size: %v cannot be larger than %v", tcResultSize, int(responseBytes)))
+		return false
+	}
+	return k.validateBasic(ctx, req, rep.BaseReport)
+}
+
+func isValidator(vals []sdk.ValAddress, valAddr sdk.ValAddress) bool {
+	for _, val := range vals {
+		if val.Equals(valAddr) {
+			return true
+		}
+	}
+	return false
 }

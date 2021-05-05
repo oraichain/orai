@@ -76,9 +76,6 @@ var (
 	// TestCaseReportKeyPrefix sets a prefix for a report key
 	TestCaseReportKeyPrefix = "tcrp"
 
-	// StrategyKeyPrefix sets a prefix for a strategy key
-	StrategyKeyPrefix = "st"
-
 	// ResultKeyPrefix sets a prefix for a result key
 	ResultKeyPrefix = "res"
 

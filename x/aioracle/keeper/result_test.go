@@ -3,7 +3,7 @@ package keeper_test
 import (
 	"testing"
 
-	aioraclekeeper "github.com/oraichain/orai/x/aioracle/keeper"
+	aiOraclekeeper "github.com/oraichain/orai/x/aioracle/keeper"
 	"github.com/oraichain/orai/x/aioracle/types"
 	"github.com/segmentio/ksuid"
 	"github.com/stretchr/testify/require"
@@ -46,7 +46,7 @@ func TestResolveResult(t *testing.T) {
 	tstaking.CreateValidator(valAddrs[2], valConsPk3, sdk.NewInt(150000000), true)
 
 	feeCollector := app.AccountKeeper.GetModuleAccount(ctx, auth.FeeCollectorName)
-	testKeeper := aioraclekeeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName), app.StakingKeeper, app.BankKeeper, app.AccountKeeper, app.DistrKeeper, feeCollector.GetName())
+	testKeeper := aiOraclekeeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName), app.StakingKeeper, app.BankKeeper, app.AccountKeeper, app.DistrKeeper, feeCollector.GetName())
 
 	// init data source results
 	dsResult1 := types.NewResult(&types.EntryPoint{}, []byte{0x50}, "success")
@@ -56,10 +56,10 @@ func TestResolveResult(t *testing.T) {
 
 	// init report
 	id := ksuid.New().String()
-	report := types.NewReport(id, dsResults, 1, []byte{0x50}, valAddrs[0], types.ResultSuccess)
+	report := types.NewReport(id, dsResults, 1, []byte{0x50}, valAddrs[0], types.ResultSuccess, nil)
 
 	// verify report
-	err := testKeeper.AddReport(ctx, id, report)
+	err := testKeeper.SetReport(ctx, id, report)
 	require.NoError(t, err)
 
 	// test result with 2 validators aka two reports, total 70% reports to finish
@@ -84,10 +84,10 @@ func TestResolveResult(t *testing.T) {
 	require.Equal(t, "finished", result.Status)
 
 	id = ksuid.New().String()
-	report = types.NewReport(id, dsResults, 1, []byte{0x50}, valAddrs[0], types.ResultSuccess)
+	report = types.NewReport(id, dsResults, 1, []byte{0x50}, valAddrs[0], types.ResultSuccess, nil)
 
 	// verify report
-	err = testKeeper.AddReport(ctx, id, report)
+	err = testKeeper.SetReport(ctx, id, report)
 	require.NoError(t, err)
 
 	testKeeper.ResolveResult(ctx, report, 1, 70)

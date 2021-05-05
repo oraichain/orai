@@ -8,6 +8,8 @@ import (
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
+	store "github.com/cosmos/cosmos-sdk/store/types"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
@@ -86,9 +88,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/upgrade"
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	"github.com/oraichain/orai/x/aioracle"
-	aioracletypes "github.com/oraichain/orai/x/aioracle/types"
+	aiOracletypes "github.com/oraichain/orai/x/aioracle/types"
 
 	// unnamed import of statik for swagger UI support
 	_ "github.com/oraichain/orai/doc/statik"
@@ -230,7 +231,7 @@ type OraichainApp struct {
 	wasmKeeper       wasm.Keeper
 
 	// custom modules here
-	aioracleKeeper *aioracle.Keeper
+	aiOracleKeeper *aioracle.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -247,6 +248,11 @@ type OraichainApp struct {
 func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool,
 	skipUpgradeHeights map[int64]bool, homePath string, invCheckPeriod uint, enabledProposals []wasm.ProposalType,
 	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp)) *OraichainApp {
+
+	baseAppOptions = append(baseAppOptions, upgradeLoader(100, &store.StoreUpgrades{
+		Added:   []string{"aioracle"},
+		Deleted: []string{"aioracle", "airesult", "provider", "websocket"},
+	}))
 
 	encodingConfig := MakeEncodingConfig()
 	appCodec, legacyAmino := encodingConfig.Marshaler, encodingConfig.Amino
@@ -401,7 +407,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	)
 	/****  Module Options ****/
 
-	app.aioracleKeeper = aioracle.NewKeeper(
+	app.aiOracleKeeper = aioracle.NewKeeper(
 		appCodec, keys[aioracle.StoreKey],
 		&app.wasmKeeper,
 		app.getSubspace(aioracle.ModuleName),
@@ -438,7 +444,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		evidence.NewAppModule(app.evidenceKeeper),
 		ibc.NewAppModule(app.ibcKeeper),
 		params.NewAppModule(app.paramsKeeper),
-		aioracle.NewAppModule(appCodec, app.aioracleKeeper),
+		aioracle.NewAppModule(appCodec, app.aiOracleKeeper),
 		transferModule,
 	)
 
@@ -678,11 +684,26 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 }
 
 func (app *OraichainApp) upgradeHandler() {
-	app.upgradeKeeper.SetUpgradeHandler("v0.3.10", func(ctx sdk.Context, plan upgradetypes.Plan) {
+	app.upgradeKeeper.SetUpgradeHandler("v0.3.0", func(ctx sdk.Context, plan upgradetypes.Plan) {
 		// upgrade changes here
-		app.aioracleKeeper.SetParam(ctx, aioracletypes.KeyMaximumAIOracleReqBytes, aioracletypes.DefaultOracleReqBytesThreshold)
-		app.aioracleKeeper.SetParam(ctx, aioracletypes.KeyMaximumAIOracleResBytes, aioracletypes.DefaultOracleResBytesThreshold)
-		app.aioracleKeeper.SetParam(ctx, aioracletypes.KeyAIOracleRewardPercentages, aioracletypes.DefaultOracleRewardPercentages)
-		app.aioracleKeeper.SetParam(ctx, aioracletypes.KeyReportPercentages, aioracletypes.DefaultReportPercentages)
+		// storeUpgrades := &store.StoreUpgrades{
+		// 	Added:   []string{"aioracle"},
+		// 	Deleted: []string{"aioracle", "airesult", "provider"},
+		// }
+		// app.useUpgradeLoader(100, storeUpgrades)
+		app.aiOracleKeeper.SetParam(ctx, aiOracletypes.KeyMaximumAIOracleReqBytes, aiOracletypes.DefaultOracleReqBytesThreshold)
+		app.aiOracleKeeper.SetParam(ctx, aiOracletypes.KeyMaximumAIOracleResBytes, aiOracletypes.DefaultOracleResBytesThreshold)
+		app.aiOracleKeeper.SetParam(ctx, aiOracletypes.KeyAIOracleRewardPercentages, aiOracletypes.DefaultOracleRewardPercentages)
+		app.aiOracleKeeper.SetParam(ctx, aiOracletypes.KeyReportPercentages, aiOracletypes.DefaultReportPercentages)
 	})
+}
+
+// func (app *OraichainApp) useUpgradeLoader(height int64, upgrades *store.StoreUpgrades) {
+// 	app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(height, upgrades))
+// }
+
+func upgradeLoader(height int64, upgrades *store.StoreUpgrades) func(*baseapp.BaseApp) {
+	return func(app *baseapp.BaseApp) {
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(height, upgrades))
+	}
 }

@@ -39,12 +39,6 @@ func (k *Keeper) SetAIOracle(ctx sdk.Context, id string, request *types.AIOracle
 	}
 }
 
-// GetAIOracleIDIter get an iterator of all key-value pairs in the store
-func (k *Keeper) GetAIOracleIDIter(ctx sdk.Context) sdk.Iterator {
-	store := ctx.KVStore(k.StoreKey)
-	return sdk.KVStorePrefixIterator(store, types.RequeststoreKeyPrefixAll())
-}
-
 // GetPaginatedAIOracles get an iterator of paginated key-value pairs in the store
 func (k *Keeper) GetPaginatedAIOracles(ctx sdk.Context, page, limit uint) sdk.Iterator {
 	store := ctx.KVStore(k.StoreKey)
@@ -67,9 +61,9 @@ func (k *Keeper) GetAIOraclesBlockHeight(ctx sdk.Context) (aiOracles []types.AIO
 }
 
 // ResolveRequestsFromReports handles the reports received in a block to group all the validators, data source owners and test case owners
-func (k *Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *types.Report, reward *types.Reward) (bool, int) {
+func (k *Querier) ResolveRequestsFromReports(ctx sdk.Context, rep *types.Report, reward *types.Reward) (bool, int) {
 
-	req, err := k.GetAIOracle(ctx, rep.BaseReport.GetRequestId())
+	req, err := k.keeper.GetAIOracle(ctx, rep.BaseReport.GetRequestId())
 	if err != nil {
 		return false, 0
 	}
@@ -83,18 +77,18 @@ func (k *Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *types.Report, 
 	var providerFees sdk.Coins
 	// collect data source owners that have their data sources executed to reward
 	for _, dataSourceResult := range rep.GetDataSourceResults() {
-		if dataSourceResult.GetStatus() == k.GetKeyResultSuccess() {
+		if dataSourceResult.GetStatus() == types.ResultSuccess {
 			reward.Results = append(reward.Results, dataSourceResult)
 			reward.BaseReward.ProviderFees = reward.BaseReward.ProviderFees.Add(dataSourceResult.GetEntryPoint().GetProviderFees()...)
 			providerFees = providerFees.Add(dataSourceResult.GetEntryPoint().GetProviderFees()...)
 		}
 	}
 	// add validator fees into the total fees of all validators
-	reward.BaseReward.ValidatorFees = reward.BaseReward.ValidatorFees.Add(k.CalculateValidatorFees(ctx, providerFees)...)
+	reward.BaseReward.ValidatorFees = reward.BaseReward.ValidatorFees.Add(k.keeper.CalculateValidatorFees(ctx, providerFees)...)
 	// collect validator current status
-	val := k.StakingKeeper.Validator(ctx, rep.BaseReport.GetValidatorAddress())
+	val := k.keeper.StakingKeeper.Validator(ctx, rep.BaseReport.GetValidatorAddress())
 	// create a new validator wrapper and append to reward obj
-	reward.BaseReward.Validators = append(reward.BaseReward.Validators, *k.NewValidator(rep.BaseReport.GetValidatorAddress(), val.GetConsensusPower(), val.GetStatus().String()))
+	reward.BaseReward.Validators = append(reward.BaseReward.Validators, *k.keeper.NewValidator(rep.BaseReport.GetValidatorAddress(), val.GetConsensusPower(), val.GetStatus().String()))
 	reward.BaseReward.TotalPower += val.GetConsensusPower()
 
 	// return boolean and length of validator list to resolve result
@@ -102,9 +96,9 @@ func (k *Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *types.Report, 
 }
 
 // ResolveRequestsFromTestCaseReports handles the test case reports received in a block to group all the validators, data source owners and test case owners
-func (k *Keeper) ResolveRequestsFromTestCaseReports(ctx sdk.Context, rep *types.TestCaseReport, reward *types.Reward) bool {
+func (k *Querier) ResolveRequestsFromTestCaseReports(ctx sdk.Context, rep *types.TestCaseReport, reward *types.Reward) bool {
 
-	req, err := k.GetAIOracle(ctx, rep.BaseReport.GetRequestId())
+	req, err := k.keeper.GetAIOracle(ctx, rep.BaseReport.GetRequestId())
 	if err != nil {
 		return false
 	}
@@ -121,17 +115,17 @@ func (k *Keeper) ResolveRequestsFromTestCaseReports(ctx sdk.Context, rep *types.
 		for _, tcResult := range result.GetTestCaseResults() {
 			if tcResult.Status == types.ResultSuccess {
 				reward.BaseReward.ProviderFees = reward.BaseReward.ProviderFees.Add(tcResult.GetEntryPoint().GetProviderFees()...)
-				reward.Results = append(reward.Results)
+				reward.Results = append(reward.Results, tcResult)
 				providerFees = providerFees.Add(tcResult.GetEntryPoint().GetProviderFees()...)
 			}
 		}
 	}
 	// add validator fees into the total fees of all validators
-	reward.BaseReward.ValidatorFees = reward.BaseReward.ValidatorFees.Add(k.CalculateValidatorFees(ctx, providerFees)...)
+	reward.BaseReward.ValidatorFees = reward.BaseReward.ValidatorFees.Add(k.keeper.CalculateValidatorFees(ctx, providerFees)...)
 	// collect validator current status
-	val := k.StakingKeeper.Validator(ctx, rep.BaseReport.GetValidatorAddress())
+	val := k.keeper.StakingKeeper.Validator(ctx, rep.BaseReport.GetValidatorAddress())
 	// create a new validator wrapper and append to reward obj
-	reward.BaseReward.Validators = append(reward.BaseReward.Validators, *k.NewValidator(rep.BaseReport.GetValidatorAddress(), val.GetConsensusPower(), val.GetStatus().String()))
+	reward.BaseReward.Validators = append(reward.BaseReward.Validators, *k.keeper.NewValidator(rep.BaseReport.GetValidatorAddress(), val.GetConsensusPower(), val.GetStatus().String()))
 	reward.BaseReward.TotalPower += val.GetConsensusPower()
 	return true
 }
