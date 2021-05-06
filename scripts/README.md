@@ -1,4 +1,3 @@
-# Create proto for cosmosjs
+# Create proto for oraichain
 
-`make proto-js SRC_DIR=tmp && cp tmp/generated/* src/messages`
-
+`./scripts/protocgen-js.sh --no-verify --no-convert --no-delimited --no-beautify -no-service`

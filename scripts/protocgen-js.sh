@@ -3,14 +3,17 @@
 set -eo pipefail
 
 # go get ./...
-# apk add nodejs-current 
-# npm install -g protobufjs
+
+if [ ! `command -v pbjs` ]; then  
+  apk add nodejs-current npm
+  npm install -g protobufjs
+fi 
 
 BASEDIR=$(dirname $0)
-PROJECTDIR=$BASEDIR/..
+PROJECTDIR=$(realpath $BASEDIR/..)
 # default is tmp folder
-SOURCEDIR=$(realpath ${1:-$PROJECTDIR/tmp})
-MODULE_SDK_DIR=$(realpath $PROJECTDIR/x)
+SOURCEDIR=$PROJECTDIR/tmp
+MODULE_SDK_DIR=$PROJECTDIR/x
 
 COSMOS_SDK_DIR=${COSMOS_SDK_DIR:-$(go list -f "{{ .Dir }}" -m github.com/cosmos/cosmos-sdk)}
 COSMOS_WASM_DIR=${COSMOS_WASM_DIR:-$(go list -f "{{ .Dir }}" -m github.com/CosmWasm/wasmd)}
@@ -36,7 +39,7 @@ pbjs \
   --es6 \
   --force-long \
   --keep-case \
-  --no-create \
+  --no-create "$@" \
   ${proto_files[@]}
 
 pbts \
