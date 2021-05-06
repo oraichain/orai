@@ -40,9 +40,11 @@ var (
 )
 
 type (
-	Keeper            = keeper.Keeper
-	MsgSetAIOracleReq = types.MsgSetAIOracleReq
-	AIOracle          = types.AIOracle
-	GenesisState      = types.GenesisState
-	Report            = types.Report
+	Keeper                  = keeper.Keeper
+	MsgSetAIOracleReq       = types.MsgSetAIOracleReq
+	MsgCreateReport         = types.MsgCreateReport
+	MsgCreateTestCaseReport = types.MsgCreateTestCaseReport
+	AIOracle                = types.AIOracle
+	GenesisState            = types.GenesisState
+	Report                  = types.Report
 )

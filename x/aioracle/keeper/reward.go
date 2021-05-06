@@ -31,8 +31,8 @@ func (k *Keeper) GetReward(ctx sdk.Context, blockHeight int64) (*types.Reward, e
 }
 
 // ProcessReward collects all the information needed to create a new Reward object
-func (k *Keeper) ProcessReward(ctx sdk.Context) {
-	reports := k.GetReportsBlockHeight(ctx)
+func (k *Querier) ProcessReward(ctx sdk.Context) {
+	reports := k.keeper.GetReportsBlockHeight(ctx)
 	reward := types.DefaultReward(ctx.BlockHeight())
 
 	// get param reward percentage oracle
@@ -42,22 +42,22 @@ func (k *Keeper) ProcessReward(ctx sdk.Context) {
 		// if we can resolve the requests from the reports successfully, we resolve its result
 		if isValid {
 			// collect param for the the total reports needed to be considered finished
-			totalReportsPercentage := k.GetParam(ctx, types.KeyReportPercentages)
+			totalReportsPercentage := k.keeper.GetParam(ctx, types.KeyReportPercentages)
 			if totalReportsPercentage < uint64(0) || totalReportsPercentage > uint64(1) {
 				totalReportsPercentage = types.DefaultReportPercentages
 			}
-			k.ResolveResult(ctx, &report, valCount, totalReportsPercentage)
+			k.keeper.ResolveResult(ctx, &report, valCount, totalReportsPercentage)
 		}
 	}
 
-	tcReports := k.GetTestCaseReportsBlockHeight(ctx)
+	tcReports := k.keeper.GetTestCaseReportsBlockHeight(ctx)
 	// Collect all the reports in the current block to get all the information for the reward
 	for _, report := range tcReports {
 		k.ResolveRequestsFromTestCaseReports(ctx, &report, reward)
 	}
 	// check if the reward is empty or not
 	if len(reward.BaseReward.Validators) > 0 {
-		k.Logger(ctx).Info(fmt.Sprintf("reward information: %v", reward))
-		k.SetReward(ctx, reward)
+		k.keeper.Logger(ctx).Info(fmt.Sprintf("reward information: %v", reward))
+		k.keeper.SetReward(ctx, reward)
 	}
 }

@@ -3,9 +3,9 @@ package keeper_test
 import (
 	"testing"
 
-	aioraclekeeper "github.com/oraichain/orai/x/aioracle/keeper"
+	aiOraclekeeper "github.com/oraichain/orai/x/aioracle/keeper"
 	"github.com/oraichain/orai/x/aioracle/types"
-	aioracletypes "github.com/oraichain/orai/x/aioracle/types"
+	aiOracletypes "github.com/oraichain/orai/x/aioracle/types"
 	"github.com/segmentio/ksuid"
 	"github.com/stretchr/testify/require"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
@@ -22,19 +22,19 @@ func TestGetReportsBlockHeight(t *testing.T) {
 	ctx := app.BaseApp.NewContext(false, tmproto.Header{})
 
 	feeCollector := app.AccountKeeper.GetModuleAccount(ctx, auth.FeeCollectorName)
-	testKeeper := aioraclekeeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName), app.StakingKeeper, app.BankKeeper, app.AccountKeeper, app.DistrKeeper, feeCollector.GetName())
+	testKeeper := aiOraclekeeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName), app.StakingKeeper, app.BankKeeper, app.AccountKeeper, app.DistrKeeper, feeCollector.GetName())
 
 	// init ai request
 	id := ksuid.New().String()
 
 	// init data source results
-	dsResult1 := aioracletypes.NewResult(&aioracletypes.EntryPoint{ProviderFees: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5)))}, []byte{0x50}, types.ResultSuccess)
-	dsResult2 := aioracletypes.NewResult(&aioracletypes.EntryPoint{ProviderFees: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5)))}, []byte{0x50}, types.ResultSuccess)
-	dsResult3 := aioracletypes.NewResult(&aioracletypes.EntryPoint{ProviderFees: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(3)))}, []byte{0x50}, types.ResultSuccess)
-	dsResults := []*aioracletypes.Result{dsResult1, dsResult2, dsResult3}
+	dsResult1 := aiOracletypes.NewResult(&aiOracletypes.EntryPoint{ProviderFees: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5)))}, []byte{0x50}, types.ResultSuccess)
+	dsResult2 := aiOracletypes.NewResult(&aiOracletypes.EntryPoint{ProviderFees: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5)))}, []byte{0x50}, types.ResultSuccess)
+	dsResult3 := aiOracletypes.NewResult(&aiOracletypes.EntryPoint{ProviderFees: sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(3)))}, []byte{0x50}, types.ResultSuccess)
+	dsResults := []*aiOracletypes.Result{dsResult1, dsResult2, dsResult3}
 
 	// init report
-	report := types.NewReport(id, dsResults, 0, []byte{0x50}, nil, "")
+	report := types.NewReport(id, dsResults, 0, []byte{0x50}, nil, "", nil)
 
 	// verify report
 	err := testKeeper.SetReport(ctx, id, report)

@@ -29459,10 +29459,10 @@ paths:
                       format: byte
       tags:
         - Query
-  '/airequest/aireq/{request_id}':
+  '/aioracle/aireq/{request_id}':
     get:
-      summary: QueryAIRequest gets the ai request meta data
-      operationId: QueryAIRequest
+      summary: QueryAIOracle gets the ai request meta data
+      operationId: QueryAIOracle
       responses:
         '200':
           description: A successful response.
@@ -29581,8 +29581,8 @@ paths:
                 type: string
                 format: byte
             title: >-
-              QueryAIRequestRes is the response type for the
-              Query/QueryAIRequest RPC method
+              QueryAIOracleRes is the response type for the
+              Query/QueryAIOracle RPC method
         default:
           description: An unexpected error response.
           schema:
@@ -29612,10 +29612,10 @@ paths:
           type: string
       tags:
         - Query
-  /airequest/aireqs:
+  /aioracle/aireqs:
     get:
-      summary: QueryAIRequestIDs gets the list of ai requests
-      operationId: QueryAIRequestIDs
+      summary: QueryAIOracleIDs gets the list of ai requests
+      operationId: QueryAIOracleIDs
       responses:
         '200':
           description: A successful response.
@@ -29627,8 +29627,8 @@ paths:
                 items:
                   type: string
             title: >-
-              QueryAIRequestIDsRes is the response type for the
-              Query/QueryAIRequestIDs RPC method
+              QueryAIOracleIDsRes is the response type for the
+              Query/QueryAIOracleIDs RPC method
         default:
           description: An unexpected error response.
           schema:
@@ -50587,7 +50587,7 @@ definitions:
 
               chain.
     description: QueryParamsResponse is the response type for the Query/Params RPC method.
-  oraichain.orai.airequest.QueryAIRequestIDsRes:
+  oraichain.orai.aioracle.QueryAIOracleIDsRes:
     type: object
     properties:
       request_ids:
@@ -50595,9 +50595,9 @@ definitions:
         items:
           type: string
     title: >-
-      QueryAIRequestIDsRes is the response type for the Query/QueryAIRequestIDs
+      QueryAIOracleIDsRes is the response type for the Query/QueryAIOracleIDs
       RPC method
-  oraichain.orai.airequest.QueryAIRequestRes:
+  oraichain.orai.aioracle.QueryAIOracleRes:
     type: object
     properties:
       request_id:
@@ -50707,7 +50707,7 @@ definitions:
         type: string
         format: byte
     title: >-
-      QueryAIRequestRes is the response type for the Query/QueryAIRequest RPC
+      QueryAIOracleRes is the response type for the Query/QueryAIOracle RPC
       method
   oraichain.orai.provider.AIDataSource:
     type: object
@@ -50767,7 +50767,7 @@ definitions:
 
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
-  oraichain.orai.airequest.AIRequest:
+  oraichain.orai.aioracle.AIOracle:
     type: object
     properties:
       request_id:
@@ -50876,7 +50876,7 @@ definitions:
       expected_output:
         type: string
         format: byte
-  oraichain.orai.airesult.AIRequestResult:
+  oraichain.orai.airesult.AIOracleResult:
     type: object
     properties:
       request_id:

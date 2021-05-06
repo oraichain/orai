@@ -80,10 +80,10 @@ Init smart contracts and create an AI request. To run the script, your current d
 Eg: ./scripts/deploy_ai_services.sh classification,cv009 classification_testcase classification_oscript '' '' '{"ai_data_source":["classification","cv009"],"testcase":["classification_testcase"]}' 1 /workspace/oraiwasm 123456789
 
 # open another terminal and run
-oraid tx airequest set-aireq oscript_price "5" "6" 30000orai 1 --from $USER --chain-id $CHAIN_ID -y
+oraid tx aioracle set-aireq oscript_price "5" "6" 30000orai 1 --from $USER --chain-id $CHAIN_ID -y
 
 # interact with the AI services
-oraid tx airequest set-aireq classification_oscript '{"image":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfx__RoRYzLDgXDiJxYGxLihJC4zoqV3V0xg&usqp=CAU","model":"inception_v3","name":"test_image"}' "6" 30000orai 1 --from $USER --chain-id $CHAIN_ID -y
+oraid tx aioracle set-aireq classification_oscript '{"image":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfx__RoRYzLDgXDiJxYGxLihJC4zoqV3V0xg&usqp=CAU","model":"inception_v3","name":"test_image"}' "6" 30000orai 1 --from $USER --chain-id $CHAIN_ID -y
 
 # Check if the AI request has finished executing
 oraid query airesult fullreq <request-id>
@@ -94,7 +94,7 @@ Most of the time, the initial inputs for data sources and test cases are unecess
 
 ## Run test
 
-`make test-method PACKAGE=github.com/oraichain/orai/x/airequest/keeper METHOD=TestCalucateMol`
+`make test-method PACKAGE=github.com/oraichain/orai/x/aioracle/keeper METHOD=TestCalucateMol`
 
 ## Build docker image
 

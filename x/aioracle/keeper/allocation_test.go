@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/oraichain/orai/x/aioracle"
-	aioraclekeeper "github.com/oraichain/orai/x/aioracle/keeper"
+	aiOraclekeeper "github.com/oraichain/orai/x/aioracle/keeper"
 	"github.com/oraichain/orai/x/aioracle/types"
 	"github.com/segmentio/ksuid"
 	"github.com/stretchr/testify/require"
@@ -17,7 +17,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/staking/teststaking"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	aioracletypes "github.com/oraichain/orai/x/aioracle/types"
+	aiOracletypes "github.com/oraichain/orai/x/aioracle/types"
 )
 
 var (
@@ -108,18 +108,18 @@ func TestAllocateTokensToManyValidators(t *testing.T) {
 		},
 	}
 
-	testKeeper := aioraclekeeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName), app.StakingKeeper, app.BankKeeper, app.AccountKeeper, app.DistrKeeper, feeCollector.GetName())
+	testKeeper := aiOraclekeeper.NewKeeper(app.AppCodec(), app.GetKey("staking"), nil, app.GetSubspace(stakingtypes.ModuleName), app.StakingKeeper, app.BankKeeper, app.AccountKeeper, app.DistrKeeper, feeCollector.GetName())
 
 	id := ksuid.New().String()
 	testKeeper.SetAIOracle(ctx, id, &aioracle.AIOracle{RequestID: id})
 
-	aioracleTest, err := testKeeper.GetAIOracle(ctx, id)
+	aiOracleTest, err := testKeeper.GetAIOracle(ctx, id)
 
 	require.NoError(t, err)
-	require.Equal(t, &aioracle.AIOracle{RequestID: id}, aioracleTest)
+	require.Equal(t, &aioracle.AIOracle{RequestID: id}, aiOracleTest)
 
 	// init reward
-	reward := aioracletypes.DefaultReward(0)
+	reward := aiOracletypes.DefaultReward(0)
 
 	// init data sources
 	firstDataSource := types.NewResult(&types.EntryPoint{"", []string{}, addrs[1], sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(5)))}, []byte{}, "good")
@@ -138,9 +138,9 @@ func TestAllocateTokensToManyValidators(t *testing.T) {
 	// set validators
 	rewardRatio := sdk.NewDec(int64(1)).Sub(sdk.NewDecWithPrec(int64(60), 2))
 	valFees, _ := sdk.NewDecCoinsFromCoins(reward.BaseReward.ProviderFees...).MulDec(rewardRatio).TruncateDecimal()
-	validatorA := &aioracletypes.Validator{valAddrs[7], abciValA.Power, "active"}
-	validatorB := &aioracletypes.Validator{valAddrs[8], abciValB.Power, "active"}
-	validatorC := &aioracletypes.Validator{valAddrs[9], abciValC.Power, "active"}
+	validatorA := &aiOracletypes.Validator{valAddrs[7], abciValA.Power, "active"}
+	validatorB := &aiOracletypes.Validator{valAddrs[8], abciValB.Power, "active"}
+	validatorC := &aiOracletypes.Validator{valAddrs[9], abciValC.Power, "active"}
 	// should be 15.6 ORAI
 	reward.BaseReward.ValidatorFees = reward.BaseReward.ValidatorFees.Add(valFees...).Add(valFees...).Add(valFees...)
 	reward.BaseReward.TotalPower = reward.BaseReward.TotalPower + validatorA.VotingPower + validatorB.VotingPower + validatorC.VotingPower

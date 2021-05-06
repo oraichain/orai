@@ -91,12 +91,14 @@ func NewAIOracleResult(
 func NewQueryFullRequestRes(
 	AIOracle AIOracle,
 	reports []Report,
+	tcReports []TestCaseReport,
 	result AIOracleResult,
 ) *QueryFullOracleRes {
 	return &QueryFullOracleRes{
-		AIOracle: AIOracle,
-		Reports:  reports,
-		Result:   result,
+		AIOracle:        AIOracle,
+		Reports:         reports,
+		TestcaseReports: tcReports,
+		Result:          result,
 	}
 }
 
@@ -150,12 +152,14 @@ func NewReport(
 	aggregatedResult []byte,
 	valAddress sdk.ValAddress,
 	status string,
+	fees sdk.Coins,
 ) *Report {
 	return &Report{
 		BaseReport: &BaseReport{
 			RequestId:        requestID,
 			ValidatorAddress: valAddress,
 			BlockHeight:      blockHeight,
+			Fees:             fees,
 		},
 		DataSourceResults: dataSourceResults,
 		AggregatedResult:  aggregatedResult,
@@ -168,12 +172,14 @@ func NewTestCaseReport(
 	results []*ResultWithTestCase,
 	blockHeight int64,
 	valAddress sdk.ValAddress,
+	fees sdk.Coins,
 ) *TestCaseReport {
 	return &TestCaseReport{
 		BaseReport: &BaseReport{
 			RequestId:        requestID,
 			ValidatorAddress: valAddress,
 			BlockHeight:      blockHeight,
+			Fees:             fees,
 		},
 		ResultsWithTestCase: results,
 	}

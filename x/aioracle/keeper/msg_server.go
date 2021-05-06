@@ -7,6 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/oraichain/orai/x/aioracle/types"
+	aioracle "github.com/oraichain/orai/x/aioracle/types"
 )
 
 type msgServer struct {
@@ -46,7 +47,7 @@ func (k msgServer) CreateAIOracle(goCtx context.Context, msg *types.MsgSetAIOrac
 	// we can safely parse fees to coins since we have validated it in the Msg already
 	providedFees, _ := sdk.ParseCoinsNormalized(msg.Fees)
 
-	requiredFees, err := k.querier.calculateMinimumFees(ctx, msg.TestOnly, contract, len(validators))
+	requiredFees, err := k.querier.keeper.calculateMinimumFees(ctx, msg.TestOnly, contract, len(validators))
 	if err != nil {
 		return nil, sdkerrors.Wrap(types.ErrQueryMinFees, fmt.Sprintf("Error getting minimum fees from oracle script with err: %v", err))
 	}
@@ -100,4 +101,120 @@ func (k msgServer) CreateAIOracle(goCtx context.Context, msg *types.MsgSetAIOrac
 		msg.GetCreator(), request.GetFees().String(), msg.GetValidatorCount(),
 		request.GetInput(), request.GetTestOnly(),
 	), nil
+}
+
+func (k *Keeper) calculateMinimumFees(ctx sdk.Context, isTestOnly bool, contractAddr sdk.AccAddress, numVal int) (sdk.Coins, error) {
+	querier := NewQuerier(k)
+	goCtx := sdk.WrapSDKContext(ctx)
+	entries := &types.ResponseEntryPointContract{}
+	var err error
+	if isTestOnly {
+		entries, err = querier.TestCaseEntries(goCtx, &types.QueryTestCaseEntriesContract{
+			Contract: contractAddr,
+			Request:  &types.EmptyParams{},
+		})
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		entries, err = querier.DataSourceEntries(goCtx, &types.QueryDataSourceEntriesContract{
+			Contract: contractAddr,
+			Request:  &types.EmptyParams{},
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+	fmt.Println("entries: ", entries)
+	minFees := sdk.Coins{}
+	for _, entry := range entries.GetData() {
+		minFees = minFees.Add(entry.GetProviderFees()...)
+	}
+	valFees := k.CalculateValidatorFees(ctx, minFees)
+	minFees = minFees.Add(valFees...)
+	// since there are more than 1 validator, we need to multiply those fees
+	minFees, _ = sdk.NewDecCoinsFromCoins(minFees...).MulDec(sdk.NewDec(int64(numVal))).TruncateDecimal()
+	return minFees, nil
+}
+
+// this handler will be triggered when the websocket create a MsgCreateReport
+func (m msgServer) CreateReport(goCtx context.Context, msg *types.MsgCreateReport) (*types.MsgCreateReportRes, error) {
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if m.querier.keeper.HasReport(ctx, msg.BaseReport.GetRequestId(), msg.BaseReport.GetValidatorAddress()) {
+		return nil, fmt.Errorf("Error: Validator already reported")
+	}
+
+	request, err := m.querier.keeper.GetAIOracle(ctx, msg.BaseReport.GetRequestId())
+	if err != nil {
+		return nil, fmt.Errorf("Error: Cannot find AI request")
+	}
+
+	if m.ValidateReport(ctx, msg.BaseReport.GetValidatorAddress(), request) != nil {
+		return nil, fmt.Errorf("Error: cannot find reporter in the AI request")
+	}
+
+	report := types.NewReport(msg.BaseReport.GetRequestId(), msg.DataSourceResults, ctx.BlockHeight(), msg.AggregatedResult, msg.BaseReport.GetValidatorAddress(), msg.ResultStatus, msg.BaseReport.GetFees())
+
+	// call keeper
+	err = m.querier.keeper.SetReport(ctx, msg.BaseReport.GetRequestId(), report)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgCreateReportRes{
+		BaseReport: &aioracle.BaseReport{
+			RequestId:        msg.BaseReport.GetRequestId(),
+			ValidatorAddress: msg.BaseReport.ValidatorAddress,
+			Fees:             msg.BaseReport.Fees,
+		},
+		DataSourceResults: msg.GetDataSourceResults(),
+		AggregatedResult:  msg.GetAggregatedResult(),
+		ResultStatus:      msg.GetResultStatus(),
+	}, nil
+}
+
+// this handler will be triggered when the websocket create a MsgCreateReport
+func (m msgServer) CreateTestCaseReport(goCtx context.Context, msg *types.MsgCreateTestCaseReport) (*types.MsgCreateTestCaseReportRes, error) {
+
+	ctx := sdk.UnwrapSDKContext(goCtx)
+	if m.querier.keeper.HasTestCaseReport(ctx, msg.BaseReport.GetRequestId(), msg.BaseReport.GetValidatorAddress()) {
+		return nil, fmt.Errorf("Error: Validator already reported")
+	}
+
+	request, err := m.querier.keeper.GetAIOracle(ctx, msg.BaseReport.GetRequestId())
+	if err != nil {
+		return nil, fmt.Errorf("Error: Cannot find AI request")
+	}
+
+	if m.ValidateReport(ctx, msg.BaseReport.GetValidatorAddress(), request) != nil {
+		return nil, fmt.Errorf("Error: cannot find reporter in the AI request")
+	}
+
+	report := types.NewTestCaseReport(msg.BaseReport.GetRequestId(), msg.GetResultsWithTestCase(), ctx.BlockHeight(), msg.BaseReport.GetValidatorAddress(), msg.BaseReport.GetFees())
+
+	// call keeper
+	err = m.querier.keeper.SetTestCaseReport(ctx, msg.BaseReport.GetRequestId(), report)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgCreateTestCaseReportRes{
+		BaseReport: &aioracle.BaseReport{
+			RequestId:        msg.BaseReport.GetRequestId(),
+			ValidatorAddress: msg.BaseReport.ValidatorAddress,
+			Fees:             msg.BaseReport.Fees,
+		},
+		ResultsWithTestCase: msg.GetResultsWithTestCase(),
+	}, nil
+}
+
+// ValidateReport validates if the report is valid to get rewards
+func (k msgServer) ValidateReport(ctx sdk.Context, val sdk.ValAddress, req *aioracle.AIOracle) error {
+	// Check if the validator is in the requested list of validators
+	if !k.querier.ContainsVal(req.GetValidators(), val) {
+		return sdkerrors.Wrap(types.ErrValidatorNotFound, fmt.Sprintln("failed to find the requested validator"))
+	}
+	return nil
 }

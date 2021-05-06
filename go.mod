@@ -6,6 +6,7 @@ require (
 	github.com/CosmWasm/wasmd v0.15.1
 	github.com/cosmos/cosmos-sdk v0.42.3
 	github.com/cosmos/go-bip39 v1.0.0
+	github.com/cosmtrek/air v1.27.3 // indirect
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.4.3
 	github.com/gorilla/mux v1.8.0
@@ -15,6 +16,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/pwaller/goupx v0.0.0-20160623083017-1d58e01d5ce2 // indirect
 	github.com/rakyll/statik v0.1.7
+	github.com/regen-network/cosmos-proto v0.3.1
 	github.com/rs/zerolog v1.20.0
 	github.com/segmentio/ksuid v1.0.3
 	github.com/snikch/goodman v0.0.0-20171125024755-10e37e294daa
