@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
@@ -21,6 +22,7 @@ const (
 	flagRPCPollInterval  = "rpc-poll-interval"
 	flagMaxTry           = "max-try"
 	flagErrExit          = "errexit"
+	flagReqFees          = "request-fees"
 )
 
 // GetTxCmd returns the transaction commands for this module
@@ -122,6 +124,12 @@ func ParseWebSocketConfig(flagSet *pflag.FlagSet) *subscribe.WebSocketConfig {
 		}
 	}
 
+	if v, err := flagSet.GetString(flagReqFees); err == nil {
+		if cfg.RequestFees, err = sdk.ParseCoinsNormalized(v); err != nil {
+			return cfg
+		}
+	}
+
 	return cfg
 }
 
@@ -140,6 +148,7 @@ func GetCmdSubscribe() *cobra.Command {
 
 			cfg := ParseWebSocketConfig(cmd.Flags())
 			cfg.Txf = tx.NewFactoryCLI(clientCtx, cmd.Flags())
+			fmt.Println("node URI: ", clientCtx.NodeURI)
 
 			subscriber := subscribe.NewSubscriber(&clientCtx, cfg)
 			return subscriber.Subscribe()
@@ -150,6 +159,7 @@ func GetCmdSubscribe() *cobra.Command {
 	cmd.Flags().String(flagRPCPollInterval, "1s", "The duration of rpc poll interval")
 	cmd.Flags().Uint64(flagMaxTry, 5, "The maximum number of tries to submit a report transaction")
 	cmd.Flags().Bool(flagErrExit, false, "Exit on error")
+	cmd.Flags().String(flagReqFees, "0orai", "Request fees that you accept to execute an AI request")
 	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }

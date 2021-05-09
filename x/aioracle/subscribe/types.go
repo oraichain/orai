@@ -17,6 +17,7 @@ type WebSocketConfig struct {
 	Txf              tx.Factory
 	AllowLogLevel    log.Option
 	Fees             sdk.Coins
+	RequestFees      sdk.Coins
 	ErrExit          bool
 }
 
@@ -28,5 +29,6 @@ func DefaultWebSocketConfig() *WebSocketConfig {
 		AllowLogLevel:    log.AllowInfo(),
 		ErrExit:          false,
 		Fees:             sdk.NewCoins(sdk.NewCoin(types.Denom, sdk.NewInt(int64(5000)))),
+		RequestFees:      sdk.NewCoins(sdk.NewCoin(types.Denom, sdk.NewInt(int64(0)))),
 	}
 }

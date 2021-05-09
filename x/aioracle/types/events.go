@@ -20,18 +20,9 @@ const (
 
 	AttributeValueCategory = ModuleName
 	// Attribute for request
-	AttributeRequestID        = "request_id"
-	AttributeRequestValidator = "request_validator"
-	AttributeRequestCreator   = "request_creator"
-	// Attributes for oracle script
-	AttributeContract              = "contract"
-	AttributeRequestValidatorCount = "request_validator_count"
-	AttributeRequestInput          = "request_input"
-	AttributeRequestExpectedOutput = "expected_request_output"
-	AttributeRequestDSources       = "data_sources"
-	AttributeRequestTCases         = "test_cases"
-	AttributeBaseReport            = "base_report"
-	AttributeReport                = "report"
-	AttributeTestCaseReport        = "testcase_report"
-	AttributeKeyValidator          = "validator"
+	AttributeRequest        = "request"
+	AttributeBaseReport     = "base_report"
+	AttributeReport         = "report"
+	AttributeTestCaseReport = "testcase_report"
+	AttributeKeyValidator   = "validator"
 )

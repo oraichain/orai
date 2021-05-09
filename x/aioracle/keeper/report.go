@@ -1,6 +1,8 @@
 package keeper
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/oraichain/orai/x/aioracle/types"
 )
@@ -95,4 +97,66 @@ func (k *Keeper) GetTestCaseReportsBlockHeight(ctx sdk.Context) (reports []types
 		}
 	}
 	return reports
+}
+
+func (k *Querier) validateReportBasic(ctx sdk.Context, req *types.AIOracle, rep *types.Report) bool {
+	if len(rep.GetDataSourceResults()) <= 0 || len(rep.GetAggregatedResult()) <= 0 {
+		k.keeper.Logger(ctx).Error(fmt.Sprintf("Report results are invalid: %v", rep))
+		return false
+	}
+	if rep.GetResultStatus() != types.ResultFailure && rep.GetResultStatus() != types.ResultSuccess {
+		k.keeper.Logger(ctx).Error(fmt.Sprintf("Report result status is invalid: %v", rep.GetResultStatus()))
+		return false
+	}
+	var dsResultSize int
+	for _, dsResult := range rep.GetDataSourceResults() {
+		if dsResult.GetStatus() != types.ResultFailure && dsResult.GetStatus() != types.ResultSuccess {
+			k.keeper.Logger(ctx).Error(fmt.Sprintf("Data source result status is invalid: %v", dsResult.GetStatus()))
+			return false
+		}
+		dsResultSize += len(dsResult.Result)
+	}
+	aggregatedResultSize := len(rep.GetAggregatedResult())
+	finalLen := dsResultSize + aggregatedResultSize
+	responseBytes := k.keeper.GetParam(ctx, types.KeyMaximumAIOracleResBytes)
+
+	if finalLen >= int(responseBytes) {
+		k.keeper.Logger(ctx).Error(fmt.Sprintf("Report result size: %v cannot be larger than %v", finalLen, responseBytes))
+		return false
+	}
+
+	return k.validateBasic(ctx, req, rep.BaseReport)
+}
+
+func (k *Querier) validateTestCaseReportBasic(ctx sdk.Context, req *types.AIOracle, rep *types.TestCaseReport) bool {
+	if len(rep.GetResultsWithTestCase()) <= 0 {
+		k.keeper.Logger(ctx).Error(fmt.Sprintf("Report results are invalid: %v", rep))
+		return false
+	}
+	var tcResultSize int
+	for _, result := range rep.GetResultsWithTestCase() {
+		for _, tcResult := range result.GetTestCaseResults() {
+			if tcResult.GetStatus() != types.ResultFailure && tcResult.GetStatus() != types.ResultSuccess {
+				k.keeper.Logger(ctx).Error(fmt.Sprintf("Report result status is invalid: %v", tcResult.GetStatus()))
+				return false
+			}
+			tcResultSize += len(tcResult.GetResult())
+		}
+	}
+	responseBytes := k.keeper.GetParam(ctx, types.KeyMaximumAIOracleResBytes)
+
+	if tcResultSize >= int(responseBytes) {
+		k.keeper.Logger(ctx).Error(fmt.Sprintf("Report result size: %v cannot be larger than %v", tcResultSize, int(responseBytes)))
+		return false
+	}
+	return k.validateBasic(ctx, req, rep.BaseReport)
+}
+
+func isValidator(vals []sdk.ValAddress, valAddr sdk.ValAddress) bool {
+	for _, val := range vals {
+		if val.Equals(valAddr) {
+			return true
+		}
+	}
+	return false
 }

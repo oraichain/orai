@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -77,22 +78,20 @@ func (k msgServer) CreateAIOracle(goCtx context.Context, msg *types.MsgSetAIOrac
 
 	k.querier.keeper.SetAIOracle(ctx, request.RequestID, request)
 
-	// TODO: Define your msg events
+	requestBytes, err := json.Marshal(request)
+	if err != nil {
+		return nil, sdkerrors.Wrap(types.ErrRequestInvalid, fmt.Sprintf("Cannot marshal request %v with error: %v", request, err))
+	}
 	// Emit an event describing a data request and asked validators.
+	eventKey := types.AttributeReport
+	if msg.TestOnly == true {
+		eventKey = types.AttributeBaseReport
+	}
 	event := sdk.NewEvent(types.EventTypeRequestWithData)
 	event = event.AppendAttributes(
-		sdk.NewAttribute(types.AttributeRequestID, string(request.RequestID[:])),
-		sdk.NewAttribute(types.AttributeContract, request.Contract.String()),
-		sdk.NewAttribute(types.AttributeRequestCreator, creator.String()),
-		sdk.NewAttribute(types.AttributeRequestValidatorCount, fmt.Sprint(msg.ValidatorCount)),
-		sdk.NewAttribute(types.AttributeRequestInput, string(msg.Input)),
+		sdk.NewAttribute(types.AttributeRequest, string(requestBytes)),
+		sdk.NewAttribute(eventKey, "report types"),
 	)
-
-	for _, validator := range validators {
-		event = event.AppendAttributes(
-			sdk.NewAttribute(types.AttributeRequestValidator, validator.String()),
-		)
-	}
 
 	ctx.EventManager().EmitEvent(event)
 
@@ -151,11 +150,15 @@ func (m msgServer) CreateReport(goCtx context.Context, msg *types.MsgCreateRepor
 		return nil, fmt.Errorf("Error: Cannot find AI request")
 	}
 
-	if m.ValidateReport(ctx, msg.BaseReport.GetValidatorAddress(), request) != nil {
-		return nil, fmt.Errorf("Error: cannot find reporter in the AI request")
+	if !m.querier.ContainsVal(request.GetValidators(), msg.BaseReport.GetValidatorAddress()) {
+		return nil, sdkerrors.Wrap(types.ErrValidatorNotFound, fmt.Sprintln("Failed to find the requested validator"))
 	}
 
 	report := types.NewReport(msg.BaseReport.GetRequestId(), msg.DataSourceResults, ctx.BlockHeight(), msg.AggregatedResult, msg.BaseReport.GetValidatorAddress(), msg.ResultStatus, msg.BaseReport.GetFees())
+
+	if !m.querier.validateReportBasic(ctx, request, report) {
+		return nil, sdkerrors.Wrap(types.ErrMsgReportInvalid, "Report does not pass the validation step")
+	}
 
 	// call keeper
 	err = m.querier.keeper.SetReport(ctx, msg.BaseReport.GetRequestId(), report)
@@ -188,11 +191,15 @@ func (m msgServer) CreateTestCaseReport(goCtx context.Context, msg *types.MsgCre
 		return nil, fmt.Errorf("Error: Cannot find AI request")
 	}
 
-	if m.ValidateReport(ctx, msg.BaseReport.GetValidatorAddress(), request) != nil {
-		return nil, fmt.Errorf("Error: cannot find reporter in the AI request")
+	if !m.querier.ContainsVal(request.GetValidators(), msg.BaseReport.GetValidatorAddress()) {
+		return nil, sdkerrors.Wrap(types.ErrValidatorNotFound, fmt.Sprintln("Failed to find the requested validator"))
 	}
 
 	report := types.NewTestCaseReport(msg.BaseReport.GetRequestId(), msg.GetResultsWithTestCase(), ctx.BlockHeight(), msg.BaseReport.GetValidatorAddress(), msg.BaseReport.GetFees())
+
+	if !m.querier.validateTestCaseReportBasic(ctx, request, report) {
+		return nil, sdkerrors.Wrap(types.ErrMsgReportInvalid, "Test case report does not pass the validation step")
+	}
 
 	// call keeper
 	err = m.querier.keeper.SetTestCaseReport(ctx, msg.BaseReport.GetRequestId(), report)
@@ -208,13 +215,4 @@ func (m msgServer) CreateTestCaseReport(goCtx context.Context, msg *types.MsgCre
 		},
 		ResultsWithTestCase: msg.GetResultsWithTestCase(),
 	}, nil
-}
-
-// ValidateReport validates if the report is valid to get rewards
-func (k msgServer) ValidateReport(ctx sdk.Context, val sdk.ValAddress, req *aioracle.AIOracle) error {
-	// Check if the validator is in the requested list of validators
-	if !k.querier.ContainsVal(req.GetValidators(), val) {
-		return sdkerrors.Wrap(types.ErrValidatorNotFound, fmt.Sprintln("failed to find the requested validator"))
-	}
-	return nil
 }

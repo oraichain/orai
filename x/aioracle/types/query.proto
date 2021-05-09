@@ -68,6 +68,11 @@ service Query {
     rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
       option (google.api.http).get = "/cosmos/aioracle/v1beta1/params";
     }
+
+    // Parameters queries the staking parameters.
+    rpc Param(QueryParamRequest) returns (QueryParamResponse) {
+      option (google.api.http).get = "/cosmos/aioracle/v1beta1/param/{param}";
+    }
 }
 
 // QueryAIOracleReq is the request type for the Query/QueryAIOracle RPC method
@@ -253,4 +258,15 @@ message QueryParamsRequest {}
 message QueryParamsResponse {
   // params holds all the parameters of this module.
   Params params = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryParamRequest is request type for the Query/Param RPC method.
+message QueryParamRequest {
+  string param = 1;
+}
+
+// QueryParamsResponse is response type for the Query/Param RPC method.
+message QueryParamResponse {
+  // params holds all the parameters of this module.
+  uint64 param = 1;
 }

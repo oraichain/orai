@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -74,9 +73,12 @@ func (k *Querier) DataSourceContract(goCtx context.Context, req *types.QueryData
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	contractReq := k.keeper.Cdc.MustMarshalJSON(&types.QueryDataSourceSmartContract{
+	contractReq, err := k.keeper.Cdc.MarshalJSON(&types.QueryDataSourceSmartContract{
 		Get: req.Request,
 	})
+	if err != nil {
+		return nil, err
+	}
 	result, err := k.keeper.QueryContract(ctx, req.Contract, contractReq)
 	return &types.ResponseContract{
 		Data: result,
@@ -91,10 +93,12 @@ func (k *Querier) TestCaseContract(goCtx context.Context, req *types.QueryTestCa
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	contractReq := k.keeper.Cdc.MustMarshalJSON(&types.QueryTestCaseSmartContract{
+	contractReq, err := k.keeper.Cdc.MarshalJSON(&types.QueryTestCaseSmartContract{
 		Test: req.Request,
 	})
-
+	if err != nil {
+		return nil, err
+	}
 	result, err := k.keeper.QueryContract(ctx, req.Contract, contractReq)
 	return &types.ResponseContract{
 		Data: result,
@@ -109,10 +113,12 @@ func (k *Querier) OracleScriptContract(goCtx context.Context, req *types.QueryOr
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	contractReq := k.keeper.Cdc.MustMarshalJSON(&types.QueryOracleScriptSmartContract{
+	contractReq, err := k.keeper.Cdc.MarshalJSON(&types.QueryOracleScriptSmartContract{
 		Aggregate: req.Request,
 	})
-
+	if err != nil {
+		return nil, err
+	}
 	result, err := k.keeper.QueryContract(ctx, req.Contract, contractReq)
 	return &types.ResponseContract{
 		Data: result,
@@ -127,10 +133,12 @@ func (k *Querier) DataSourceEntries(goCtx context.Context, req *types.QueryDataS
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	contractReq := k.keeper.Cdc.MustMarshalJSON(&types.QueryDataSourceEntriesSmartContract{
+	contractReq, err := k.keeper.Cdc.MarshalJSON(&types.QueryDataSourceEntriesSmartContract{
 		GetDataSources: req.Request,
 	})
-
+	if err != nil {
+		return nil, err
+	}
 	result, err := k.keeper.QueryContract(ctx, req.Contract, contractReq)
 	if err != nil {
 		return nil, err
@@ -151,10 +159,12 @@ func (k *Querier) TestCaseEntries(goCtx context.Context, req *types.QueryTestCas
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	contractReq := k.keeper.Cdc.MustMarshalJSON(&types.QueryTestCaseEntriesSmartContract{
+	contractReq, err := k.keeper.Cdc.MarshalJSON(&types.QueryTestCaseEntriesSmartContract{
 		GetTestCases: req.Request,
 	})
-
+	if err != nil {
+		return nil, err
+	}
 	result, err := k.keeper.QueryContract(ctx, req.Contract, contractReq)
 	if err != nil {
 		return nil, err
@@ -302,6 +312,13 @@ func (k *Querier) Params(c context.Context, _ *types.QueryParamsRequest) (*types
 	return &types.QueryParamsResponse{Params: params}, nil
 }
 
+// Params queries the staking parameters
+func (k *Querier) Param(c context.Context, paramReq *types.QueryParamRequest) (*types.QueryParamResponse, error) {
+	ctx := sdk.UnwrapSDKContext(c)
+	resp := k.keeper.GetParam(ctx, []byte(paramReq.Param))
+	return &types.QueryParamResponse{Param: resp}, nil
+}
+
 // containsVal returns whether the given slice of validators contains the target validator.
 func (k *Querier) ContainsVal(vals []sdk.ValAddress, target sdk.ValAddress) bool {
 	for _, val := range vals {
@@ -310,105 +327,6 @@ func (k *Querier) ContainsVal(vals []sdk.ValAddress, target sdk.ValAddress) bool
 		}
 	}
 	return false
-}
-
-func (k *Querier) ExecuteAIOracles(ctx sdk.Context, valAddress sdk.ValAddress) {
-	aiOracles := k.keeper.GetAIOraclesBlockHeight(ctx)
-	if len(aiOracles) == 0 {
-		return
-	}
-	// execute each ai oracle request
-	for _, aiOracle := range aiOracles {
-		// if the ai oracle request does not include the validator address, then we skip
-		if !isValidator(aiOracle.GetValidators(), valAddress) {
-			continue
-		}
-		if aiOracle.TestOnly {
-			k.executeAIOracleTestOnly(ctx, aiOracle, valAddress)
-			continue
-		}
-		k.executeAIOracle(ctx, aiOracle, valAddress)
-	}
-}
-
-func (k *Querier) executeAIOracle(ctx sdk.Context, aiOracle types.AIOracle, valAddress sdk.ValAddress) {
-	// querier to interact with the wasm contract
-	goCtx := sdk.WrapSDKContext(ctx)
-	var dataSourceResults []*types.Result
-	var resultArr = []string{}
-	// collect list entries to get entry length
-	entries, err := k.DataSourceEntries(goCtx, &types.QueryDataSourceEntriesContract{
-		Contract: aiOracle.GetContract(),
-		Request:  &types.EmptyParams{},
-	})
-	if err != nil {
-		ctx.Logger().Error(fmt.Sprintf("Cannot get data source entries for the given request contract: %v with error: %v", aiOracle.GetContract(), err))
-		return
-	}
-
-	// if there's no data source we stop executing and return no report
-	if len(entries.GetData()) <= 0 {
-		ctx.Logger().Error(fmt.Sprintf("The data source entry list is empty"))
-		return
-	}
-
-	// loop to execute data source one by one
-	for _, entry := range entries.GetData() {
-		// run the data source script
-		ctx.Logger().Info(fmt.Sprintf("Data source entrypoint: %v and input: %v", entry, string(aiOracle.GetInput())))
-		result, err := k.DataSourceContract(goCtx, &types.QueryDataSourceContract{
-			Contract: aiOracle.GetContract(),
-			Request: &types.RequestDataSource{
-				Dsource: entry,
-				Input:   string(aiOracle.GetInput()),
-			},
-		})
-		// By default, we consider returning null as failure. If any datasource does not follow this rule then it should not be used by any oracle scripts.
-		dataSourceResult := types.NewResult(entry, result.GetData(), types.ResultSuccess)
-		if err != nil {
-			ctx.Logger().Error(fmt.Sprintf("Cannot execute given data source %v with error: %v", entry.Url, err))
-			// change status to fail so the datasource cannot be rewarded afterwards
-			dataSourceResult.Status = types.ResultFailure
-			dataSourceResult.Result = []byte(types.FailedResponseDs)
-			continue
-		}
-		resultArr = append(resultArr, string(result.Data))
-		// append an data source result into the list
-		dataSourceResults = append(dataSourceResults, dataSourceResult)
-	}
-
-	// store report into blockchain as proof for executing AI requests
-	report := types.NewReport(aiOracle.GetRequestID(), dataSourceResults, ctx.BlockHeight(), []byte{}, valAddress, types.ResultSuccess, sdk.NewCoins(sdk.NewCoin(types.Denom, sdk.NewInt(0))))
-
-	ctx.Logger().Info(fmt.Sprintf("results collected from the data sources: %v", resultArr))
-	aggregatedResult, err := k.OracleScriptContract(goCtx, &types.QueryOracleScriptContract{
-		Contract: aiOracle.GetContract(),
-		Request: &types.RequestOracleScript{
-			Results: resultArr,
-		},
-	})
-	if err != nil {
-		ctx.Logger().Error(fmt.Sprintf("Cannot execute oracle script contract %v with error: %v", aiOracle.GetContract(), err))
-		report.AggregatedResult = []byte(types.FailedResponseOs)
-		report.ResultStatus = types.ResultFailure
-	} else {
-		report.AggregatedResult = aggregatedResult.Data
-	}
-	ctx.Logger().Info(fmt.Sprintf("Oracle script final result: %v", aggregatedResult))
-	reportBytes, err := json.Marshal(report)
-	if err != nil {
-		ctx.Logger().Error(fmt.Sprintf("Cannot marshal report %v with error: %v", report, err))
-	}
-	// verify basic report information to make sure the report is stored in a valid manner
-	if k.validateReportBasic(ctx, &aiOracle, report, report.BaseReport.GetBlockHeight()) {
-		event := sdk.NewEvent(types.EventTypeReportWithData)
-		event = event.AppendAttributes(
-			sdk.NewAttribute(types.AttributeReport, string(reportBytes[:])),
-		)
-		ctx.EventManager().Events().AppendEvent(event)
-		ctx.EventManager().EmitEvent(event)
-		ctx.Logger().Info(fmt.Sprintf("Finish handling the AI oracles with report: %v", report))
-	}
 }
 
 func (k *Querier) validateBasic(ctx sdk.Context, req *types.AIOracle, rep *types.BaseReport) bool {
@@ -427,139 +345,4 @@ func (k *Querier) validateBasic(ctx sdk.Context, req *types.AIOracle, rep *types
 		return false
 	}
 	return true
-}
-
-func (k *Querier) validateReportBasic(ctx sdk.Context, req *types.AIOracle, rep *types.Report, blockHeight int64) bool {
-	if len(rep.GetDataSourceResults()) <= 0 || len(rep.GetAggregatedResult()) <= 0 {
-		k.keeper.Logger(ctx).Error(fmt.Sprintf("Report results are invalid: %v", rep))
-		return false
-	}
-	if rep.GetResultStatus() != types.ResultFailure && rep.GetResultStatus() != types.ResultSuccess {
-		k.keeper.Logger(ctx).Error(fmt.Sprintf("Report result status is invalid: %v", rep.GetResultStatus()))
-		return false
-	}
-	var dsResultSize int
-	for _, dsResult := range rep.GetDataSourceResults() {
-		if dsResult.GetStatus() != types.ResultFailure && dsResult.GetStatus() != types.ResultSuccess {
-			k.keeper.Logger(ctx).Error(fmt.Sprintf("Data source result status is invalid: %v", dsResult.GetStatus()))
-			return false
-		}
-		dsResultSize += len(dsResult.Result)
-	}
-	aggregatedResultSize := len(rep.GetAggregatedResult())
-	finalLen := dsResultSize + aggregatedResultSize
-	responseBytes := k.keeper.GetParam(ctx, types.KeyMaximumAIOracleResBytes)
-
-	if finalLen >= int(responseBytes) {
-		k.keeper.Logger(ctx).Error(fmt.Sprintf("Report result size: %v cannot be larger than %v", finalLen, responseBytes))
-		return false
-	}
-
-	return k.validateBasic(ctx, req, rep.BaseReport)
-}
-
-func (k *Querier) executeAIOracleTestOnly(ctx sdk.Context, aiOracle types.AIOracle, valAddress sdk.ValAddress) {
-	// querier to interact with the wasm contract
-	goCtx := sdk.WrapSDKContext(ctx)
-	var resultsWithTc []*types.ResultWithTestCase
-	// collect list entries to get entry length
-	entries, err := k.DataSourceEntries(goCtx, &types.QueryDataSourceEntriesContract{
-		Contract: aiOracle.GetContract(),
-		Request:  &types.EmptyParams{},
-	})
-	if err != nil {
-		ctx.Logger().Error(fmt.Sprintf("Cannot get data source entries for the given request contract: %v with error: %v", aiOracle.GetContract(), err))
-		return
-	}
-	tCaseEntries, err := k.TestCaseEntries(goCtx, &types.QueryTestCaseEntriesContract{
-		Contract: aiOracle.GetContract(),
-		Request:  &types.EmptyParams{},
-	})
-	if err != nil {
-		ctx.Logger().Error(fmt.Sprintf("Cannot get test case entries for the given request contract: %v with error: %v", aiOracle.GetContract(), err))
-		return
-	}
-
-	// if there's no data source or test case then we stop executing
-	if len(entries.GetData()) <= 0 || len(tCaseEntries.GetData()) <= 0 {
-		ctx.Logger().Error(fmt.Sprintf("The data source or test case entry list is empty"))
-		return
-	}
-
-	// loop to execute data source one by one
-	for _, entry := range entries.GetData() {
-		var results []*types.Result
-		for _, tCaseEntry := range tCaseEntries.GetData() {
-			// run the data source script
-			ctx.Logger().Info(fmt.Sprintf("Data source entrypoint: %v and input: %v", entry, string(aiOracle.GetInput())))
-			ctx.Logger().Info(fmt.Sprintf("Testcase entrypoint: %v", tCaseEntry))
-			result, err := k.TestCaseContract(goCtx, &types.QueryTestCaseContract{
-				Contract: aiOracle.GetContract(),
-				Request: &types.RequestTestCase{
-					Tcase: tCaseEntry,
-					Input: entry,
-				},
-			})
-			tCaseResult := types.NewResult(tCaseEntry, []byte{}, types.ResultSuccess)
-			if err != nil {
-				ctx.Logger().Error(fmt.Sprintf("Cannot execute test case %v with error: %v", tCaseEntry.Url, err))
-				tCaseResult.Result = []byte(types.FailedResponseTc)
-				tCaseResult.Status = types.ResultFailure
-				results = append(results, tCaseResult)
-				continue
-			}
-			tCaseResult.Result = result.GetData()
-			results = append(results, tCaseResult)
-		}
-		resultWithTc := types.NewResultWithTestCase(entry, results, types.ResultSuccess)
-		resultsWithTc = append(resultsWithTc, resultWithTc)
-	}
-	// store report into blockchain as proof for executing AI requests
-	report := types.NewTestCaseReport(aiOracle.GetRequestID(), resultsWithTc, ctx.BlockHeight(), valAddress, sdk.NewCoins(sdk.NewCoin(types.Denom, sdk.NewInt(0))))
-	reportBytes, err := json.Marshal(report)
-	if err != nil {
-		ctx.Logger().Error(fmt.Sprintf("Cannot marshal report %v with error: %v", report, err))
-	}
-	if k.validateTestCaseReportBasic(ctx, &aiOracle, report, report.BaseReport.GetBlockHeight()) {
-		event := sdk.NewEvent(types.EventTypeReportWithData)
-		event = event.AppendAttributes(
-			sdk.NewAttribute(types.AttributeTestCaseReport, string(reportBytes[:])),
-		)
-		ctx.EventManager().Events().AppendEvent(event)
-		ctx.EventManager().EmitEvent(event)
-		ctx.Logger().Info(fmt.Sprintf("Finish handling the test AI oracles with report: %v", report))
-	}
-}
-
-func (k *Querier) validateTestCaseReportBasic(ctx sdk.Context, req *types.AIOracle, rep *types.TestCaseReport, blockHeight int64) bool {
-	if len(rep.GetResultsWithTestCase()) <= 0 {
-		k.keeper.Logger(ctx).Error(fmt.Sprintf("Report results are invalid: %v", rep))
-		return false
-	}
-	var tcResultSize int
-	for _, result := range rep.GetResultsWithTestCase() {
-		for _, tcResult := range result.GetTestCaseResults() {
-			if tcResult.GetStatus() != types.ResultFailure && tcResult.GetStatus() != types.ResultSuccess {
-				k.keeper.Logger(ctx).Error(fmt.Sprintf("Report result status is invalid: %v", tcResult.GetStatus()))
-				return false
-			}
-			tcResultSize += len(tcResult.GetResult())
-		}
-	}
-	responseBytes := k.keeper.GetParam(ctx, types.KeyMaximumAIOracleResBytes)
-
-	if tcResultSize >= int(responseBytes) {
-		k.keeper.Logger(ctx).Error(fmt.Sprintf("Report result size: %v cannot be larger than %v", tcResultSize, int(responseBytes)))
-		return false
-	}
-	return k.validateBasic(ctx, req, rep.BaseReport)
-}
-
-func isValidator(vals []sdk.ValAddress, valAddr sdk.ValAddress) bool {
-	for _, val := range vals {
-		if val.Equals(valAddr) {
-			return true
-		}
-	}
-	return false
 }

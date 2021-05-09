@@ -5,15 +5,17 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/oraichain/orai/x/aioracle/types"
 	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/crypto/tmhash"
 	tmtypes "github.com/tendermint/tendermint/types"
 	"golang.org/x/sync/errgroup"
 )
 
 const (
 	// TxQuery ...
-	TxQuery        = "tm.event = 'NewBlock'"
+	TxQuery        = "tm.event = 'Tx'"
 	SubscriberName = "txevents"
 	// EventChannelCapacity is a buffer size of channel between node and this program
 	EventChannelCapacity = 5000
@@ -49,16 +51,43 @@ func GetAttributeMap(attrs []abci.EventAttribute) map[string][]string {
 }
 
 // Implementation
-func (subscriber *Subscriber) handleReport(queryClient types.QueryClient, ev abci.Event) error {
-	subscriber.log.Info(":eyes: Inspecting incoming report: %X", ev)
-	for _, attr := range ev.Attributes {
-		if string(attr.Key) == types.AttributeReport {
-			subscriber.submitReport(attr.Value)
-		}
-		if string(attr.Key) == types.AttributeTestCaseReport {
-			subscriber.submitTestCaseReport(attr.Value)
+func (subscriber *Subscriber) handleTransaction(queryClient types.QueryClient, tx *abci.TxResult) error {
+	subscriber.log.Info(":eyes: Inspecting incoming transaction: %X", tmhash.Sum(tx.Tx))
+	if tx.Result.Code != 0 {
+		subscriber.log.Debug(":alien: Skipping transaction with non-zero code: %d", tx.Result.Code)
+		return nil
+	}
+
+	logs, err := sdk.ParseABCILogs(tx.Result.Log)
+	if err != nil {
+		subscriber.log.Error(":cold_sweat: Failed to parse transaction logs with error: %s", err.Error())
+		return err
+	}
+
+	for _, log := range logs {
+		for _, ev := range log.Events {
+			// process with each event type
+			switch ev.Type {
+			case types.EventTypeRequestWithData:
+				msgReportBytes, err := subscriber.handleAIRequestLog(queryClient, ev.Attributes)
+				if err != nil {
+					subscriber.log.Error(":eyes: There is something wrong when handling AI Request: %v", err)
+					return err
+				}
+				// split two functions to do unit test easier an decouple the business logic
+				err = subscriber.handleReport(queryClient, msgReportBytes)
+				break
+			default:
+				subscriber.log.Debug(":ghost: Skipping non-{request/packet} type: %s", ev.Type)
+				break
+			}
+
+			if err != nil {
+				return err
+			}
 		}
 	}
+
 	return nil
 }
 
@@ -101,19 +130,8 @@ func (subscriber *Subscriber) Subscribe() error {
 			case <-ctx.Done():
 				break
 			case ev := <-eventChan:
-				switch dataType := ev.Data.(type) {
-				case tmtypes.EventDataNewBlock:
-					events := dataType.ResultBeginBlock.Events
-					for _, ev := range events {
-						if ev.Type == types.EventTypeReportWithData {
-							err = subscriber.handleReport(queryClient, ev)
-							if err != nil {
-								return nil
-							}
-							break
-						}
-					}
-				}
+				txResult := ev.Data.(tmtypes.EventDataTx).TxResult
+				err = subscriber.handleTransaction(queryClient, &txResult)
 			}
 
 			// check exit on error
