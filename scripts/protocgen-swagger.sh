@@ -1,8 +1,11 @@
 set -eo pipefail
 
 # go get ./...
-# apk add nodejs-current 
-# npm install -g swagger-combine
+
+if [ ! `command -v swagger-combine` ]; then  
+  apk add nodejs-current npm
+  npm install -g swagger-combine
+fi 
 
 BASEDIR=$(dirname $0)
 PROJECTDIR=$BASEDIR/..
