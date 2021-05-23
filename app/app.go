@@ -249,7 +249,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	skipUpgradeHeights map[int64]bool, homePath string, invCheckPeriod uint, enabledProposals []wasm.ProposalType,
 	appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp)) *OraichainApp {
 
-	baseAppOptions = append(baseAppOptions, upgradeLoader(100, &store.StoreUpgrades{
+	baseAppOptions = append(baseAppOptions, upgradeLoader(564999, &store.StoreUpgrades{
 		Added:   []string{"aioracle"},
 		Deleted: []string{"aioracle", "airesult", "provider", "websocket"},
 	}))
@@ -684,7 +684,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 }
 
 func (app *OraichainApp) upgradeHandler() {
-	app.upgradeKeeper.SetUpgradeHandler("v0.3.0", func(ctx sdk.Context, plan upgradetypes.Plan) {
+	app.upgradeKeeper.SetUpgradeHandler("v0.3.1", func(ctx sdk.Context, plan upgradetypes.Plan) {
 		// upgrade changes here
 		// storeUpgrades := &store.StoreUpgrades{
 		// 	Added:   []string{"aioracle"},

@@ -67,7 +67,7 @@ func (k *Querier) ResolveRequestsFromReports(ctx sdk.Context, rep *types.Report,
 	if err != nil {
 		return false, 0
 	}
-	validation := k.validateReportBasic(ctx, req, rep, ctx.BlockHeight())
+	validation := k.validateReportBasic(ctx, req, rep)
 	// if the report cannot pass the validation basic then we skip the rest
 	if !validation {
 		return false, 0
@@ -102,7 +102,7 @@ func (k *Querier) ResolveRequestsFromTestCaseReports(ctx sdk.Context, rep *types
 	if err != nil {
 		return false
 	}
-	validation := k.validateTestCaseReportBasic(ctx, req, rep, ctx.BlockHeight())
+	validation := k.validateTestCaseReportBasic(ctx, req, rep)
 	// if the report cannot pass the validation basic then we skip the rest
 	if !validation {
 		return false

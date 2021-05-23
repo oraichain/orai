@@ -1,10 +1,9 @@
 package subscribe
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -12,22 +11,33 @@ import (
 	"github.com/oraichain/orai/x/aioracle/types"
 )
 
-// SubmitReport creates a new MsgCreateReport and submits it to the Oraichain to create a new report
-func (subscriber *Subscriber) submitReport(msgReportBytes []byte) (err error) {
-	fmt.Println("msg report string: ", string(msgReportBytes))
+func (subscriber *Subscriber) handleReport(queryClient types.QueryClient, msgReportBytes []byte) error {
 	msgReport := &types.MsgCreateReport{BaseReport: &types.BaseReport{}}
-	err = json.Unmarshal(msgReportBytes, &msgReport)
-	if err != nil {
-		subscriber.log.Error(":exploding_head: Failed to parse json with error: %s", err.Error())
-		return err
+	msgTcReport := &types.MsgCreateTestCaseReport{BaseReport: &types.BaseReport{}}
+	errReport := json.Unmarshal(msgReportBytes, msgReport)
+	errTcReport := json.Unmarshal(msgReportBytes, msgTcReport)
+	if errReport != nil {
+		if errTcReport != nil {
+			subscriber.log.Error(":exploding_head: Failed to unmarshal test case report and report with err: %v, %v", errReport, errTcReport)
+			return fmt.Errorf("Cannot unmarshal report")
+		}
+		subscriber.log.Info(":eyes: unmarshal test case report successfully: %v", msgTcReport)
+		subscriber.submitTestCaseReport(queryClient, msgTcReport)
+		return nil
 	}
+	subscriber.submitReport(queryClient, msgReport)
+	return nil
+}
+
+// SubmitReport creates a new MsgCreateReport and submits it to the Oraichain to create a new report
+func (subscriber *Subscriber) submitReport(queryClient types.QueryClient, msgReport *types.MsgCreateReport) (err error) {
 	fmt.Println("message report: ", msgReport.BaseReport)
 
 	if err = msgReport.ValidateBasic(); err != nil {
 		subscriber.log.Error(":exploding_head: Failed to validate basic with error: %s", err.Error())
 		return err
 	}
-	minGasPrices, err := subscriber.calculateGasPrices()
+	minGasPrices, err := subscriber.calculateGasPrices(queryClient)
 	if err != nil {
 		subscriber.log.Error(":exploding_head: Failed to collect gas prices: %s", err.Error())
 		return err
@@ -67,18 +77,12 @@ func (subscriber *Subscriber) submitReport(msgReportBytes []byte) (err error) {
 }
 
 // SubmitReport creates a new MsgCreateReport and submits it to the Oraichain to create a new report
-func (subscriber *Subscriber) submitTestCaseReport(msgReportBytes []byte) (err error) {
-	msgReport := &types.MsgCreateTestCaseReport{BaseReport: &types.BaseReport{}}
-	err = json.Unmarshal(msgReportBytes, msgReport)
-	if err != nil {
-		return err
-	}
-
+func (subscriber *Subscriber) submitTestCaseReport(queryClient types.QueryClient, msgReport *types.MsgCreateTestCaseReport) (err error) {
 	if err = msgReport.ValidateBasic(); err != nil {
 		subscriber.log.Error(":exploding_head: Failed to validate basic with error: %s", err.Error())
 		return err
 	}
-	minGasPrices, err := subscriber.calculateGasPrices()
+	minGasPrices, err := subscriber.calculateGasPrices(queryClient)
 	if err != nil {
 		return err
 	}
@@ -122,36 +126,19 @@ type MinGasPrices struct {
 	Price string `json:"minFees"`
 }
 
-func getMinGasPrices() (string, error) {
-	resp, err := http.Get("http://localhost:1317/aioracle/min-gas-prices")
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-	var minGasPrices MinGasPrices
-	// collect response from the request
-	json.Unmarshal(body, &minGasPrices)
-	fmt.Println("min gas prices: ", minGasPrices.Price)
-	return minGasPrices.Price, nil
-}
-
-func (subscriber *Subscriber) calculateGasPrices() (sdk.DecCoins, error) {
+func (subscriber *Subscriber) calculateGasPrices(queryClient types.QueryClient) (sdk.DecCoins, error) {
 	// collect gas prices to create a new report
 	minGasPricesObj := subscriber.config.Txf.GasPrices()
 	minGasPrices := minGasPricesObj.String()
 	// if the validator does not specify gas prices then we collect from the api get min gas prices
 	if minGasPrices == "" {
-		minGasPrices, err := getMinGasPrices()
+		minGasPrices, err := queryClient.QueryMinGasPrices(context.Background(), &types.MinGasPricesReq{})
 		if err != nil {
 			subscriber.log.Error(":exploding_head: Failed to collect the minimum gas prices of your node to create a new report with error: %s", err.Error())
 			return nil, err
 		}
 		// test parsing the gas prices to prevent panic
-		minGasPricesObj, err = sdk.ParseDecCoins(minGasPrices)
+		minGasPricesObj, err = sdk.ParseDecCoins(minGasPrices.MinGasPrices)
 		if err != nil {
 			subscriber.log.Error(":exploding_head: Invalid syntax for the minimum gas prices. Expected orai, got error: %s", err.Error())
 			return nil, err

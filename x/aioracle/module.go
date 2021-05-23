@@ -17,7 +17,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/oraichain/orai/x/aioracle/client/cli"
 	"github.com/oraichain/orai/x/aioracle/client/rest"
@@ -168,10 +167,6 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json
 // BeginBlock executes all ABCI BeginBlock logic respective to the capability module.
 func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
 	am.keeper.ResolveRngSeed(ctx, req)
-	validator, err := am.getValidatorAddress(*clientContext, ctx)
-	if err == nil {
-		am.querier.ExecuteAIOracles(ctx, validator)
-	}
 	am.keeper.AllocateTokens(ctx, req.GetLastCommitInfo().Votes, ctx.BlockHeight())
 }
 
@@ -180,25 +175,4 @@ func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
 func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
 	am.querier.ProcessReward(ctx)
 	return []abci.ValidatorUpdate{}
-}
-
-func (am AppModule) getValidatorAddress(clientCtx client.Context, ctx sdk.Context) (sdk.ValAddress, error) {
-	node, err := clientCtx.GetNode()
-	if err != nil {
-		return nil, err
-	}
-
-	status, err := node.Status(context.Background())
-	if err != nil {
-		return nil, err
-	}
-	consAddr, err := sdk.ConsAddressFromHex(status.ValidatorInfo.Address.String())
-	if err != nil {
-		return nil, err
-	}
-	validator := am.keeper.StakingKeeper.ValidatorByConsAddr(ctx, consAddr)
-	if validator != nil {
-		return validator.GetOperator(), nil
-	}
-	return nil, sdkerrors.Wrap(types.ErrCannotFindValidator, "Cannot find validator by consensus address")
 }
