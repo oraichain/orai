@@ -15,7 +15,7 @@ import (
 
 const (
 	// DefaultMaxScanSize copy from wasm, we make bigger for sure
-	DefaultMaxScanSize = 700 * 1024
+	DefaultMaxScanSize = 10 * 1024 * 1024
 )
 
 // LaunchProcess runs a subprocess and returns when the subprocess exits,
