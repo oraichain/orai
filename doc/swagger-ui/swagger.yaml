@@ -3,7 +3,6 @@ info:
   title: Cosmos SDK - Legacy REST and gRPC Gateway docs
   description: 'A REST interface for state queries, legacy transactions'
   version: 1.0.0
-
 paths:
   /node_info:
     get:
@@ -19326,6 +19325,19 @@ paths:
           in: query
           required: false
           type: boolean
+        - name: order_by
+          description: |2-
+             - ORDER_BY_UNSPECIFIED: ORDER_BY_UNSPECIFIED specifies an unknown sorting order. OrderBy defaults to ASC in this case.
+             - ORDER_BY_ASC: ORDER_BY_ASC defines ascending order
+             - ORDER_BY_DESC: ORDER_BY_DESC defines descending order
+          in: query
+          required: false
+          type: string
+          enum:
+            - ORDER_BY_UNSPECIFIED
+            - ORDER_BY_ASC
+            - ORDER_BY_DESC
+          default: ORDER_BY_UNSPECIFIED
       tags:
         - Service
     post:
@@ -29459,130 +29471,291 @@ paths:
                       format: byte
       tags:
         - Query
-  '/aioracle/aireq/{request_id}':
+  '/aioracle/fullreq/{request_id}':
     get:
-      summary: QueryAIOracle gets the ai request meta data
-      operationId: QueryAIOracle
+      summary: QueryFullOracleReq gets the ai result meta data
+      operationId: QueryFullRequest
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              request_id:
-                type: string
-              oracle_script_name:
-                type: string
-              creator:
-                type: string
-                format: byte
-                description: >-
-                  Owner is the address who is allowed to make further changes to
-                  the data source.
-              validators:
-                type: array
-                items:
-                  type: string
-                  format: byte
-              block_height:
-                type: string
-                format: int64
-              ai_data_sources:
+              ai_oracle:
+                type: object
+                properties:
+                  request_id:
+                    type: string
+                  contract:
+                    type: string
+                    format: byte
+                  creator:
+                    type: string
+                    format: byte
+                    description: >-
+                      Owner is the address who is allowed to make further
+                      changes to the data source.
+                  validators:
+                    type: array
+                    items:
+                      type: string
+                      format: byte
+                  block_height:
+                    type: string
+                    format: int64
+                  fees:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                  input:
+                    type: string
+                    format: byte
+                  test_only:
+                    type: boolean
+              reports:
                 type: array
                 items:
                   type: object
                   properties:
-                    name:
-                      type: string
-                    contract:
-                      type: string
-                    owner:
-                      type: string
-                      format: byte
-                      description: >-
-                        Owner is the address who is allowed to make further
-                        changes to the data source.
-                    description:
-                      type: string
-                    fees:
+                    base_report:
+                      type: object
+                      properties:
+                        request_id:
+                          type: string
+                        block_height:
+                          type: string
+                          format: int64
+                        fees:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              denom:
+                                type: string
+                              amount:
+                                type: string
+                            description: >-
+                              Coin defines a token with a denomination and an
+                              amount.
+
+
+                              NOTE: The amount field is an Int which implements
+                              the custom method
+
+                              signatures required by gogoproto.
+                        validator_address:
+                          type: string
+                          format: byte
+                    data_source_results:
                       type: array
                       items:
                         type: object
                         properties:
-                          denom:
+                          entry_point:
+                            type: object
+                            properties:
+                              url:
+                                type: string
+                              headers:
+                                type: array
+                                items:
+                                  type: string
+                              owner:
+                                type: string
+                                format: byte
+                              provider_fees:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    denom:
+                                      type: string
+                                    amount:
+                                      type: string
+                                  description: >-
+                                    Coin defines a token with a denomination and
+                                    an amount.
+
+
+                                    NOTE: The amount field is an Int which
+                                    implements the custom method
+
+                                    signatures required by gogoproto.
+                          result:
                             type: string
-                          amount:
+                            format: byte
+                          status:
                             type: string
-                        description: >-
-                          Coin defines a token with a denomination and an
-                          amount.
-
-
-                          NOTE: The amount field is an Int which implements the
-                          custom method
-
-                          signatures required by gogoproto.
-              test_cases:
+                    result_status:
+                      type: string
+                    aggregated_result:
+                      type: string
+                      format: byte
+                  title: >-
+                    Report stores the result of the data source when validator
+                    executes it
+              testcase_reports:
                 type: array
                 items:
                   type: object
                   properties:
-                    name:
-                      type: string
-                    contract:
-                      type: string
-                    owner:
-                      type: string
-                      format: byte
-                      description: >-
-                        Owner is the address who is allowed to make further
-                        changes to the data source.
-                    description:
-                      type: string
-                    fees:
+                    base_report:
+                      type: object
+                      properties:
+                        request_id:
+                          type: string
+                        block_height:
+                          type: string
+                          format: int64
+                        fees:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              denom:
+                                type: string
+                              amount:
+                                type: string
+                            description: >-
+                              Coin defines a token with a denomination and an
+                              amount.
+
+
+                              NOTE: The amount field is an Int which implements
+                              the custom method
+
+                              signatures required by gogoproto.
+                        validator_address:
+                          type: string
+                          format: byte
+                    results_with_test_case:
                       type: array
                       items:
                         type: object
                         properties:
-                          denom:
+                          entry_point:
+                            type: object
+                            properties:
+                              url:
+                                type: string
+                              headers:
+                                type: array
+                                items:
+                                  type: string
+                              owner:
+                                type: string
+                                format: byte
+                              provider_fees:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    denom:
+                                      type: string
+                                    amount:
+                                      type: string
+                                  description: >-
+                                    Coin defines a token with a denomination and
+                                    an amount.
+
+
+                                    NOTE: The amount field is an Int which
+                                    implements the custom method
+
+                                    signatures required by gogoproto.
+                          test_case_results:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                entry_point:
+                                  type: object
+                                  properties:
+                                    url:
+                                      type: string
+                                    headers:
+                                      type: array
+                                      items:
+                                        type: string
+                                    owner:
+                                      type: string
+                                      format: byte
+                                    provider_fees:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          denom:
+                                            type: string
+                                          amount:
+                                            type: string
+                                        description: >-
+                                          Coin defines a token with a denomination
+                                          and an amount.
+
+
+                                          NOTE: The amount field is an Int which
+                                          implements the custom method
+
+                                          signatures required by gogoproto.
+                                result:
+                                  type: string
+                                  format: byte
+                                status:
+                                  type: string
+                          status:
                             type: string
-                          amount:
-                            type: string
-                        description: >-
-                          Coin defines a token with a denomination and an
-                          amount.
-
-
-                          NOTE: The amount field is an Int which implements the
-                          custom method
-
-                          signatures required by gogoproto.
-              fees:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    denom:
-                      type: string
-                    amount:
-                      type: string
-                  description: >-
-                    Coin defines a token with a denomination and an amount.
-
-
-                    NOTE: The amount field is an Int which implements the custom
-                    method
-
-                    signatures required by gogoproto.
-              input:
-                type: string
-                format: byte
-              output:
-                type: string
-                format: byte
+                  title: >-
+                    TestCaseReport stores the result of the test cases when a
+                    validator executes it
+              result:
+                type: object
+                properties:
+                  request_id:
+                    type: string
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        validator:
+                          type: object
+                          properties:
+                            address:
+                              type: string
+                              format: byte
+                              title: >-
+                                Address is the address who is the original
+                                validator to store information of those that
+                                execute the oScript
+                            voting_power:
+                              type: string
+                              format: int64
+                            status:
+                              type: string
+                        result:
+                          type: string
+                          format: byte
+                        result_status:
+                          type: string
+                  status:
+                    type: string
             title: >-
-              QueryAIOracleRes is the response type for the
-              Query/QueryAIOracle RPC method
+              QueryFullOracleRes is the response type for the
+              Query/QueryFullOracleRes RPC method
         default:
           description: An unexpected error response.
           schema:
@@ -29612,7 +29785,180 @@ paths:
           type: string
       tags:
         - Query
-  /aioracle/aireqs:
+  /aioracle/min-fees:
+    get:
+      summary: QueryMinFees gets the min fees of oracle script contract
+      operationId: QueryMinFees
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              minimum_fees:
+                type: string
+            title: >-
+              MinFeesRes is the response type for the Query/QueryMinFees RPC
+              method
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: contract_addr
+          in: query
+          required: false
+          type: string
+        - name: val_num
+          in: query
+          required: false
+          type: string
+          format: int64
+        - name: test_only
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /aioracle/min-gas-prices:
+    get:
+      summary: QueryMinGasPrices gets the min gas prices of a validator
+      operationId: QueryMinGasPrices
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              min_gas_prices:
+                type: string
+            title: >-
+              MinGasPricesRes is the response type for the
+              Query/QueryMinGasPrices RPC method
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      tags:
+        - Query
+  '/aioracle/req/{request_id}':
+    get:
+      summary: QueryAIOracle gets the ai request meta data
+      operationId: QueryAIOracle
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              request_id:
+                type: string
+              contract:
+                type: string
+                format: byte
+              creator:
+                type: string
+                format: byte
+                description: >-
+                  Owner is the address who is allowed to make further changes to
+                  the data source.
+              validators:
+                type: array
+                items:
+                  type: string
+                  format: byte
+              block_height:
+                type: string
+                format: int64
+              fees:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    denom:
+                      type: string
+                    amount:
+                      type: string
+                  description: >-
+                    Coin defines a token with a denomination and an amount.
+
+
+                    NOTE: The amount field is an Int which implements the custom
+                    method
+
+                    signatures required by gogoproto.
+              input:
+                type: string
+                format: byte
+            title: >-
+              QueryAIOracleRes is the response type for the Query/QueryAIOracle
+              RPC method
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: request_id
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /aioracle/reqs:
     get:
       summary: QueryAIOracleIDs gets the list of ai requests
       operationId: QueryAIOracleIDs
@@ -29664,276 +30010,7 @@ paths:
           format: int64
       tags:
         - Query
-  '/airesult/fullreq/{request_id}':
-    get:
-      summary: QueryFullRequest gets the ai result meta data
-      operationId: QueryFullRequest
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              ai_request:
-                type: object
-                properties:
-                  request_id:
-                    type: string
-                  oracle_script_name:
-                    type: string
-                  creator:
-                    type: string
-                    format: byte
-                    description: >-
-                      Owner is the address who is allowed to make further
-                      changes to the data source.
-                  validators:
-                    type: array
-                    items:
-                      type: string
-                      format: byte
-                  block_height:
-                    type: string
-                    format: int64
-                  ai_data_sources:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        name:
-                          type: string
-                        contract:
-                          type: string
-                        owner:
-                          type: string
-                          format: byte
-                          description: >-
-                            Owner is the address who is allowed to make further
-                            changes to the data source.
-                        description:
-                          type: string
-                        fees:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              denom:
-                                type: string
-                              amount:
-                                type: string
-                            description: >-
-                              Coin defines a token with a denomination and an
-                              amount.
-
-
-                              NOTE: The amount field is an Int which implements
-                              the custom method
-
-                              signatures required by gogoproto.
-                  test_cases:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        name:
-                          type: string
-                        contract:
-                          type: string
-                        owner:
-                          type: string
-                          format: byte
-                          description: >-
-                            Owner is the address who is allowed to make further
-                            changes to the data source.
-                        description:
-                          type: string
-                        fees:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              denom:
-                                type: string
-                              amount:
-                                type: string
-                            description: >-
-                              Coin defines a token with a denomination and an
-                              amount.
-
-
-                              NOTE: The amount field is an Int which implements
-                              the custom method
-
-                              signatures required by gogoproto.
-                  fees:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        denom:
-                          type: string
-                        amount:
-                          type: string
-                      description: >-
-                        Coin defines a token with a denomination and an amount.
-
-
-                        NOTE: The amount field is an Int which implements the
-                        custom method
-
-                        signatures required by gogoproto.
-                  input:
-                    type: string
-                    format: byte
-                  expected_output:
-                    type: string
-                    format: byte
-              reports:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    requestID:
-                      type: string
-                    DataSourceResults:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                          result:
-                            type: string
-                            format: byte
-                          status:
-                            type: string
-                    TestCaseResults:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          name:
-                            type: string
-                          DataSourceResults:
-                            type: array
-                            items:
-                              type: object
-                              properties:
-                                name:
-                                  type: string
-                                result:
-                                  type: string
-                                  format: byte
-                                status:
-                                  type: string
-                    blockHeight:
-                      type: string
-                      format: int64
-                    fees:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          denom:
-                            type: string
-                          amount:
-                            type: string
-                        description: >-
-                          Coin defines a token with a denomination and an
-                          amount.
-
-
-                          NOTE: The amount field is an Int which implements the
-                          custom method
-
-                          signatures required by gogoproto.
-                    aggregatedResult:
-                      type: string
-                      format: byte
-                    resultStatus:
-                      type: string
-                    reporter:
-                      type: object
-                      properties:
-                        address:
-                          type: string
-                          format: byte
-                        name:
-                          type: string
-                        validator:
-                          type: string
-                          format: byte
-                      title: >-
-                        Reporter is the one who send reports from the validator
-                        back to Oraichain created by a validator
-                  title: >-
-                    Report stores the result of the data source when validator
-                    executes it
-              result:
-                type: object
-                properties:
-                  request_id:
-                    type: string
-                  results:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        validator:
-                          type: object
-                          properties:
-                            address:
-                              type: string
-                              format: byte
-                              title: >-
-                                Address is the address who is the original
-                                validator to store information of those that
-                                execute the oScript
-                            votingPower:
-                              type: string
-                              format: int64
-                            status:
-                              type: string
-                        result:
-                          type: string
-                          format: byte
-                        resultStatus:
-                          type: string
-                  status:
-                    type: string
-            title: >-
-              QueryFullRequestRes is the response type for the
-              Query/QueryFullRequest RPC method
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    type_url:
-                      type: string
-                    value:
-                      type: string
-                      format: byte
-      parameters:
-        - name: request_id
-          in: path
-          required: true
-          type: string
-      tags:
-        - Query
-  '/airesult/reward/{block_height}':
+  '/aioracle/reward/{block_height}':
     get:
       summary: QueryReward gets the reward given a block height
       operationId: QueryReward
@@ -29946,133 +30023,108 @@ paths:
               reward:
                 type: object
                 properties:
-                  validators:
+                  base_reward:
+                    type: object
+                    properties:
+                      validators:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            address:
+                              type: string
+                              format: byte
+                              title: >-
+                                Address is the address who is the original
+                                validator to store information of those that
+                                execute the oScript
+                            voting_power:
+                              type: string
+                              format: int64
+                            status:
+                              type: string
+                      block_height:
+                        type: string
+                        format: int64
+                      total_power:
+                        type: string
+                        format: int64
+                      provider_fees:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            denom:
+                              type: string
+                            amount:
+                              type: string
+                          description: >-
+                            Coin defines a token with a denomination and an
+                            amount.
+
+
+                            NOTE: The amount field is an Int which implements
+                            the custom method
+
+                            signatures required by gogoproto.
+                      validator_fees:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            denom:
+                              type: string
+                            amount:
+                              type: string
+                          description: >-
+                            Coin defines a token with a denomination and an
+                            amount.
+
+
+                            NOTE: The amount field is an Int which implements
+                            the custom method
+
+                            signatures required by gogoproto.
+                  results:
                     type: array
                     items:
                       type: object
                       properties:
-                        address:
+                        entry_point:
+                          type: object
+                          properties:
+                            url:
+                              type: string
+                            headers:
+                              type: array
+                              items:
+                                type: string
+                            owner:
+                              type: string
+                              format: byte
+                            provider_fees:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  denom:
+                                    type: string
+                                  amount:
+                                    type: string
+                                description: >-
+                                  Coin defines a token with a denomination and
+                                  an amount.
+
+
+                                  NOTE: The amount field is an Int which
+                                  implements the custom method
+
+                                  signatures required by gogoproto.
+                        result:
                           type: string
                           format: byte
-                          title: >-
-                            Address is the address who is the original validator
-                            to store information of those that execute the
-                            oScript
-                        votingPower:
-                          type: string
-                          format: int64
                         status:
                           type: string
-                  data_sources:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        name:
-                          type: string
-                        contract:
-                          type: string
-                        owner:
-                          type: string
-                          format: byte
-                          description: >-
-                            Owner is the address who is allowed to make further
-                            changes to the data source.
-                        description:
-                          type: string
-                        fees:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              denom:
-                                type: string
-                              amount:
-                                type: string
-                            description: >-
-                              Coin defines a token with a denomination and an
-                              amount.
-
-
-                              NOTE: The amount field is an Int which implements
-                              the custom method
-
-                              signatures required by gogoproto.
-                  test_cases:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        name:
-                          type: string
-                        contract:
-                          type: string
-                        owner:
-                          type: string
-                          format: byte
-                          description: >-
-                            Owner is the address who is allowed to make further
-                            changes to the data source.
-                        description:
-                          type: string
-                        fees:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              denom:
-                                type: string
-                              amount:
-                                type: string
-                            description: >-
-                              Coin defines a token with a denomination and an
-                              amount.
-
-
-                              NOTE: The amount field is an Int which implements
-                              the custom method
-
-                              signatures required by gogoproto.
-                  block_height:
-                    type: string
-                    format: int64
-                  total_power:
-                    type: string
-                    format: int64
-                  provider_fees:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        denom:
-                          type: string
-                        amount:
-                          type: string
-                      description: >-
-                        Coin defines a token with a denomination and an amount.
-
-
-                        NOTE: The amount field is an Int which implements the
-                        custom method
-
-                        signatures required by gogoproto.
-                  validator_fees:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        denom:
-                          type: string
-                        amount:
-                          type: string
-                      description: >-
-                        Coin defines a token with a denomination and an amount.
-
-
-                        NOTE: The amount field is an Int which implements the
-                        custom method
-
-                        signatures required by gogoproto.
             title: >-
               QueryRewardRes is the response type for the Query/QueryReward RPC
               method
@@ -30105,48 +30157,23 @@ paths:
           type: string
       tags:
         - Query
-  '/provider/datasource/{name}':
+  '/cosmos/aioracle/v1beta1/param/{param}':
     get:
-      summary: DataSourceInfo gets the data source meta data
-      operationId: DataSourceInfo
+      summary: Parameters queries the staking parameters.
+      operationId: Param
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              name:
+              param:
                 type: string
-              owner:
-                type: string
-                format: byte
-                description: >-
-                  Owner is the address who is allowed to make further changes to
-                  the data source.
-              contract:
-                type: string
-              description:
-                type: string
-              fees:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    denom:
-                      type: string
-                    amount:
-                      type: string
-                  description: >-
-                    Coin defines a token with a denomination and an amount.
-
-
-                    NOTE: The amount field is an Int which implements the custom
-                    method
-
-                    signatures required by gogoproto.
-            title: >-
-              DataSourceInfoRes is the response type for the
-              Query/DataSourceInfo RPC method
+                format: uint64
+                description: params holds all the parameters of this module.
+            description: >-
+              QueryParamsResponse is response type for the Query/Param RPC
+              method.
         default:
           description: An unexpected error response.
           schema:
@@ -30170,64 +30197,41 @@ paths:
                       type: string
                       format: byte
       parameters:
-        - name: name
-          description: address is the address of the contract to query
+        - name: param
           in: path
           required: true
           type: string
       tags:
         - Query
-  /provider/datasources:
+  /cosmos/aioracle/v1beta1/params:
     get:
-      summary: ListDataSources gets the list of data sources
-      operationId: ListDataSources
+      summary: Parameters queries the staking parameters.
+      operationId: AioracleParams
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              AIDataSources:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                    contract:
-                      type: string
-                    owner:
-                      type: string
-                      format: byte
-                      description: >-
-                        Owner is the address who is allowed to make further
-                        changes to the data source.
-                    description:
-                      type: string
-                    fees:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          denom:
-                            type: string
-                          amount:
-                            type: string
-                        description: >-
-                          Coin defines a token with a denomination and an
-                          amount.
-
-
-                          NOTE: The amount field is an Int which implements the
-                          custom method
-
-                          signatures required by gogoproto.
-              count:
-                type: string
-                format: int64
-            title: >-
-              ListDataSourcesRes is the response type for the
-              Query/ListDataSources RPC method
+              params:
+                description: params holds all the parameters of this module.
+                type: object
+                properties:
+                  maximum_ai_oracle_request_bytes:
+                    type: string
+                    format: uint64
+                  reward_ai_oracle_percentages:
+                    type: string
+                    format: uint64
+                  reports_percentages:
+                    type: string
+                    format: uint64
+                  maximum_ai_oracle_response_bytes:
+                    type: string
+                    format: uint64
+            description: >-
+              QueryParamsResponse is response type for the Query/Params RPC
+              method.
         default:
           description: An unexpected error response.
           schema:
@@ -30250,410 +30254,6 @@ paths:
                     value:
                       type: string
                       format: byte
-      parameters:
-        - name: name
-          in: query
-          required: false
-          type: string
-        - name: page
-          in: query
-          required: false
-          type: string
-          format: int64
-        - name: limit
-          in: query
-          required: false
-          type: string
-          format: int64
-      tags:
-        - Query
-  /provider/minfees:
-    get:
-      summary: QueryMinFees gets the min fees of oracle script
-      operationId: QueryMinFees
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              minFees:
-                type: string
-            title: >-
-              ListOracleScriptsRes is the response type for the
-              Query/ListOracleScripts RPC method
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    type_url:
-                      type: string
-                    value:
-                      type: string
-                      format: byte
-      parameters:
-        - name: OracleScriptName
-          in: query
-          required: false
-          type: string
-        - name: ValNum
-          in: query
-          required: false
-          type: string
-          format: int64
-      tags:
-        - Query
-  '/provider/oscript/{name}':
-    get:
-      summary: OracleScriptInfo gets the oracle script meta data
-      operationId: OracleScriptInfo
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-              owner:
-                type: string
-                format: byte
-                description: >-
-                  Owner is the address who is allowed to make further changes to
-                  the oracle script.
-              contract:
-                type: string
-              description:
-                type: string
-              fees:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    denom:
-                      type: string
-                    amount:
-                      type: string
-                  description: >-
-                    Coin defines a token with a denomination and an amount.
-
-
-                    NOTE: The amount field is an Int which implements the custom
-                    method
-
-                    signatures required by gogoproto.
-              d_sources:
-                type: array
-                items:
-                  type: string
-              t_cases:
-                type: array
-                items:
-                  type: string
-            title: >-
-              OracleScriptInfoRes is the response type for the
-              Query/OracleScriptInfo RPC method
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    type_url:
-                      type: string
-                    value:
-                      type: string
-                      format: byte
-      parameters:
-        - name: name
-          description: address is the address of the contract to query
-          in: path
-          required: true
-          type: string
-      tags:
-        - Query
-  /provider/oscripts:
-    get:
-      summary: ListOracleScripts gets the list of oracle scripts
-      operationId: ListOracleScripts
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              OracleScripts:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                    contract:
-                      type: string
-                    owner:
-                      type: string
-                      format: byte
-                      description: >-
-                        Owner is the address who is allowed to make further
-                        changes to the data source.
-                    description:
-                      type: string
-                    minimum_fees:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          denom:
-                            type: string
-                          amount:
-                            type: string
-                        description: >-
-                          Coin defines a token with a denomination and an
-                          amount.
-
-
-                          NOTE: The amount field is an Int which implements the
-                          custom method
-
-                          signatures required by gogoproto.
-                    d_sources:
-                      type: array
-                      items:
-                        type: string
-                    t_cases:
-                      type: array
-                      items:
-                        type: string
-              count:
-                type: string
-                format: int64
-            title: >-
-              ListOracleScriptsRes is the response type for the
-              Query/ListOracleScripts RPC method
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    type_url:
-                      type: string
-                    value:
-                      type: string
-                      format: byte
-      parameters:
-        - name: name
-          in: query
-          required: false
-          type: string
-        - name: page
-          in: query
-          required: false
-          type: string
-          format: int64
-        - name: limit
-          in: query
-          required: false
-          type: string
-          format: int64
-      tags:
-        - Query
-  '/provider/testcase/{name}':
-    get:
-      summary: TestCaseInfo gets the test case meta data
-      operationId: TestCaseInfo
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-              owner:
-                type: string
-                format: byte
-                description: >-
-                  Owner is the address who is allowed to make further changes to
-                  the test case.
-              contract:
-                type: string
-              description:
-                type: string
-              fees:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    denom:
-                      type: string
-                    amount:
-                      type: string
-                  description: >-
-                    Coin defines a token with a denomination and an amount.
-
-
-                    NOTE: The amount field is an Int which implements the custom
-                    method
-
-                    signatures required by gogoproto.
-            title: >-
-              TestCaseInfoRes is the response type for the Query/TestCaseInfo
-              RPC method
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    type_url:
-                      type: string
-                    value:
-                      type: string
-                      format: byte
-      parameters:
-        - name: name
-          description: address is the address of the contract to query
-          in: path
-          required: true
-          type: string
-      tags:
-        - Query
-  /provider/testcases:
-    get:
-      summary: ListTestCases gets the list of test cases
-      operationId: ListTestCases
-      responses:
-        '200':
-          description: A successful response.
-          schema:
-            type: object
-            properties:
-              TestCases:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                    contract:
-                      type: string
-                    owner:
-                      type: string
-                      format: byte
-                      description: >-
-                        Owner is the address who is allowed to make further
-                        changes to the data source.
-                    description:
-                      type: string
-                    fees:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          denom:
-                            type: string
-                          amount:
-                            type: string
-                        description: >-
-                          Coin defines a token with a denomination and an
-                          amount.
-
-
-                          NOTE: The amount field is an Int which implements the
-                          custom method
-
-                          signatures required by gogoproto.
-              count:
-                type: string
-                format: int64
-            title: >-
-              ListTestCasesRes is the response type for the Query/ListTestCases
-              RPC method
-        default:
-          description: An unexpected error response.
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-              code:
-                type: integer
-                format: int32
-              message:
-                type: string
-              details:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    type_url:
-                      type: string
-                    value:
-                      type: string
-                      format: byte
-      parameters:
-        - name: name
-          in: query
-          required: false
-          type: string
-        - name: page
-          in: query
-          required: false
-          type: string
-          format: int64
-        - name: limit
-          in: query
-          required: false
-          type: string
-          format: int64
       tags:
         - Query
   /wasm/v1beta1/code:
@@ -44791,6 +44391,19 @@ definitions:
       Single is the mode info for a single signer. It is structured as a message
       to allow for additional fields such as locale for SIGN_MODE_TEXTUAL in the
       future
+  cosmos.tx.v1beta1.OrderBy:
+    type: string
+    enum:
+      - ORDER_BY_UNSPECIFIED
+      - ORDER_BY_ASC
+      - ORDER_BY_DESC
+    default: ORDER_BY_UNSPECIFIED
+    description: >-
+      - ORDER_BY_UNSPECIFIED: ORDER_BY_UNSPECIFIED specifies an unknown sorting
+      order. OrderBy defaults to ASC in this case.
+       - ORDER_BY_ASC: ORDER_BY_ASC defines ascending order
+       - ORDER_BY_DESC: ORDER_BY_DESC defines descending order
+    title: OrderBy defines the sorting order
   cosmos.tx.v1beta1.SignerInfo:
     type: object
     properties:
@@ -50587,193 +50200,14 @@ definitions:
 
               chain.
     description: QueryParamsResponse is the response type for the Query/Params RPC method.
-  oraichain.orai.aioracle.QueryAIOracleIDsRes:
-    type: object
-    properties:
-      request_ids:
-        type: array
-        items:
-          type: string
-    title: >-
-      QueryAIOracleIDsRes is the response type for the Query/QueryAIOracleIDs
-      RPC method
-  oraichain.orai.aioracle.QueryAIOracleRes:
-    type: object
-    properties:
-      request_id:
-        type: string
-      oracle_script_name:
-        type: string
-      creator:
-        type: string
-        format: byte
-        description: >-
-          Owner is the address who is allowed to make further changes to the
-          data source.
-      validators:
-        type: array
-        items:
-          type: string
-          format: byte
-      block_height:
-        type: string
-        format: int64
-      ai_data_sources:
-        type: array
-        items:
-          type: object
-          properties:
-            name:
-              type: string
-            contract:
-              type: string
-            owner:
-              type: string
-              format: byte
-              description: >-
-                Owner is the address who is allowed to make further changes to
-                the data source.
-            description:
-              type: string
-            fees:
-              type: array
-              items:
-                type: object
-                properties:
-                  denom:
-                    type: string
-                  amount:
-                    type: string
-                description: >-
-                  Coin defines a token with a denomination and an amount.
-
-
-                  NOTE: The amount field is an Int which implements the custom
-                  method
-
-                  signatures required by gogoproto.
-      test_cases:
-        type: array
-        items:
-          type: object
-          properties:
-            name:
-              type: string
-            contract:
-              type: string
-            owner:
-              type: string
-              format: byte
-              description: >-
-                Owner is the address who is allowed to make further changes to
-                the data source.
-            description:
-              type: string
-            fees:
-              type: array
-              items:
-                type: object
-                properties:
-                  denom:
-                    type: string
-                  amount:
-                    type: string
-                description: >-
-                  Coin defines a token with a denomination and an amount.
-
-
-                  NOTE: The amount field is an Int which implements the custom
-                  method
-
-                  signatures required by gogoproto.
-      fees:
-        type: array
-        items:
-          type: object
-          properties:
-            denom:
-              type: string
-            amount:
-              type: string
-          description: |-
-            Coin defines a token with a denomination and an amount.
-
-            NOTE: The amount field is an Int which implements the custom method
-            signatures required by gogoproto.
-      input:
-        type: string
-        format: byte
-      output:
-        type: string
-        format: byte
-    title: >-
-      QueryAIOracleRes is the response type for the Query/QueryAIOracle RPC
-      method
-  oraichain.orai.provider.AIDataSource:
-    type: object
-    properties:
-      name:
-        type: string
-      contract:
-        type: string
-      owner:
-        type: string
-        format: byte
-        description: >-
-          Owner is the address who is allowed to make further changes to the
-          data source.
-      description:
-        type: string
-      fees:
-        type: array
-        items:
-          type: object
-          properties:
-            denom:
-              type: string
-            amount:
-              type: string
-          description: |-
-            Coin defines a token with a denomination and an amount.
-
-            NOTE: The amount field is an Int which implements the custom method
-            signatures required by gogoproto.
-  oraichain.orai.provider.TestCase:
-    type: object
-    properties:
-      name:
-        type: string
-      contract:
-        type: string
-      owner:
-        type: string
-        format: byte
-        description: >-
-          Owner is the address who is allowed to make further changes to the
-          data source.
-      description:
-        type: string
-      fees:
-        type: array
-        items:
-          type: object
-          properties:
-            denom:
-              type: string
-            amount:
-              type: string
-          description: |-
-            Coin defines a token with a denomination and an amount.
-
-            NOTE: The amount field is an Int which implements the custom method
-            signatures required by gogoproto.
   oraichain.orai.aioracle.AIOracle:
     type: object
     properties:
       request_id:
         type: string
-      oracle_script_name:
+      contract:
         type: string
+        format: byte
       creator:
         type: string
         format: byte
@@ -50788,74 +50222,6 @@ definitions:
       block_height:
         type: string
         format: int64
-      ai_data_sources:
-        type: array
-        items:
-          type: object
-          properties:
-            name:
-              type: string
-            contract:
-              type: string
-            owner:
-              type: string
-              format: byte
-              description: >-
-                Owner is the address who is allowed to make further changes to
-                the data source.
-            description:
-              type: string
-            fees:
-              type: array
-              items:
-                type: object
-                properties:
-                  denom:
-                    type: string
-                  amount:
-                    type: string
-                description: >-
-                  Coin defines a token with a denomination and an amount.
-
-
-                  NOTE: The amount field is an Int which implements the custom
-                  method
-
-                  signatures required by gogoproto.
-      test_cases:
-        type: array
-        items:
-          type: object
-          properties:
-            name:
-              type: string
-            contract:
-              type: string
-            owner:
-              type: string
-              format: byte
-              description: >-
-                Owner is the address who is allowed to make further changes to
-                the data source.
-            description:
-              type: string
-            fees:
-              type: array
-              items:
-                type: object
-                properties:
-                  denom:
-                    type: string
-                  amount:
-                    type: string
-                description: >-
-                  Coin defines a token with a denomination and an amount.
-
-
-                  NOTE: The amount field is an Int which implements the custom
-                  method
-
-                  signatures required by gogoproto.
       fees:
         type: array
         items:
@@ -50873,10 +50239,9 @@ definitions:
       input:
         type: string
         format: byte
-      expected_output:
-        type: string
-        format: byte
-  oraichain.orai.airesult.AIOracleResult:
+      test_only:
+        type: boolean
+  oraichain.orai.aioracle.AIOracleResult:
     type: object
     properties:
       request_id:
@@ -50895,7 +50260,7 @@ definitions:
                   title: >-
                     Address is the address who is the original validator to
                     store information of those that execute the oScript
-                votingPower:
+                voting_power:
                   type: string
                   format: int64
                 status:
@@ -50903,20 +50268,209 @@ definitions:
             result:
               type: string
               format: byte
-            resultStatus:
+            result_status:
               type: string
       status:
         type: string
-  oraichain.orai.airesult.QueryFullRequestRes:
+  oraichain.orai.aioracle.BaseReport:
     type: object
     properties:
-      ai_request:
+      request_id:
+        type: string
+      block_height:
+        type: string
+        format: int64
+      fees:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+      validator_address:
+        type: string
+        format: byte
+  oraichain.orai.aioracle.BaseReward:
+    type: object
+    properties:
+      validators:
+        type: array
+        items:
+          type: object
+          properties:
+            address:
+              type: string
+              format: byte
+              title: >-
+                Address is the address who is the original validator to store
+                information of those that execute the oScript
+            voting_power:
+              type: string
+              format: int64
+            status:
+              type: string
+      block_height:
+        type: string
+        format: int64
+      total_power:
+        type: string
+        format: int64
+      provider_fees:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+      validator_fees:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+  oraichain.orai.aioracle.EmptyParams:
+    type: object
+  oraichain.orai.aioracle.EntryPoint:
+    type: object
+    properties:
+      url:
+        type: string
+      headers:
+        type: array
+        items:
+          type: string
+      owner:
+        type: string
+        format: byte
+      provider_fees:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+  oraichain.orai.aioracle.MinFeesRes:
+    type: object
+    properties:
+      minimum_fees:
+        type: string
+    title: MinFeesRes is the response type for the Query/QueryMinFees RPC method
+  oraichain.orai.aioracle.MinGasPricesRes:
+    type: object
+    properties:
+      min_gas_prices:
+        type: string
+    title: >-
+      MinGasPricesRes is the response type for the Query/QueryMinGasPrices RPC
+      method
+  oraichain.orai.aioracle.Params:
+    type: object
+    properties:
+      maximum_ai_oracle_request_bytes:
+        type: string
+        format: uint64
+      reward_ai_oracle_percentages:
+        type: string
+        format: uint64
+      reports_percentages:
+        type: string
+        format: uint64
+      maximum_ai_oracle_response_bytes:
+        type: string
+        format: uint64
+    description: Params defines the set of wasm parameters.
+  oraichain.orai.aioracle.QueryAIOracleIDsRes:
+    type: object
+    properties:
+      request_ids:
+        type: array
+        items:
+          type: string
+    title: >-
+      QueryAIOracleIDsRes is the response type for the Query/QueryAIOracleIDs
+      RPC method
+  oraichain.orai.aioracle.QueryAIOracleRes:
+    type: object
+    properties:
+      request_id:
+        type: string
+      contract:
+        type: string
+        format: byte
+      creator:
+        type: string
+        format: byte
+        description: >-
+          Owner is the address who is allowed to make further changes to the
+          data source.
+      validators:
+        type: array
+        items:
+          type: string
+          format: byte
+      block_height:
+        type: string
+        format: int64
+      fees:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+      input:
+        type: string
+        format: byte
+    title: >-
+      QueryAIOracleRes is the response type for the Query/QueryAIOracle RPC
+      method
+  oraichain.orai.aioracle.QueryFullOracleRes:
+    type: object
+    properties:
+      ai_oracle:
         type: object
         properties:
           request_id:
             type: string
-          oracle_script_name:
+          contract:
             type: string
+            format: byte
           creator:
             type: string
             format: byte
@@ -50931,74 +50485,6 @@ definitions:
           block_height:
             type: string
             format: int64
-          ai_data_sources:
-            type: array
-            items:
-              type: object
-              properties:
-                name:
-                  type: string
-                contract:
-                  type: string
-                owner:
-                  type: string
-                  format: byte
-                  description: >-
-                    Owner is the address who is allowed to make further changes
-                    to the data source.
-                description:
-                  type: string
-                fees:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      denom:
-                        type: string
-                      amount:
-                        type: string
-                    description: >-
-                      Coin defines a token with a denomination and an amount.
-
-
-                      NOTE: The amount field is an Int which implements the
-                      custom method
-
-                      signatures required by gogoproto.
-          test_cases:
-            type: array
-            items:
-              type: object
-              properties:
-                name:
-                  type: string
-                contract:
-                  type: string
-                owner:
-                  type: string
-                  format: byte
-                  description: >-
-                    Owner is the address who is allowed to make further changes
-                    to the data source.
-                description:
-                  type: string
-                fees:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      denom:
-                        type: string
-                      amount:
-                        type: string
-                    description: >-
-                      Coin defines a token with a denomination and an amount.
-
-
-                      NOTE: The amount field is an Int which implements the
-                      custom method
-
-                      signatures required by gogoproto.
           fees:
             type: array
             items:
@@ -51019,89 +50505,202 @@ definitions:
           input:
             type: string
             format: byte
-          expected_output:
-            type: string
-            format: byte
+          test_only:
+            type: boolean
       reports:
         type: array
         items:
           type: object
           properties:
-            requestID:
-              type: string
-            DataSourceResults:
+            base_report:
+              type: object
+              properties:
+                request_id:
+                  type: string
+                block_height:
+                  type: string
+                  format: int64
+                fees:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                    description: >-
+                      Coin defines a token with a denomination and an amount.
+
+
+                      NOTE: The amount field is an Int which implements the
+                      custom method
+
+                      signatures required by gogoproto.
+                validator_address:
+                  type: string
+                  format: byte
+            data_source_results:
               type: array
               items:
                 type: object
                 properties:
-                  name:
-                    type: string
+                  entry_point:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                      headers:
+                        type: array
+                        items:
+                          type: string
+                      owner:
+                        type: string
+                        format: byte
+                      provider_fees:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            denom:
+                              type: string
+                            amount:
+                              type: string
+                          description: >-
+                            Coin defines a token with a denomination and an
+                            amount.
+
+
+                            NOTE: The amount field is an Int which implements
+                            the custom method
+
+                            signatures required by gogoproto.
                   result:
                     type: string
                     format: byte
                   status:
                     type: string
-            TestCaseResults:
+            result_status:
+              type: string
+            aggregated_result:
+              type: string
+              format: byte
+          title: >-
+            Report stores the result of the data source when validator executes
+            it
+      testcase_reports:
+        type: array
+        items:
+          type: object
+          properties:
+            base_report:
+              type: object
+              properties:
+                request_id:
+                  type: string
+                block_height:
+                  type: string
+                  format: int64
+                fees:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                    description: >-
+                      Coin defines a token with a denomination and an amount.
+
+
+                      NOTE: The amount field is an Int which implements the
+                      custom method
+
+                      signatures required by gogoproto.
+                validator_address:
+                  type: string
+                  format: byte
+            results_with_test_case:
               type: array
               items:
                 type: object
                 properties:
-                  name:
-                    type: string
-                  DataSourceResults:
+                  entry_point:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                      headers:
+                        type: array
+                        items:
+                          type: string
+                      owner:
+                        type: string
+                        format: byte
+                      provider_fees:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            denom:
+                              type: string
+                            amount:
+                              type: string
+                          description: >-
+                            Coin defines a token with a denomination and an
+                            amount.
+
+
+                            NOTE: The amount field is an Int which implements
+                            the custom method
+
+                            signatures required by gogoproto.
+                  test_case_results:
                     type: array
                     items:
                       type: object
                       properties:
-                        name:
-                          type: string
+                        entry_point:
+                          type: object
+                          properties:
+                            url:
+                              type: string
+                            headers:
+                              type: array
+                              items:
+                                type: string
+                            owner:
+                              type: string
+                              format: byte
+                            provider_fees:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  denom:
+                                    type: string
+                                  amount:
+                                    type: string
+                                description: >-
+                                  Coin defines a token with a denomination and
+                                  an amount.
+
+
+                                  NOTE: The amount field is an Int which
+                                  implements the custom method
+
+                                  signatures required by gogoproto.
                         result:
                           type: string
                           format: byte
                         status:
                           type: string
-            blockHeight:
-              type: string
-              format: int64
-            fees:
-              type: array
-              items:
-                type: object
-                properties:
-                  denom:
+                  status:
                     type: string
-                  amount:
-                    type: string
-                description: >-
-                  Coin defines a token with a denomination and an amount.
-
-
-                  NOTE: The amount field is an Int which implements the custom
-                  method
-
-                  signatures required by gogoproto.
-            aggregatedResult:
-              type: string
-              format: byte
-            resultStatus:
-              type: string
-            reporter:
-              type: object
-              properties:
-                address:
-                  type: string
-                  format: byte
-                name:
-                  type: string
-                validator:
-                  type: string
-                  format: byte
-              title: >-
-                Reporter is the one who send reports from the validator back to
-                Oraichain created by a validator
           title: >-
-            Report stores the result of the data source when validator executes
-            it
+            TestCaseReport stores the result of the test cases when a validator
+            executes it
       result:
         type: object
         properties:
@@ -51121,7 +50720,7 @@ definitions:
                       title: >-
                         Address is the address who is the original validator to
                         store information of those that execute the oScript
-                    votingPower:
+                    voting_power:
                       type: string
                       format: int64
                     status:
@@ -51129,17 +50728,480 @@ definitions:
                 result:
                   type: string
                   format: byte
-                resultStatus:
+                result_status:
                   type: string
           status:
             type: string
     title: >-
-      QueryFullRequestRes is the response type for the Query/QueryFullRequest
+      QueryFullOracleRes is the response type for the Query/QueryFullOracleRes
       RPC method
-  oraichain.orai.airesult.QueryRewardRes:
+  oraichain.orai.aioracle.QueryParamResponse:
+    type: object
+    properties:
+      param:
+        type: string
+        format: uint64
+        description: params holds all the parameters of this module.
+    description: QueryParamsResponse is response type for the Query/Param RPC method.
+  oraichain.orai.aioracle.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        description: params holds all the parameters of this module.
+        type: object
+        properties:
+          maximum_ai_oracle_request_bytes:
+            type: string
+            format: uint64
+          reward_ai_oracle_percentages:
+            type: string
+            format: uint64
+          reports_percentages:
+            type: string
+            format: uint64
+          maximum_ai_oracle_response_bytes:
+            type: string
+            format: uint64
+    description: QueryParamsResponse is response type for the Query/Params RPC method.
+  oraichain.orai.aioracle.QueryRewardRes:
     type: object
     properties:
       reward:
+        type: object
+        properties:
+          base_reward:
+            type: object
+            properties:
+              validators:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                      format: byte
+                      title: >-
+                        Address is the address who is the original validator to
+                        store information of those that execute the oScript
+                    voting_power:
+                      type: string
+                      format: int64
+                    status:
+                      type: string
+              block_height:
+                type: string
+                format: int64
+              total_power:
+                type: string
+                format: int64
+              provider_fees:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    denom:
+                      type: string
+                    amount:
+                      type: string
+                  description: >-
+                    Coin defines a token with a denomination and an amount.
+
+
+                    NOTE: The amount field is an Int which implements the custom
+                    method
+
+                    signatures required by gogoproto.
+              validator_fees:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    denom:
+                      type: string
+                    amount:
+                      type: string
+                  description: >-
+                    Coin defines a token with a denomination and an amount.
+
+
+                    NOTE: The amount field is an Int which implements the custom
+                    method
+
+                    signatures required by gogoproto.
+          results:
+            type: array
+            items:
+              type: object
+              properties:
+                entry_point:
+                  type: object
+                  properties:
+                    url:
+                      type: string
+                    headers:
+                      type: array
+                      items:
+                        type: string
+                    owner:
+                      type: string
+                      format: byte
+                    provider_fees:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          denom:
+                            type: string
+                          amount:
+                            type: string
+                        description: >-
+                          Coin defines a token with a denomination and an
+                          amount.
+
+
+                          NOTE: The amount field is an Int which implements the
+                          custom method
+
+                          signatures required by gogoproto.
+                result:
+                  type: string
+                  format: byte
+                status:
+                  type: string
+    title: QueryRewardRes is the response type for the Query/QueryReward RPC method
+  oraichain.orai.aioracle.Report:
+    type: object
+    properties:
+      base_report:
+        type: object
+        properties:
+          request_id:
+            type: string
+          block_height:
+            type: string
+            format: int64
+          fees:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+          validator_address:
+            type: string
+            format: byte
+      data_source_results:
+        type: array
+        items:
+          type: object
+          properties:
+            entry_point:
+              type: object
+              properties:
+                url:
+                  type: string
+                headers:
+                  type: array
+                  items:
+                    type: string
+                owner:
+                  type: string
+                  format: byte
+                provider_fees:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                    description: >-
+                      Coin defines a token with a denomination and an amount.
+
+
+                      NOTE: The amount field is an Int which implements the
+                      custom method
+
+                      signatures required by gogoproto.
+            result:
+              type: string
+              format: byte
+            status:
+              type: string
+      result_status:
+        type: string
+      aggregated_result:
+        type: string
+        format: byte
+    title: Report stores the result of the data source when validator executes it
+  oraichain.orai.aioracle.RequestDataSource:
+    type: object
+    properties:
+      dsource:
+        type: object
+        properties:
+          url:
+            type: string
+          headers:
+            type: array
+            items:
+              type: string
+          owner:
+            type: string
+            format: byte
+          provider_fees:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+      input:
+        type: string
+  oraichain.orai.aioracle.RequestOracleScript:
+    type: object
+    properties:
+      results:
+        type: array
+        items:
+          type: string
+  oraichain.orai.aioracle.RequestTestCase:
+    type: object
+    properties:
+      tcase:
+        type: object
+        properties:
+          url:
+            type: string
+          headers:
+            type: array
+            items:
+              type: string
+          owner:
+            type: string
+            format: byte
+          provider_fees:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+      input:
+        type: object
+        properties:
+          url:
+            type: string
+          headers:
+            type: array
+            items:
+              type: string
+          owner:
+            type: string
+            format: byte
+          provider_fees:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+  oraichain.orai.aioracle.ResponseContract:
+    type: object
+    properties:
+      data:
+        type: string
+        format: byte
+    title: Report stores the result of the data source when validator executes it
+  oraichain.orai.aioracle.ResponseEntryPointContract:
+    type: object
+    properties:
+      data:
+        type: array
+        items:
+          type: object
+          properties:
+            url:
+              type: string
+            headers:
+              type: array
+              items:
+                type: string
+            owner:
+              type: string
+              format: byte
+            provider_fees:
+              type: array
+              items:
+                type: object
+                properties:
+                  denom:
+                    type: string
+                  amount:
+                    type: string
+                description: >-
+                  Coin defines a token with a denomination and an amount.
+
+
+                  NOTE: The amount field is an Int which implements the custom
+                  method
+
+                  signatures required by gogoproto.
+  oraichain.orai.aioracle.Result:
+    type: object
+    properties:
+      entry_point:
+        type: object
+        properties:
+          url:
+            type: string
+          headers:
+            type: array
+            items:
+              type: string
+          owner:
+            type: string
+            format: byte
+          provider_fees:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+      result:
+        type: string
+        format: byte
+      status:
+        type: string
+  oraichain.orai.aioracle.ResultWithTestCase:
+    type: object
+    properties:
+      entry_point:
+        type: object
+        properties:
+          url:
+            type: string
+          headers:
+            type: array
+            items:
+              type: string
+          owner:
+            type: string
+            format: byte
+          provider_fees:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+      test_case_results:
+        type: array
+        items:
+          type: object
+          properties:
+            entry_point:
+              type: object
+              properties:
+                url:
+                  type: string
+                headers:
+                  type: array
+                  items:
+                    type: string
+                owner:
+                  type: string
+                  format: byte
+                provider_fees:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                    description: >-
+                      Coin defines a token with a denomination and an amount.
+
+
+                      NOTE: The amount field is an Int which implements the
+                      custom method
+
+                      signatures required by gogoproto.
+            result:
+              type: string
+              format: byte
+            status:
+              type: string
+      status:
+        type: string
+  oraichain.orai.aioracle.Reward:
+    type: object
+    properties:
+      base_reward:
         type: object
         properties:
           validators:
@@ -51153,79 +51215,11 @@ definitions:
                   title: >-
                     Address is the address who is the original validator to
                     store information of those that execute the oScript
-                votingPower:
+                voting_power:
                   type: string
                   format: int64
                 status:
                   type: string
-          data_sources:
-            type: array
-            items:
-              type: object
-              properties:
-                name:
-                  type: string
-                contract:
-                  type: string
-                owner:
-                  type: string
-                  format: byte
-                  description: >-
-                    Owner is the address who is allowed to make further changes
-                    to the data source.
-                description:
-                  type: string
-                fees:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      denom:
-                        type: string
-                      amount:
-                        type: string
-                    description: >-
-                      Coin defines a token with a denomination and an amount.
-
-
-                      NOTE: The amount field is an Int which implements the
-                      custom method
-
-                      signatures required by gogoproto.
-          test_cases:
-            type: array
-            items:
-              type: object
-              properties:
-                name:
-                  type: string
-                contract:
-                  type: string
-                owner:
-                  type: string
-                  format: byte
-                  description: >-
-                    Owner is the address who is allowed to make further changes
-                    to the data source.
-                description:
-                  type: string
-                fees:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      denom:
-                        type: string
-                      amount:
-                        type: string
-                    description: >-
-                      Coin defines a token with a denomination and an amount.
-
-
-                      NOTE: The amount field is an Int which implements the
-                      custom method
-
-                      signatures required by gogoproto.
           block_height:
             type: string
             format: int64
@@ -51266,243 +51260,156 @@ definitions:
                 method
 
                 signatures required by gogoproto.
-    title: QueryRewardRes is the response type for the Query/QueryReward RPC method
-  oraichain.orai.airesult.Reward:
-    type: object
-    properties:
-      validators:
+      results:
         type: array
         items:
           type: object
           properties:
-            address:
-              type: string
-              format: byte
-              title: >-
-                Address is the address who is the original validator to store
-                information of those that execute the oScript
-            votingPower:
-              type: string
-              format: int64
-            status:
-              type: string
-      data_sources:
-        type: array
-        items:
-          type: object
-          properties:
-            name:
-              type: string
-            contract:
-              type: string
-            owner:
-              type: string
-              format: byte
-              description: >-
-                Owner is the address who is allowed to make further changes to
-                the data source.
-            description:
-              type: string
-            fees:
-              type: array
-              items:
-                type: object
-                properties:
-                  denom:
+            entry_point:
+              type: object
+              properties:
+                url:
+                  type: string
+                headers:
+                  type: array
+                  items:
                     type: string
-                  amount:
-                    type: string
-                description: >-
-                  Coin defines a token with a denomination and an amount.
+                owner:
+                  type: string
+                  format: byte
+                provider_fees:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                    description: >-
+                      Coin defines a token with a denomination and an amount.
 
 
-                  NOTE: The amount field is an Int which implements the custom
-                  method
+                      NOTE: The amount field is an Int which implements the
+                      custom method
 
-                  signatures required by gogoproto.
-      test_cases:
-        type: array
-        items:
-          type: object
-          properties:
-            name:
-              type: string
-            contract:
-              type: string
-            owner:
-              type: string
-              format: byte
-              description: >-
-                Owner is the address who is allowed to make further changes to
-                the data source.
-            description:
-              type: string
-            fees:
-              type: array
-              items:
-                type: object
-                properties:
-                  denom:
-                    type: string
-                  amount:
-                    type: string
-                description: >-
-                  Coin defines a token with a denomination and an amount.
-
-
-                  NOTE: The amount field is an Int which implements the custom
-                  method
-
-                  signatures required by gogoproto.
-      block_height:
-        type: string
-        format: int64
-      total_power:
-        type: string
-        format: int64
-      provider_fees:
-        type: array
-        items:
-          type: object
-          properties:
-            denom:
-              type: string
-            amount:
-              type: string
-          description: |-
-            Coin defines a token with a denomination and an amount.
-
-            NOTE: The amount field is an Int which implements the custom method
-            signatures required by gogoproto.
-      validator_fees:
-        type: array
-        items:
-          type: object
-          properties:
-            denom:
-              type: string
-            amount:
-              type: string
-          description: |-
-            Coin defines a token with a denomination and an amount.
-
-            NOTE: The amount field is an Int which implements the custom method
-            signatures required by gogoproto.
-  oraichain.orai.websocket.DataSourceResult:
-    type: object
-    properties:
-      name:
-        type: string
-      result:
-        type: string
-        format: byte
-      status:
-        type: string
-  oraichain.orai.websocket.Report:
-    type: object
-    properties:
-      requestID:
-        type: string
-      DataSourceResults:
-        type: array
-        items:
-          type: object
-          properties:
-            name:
-              type: string
+                      signatures required by gogoproto.
             result:
               type: string
               format: byte
             status:
               type: string
-      TestCaseResults:
+  oraichain.orai.aioracle.TestCaseReport:
+    type: object
+    properties:
+      base_report:
+        type: object
+        properties:
+          request_id:
+            type: string
+          block_height:
+            type: string
+            format: int64
+          fees:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+          validator_address:
+            type: string
+            format: byte
+      results_with_test_case:
         type: array
         items:
           type: object
           properties:
-            name:
-              type: string
-            DataSourceResults:
+            entry_point:
+              type: object
+              properties:
+                url:
+                  type: string
+                headers:
+                  type: array
+                  items:
+                    type: string
+                owner:
+                  type: string
+                  format: byte
+                provider_fees:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      denom:
+                        type: string
+                      amount:
+                        type: string
+                    description: >-
+                      Coin defines a token with a denomination and an amount.
+
+
+                      NOTE: The amount field is an Int which implements the
+                      custom method
+
+                      signatures required by gogoproto.
+            test_case_results:
               type: array
               items:
                 type: object
                 properties:
-                  name:
-                    type: string
+                  entry_point:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                      headers:
+                        type: array
+                        items:
+                          type: string
+                      owner:
+                        type: string
+                        format: byte
+                      provider_fees:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            denom:
+                              type: string
+                            amount:
+                              type: string
+                          description: >-
+                            Coin defines a token with a denomination and an
+                            amount.
+
+
+                            NOTE: The amount field is an Int which implements
+                            the custom method
+
+                            signatures required by gogoproto.
                   result:
                     type: string
                     format: byte
                   status:
                     type: string
-      blockHeight:
-        type: string
-        format: int64
-      fees:
-        type: array
-        items:
-          type: object
-          properties:
-            denom:
-              type: string
-            amount:
-              type: string
-          description: |-
-            Coin defines a token with a denomination and an amount.
-
-            NOTE: The amount field is an Int which implements the custom method
-            signatures required by gogoproto.
-      aggregatedResult:
-        type: string
-        format: byte
-      resultStatus:
-        type: string
-      reporter:
-        type: object
-        properties:
-          address:
-            type: string
-            format: byte
-          name:
-            type: string
-          validator:
-            type: string
-            format: byte
-        title: >-
-          Reporter is the one who send reports from the validator back to
-          Oraichain created by a validator
-    title: Report stores the result of the data source when validator executes it
-  oraichain.orai.websocket.Reporter:
-    type: object
-    properties:
-      address:
-        type: string
-        format: byte
-      name:
-        type: string
-      validator:
-        type: string
-        format: byte
-    title: >-
-      Reporter is the one who send reports from the validator back to Oraichain
-      created by a validator
-  oraichain.orai.websocket.TestCaseResult:
-    type: object
-    properties:
-      name:
-        type: string
-      DataSourceResults:
-        type: array
-        items:
-          type: object
-          properties:
-            name:
-              type: string
-            result:
-              type: string
-              format: byte
             status:
               type: string
-  oraichain.orai.websocket.ValResult:
+    title: >-
+      TestCaseReport stores the result of the test cases when a validator
+      executes it
+  oraichain.orai.aioracle.ValResult:
     type: object
     properties:
       validator:
@@ -51514,7 +51421,7 @@ definitions:
             title: >-
               Address is the address who is the original validator to store
               information of those that execute the oScript
-          votingPower:
+          voting_power:
             type: string
             format: int64
           status:
@@ -51522,9 +51429,9 @@ definitions:
       result:
         type: string
         format: byte
-      resultStatus:
+      result_status:
         type: string
-  oraichain.orai.websocket.Validator:
+  oraichain.orai.aioracle.Validator:
     type: object
     properties:
       address:
@@ -51533,295 +51440,11 @@ definitions:
         title: >-
           Address is the address who is the original validator to store
           information of those that execute the oScript
-      votingPower:
+      voting_power:
         type: string
         format: int64
       status:
         type: string
-  oraichain.orai.provider.DataSourceInfoRes:
-    type: object
-    properties:
-      name:
-        type: string
-      owner:
-        type: string
-        format: byte
-        description: >-
-          Owner is the address who is allowed to make further changes to the
-          data source.
-      contract:
-        type: string
-      description:
-        type: string
-      fees:
-        type: array
-        items:
-          type: object
-          properties:
-            denom:
-              type: string
-            amount:
-              type: string
-          description: |-
-            Coin defines a token with a denomination and an amount.
-
-            NOTE: The amount field is an Int which implements the custom method
-            signatures required by gogoproto.
-    title: >-
-      DataSourceInfoRes is the response type for the Query/DataSourceInfo RPC
-      method
-  oraichain.orai.provider.ListDataSourcesRes:
-    type: object
-    properties:
-      AIDataSources:
-        type: array
-        items:
-          type: object
-          properties:
-            name:
-              type: string
-            contract:
-              type: string
-            owner:
-              type: string
-              format: byte
-              description: >-
-                Owner is the address who is allowed to make further changes to
-                the data source.
-            description:
-              type: string
-            fees:
-              type: array
-              items:
-                type: object
-                properties:
-                  denom:
-                    type: string
-                  amount:
-                    type: string
-                description: >-
-                  Coin defines a token with a denomination and an amount.
-
-
-                  NOTE: The amount field is an Int which implements the custom
-                  method
-
-                  signatures required by gogoproto.
-      count:
-        type: string
-        format: int64
-    title: >-
-      ListDataSourcesRes is the response type for the Query/ListDataSources RPC
-      method
-  oraichain.orai.provider.ListOracleScriptsRes:
-    type: object
-    properties:
-      OracleScripts:
-        type: array
-        items:
-          type: object
-          properties:
-            name:
-              type: string
-            contract:
-              type: string
-            owner:
-              type: string
-              format: byte
-              description: >-
-                Owner is the address who is allowed to make further changes to
-                the data source.
-            description:
-              type: string
-            minimum_fees:
-              type: array
-              items:
-                type: object
-                properties:
-                  denom:
-                    type: string
-                  amount:
-                    type: string
-                description: >-
-                  Coin defines a token with a denomination and an amount.
-
-
-                  NOTE: The amount field is an Int which implements the custom
-                  method
-
-                  signatures required by gogoproto.
-            d_sources:
-              type: array
-              items:
-                type: string
-            t_cases:
-              type: array
-              items:
-                type: string
-      count:
-        type: string
-        format: int64
-    title: >-
-      ListOracleScriptsRes is the response type for the Query/ListOracleScripts
-      RPC method
-  oraichain.orai.provider.ListTestCasesRes:
-    type: object
-    properties:
-      TestCases:
-        type: array
-        items:
-          type: object
-          properties:
-            name:
-              type: string
-            contract:
-              type: string
-            owner:
-              type: string
-              format: byte
-              description: >-
-                Owner is the address who is allowed to make further changes to
-                the data source.
-            description:
-              type: string
-            fees:
-              type: array
-              items:
-                type: object
-                properties:
-                  denom:
-                    type: string
-                  amount:
-                    type: string
-                description: >-
-                  Coin defines a token with a denomination and an amount.
-
-
-                  NOTE: The amount field is an Int which implements the custom
-                  method
-
-                  signatures required by gogoproto.
-      count:
-        type: string
-        format: int64
-    title: >-
-      ListTestCasesRes is the response type for the Query/ListTestCases RPC
-      method
-  oraichain.orai.provider.MinFeesRes:
-    type: object
-    properties:
-      minFees:
-        type: string
-    title: >-
-      ListOracleScriptsRes is the response type for the Query/ListOracleScripts
-      RPC method
-  oraichain.orai.provider.OracleScript:
-    type: object
-    properties:
-      name:
-        type: string
-      contract:
-        type: string
-      owner:
-        type: string
-        format: byte
-        description: >-
-          Owner is the address who is allowed to make further changes to the
-          data source.
-      description:
-        type: string
-      minimum_fees:
-        type: array
-        items:
-          type: object
-          properties:
-            denom:
-              type: string
-            amount:
-              type: string
-          description: |-
-            Coin defines a token with a denomination and an amount.
-
-            NOTE: The amount field is an Int which implements the custom method
-            signatures required by gogoproto.
-      d_sources:
-        type: array
-        items:
-          type: string
-      t_cases:
-        type: array
-        items:
-          type: string
-  oraichain.orai.provider.OracleScriptInfoRes:
-    type: object
-    properties:
-      name:
-        type: string
-      owner:
-        type: string
-        format: byte
-        description: >-
-          Owner is the address who is allowed to make further changes to the
-          oracle script.
-      contract:
-        type: string
-      description:
-        type: string
-      fees:
-        type: array
-        items:
-          type: object
-          properties:
-            denom:
-              type: string
-            amount:
-              type: string
-          description: |-
-            Coin defines a token with a denomination and an amount.
-
-            NOTE: The amount field is an Int which implements the custom method
-            signatures required by gogoproto.
-      d_sources:
-        type: array
-        items:
-          type: string
-      t_cases:
-        type: array
-        items:
-          type: string
-    title: >-
-      OracleScriptInfoRes is the response type for the Query/OracleScriptInfo
-      RPC method
-  oraichain.orai.provider.TestCaseInfoRes:
-    type: object
-    properties:
-      name:
-        type: string
-      owner:
-        type: string
-        format: byte
-        description: >-
-          Owner is the address who is allowed to make further changes to the
-          test case.
-      contract:
-        type: string
-      description:
-        type: string
-      fees:
-        type: array
-        items:
-          type: object
-          properties:
-            denom:
-              type: string
-            amount:
-              type: string
-          description: |-
-            Coin defines a token with a denomination and an amount.
-
-            NOTE: The amount field is an Int which implements the custom method
-            signatures required by gogoproto.
-    title: TestCaseInfoRes is the response type for the Query/TestCaseInfo RPC method
   cosmwasm.wasm.v1beta1.AbsoluteTxPosition:
     type: object
     properties:
@@ -52317,58 +51940,3 @@ definitions:
     title: >-
       QuerySmartContractStateResponse is the response type for the
       Query/SmartContractState RPC method
-  oraichain.orai.websocket.Fetch:
-    type: object
-    properties:
-      url:
-        type: string
-      method:
-        type: string
-      authorization:
-        type: string
-      body:
-        type: string
-  oraichain.orai.websocket.Request:
-    type: object
-    properties:
-      fetch:
-        type: object
-        properties:
-          url:
-            type: string
-          method:
-            type: string
-          authorization:
-            type: string
-          body:
-            type: string
-    title: Report stores the result of the data source when validator executes it
-  oraichain.orai.websocket.RequestDataSource:
-    type: object
-    properties:
-      input:
-        type: string
-  oraichain.orai.websocket.RequestOracleScript:
-    type: object
-    properties:
-      results:
-        type: array
-        items:
-          type: string
-  oraichain.orai.websocket.RequestTestCase:
-    type: object
-    properties:
-      contract:
-        type: string
-        format: byte
-      input:
-        type: string
-      output:
-        type: string
-  oraichain.orai.websocket.ResponseContract:
-    type: object
-    properties:
-      data:
-        type: string
-        format: byte
-    title: Report stores the result of the data source when validator executes it
