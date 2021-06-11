@@ -8,7 +8,7 @@ CHAIN_ID=${CHAIN_ID:-Oraichain}
 USER=${USER:-tupt}
 MONIKER=${MONIKER:-node001}
 # PASSWORD=${PASSWORD:-$1}
-rm -rf .oraid/
+# rm -rf .oraid/
 
 oraid init --chain-id "$CHAIN_ID" "$MONIKER"
 

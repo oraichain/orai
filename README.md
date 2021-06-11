@@ -12,7 +12,7 @@ go get -d ./...
 # build protobuf templates
 make proto-gen
 
-# wget https://github.com/CosmWasm/wasmvm/releases/download/v0.13.0/libwasmvm_muslc.a -O /lib/libwasmvm_muslc.a
+# wget https://github.com/CosmWasm/wasmvm/releases/download/v0.14.0/libwasmvm_muslc.a -O /lib/libwasmvm_muslc.a
 make build GOMOD_FLAGS=
 ln -s $PWD/build/oraid /usr/bin/oraid
 

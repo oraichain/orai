@@ -19,10 +19,11 @@ services:
       - orai.dev.env
     volumes:
       - ./:/workspace
-      - ./smart-contracts:/workspace/oraiwasm
+      - ./build:/usr/local/bin
+      - ./upgrades:/root/oraivisor/upgrades      
 
-  orai_prod:
-    image: orai/orai:0.20.1-alpine
+  orai1:
+    image: orai/orai:alpine-wasm
     tty: true
     ulimits:
       nofile:
@@ -30,14 +31,16 @@ services:
         hard: 65536
     ports:
       - 1318:1317
-      - 26666:26656
-      - 26667:26657
+      - 26658:26656
+      - 26659:26657
     security_opt:
       - 'seccomp:unconfined'
     cap_add:
       - SYS_PTRACE
     env_file:
-      - orai.env
+      - orai.dev.env
     volumes:
-      - ./:/workspace
-      - ./build:/workspace/build
+      - ./.oraid1:/workspace/.oraid
+      - ./build:/usr/local/bin
+      - ./scripts:/workspace/scripts
+      - ./upgrades:/root/oraivisor/upgrades

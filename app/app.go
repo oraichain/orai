@@ -22,6 +22,7 @@ import (
 
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
@@ -234,8 +235,9 @@ type OraichainApp struct {
 	aiOracleKeeper *aioracle.Keeper
 
 	// make scoped keepers public for test purposes
-	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
-	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
+	scopedIBCKeeper      capabilitykeeper.ScopedKeeper
+	scopedTransferKeeper capabilitykeeper.ScopedKeeper
+	scopedWasmKeeper     capabilitykeeper.ScopedKeeper
 
 	// the module manager
 	mm *module.Manager
@@ -293,6 +295,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	app.capabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
 	scopedIBCKeeper := app.capabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.capabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
+	scopedWasmKeeper := app.capabilityKeeper.ScopeToModule(wasm.ModuleName)
 
 	// add keepers
 	app.accountKeeper = authkeeper.NewAccountKeeper(
@@ -350,6 +353,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		app.ibcKeeper.ChannelKeeper, &app.ibcKeeper.PortKeeper,
 		app.accountKeeper, app.bankKeeper, scopedTransferKeeper,
 	)
+
 	transferModule := transfer.NewAppModule(app.transferKeeper)
 
 	// Create static IBC router, add transfer route, then set and seal it
@@ -363,7 +367,6 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	app.evidenceKeeper = *evidenceKeeper
 
 	// just re-use the full router - do we want to limit this more?
-	var wasmRouter = bApp.Router()
 	wasmDir := filepath.Join(homePath, "wasm")
 
 	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
@@ -372,7 +375,12 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	}
 	// The last arguments can contain custom message handlers, and custom query handlers,
 	// if we want to allow any custom callbacks
-	supportedFeatures := "staking"
+	supportedFeatures := "staking,stargate"
+
+	// add custom query
+	wasmOpts := []wasm.Option{
+		wasmkeeper.WithQueryPlugins(aioracle.CreateQueryPlugins(app.bankKeeper, app.stakingKeeper)),
+	}
 
 	app.wasmKeeper = wasm.NewKeeper(
 		appCodec,
@@ -382,18 +390,23 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		app.bankKeeper,
 		app.stakingKeeper,
 		app.distrKeeper,
-		wasmRouter,
+		app.ibcKeeper.ChannelKeeper,
+		&app.ibcKeeper.PortKeeper,
+		scopedWasmKeeper,
+		app.transferKeeper,
+		app.Router(),
+		app.GRPCQueryRouter(),
 		wasmDir,
 		wasmConfig,
 		supportedFeatures,
-		nil,
-		aioracle.CreateQueryPlugins(app.bankKeeper, app.stakingKeeper),
+		wasmOpts...,
 	)
 
 	// The gov proposal types can be individually enabled
 	if len(enabledProposals) != 0 {
 		govRouter.AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.wasmKeeper, enabledProposals))
 	}
+	ibcRouter.AddRoute(wasm.ModuleName, wasm.NewIBCHandler(app.wasmKeeper, app.ibcKeeper.ChannelKeeper))
 	app.ibcKeeper.SetRouter(ibcRouter)
 
 	app.govKeeper = govkeeper.NewKeeper(
@@ -440,7 +453,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		distr.NewAppModule(appCodec, app.distrKeeper, app.accountKeeper, app.bankKeeper, app.stakingKeeper),
 		staking.NewAppModule(appCodec, app.stakingKeeper, app.accountKeeper, app.bankKeeper),
 		upgrade.NewAppModule(app.upgradeKeeper),
-		wasm.NewAppModule(&app.wasmKeeper, app.stakingKeeper),
+		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.stakingKeeper),
 		evidence.NewAppModule(app.evidenceKeeper),
 		ibc.NewAppModule(app.ibcKeeper),
 		params.NewAppModule(app.paramsKeeper),
@@ -493,7 +506,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		distr.NewAppModule(appCodec, app.distrKeeper, app.accountKeeper, app.bankKeeper, app.stakingKeeper),
 		slashing.NewAppModule(appCodec, app.slashingKeeper, app.accountKeeper, app.bankKeeper, app.stakingKeeper),
 		params.NewAppModule(app.paramsKeeper),
-		wasm.NewAppModule(&app.wasmKeeper, app.stakingKeeper),
+		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.stakingKeeper),
 		evidence.NewAppModule(app.evidenceKeeper),
 		ibc.NewAppModule(app.ibcKeeper),
 		transferModule,
@@ -535,8 +548,9 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		app.capabilityKeeper.InitializeAndSeal(ctx)
 	}
 
-	app.ScopedIBCKeeper = scopedIBCKeeper
-	app.ScopedTransferKeeper = scopedTransferKeeper
+	app.scopedIBCKeeper = scopedIBCKeeper
+	app.scopedTransferKeeper = scopedTransferKeeper
+	app.scopedWasmKeeper = scopedWasmKeeper
 
 	return app
 }
