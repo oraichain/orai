@@ -36,7 +36,10 @@ func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *websocket.Repor
 	// collect data source owners that have their data sources executed to reward
 	for _, dataSourceResult := range rep.GetDataSourceResults() {
 		if dataSourceResult.GetStatus() == k.webSocketKeeper.GetKeyResultSuccess() {
-			dataSource, _ := k.providerKeeper.GetAIDataSource(ctx, dataSourceResult.GetName())
+			dataSource, err := k.providerKeeper.GetAIDataSource(ctx, dataSourceResult.GetName())
+			if err != nil || dataSource == nil {
+				continue
+			}
 			reward.DataSources = append(reward.DataSources, *dataSource)
 			reward.ProviderFees = reward.ProviderFees.Add(dataSource.GetFees()...)
 		}
@@ -44,7 +47,10 @@ func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *websocket.Repor
 
 	// collect data source owners that have their data sources executed to reward
 	for _, testCaseResult := range rep.GetTestCaseResults() {
-		testCase, _ := k.providerKeeper.GetTestCase(ctx, testCaseResult.GetName())
+		testCase, err := k.providerKeeper.GetTestCase(ctx, testCaseResult.GetName())
+		if err != nil || testCase == nil {
+			continue
+		}
 		reward.TestCases = append(reward.TestCases, *testCase)
 		reward.ProviderFees = reward.ProviderFees.Add(testCase.GetFees()...)
 	}
