@@ -23,12 +23,12 @@ func GetTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 	txCmd.AddCommand(
-		GetCmdSetAIDataSource(),
-		GetCmdSetOracleScript(),
-		GetCmdSetTestCase(),
-		GetCmdEditOracleScript(),
-		GetCmdEditAIDataSource(),
-		GetCmdEditTestCase(),
+	// GetCmdSetAIDataSource(),
+	// GetCmdSetOracleScript(),
+	// GetCmdSetTestCase(),
+	// GetCmdEditOracleScript(),
+	// GetCmdEditAIDataSource(),
+	// GetCmdEditTestCase(),
 	)
 	return txCmd
 }
