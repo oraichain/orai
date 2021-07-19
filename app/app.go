@@ -390,7 +390,8 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		wasmConfig,
 		supportedFeatures,
 		nil,
-		websocket.CreateQueryPlugins(app.bankKeeper, app.stakingKeeper),
+		// websocket.CreateQueryPlugins(app.bankKeeper, app.stakingKeeper),
+		nil,
 	)
 
 	// The gov proposal types can be individually enabled
