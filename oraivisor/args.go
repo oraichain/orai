@@ -23,7 +23,6 @@ type Config struct {
 	Name                  string
 	AllowDownloadBinaries bool
 	RestartAfterUpgrade   bool
-	WatchStdOut           bool
 	LogBufferSize         int
 }
 
@@ -101,10 +100,6 @@ func GetConfigFromEnv() (*Config, error) {
 
 	if os.Getenv("DAEMON_RESTART_AFTER_UPGRADE") == "true" {
 		cfg.RestartAfterUpgrade = true
-	}
-
-	if os.Getenv("DEAMON_WATCH_STDOUT") == "true" {
-		cfg.WatchStdOut = true
 	}
 
 	logBufferSizeStr := os.Getenv("DAEMON_LOG_BUFFER_SIZE")
