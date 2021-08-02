@@ -13,11 +13,6 @@ import (
 	"syscall"
 )
 
-const (
-	// DefaultMaxScanSize copy from wasm, we make bigger for sure
-	DefaultMaxScanSize = 700 * 1024
-)
-
 // LaunchProcess runs a subprocess and returns when the subprocess exits,
 // either when it dies, or *after* a successful upgrade.
 func LaunchProcess(cfg *Config, args []string, stdout, stderr io.Writer) (bool, error) {
@@ -41,11 +36,26 @@ func LaunchProcess(cfg *Config, args []string, stdout, stderr io.Writer) (bool, 
 		return false, err
 	}
 
-	scanOut := bufio.NewScanner(io.TeeReader(outpipe, stdout))
 	scanErr := bufio.NewScanner(io.TeeReader(errpipe, stderr))
-	buf := make([]byte, 2)
-	scanOut.Buffer(buf, DefaultMaxScanSize)
-	scanErr.Buffer(buf, DefaultMaxScanSize)
+	// set scanner's buffer size to cfg.LogBufferSize, and ensure larger than bufio.MaxScanTokenSize otherwise fallback to bufio.MaxScanTokenSize
+	var maxCapacity int
+	if cfg.LogBufferSize < bufio.MaxScanTokenSize {
+		maxCapacity = bufio.MaxScanTokenSize
+	} else {
+		maxCapacity = cfg.LogBufferSize
+	}
+
+	bufErr := make([]byte, maxCapacity)
+	scanErr.Buffer(bufErr, maxCapacity)
+
+	var scanOut *bufio.Scanner = nil
+	if cfg.WatchStdOut {
+		fmt.Println("Watch stdout as well")
+		scanOut = bufio.NewScanner(io.TeeReader(outpipe, stdout))
+		bufOut := make([]byte, maxCapacity)
+		scanOut.Buffer(bufOut, maxCapacity)
+	}
+
 	if err := cmd.Start(); err != nil {
 		return false, fmt.Errorf("launching process %s %s: %w", bin, strings.Join(args, " "), err)
 	}
@@ -132,8 +142,10 @@ func WaitForUpgradeOrExit(cmd *exec.Cmd, scanOut, scanErr *bufio.Scanner) (*Upgr
 		}
 	}
 
-	// wait for the scanners, which can trigger upgrade and kill cmd
-	go waitScan(scanOut)
+	// wait for the scanners, which can trigger upgrade and kill cmd, scanOut is options
+	if scanOut != nil {
+		go waitScan(scanOut)
+	}
 	go waitScan(scanErr)
 
 	// if the command exits normally (eg. short command like `gaiad version`), just return (nil, nil)
