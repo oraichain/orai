@@ -21,23 +21,23 @@ services:
       - ./:/workspace
       - ./smart-contracts:/workspace/oraiwasm
 
-  orai_prod:
-    image: orai/orai:0.20.1-alpine
-    tty: true
-    ulimits:
-      nofile:
-        soft: 65536
-        hard: 65536
-    ports:
-      - 1318:1317
-      - 26666:26656
-      - 26667:26657
-    security_opt:
-      - 'seccomp:unconfined'
-    cap_add:
-      - SYS_PTRACE
-    env_file:
-      - orai.env
-    volumes:
-      - ./:/workspace
-      - ./build:/workspace/build
+  # orai_prod:
+  #   image: orai/orai:0.20.1-alpine
+  #   tty: true
+  #   ulimits:
+  #     nofile:
+  #       soft: 65536
+  #       hard: 65536
+  #   ports:
+  #     - 1318:1317
+  #     - 26666:26656
+  #     - 26667:26657
+  #   security_opt:
+  #     - 'seccomp:unconfined'
+  #   cap_add:
+  #     - SYS_PTRACE
+  #   env_file:
+  #     - orai.env
+  #   volumes:
+  #     - ./:/workspace
+  #     - ./build:/workspace/build
