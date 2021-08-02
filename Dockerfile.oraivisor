@@ -18,7 +18,7 @@ RUN go get github.com/pwaller/goupx
 RUN goupx /code/build/oraivisor
 
 # ----- Update oraivisor from mainnet-alpine ---------------------------------------------------
-FROM orai/orai:mainnet-alpine
+FROM orai/orai:0.20.1-alpine
 
 # copy binaries
 COPY --from=go-builder /code/build/oraivisor /usr/bin
