@@ -16,6 +16,10 @@ import (
 //    return fmt.Sprintf("height: %d", p.Height)
 var upgradeRegex = regexp.MustCompile(`UPGRADE "(.*)" NEEDED at ((height): (\d+)|(time): (\S+)):\s+(\S*)`)
 
+var infoHotFix = map[string]string{
+	"https://ipfs.io/ipfs/Qmahj5DWvXanBji73YywYuDs9dXA2Cm3dfsLMtvxL7GsJC": "https://ipfs.io/ipfs/QmSymqJhmDAqa5CkfDpri8Pjt3rfL1qbGT3CC7XqXEnaBo",
+}
+
 // UpgradeInfo is the details from the regexp
 type UpgradeInfo struct {
 	Name string
@@ -29,18 +33,16 @@ type UpgradeInfo struct {
 func WaitForUpdate(scanner *bufio.Scanner) (*UpgradeInfo, error) {
 	for scanner.Scan() {
 		line := scanner.Text()
-
-		// // pre-check incase processing wrong string
-		// if !strings.HasPrefix(line, "UPGRADE") {
-		// 	continue
-		// }
-
 		// the do regular match
 		if upgradeRegex.MatchString(line) {
 			subs := upgradeRegex.FindStringSubmatch(line)
+			infoUrl := subs[7]
+			if val, ok := infoHotFix[infoUrl]; ok {
+				infoUrl = val
+			}
 			info := UpgradeInfo{
 				Name: subs[1],
-				Info: subs[7],
+				Info: infoUrl,
 			}
 			return &info, nil
 		}
