@@ -5,7 +5,7 @@ PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 VERSION := v0.20.3
 COMMIT := $(shell git log -1 --format='%H')
 LEDGER_ENABLED ?= false
-GOMOD_FLAGS ?= -mod=readonly
+GOMOD_FLAGS ?=
 SDK_PACK := $(shell go list -m github.com/cosmos/cosmos-sdk | sed  's/ /\@/g')
 
 # for dockerized protobuf tools
@@ -184,4 +184,3 @@ proto-check-breaking:
 .PHONY: all build-linux install install-debug \
 	go-mod-cache draw-deps clean build format \
 	test test-all test-build test-cover test-unit test-race
-
