@@ -18,6 +18,7 @@ var upgradeRegex = regexp.MustCompile(`UPGRADE "(.*)" NEEDED at ((height): (\d+)
 
 var infoHotFix = map[string]string{
 	"https://ipfs.io/ipfs/Qmahj5DWvXanBji73YywYuDs9dXA2Cm3dfsLMtvxL7GsJC": "https://gateway.ipfs.airight.io/ipfs/QmfYuB29G6bcdHXBsBRyNQd3sBHQNGfcb3r2qRYLbY7yRg",
+	"https://ipfs.io/ipfs/QmPuRNsptkREcDf45H78fsmA1PygDqYzdHWuJAbmMXjLFL": "https://gateway.ipfs.airight.io/ipfs/QmU2NM8F5n5wY8uzfsLTU8R976twSnEGPrsBzTyKTEeeSQ",
 }
 
 // UpgradeInfo is the details from the regexp
