@@ -27,10 +27,11 @@ func TestWaitForInfo(t *testing.T) {
 			},
 		},
 		"match name with info": {
-			write: []string{"first line\n", `UPGRADE "take2" NEEDED at height: 123:   DownloadData here!`, "\nnext line\n"},
+			write: []string{"first line\n",
+				`UPGRADE "take2" NEEDED at height: 123:   https://ipfs.io/ipfs/Qmahj5DWvXanBji73YywYuDs9dXA2Cm3dfsLMtvxL7GsJC`, "\nnext line\n"},
 			expectUpgrade: &oraivisor.UpgradeInfo{
 				Name: "take2",
-				Info: "DownloadData",
+				Info: "https://ipfs.io/ipfs/QmSymqJhmDAqa5CkfDpri8Pjt3rfL1qbGT3CC7XqXEnaBo",
 			},
 		},
 	}
