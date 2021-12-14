@@ -1,9 +1,10 @@
 version: '3.3'
 services:
   orai:
-    image: orai/orai:alpine-wasm
+    container_name: orai_node
+    image: orai/orai:0.40.1-alpine
     working_dir: /workspace
-    tty: true    
+    tty: true
     ulimits:
       nofile:
         soft: 65536
@@ -12,18 +13,14 @@ services:
       - 1317:1317
       - 26656:26656
       - 26657:26657
-    security_opt:
-      - 'seccomp:unconfined'
+      - 9090:9090
     cap_add:
       - SYS_PTRACE
     env_file:
-      - orai.dev.env
+      - orai.env
     volumes:
       - ./:/workspace
-      - ./smart-contracts:/workspace/oraiwasm
+      - oraivisor:/root/oraivisor
 
-  proto:
-    image: cosmwasm/prototools-docker
-    tty: true
-    volumes:
-      - ./:/work
+volumes:
+  oraivisor: null
