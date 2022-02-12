@@ -6,14 +6,13 @@ require (
 	github.com/CosmWasm/wasmd v0.15.0
 	github.com/cosmos/cosmos-sdk v0.42.11
 	github.com/cosmos/go-bip39 v1.0.0
-	github.com/cosmtrek/air v1.21.2 // indirect
+	github.com/cosmtrek/air v1.27.10 // indirect
 	github.com/creack/pty v1.1.11 // indirect
 	github.com/fatih/color v1.10.0 // indirect
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/kyokomi/emoji v2.2.4+incompatible
 	github.com/oasisprotocol/oasis-core/go v0.2012.4
 	github.com/pkg/errors v0.9.1
