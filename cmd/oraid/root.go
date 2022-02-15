@@ -32,6 +32,7 @@ import (
 
 	clientcodec "github.com/CosmWasm/wasmd/x/wasm/client/codec"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/debug"
@@ -71,6 +72,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	config.SetBech32PrefixForAccount(app.Bech32PrefixAccAddr, app.Bech32PrefixAccPub)
 	config.SetBech32PrefixForValidator(app.Bech32PrefixValAddr, app.Bech32PrefixValPub)
 	config.SetBech32PrefixForConsensusNode(app.Bech32PrefixConsAddr, app.Bech32PrefixConsPub)
+	config.SetAddressVerifier(wasmtypes.VerifyAddressLen())
 	config.Seal()
 
 	initClientCtx := client.Context{}.

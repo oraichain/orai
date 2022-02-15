@@ -858,7 +858,7 @@ func (app *OraichainApp) upgradeHandler() {
 			"ibc":          1,
 			"genutil":      1,
 			"transfer":     1,
-			// "wasm":         1,
+			"wasm":         1,
 			// "provider":  1,
 			// "airequest": 1,
 			// "websocket": 1,
