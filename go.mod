@@ -1,12 +1,12 @@
 module github.com/oraichain/orai
 
-go 1.15
+go 1.17
 
 require (
 	github.com/CosmWasm/wasmd v0.23.0
-	github.com/cosmos/cosmos-sdk v0.45.1
-	github.com/cosmos/ibc-go/v2 v2.0.2
+	github.com/cosmos/cosmos-sdk v0.45.0
 	github.com/cosmos/go-bip39 v1.0.0
+	github.com/cosmos/ibc-go/v2 v2.0.2
 	github.com/cosmtrek/air v1.27.10 // indirect
 	github.com/creack/pty v1.1.11 // indirect
 	github.com/gogo/protobuf v1.3.3
@@ -16,6 +16,7 @@ require (
 	github.com/kyokomi/emoji v2.2.4+incompatible
 	github.com/oasisprotocol/oasis-core/go v0.2012.4
 	github.com/pkg/errors v0.9.1
+	github.com/prometheus/client_golang v1.12.0
 	github.com/pwaller/goupx v0.0.0-20160623083017-1d58e01d5ce2 // indirect
 	github.com/rakyll/statik v0.1.7
 	github.com/rs/zerolog v1.26.0

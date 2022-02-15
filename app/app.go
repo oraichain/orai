@@ -108,6 +108,7 @@ import (
 	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
 	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	ibcclientclient "github.com/cosmos/ibc-go/v2/modules/core/02-client/client"
+	appparams "github.com/oraichain/orai/app/params"
 )
 
 const appName = "Oraichain"
@@ -283,10 +284,9 @@ type OraichainApp struct {
 
 // NewOraichainApp returns a reference to an initialized OraichainApp.
 func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool,
-	skipUpgradeHeights map[int64]bool, homePath string, invCheckPeriod uint, enabledProposals []wasm.ProposalType,
+	skipUpgradeHeights map[int64]bool, homePath string, invCheckPeriod uint, encodingConfig appparams.EncodingConfig, enabledProposals []wasm.ProposalType,
 	appOpts servertypes.AppOptions, wasmOpts []wasm.Option, baseAppOptions ...func(*baseapp.BaseApp)) *OraichainApp {
 
-	encodingConfig := MakeEncodingConfig()
 	appCodec, legacyAmino := encodingConfig.Marshaler, encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 
@@ -709,6 +709,9 @@ func (app *OraichainApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain)
 	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		panic(err)
 	}
+
+	app.upgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
+
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
 }
 
@@ -855,11 +858,11 @@ func (app *OraichainApp) upgradeHandler() {
 			"ibc":          1,
 			"genutil":      1,
 			"transfer":     1,
-			"wasm":         1,
-			"provider":     1,
-			"airequest":    1,
-			"websocket":    1,
-			"airesult":     1,
+			// "wasm":         1,
+			// "provider":  1,
+			// "airequest": 1,
+			// "websocket": 1,
+			// "airesult":  1,
 		}
 
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
@@ -872,7 +875,8 @@ func (app *OraichainApp) upgradeHandler() {
 
 	if upgradeInfo.Name == "v0.44" && !app.upgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		storeUpgrades := storetypes.StoreUpgrades{
-			Added: []string{"authz", "feegrant"},
+			Added:   []string{"authz", "feegrant"},
+			Deleted: []string{},
 		}
 
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades

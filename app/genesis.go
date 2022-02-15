@@ -39,7 +39,7 @@ func NewDefaultGenesisState(cdc codec.Codec) GenesisState {
 
 	govGenesis.DepositParams.MinDeposit = sdk.NewCoins(sdk.NewCoin(provider.Denom, sdk.TokensFromConsensusPower(10, sdk.NewInt(1000000))))
 	// TODO: testing
-	govGenesis.VotingParams.VotingPeriod = time.Minute * 2 // test for 10 mins voting period
+	govGenesis.VotingParams.VotingPeriod = time.Second * 30 // test for 10 mins voting period
 	genesisState[gov.ModuleName] = cdc.MustMarshalJSON(govGenesis)
 
 	crisisGenesis.ConstantFee = sdk.NewCoin(provider.Denom, sdk.TokensFromConsensusPower(10, sdk.NewInt(1000000)))
