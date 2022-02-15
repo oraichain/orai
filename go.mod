@@ -3,7 +3,7 @@ module github.com/oraichain/orai
 go 1.15
 
 require (
-	github.com/CosmWasm/wasmd v0.15.0
+	github.com/CosmWasm/wasmd v0.17.0
 	github.com/cosmos/cosmos-sdk v0.42.11
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/cosmtrek/air v1.27.10 // indirect
