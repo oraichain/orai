@@ -12,7 +12,7 @@ func (k Keeper) ResolveResult(ctx sdk.Context, rep *websocket.Report, valCount i
 	id := rep.GetRequestID()
 	// get a new validator object for the result object.
 	valAddress := rep.GetReporter().GetValidator()
-	validator := k.webSocketKeeper.NewValidator(valAddress, k.stakingKeeper.Validator(ctx, valAddress).GetConsensusPower(), k.stakingKeeper.Validator(ctx, valAddress).GetStatus().String())
+	validator := k.webSocketKeeper.NewValidator(valAddress, k.stakingKeeper.Validator(ctx, valAddress).GetConsensusPower(sdk.NewInt(1000000)), k.stakingKeeper.Validator(ctx, valAddress).GetStatus().String())
 
 	if !k.HasResult(ctx, id) {
 		// if the the request only needs a validator to return a result from the report then it's finished
@@ -63,7 +63,7 @@ func (k Keeper) HasResult(ctx sdk.Context, reqID string) bool {
 func (k Keeper) GetResult(ctx sdk.Context, reqID string) (*types.AIRequestResult, error) {
 	store := ctx.KVStore(k.storeKey)
 	var result types.AIRequestResult
-	err := k.cdc.UnmarshalBinaryBare(store.Get(types.ResultStoreKey(reqID)), &result)
+	err := k.cdc.Unmarshal(store.Get(types.ResultStoreKey(reqID)), &result)
 	if err != nil {
 		return &types.AIRequestResult{}, err
 	}
@@ -74,7 +74,7 @@ func (k Keeper) GetResult(ctx sdk.Context, reqID string) (*types.AIRequestResult
 func (k Keeper) SetResult(ctx sdk.Context, reqID string, result *types.AIRequestResult) error {
 	store := ctx.KVStore(k.storeKey)
 
-	bz, err := k.cdc.MarshalBinaryBare(result)
+	bz, err := k.cdc.Marshal(result)
 	store.Set(types.ResultStoreKey(reqID), bz)
 	return err
 }

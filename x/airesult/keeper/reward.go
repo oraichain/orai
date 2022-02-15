@@ -9,7 +9,7 @@ import (
 
 // SetReward saves the reward to the storage without performing validation.
 func (k Keeper) SetReward(ctx sdk.Context, rew *types.Reward) error {
-	bz, err := k.cdc.MarshalBinaryBare(rew)
+	bz, err := k.cdc.Marshal(rew)
 	ctx.KVStore(k.storeKey).Set(types.RewardStoreKey(rew.BlockHeight), bz)
 	return err
 }
@@ -25,7 +25,7 @@ func (k Keeper) GetReward(ctx sdk.Context, blockHeight int64) (*types.Reward, er
 		return nil, err
 	}
 	var reward types.Reward
-	err = k.cdc.UnmarshalBinaryBare(store.Get(types.RewardStoreKey(blockHeight)), &reward)
+	err = k.cdc.Unmarshal(store.Get(types.RewardStoreKey(blockHeight)), &reward)
 	if err != nil {
 		return &types.Reward{
 			BlockHeight: int64(-1),

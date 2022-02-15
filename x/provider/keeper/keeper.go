@@ -15,14 +15,14 @@ import (
 // always clone keeper to make it immutable
 type (
 	Keeper struct {
-		cdc        codec.Marshaler
+		cdc        codec.Codec
 		storeKey   sdk.StoreKey
 		wasmKeeper *wasm.Keeper
 		paramSpace params.Subspace
 	}
 )
 
-func NewKeeper(cdc codec.Marshaler, storeKey sdk.StoreKey, wasmKeeper *wasm.Keeper, providerSubspace params.Subspace) *Keeper {
+func NewKeeper(cdc codec.Codec, storeKey sdk.StoreKey, wasmKeeper *wasm.Keeper, providerSubspace params.Subspace) *Keeper {
 	if !providerSubspace.HasKeyTable() {
 		// register parameters of the provider module into the param space
 		providerSubspace = providerSubspace.WithKeyTable(types.ParamKeyTable())
@@ -132,7 +132,7 @@ func (k *Keeper) GetAIDataSource(ctx sdk.Context, name string) (*types.AIDataSou
 	}
 	store := ctx.KVStore(k.storeKey)
 	aiDataSource := &types.AIDataSource{}
-	err := k.cdc.UnmarshalBinaryBare(store.Get(types.DataSourceStoreKey(name)), aiDataSource)
+	err := k.cdc.Unmarshal(store.Get(types.DataSourceStoreKey(name)), aiDataSource)
 	return aiDataSource, err
 }
 
@@ -149,7 +149,7 @@ func (k *Keeper) GetAIDataSources(ctx sdk.Context, page, limit uint) ([]types.AI
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var dSource types.AIDataSource
-		err := k.cdc.UnmarshalBinaryBare(iterator.Value(), &dSource)
+		err := k.cdc.Unmarshal(iterator.Value(), &dSource)
 		if err != nil {
 			return []types.AIDataSource{}, err
 		}
@@ -167,7 +167,7 @@ func (k *Keeper) GetAIDataSources(ctx sdk.Context, page, limit uint) ([]types.AI
 func (k Keeper) SetAIDataSource(ctx sdk.Context, name string, aiDataSource *types.AIDataSource) error {
 	store := ctx.KVStore(k.storeKey)
 
-	bz, err := k.cdc.MarshalBinaryBare(aiDataSource)
+	bz, err := k.cdc.Marshal(aiDataSource)
 	if err == nil {
 		store.Set(types.DataSourceStoreKey(name), bz)
 	}
@@ -200,14 +200,14 @@ func (k *Keeper) GetOracleScript(ctx sdk.Context, name string) (*types.OracleScr
 	}
 	store := ctx.KVStore(k.storeKey)
 	oScript := &types.OracleScript{}
-	err := k.cdc.UnmarshalBinaryBare(store.Get(types.OracleScriptStoreKey(name)), oScript)
+	err := k.cdc.Unmarshal(store.Get(types.OracleScriptStoreKey(name)), oScript)
 	return oScript, err
 }
 
 // SetOracleScript allows users to set a oScript into the store
 func (k Keeper) SetOracleScript(ctx sdk.Context, name string, oScript *types.OracleScript) error {
 	store := ctx.KVStore(k.storeKey)
-	bz, err := k.cdc.MarshalBinaryBare(oScript)
+	bz, err := k.cdc.Marshal(oScript)
 	if err == nil {
 		store.Set(types.OracleScriptStoreKey(name), bz)
 	}
@@ -224,7 +224,7 @@ func (k *Keeper) GetOracleScripts(ctx sdk.Context, page, limit uint) ([]types.Or
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var oScript types.OracleScript
-		err := k.cdc.UnmarshalBinaryBare(iterator.Value(), &oScript)
+		err := k.cdc.Unmarshal(iterator.Value(), &oScript)
 		if err != nil {
 			return []types.OracleScript{}, err
 		}
@@ -308,7 +308,7 @@ func (k *Keeper) GetTestCase(ctx sdk.Context, name string) (*types.TestCase, err
 	}
 	store := ctx.KVStore(k.storeKey)
 	testCase := &types.TestCase{}
-	err := k.cdc.UnmarshalBinaryBare(store.Get(types.TestCaseStoreKey(name)), testCase)
+	err := k.cdc.Unmarshal(store.Get(types.TestCaseStoreKey(name)), testCase)
 	return testCase, err
 }
 
@@ -320,7 +320,7 @@ func (k *Keeper) GetTestCases(ctx sdk.Context, page, limit uint) ([]types.TestCa
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var tCase types.TestCase
-		err := k.cdc.UnmarshalBinaryBare(iterator.Value(), &tCase)
+		err := k.cdc.Unmarshal(iterator.Value(), &tCase)
 		if err != nil {
 			return []types.TestCase{}, err
 		}
@@ -337,7 +337,7 @@ func (k *Keeper) GetTestCases(ctx sdk.Context, page, limit uint) ([]types.TestCa
 func (k Keeper) SetTestCase(ctx sdk.Context, name string, testCase *types.TestCase) error {
 	store := ctx.KVStore(k.storeKey)
 
-	bz, err := k.cdc.MarshalBinaryBare(testCase)
+	bz, err := k.cdc.Marshal(testCase)
 
 	if err == nil {
 		store.Set(types.TestCaseStoreKey(name), bz)

@@ -17,7 +17,7 @@ import (
 // Keeper of the provider store
 type Keeper struct {
 	storeKey        sdk.StoreKey
-	cdc             codec.Marshaler
+	cdc             codec.Codec
 	stakingKeeper   stakingkeeper.Keeper
 	wasmKeeper      *wasm.Keeper
 	providerKeeper  *provider.Keeper
@@ -26,7 +26,7 @@ type Keeper struct {
 }
 
 // NewKeeper creates a provider keeper
-func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, provider *provider.Keeper, s stakingkeeper.Keeper, r *airequest.Keeper) *Keeper {
+func NewKeeper(cdc codec.Codec, key sdk.StoreKey, wasmKeeper *wasm.Keeper, provider *provider.Keeper, s stakingkeeper.Keeper, r *airequest.Keeper) *Keeper {
 	// if !aiRequestSubspace.HasKeyTable() {
 	// 	// register parameters of the provider module into the param space
 	// 	aiRequestSubspace = aiRequestSubspace.WithKeyTable(types.ParamKeyTable())

@@ -17,7 +17,7 @@ import (
 // always clone keeper to make it immutable
 type (
 	Keeper struct {
-		cdc            codec.Marshaler
+		cdc            codec.Codec
 		storeKey       sdk.StoreKey
 		wasmKeeper     *wasm.Keeper
 		paramSpace     params.Subspace
@@ -28,7 +28,7 @@ type (
 )
 
 // NewKeeper creates a airequest keeper
-func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, aiRequestSubspace params.Subspace, stakingKeeper staking.Keeper, bankKeeper bank.Keeper, providerKeeper *provider.Keeper) *Keeper {
+func NewKeeper(cdc codec.Codec, key sdk.StoreKey, wasmKeeper *wasm.Keeper, aiRequestSubspace params.Subspace, stakingKeeper staking.Keeper, bankKeeper bank.Keeper, providerKeeper *provider.Keeper) *Keeper {
 	if !aiRequestSubspace.HasKeyTable() {
 		// register parameters of the airequest module into the param space
 		aiRequestSubspace = aiRequestSubspace.WithKeyTable(types.ParamKeyTable())

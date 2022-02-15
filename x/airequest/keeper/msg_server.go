@@ -83,10 +83,10 @@ func (k msgServer) CreateAIRequest(goCtx context.Context, msg *types.MsgSetAIReq
 	}
 
 	// substract coins in the creator wallet to charge fees
-	err = k.keeper.bankKeeper.SubtractCoins(ctx, msg.Creator, providedFees)
-	if err != nil {
-		return nil, sdkerrors.Wrap(types.ErrNeedMoreFees, "Your account has run out of tokens to create the AI Request, or there is something wrong")
-	}
+	// err = k.keeper.bankKeeper.SubtractCoins(ctx, msg.Creator, providedFees)
+	// if err != nil {
+	// 	return nil, sdkerrors.Wrap(types.ErrNeedMoreFees, "Your account has run out of tokens to create the AI Request, or there is something wrong")
+	// }
 
 	// set a new request with the aggregated result into blockchain
 	request := types.NewAIRequest(msg.RequestID, msg.OracleScriptName, msg.Creator, validators, ctx.BlockHeight(), dataSourceObjs, testcaseObjs, providedFees, msg.Input, msg.ExpectedOutput)

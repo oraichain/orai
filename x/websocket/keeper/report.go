@@ -16,7 +16,7 @@ func (k Keeper) HasReport(ctx sdk.Context, id string, val sdk.ValAddress) bool {
 
 // SetReport saves the report to the storage without performing validation.
 func (k Keeper) SetReport(ctx sdk.Context, id string, rep *types.Report) error {
-	bz, err := k.cdc.MarshalBinaryBare(rep)
+	bz, err := k.cdc.Marshal(rep)
 	if err != nil {
 		return err
 	}
@@ -53,7 +53,7 @@ func (k Keeper) GetReports(ctx sdk.Context, rid string) (reports []types.Report)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var rep types.Report
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &rep)
+		k.cdc.Unmarshal(iterator.Value(), &rep)
 		reports = append(reports, rep)
 	}
 	return reports
@@ -65,7 +65,7 @@ func (k Keeper) GetReportsBlockHeight(ctx sdk.Context, blockHeight int64) (repor
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var rep types.Report
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &rep)
+		k.cdc.Unmarshal(iterator.Value(), &rep)
 		// check if block height is equal or not
 		if rep.GetBlockHeight() == blockHeight {
 			reports = append(reports, rep)
@@ -94,7 +94,7 @@ func (k Keeper) GetAllReports(ctx sdk.Context) (reports []types.Report) {
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var rep types.Report
-		k.cdc.MustUnmarshalBinaryBare(iterator.Value(), &rep)
+		k.cdc.Unmarshal(iterator.Value(), &rep)
 		reports = append(reports, rep)
 	}
 	return reports

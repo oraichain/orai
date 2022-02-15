@@ -20,7 +20,7 @@ func (k Keeper) RandomValidators(ctx sdk.Context, size int, nonce []byte) ([]sdk
 	k.stakingKeeper.IterateBondedValidatorsByPower(ctx, func(idx int64, val staking.ValidatorI) (stop bool) {
 		// the highest staked validator has the highest freq appearance in the list. When random => higher chance of getting picked
 		maxValidatorSize++
-		totalPowers += val.GetConsensusPower()
+		totalPowers += val.GetConsensusPower(sdk.NewInt(1000000))
 		return false
 	})
 	// if there is no voting power, we return error to prevent x % 0 sampling
@@ -70,7 +70,7 @@ func (k Keeper) createValSamplingList(ctx sdk.Context, maxValidatorSize int) (va
 		// store the prev voting power validator
 		prevVotingP = curVotingP
 		// collect the new voting power
-		curVotingP = val.GetConsensusPower()
+		curVotingP = val.GetConsensusPower(sdk.NewInt(1000000))
 
 		// if we meet the equal sistuation the first time then we note down the index
 		if prevVotingP == curVotingP {

@@ -69,7 +69,7 @@ func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *websocket.Repor
 	// collect validator current status
 	val := k.stakingKeeper.Validator(ctx, valAddress)
 	// create a new validator wrapper and append to reward obj
-	validator := k.webSocketKeeper.NewValidator(valAddress, val.GetConsensusPower(), val.GetStatus().String())
+	validator := k.webSocketKeeper.NewValidator(valAddress, val.GetConsensusPower(sdk.NewInt(1000000)), val.GetStatus().String())
 	reward.Validators = append(reward.Validators, *validator)
 	reward.TotalPower += validator.GetVotingPower()
 

@@ -21,16 +21,16 @@ func (k Keeper) AllocateTokens(ctx sdk.Context, prevVotes []abci.VoteInfo, block
 	}
 
 	// retrieve fee collector module account to prepare token allocation1
-	feeCollector := k.authKeeper.GetModuleAccount(ctx, k.feeCollectorName)
+	// feeCollector := k.authKeeper.GetModuleAccount(ctx, k.feeCollectorName)
 	// add all the fees from the report since we only reward those included in the report
 	feesCollected := rewardObj.ProviderFees.Add(rewardObj.ValidatorFees...)
 	reward := sdk.NewDecCoinsFromCoins(feesCollected...)
 	// append those coins into the fee collector to get ready allocating them to the distr module.
-	err = k.bankKeeper.AddCoins(ctx, feeCollector.GetAddress(), feesCollected)
-	if err != nil {
-		k.Logger(ctx).Error(fmt.Sprintf("error adding coins using bank keeper: %v\n", err.Error()))
-		return
-	}
+	// err = k.bankKeeper.AddCoins(ctx, feeCollector.GetAddress(), feesCollected)
+	// if err != nil {
+	// 	k.Logger(ctx).Error(fmt.Sprintf("error adding coins using bank keeper: %v\n", err.Error()))
+	// 	return
+	// }
 	remaining := reward
 	hasNeg := false
 

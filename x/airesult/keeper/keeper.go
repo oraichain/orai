@@ -21,7 +21,7 @@ import (
 // always clone keeper to make it immutable
 type (
 	Keeper struct {
-		cdc              codec.Marshaler
+		cdc              codec.Codec
 		storeKey         sdk.StoreKey
 		wasmKeeper       *wasm.Keeper
 		paramSpace       params.Subspace
@@ -38,7 +38,7 @@ type (
 	// TestKeeper is created solely for unit test
 	TestKeeper struct {
 		Keeper           Keeper
-		Cdc              codec.Marshaler
+		Cdc              codec.Codec
 		StoreKey         sdk.StoreKey
 		WasmKeeper       *wasm.Keeper
 		ParamSpace       params.Subspace
@@ -54,7 +54,7 @@ type (
 )
 
 // NewKeeper creates a airequest keeper
-func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, subspace params.Subspace, stakingKeeper staking.Keeper, providerKeeper *provider.Keeper, bankKeeper bank.Keeper, distrKeeper distr.Keeper, authKeeper auth.AccountKeeper, webSocketKeeper *websocket.Keeper, aiRequestKeeper *airequest.Keeper, feeCollectorName string) *Keeper {
+func NewKeeper(cdc codec.Codec, key sdk.StoreKey, wasmKeeper *wasm.Keeper, subspace params.Subspace, stakingKeeper staking.Keeper, providerKeeper *provider.Keeper, bankKeeper bank.Keeper, distrKeeper distr.Keeper, authKeeper auth.AccountKeeper, webSocketKeeper *websocket.Keeper, aiRequestKeeper *airequest.Keeper, feeCollectorName string) *Keeper {
 	if !subspace.HasKeyTable() {
 		// register parameters of the airequest module into the param space
 		subspace = subspace.WithKeyTable(types.ParamKeyTable())
@@ -76,7 +76,7 @@ func NewKeeper(cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, s
 }
 
 // NewTestKeeper creates a airequest keeper for testing
-func NewTestKeeper(keeper Keeper, cdc codec.Marshaler, key sdk.StoreKey, wasmKeeper *wasm.Keeper, subspace params.Subspace, stakingKeeper staking.Keeper, providerKeeper *provider.Keeper, bankKeeper bank.Keeper, distrKeeper distr.Keeper, authKeeper auth.AccountKeeper, webSocketKeeper *websocket.Keeper, aiRequestKeeper *airequest.Keeper, feeCollectorName string) *TestKeeper {
+func NewTestKeeper(keeper Keeper, cdc codec.Codec, key sdk.StoreKey, wasmKeeper *wasm.Keeper, subspace params.Subspace, stakingKeeper staking.Keeper, providerKeeper *provider.Keeper, bankKeeper bank.Keeper, distrKeeper distr.Keeper, authKeeper auth.AccountKeeper, webSocketKeeper *websocket.Keeper, aiRequestKeeper *airequest.Keeper, feeCollectorName string) *TestKeeper {
 	if !subspace.HasKeyTable() {
 		// register parameters of the airequest module into the param space
 		subspace = subspace.WithKeyTable(types.ParamKeyTable())

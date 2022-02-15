@@ -86,13 +86,13 @@ func TestAllocateTokensToManyValidators(t *testing.T) {
 	require.True(t, app.DistrKeeper.GetValidatorCurrentRewards(ctx, valAddrs[9]).Rewards.IsZero())
 
 	// allocate tokens as if both had voted and second was proposer
-	fees := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100)))
+	// fees := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(100)))
 	feeCollector := app.AccountKeeper.GetModuleAccount(ctx, types.FeeCollectorName)
 	require.NotNil(t, feeCollector)
 
-	err := app.BankKeeper.SetBalances(ctx, feeCollector.GetAddress(), fees)
+	// err := app.BankKeeper.SetBalances(ctx, feeCollector.GetAddress(), fees)
 
-	require.NoError(t, err)
+	// require.NoError(t, err)
 	app.AccountKeeper.SetAccount(ctx, app.AccountKeeper.GetModuleAccount(ctx, types.FeeCollectorName))
 
 	votes := []abci.VoteInfo{
@@ -274,13 +274,13 @@ func TestAllocateTokensTruncation(t *testing.T) {
 	require.True(t, app.DistrKeeper.GetValidatorCurrentRewards(ctx, valAddrs[1]).Rewards.IsZero())
 
 	// allocate tokens as if both had voted and second was proposer
-	fees := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(634195840)))
+	// fees := sdk.NewCoins(sdk.NewCoin(sdk.DefaultBondDenom, sdk.NewInt(634195840)))
 
 	feeCollector := app.AccountKeeper.GetModuleAccount(ctx, types.FeeCollectorName)
 	require.NotNil(t, feeCollector)
 
-	err := app.BankKeeper.SetBalances(ctx, feeCollector.GetAddress(), fees)
-	require.NoError(t, err)
+	// err := app.BankKeeper.SetBalances(ctx, feeCollector.GetAddress(), fees)
+	// require.NoError(t, err)
 
 	app.AccountKeeper.SetAccount(ctx, feeCollector)
 

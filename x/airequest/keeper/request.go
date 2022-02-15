@@ -17,7 +17,7 @@ func (k Keeper) GetAIRequest(ctx sdk.Context, id string) (*types.AIRequest, erro
 		return nil, err
 	}
 	result := &types.AIRequest{}
-	err = k.cdc.UnmarshalBinaryBare(store.Get(types.RequestStoreKey(id)), result)
+	err = k.cdc.Unmarshal(store.Get(types.RequestStoreKey(id)), result)
 	return result, err
 }
 
@@ -30,7 +30,7 @@ func (k Keeper) HasAIRequest(ctx sdk.Context, id string) bool {
 // SetAIRequest allows users to set a oScript into the store
 func (k Keeper) SetAIRequest(ctx sdk.Context, id string, request *types.AIRequest) {
 	store := ctx.KVStore(k.storeKey)
-	bz, err := k.cdc.MarshalBinaryBare(request)
+	bz, err := k.cdc.Marshal(request)
 	if err != nil {
 		k.Logger(ctx).Error(fmt.Sprintf("error: %v\n", err.Error()))
 	}
