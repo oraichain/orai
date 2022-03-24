@@ -2,7 +2,7 @@ version: '3.3'
 services:
   orai:
     container_name: orai_node
-    image: orai/orai:0.40.1-alpine
+    image: orai/orai:0.42.0-alpine-dev
     working_dir: /workspace
     tty: true
     ulimits:
