@@ -20,7 +20,7 @@ oraid init --chain-id $CHAIN_ID "$MONIKER"
 
 sed -i "s/enabled-unsafe-cors *= *.*/enabled-unsafe-cors = true/g" .oraid/config/app.toml
 sed -i "s/cors_allowed_origins *= *.*/cors_allowed_origins = \[\"*\"\]/g" .oraid/config/config.toml
-sed -i "s/\<laddr\> *= *.*/laddr = \"tcp:\/\/0.0.0.0:26657\"/g" .oraid/config/config.toml # replace exactly the string laddr with \< and \>
+sed -i "1,/\<laddr\>/{s/\<laddr\> *= *.*/laddr = \"tcp:\/\/0.0.0.0:26657\"/g}" .oraid/config/config.toml # replace exactly the string laddr with\< and \>
 
 # submit a genesis validator tx
 ## Workraround for https://github.com/cosmos/cosmos-sdk/issues/8251
