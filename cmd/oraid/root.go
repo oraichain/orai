@@ -30,7 +30,6 @@ import (
 	"github.com/tendermint/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
-	clientcodec "github.com/CosmWasm/wasmd/x/wasm/client/codec"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -76,7 +75,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	config.Seal()
 
 	initClientCtx := client.Context{}.
-		WithCodec(clientcodec.NewProtoCodec(encodingConfig.Marshaler, encodingConfig.InterfaceRegistry)).
+		WithCodec(encodingConfig.Marshaler).
 		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
 		WithTxConfig(encodingConfig.TxConfig).
 		WithLegacyAmino(encodingConfig.Amino).
