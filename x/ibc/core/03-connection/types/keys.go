@@ -5,7 +5,7 @@ import (
 	"regexp"
 
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	host "github.com/cosmos/cosmos-sdk/x/ibc/core/24-host"
+	host "github.com/oraichain/orai/x/ibc/core/24-host"
 )
 
 const (

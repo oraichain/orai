@@ -17,9 +17,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/version"
-	clienttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/02-client/types"
-	commitmenttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/23-commitment/types"
-	"github.com/cosmos/cosmos-sdk/x/ibc/light-clients/07-tendermint/types"
+	clienttypes "github.com/oraichain/orai/x/ibc/core/02-client/types"
+	commitmenttypes "github.com/oraichain/orai/x/ibc/core/23-commitment/types"
+	"github.com/oraichain/orai/x/ibc/light-clients/07-tendermint/types"
 )
 
 const (

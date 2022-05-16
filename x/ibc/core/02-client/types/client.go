@@ -10,8 +10,8 @@ import (
 
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	host "github.com/cosmos/cosmos-sdk/x/ibc/core/24-host"
-	"github.com/cosmos/cosmos-sdk/x/ibc/core/exported"
+	host "github.com/oraichain/orai/x/ibc/core/24-host"
+	"github.com/oraichain/orai/x/ibc/core/exported"
 )
 
 var (

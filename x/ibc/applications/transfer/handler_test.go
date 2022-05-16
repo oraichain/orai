@@ -6,11 +6,11 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/types"
-	clienttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/02-client/types"
-	channeltypes "github.com/cosmos/cosmos-sdk/x/ibc/core/04-channel/types"
-	"github.com/cosmos/cosmos-sdk/x/ibc/core/exported"
-	ibctesting "github.com/cosmos/cosmos-sdk/x/ibc/testing"
+	"github.com/oraichain/orai/x/ibc/applications/transfer/types"
+	clienttypes "github.com/oraichain/orai/x/ibc/core/02-client/types"
+	channeltypes "github.com/oraichain/orai/x/ibc/core/04-channel/types"
+	"github.com/oraichain/orai/x/ibc/core/exported"
+	ibctesting "github.com/oraichain/orai/x/ibc/testing"
 )
 
 type TransferTestSuite struct {

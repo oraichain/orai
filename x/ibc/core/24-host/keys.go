@@ -3,7 +3,7 @@ package host
 import (
 	"fmt"
 
-	"github.com/cosmos/cosmos-sdk/x/ibc/core/exported"
+	"github.com/oraichain/orai/x/ibc/core/exported"
 )
 
 const (

@@ -13,9 +13,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/query"
-	"github.com/cosmos/cosmos-sdk/x/ibc/core/02-client/types"
-	host "github.com/cosmos/cosmos-sdk/x/ibc/core/24-host"
-	"github.com/cosmos/cosmos-sdk/x/ibc/core/exported"
+	"github.com/oraichain/orai/x/ibc/core/02-client/types"
+	host "github.com/oraichain/orai/x/ibc/core/24-host"
+	"github.com/oraichain/orai/x/ibc/core/exported"
 )
 
 var _ types.QueryServer = Keeper{}

@@ -15,11 +15,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/store/rootmulti"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	clienttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/02-client/types"
-	"github.com/cosmos/cosmos-sdk/x/ibc/core/03-connection/types"
-	commitmenttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/23-commitment/types"
-	ibctmtypes "github.com/cosmos/cosmos-sdk/x/ibc/light-clients/07-tendermint/types"
-	ibctesting "github.com/cosmos/cosmos-sdk/x/ibc/testing"
+	clienttypes "github.com/oraichain/orai/x/ibc/core/02-client/types"
+	"github.com/oraichain/orai/x/ibc/core/03-connection/types"
+	commitmenttypes "github.com/oraichain/orai/x/ibc/core/23-commitment/types"
+	ibctmtypes "github.com/oraichain/orai/x/ibc/light-clients/07-tendermint/types"
+	ibctesting "github.com/oraichain/orai/x/ibc/testing"
 )
 
 var (

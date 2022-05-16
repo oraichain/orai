@@ -4,6 +4,8 @@ go 1.15
 
 require (
 	github.com/CosmWasm/wasmd v0.15.0
+	github.com/armon/go-metrics v0.3.8
+	github.com/confio/ics23/go v0.6.6
 	github.com/cosmos/cosmos-sdk v0.42.11
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/cosmtrek/air v1.27.10 // indirect

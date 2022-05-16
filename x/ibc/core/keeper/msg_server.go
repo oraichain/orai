@@ -8,12 +8,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	clienttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/02-client/types"
-	connectiontypes "github.com/cosmos/cosmos-sdk/x/ibc/core/03-connection/types"
-	channel "github.com/cosmos/cosmos-sdk/x/ibc/core/04-channel"
-	channeltypes "github.com/cosmos/cosmos-sdk/x/ibc/core/04-channel/types"
-	porttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/05-port/types"
-	coretypes "github.com/cosmos/cosmos-sdk/x/ibc/core/types"
+	clienttypes "github.com/oraichain/orai/x/ibc/core/02-client/types"
+	connectiontypes "github.com/oraichain/orai/x/ibc/core/03-connection/types"
+	channel "github.com/oraichain/orai/x/ibc/core/04-channel"
+	channeltypes "github.com/oraichain/orai/x/ibc/core/04-channel/types"
+	porttypes "github.com/oraichain/orai/x/ibc/core/05-port/types"
+	coretypes "github.com/oraichain/orai/x/ibc/core/types"
 )
 
 var _ clienttypes.MsgServer = Keeper{}

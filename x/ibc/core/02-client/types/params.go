@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/cosmos/cosmos-sdk/x/ibc/core/exported"
+	"github.com/oraichain/orai/x/ibc/core/exported"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 

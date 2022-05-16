@@ -4,9 +4,9 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/ibc/core/02-client/keeper"
-	"github.com/cosmos/cosmos-sdk/x/ibc/core/02-client/types"
-	"github.com/cosmos/cosmos-sdk/x/ibc/core/exported"
+	"github.com/oraichain/orai/x/ibc/core/02-client/keeper"
+	"github.com/oraichain/orai/x/ibc/core/02-client/types"
+	"github.com/oraichain/orai/x/ibc/core/exported"
 )
 
 // InitGenesis initializes the ibc client submodule's state from a provided genesis

@@ -8,11 +8,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/cosmos/cosmos-sdk/types/query"
-	"github.com/cosmos/cosmos-sdk/x/ibc/core/02-client/types"
-	commitmenttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/23-commitment/types"
-	"github.com/cosmos/cosmos-sdk/x/ibc/core/exported"
-	ibctmtypes "github.com/cosmos/cosmos-sdk/x/ibc/light-clients/07-tendermint/types"
-	ibctesting "github.com/cosmos/cosmos-sdk/x/ibc/testing"
+	"github.com/oraichain/orai/x/ibc/core/02-client/types"
+	commitmenttypes "github.com/oraichain/orai/x/ibc/core/23-commitment/types"
+	"github.com/oraichain/orai/x/ibc/core/exported"
+	ibctmtypes "github.com/oraichain/orai/x/ibc/light-clients/07-tendermint/types"
+	ibctesting "github.com/oraichain/orai/x/ibc/testing"
 )
 
 func (suite *KeeperTestSuite) TestQueryClientState() {

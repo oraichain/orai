@@ -2,9 +2,9 @@ package ante
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	clienttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/02-client/types"
-	channelkeeper "github.com/cosmos/cosmos-sdk/x/ibc/core/04-channel/keeper"
-	channeltypes "github.com/cosmos/cosmos-sdk/x/ibc/core/04-channel/types"
+	clienttypes "github.com/oraichain/orai/x/ibc/core/02-client/types"
+	channelkeeper "github.com/oraichain/orai/x/ibc/core/04-channel/keeper"
+	channeltypes "github.com/oraichain/orai/x/ibc/core/04-channel/types"
 )
 
 type Decorator struct {

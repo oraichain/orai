@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/types"
+	"github.com/oraichain/orai/x/ibc/applications/transfer/types"
 )
 
 func TestValidateGenesis(t *testing.T) {

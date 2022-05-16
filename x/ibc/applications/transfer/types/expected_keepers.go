@@ -4,9 +4,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
-	connectiontypes "github.com/cosmos/cosmos-sdk/x/ibc/core/03-connection/types"
-	channeltypes "github.com/cosmos/cosmos-sdk/x/ibc/core/04-channel/types"
-	ibcexported "github.com/cosmos/cosmos-sdk/x/ibc/core/exported"
+	connectiontypes "github.com/oraichain/orai/x/ibc/core/03-connection/types"
+	channeltypes "github.com/oraichain/orai/x/ibc/core/04-channel/types"
+	ibcexported "github.com/oraichain/orai/x/ibc/core/exported"
 )
 
 // AccountKeeper defines the contract required for account APIs.

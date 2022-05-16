@@ -4,7 +4,7 @@
 docker-compose up -d
 
 # enter protoc container and generate the proto files
-docker-compose exec protoc ash
+docker-compose exec proto ash
 
 # first time
 go get ./...

@@ -5,9 +5,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/cosmos/cosmos-sdk/x/ibc/core/03-connection/types"
-	commitmenttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/23-commitment/types"
-	ibctesting "github.com/cosmos/cosmos-sdk/x/ibc/testing"
+	"github.com/oraichain/orai/x/ibc/core/03-connection/types"
+	commitmenttypes "github.com/oraichain/orai/x/ibc/core/23-commitment/types"
+	ibctesting "github.com/oraichain/orai/x/ibc/testing"
 )
 
 func TestValidateGenesis(t *testing.T) {
