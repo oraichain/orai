@@ -2,7 +2,7 @@ version: '3.3'
 services:
   orai:
     container_name: orai_node
-    image: orai/orai:0.40.1-alpine
+    image: orai/orai:0.40.3-alpine-dev
     working_dir: /workspace
     tty: true
     ulimits:
@@ -17,7 +17,7 @@ services:
     cap_add:
       - SYS_PTRACE
     env_file:
-      - orai.env
+      - orai.dev.env
     volumes:
       - ./:/workspace
       - oraivisor:/root/oraivisor
