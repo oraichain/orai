@@ -6,7 +6,7 @@ require (
 	github.com/CosmWasm/wasmd v0.15.0
 	github.com/armon/go-metrics v0.3.8
 	github.com/confio/ics23/go v0.6.6
-	github.com/cosmos/cosmos-sdk v0.42.11
+	github.com/cosmos/cosmos-sdk v0.42.11 // v0.42.11
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/cosmtrek/air v1.27.10 // indirect
 	github.com/creack/pty v1.1.11 // indirect
@@ -38,3 +38,5 @@ require (
 replace google.golang.org/grpc => google.golang.org/grpc v1.33.2
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
+
+replace github.com/cosmos/cosmos-sdk => ./cosmos-sdk
