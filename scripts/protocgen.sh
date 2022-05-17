@@ -25,3 +25,8 @@ do
   rm -rf $PROTO_DIR
 done
 
+# if got this error: include directory /work/cosmos-sdk/proto is within include directory /work which is not allowed
+
+# then remove the replace cosmos sdk line to run proto-gen first
+
+# this script can be run in proto container (in docker-compose.yml file)
