@@ -955,7 +955,10 @@ func (m *MsgCreateTestCase) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
+			if skippy < 0 {
+				return ErrInvalidLengthTxTcase
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthTxTcase
 			}
 			if (iNdEx + skippy) > l {
@@ -1167,7 +1170,10 @@ func (m *MsgCreateTestCaseRes) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
+			if skippy < 0 {
+				return ErrInvalidLengthTxTcase
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthTxTcase
 			}
 			if (iNdEx + skippy) > l {
@@ -1411,7 +1417,10 @@ func (m *MsgEditTestCase) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
+			if skippy < 0 {
+				return ErrInvalidLengthTxTcase
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthTxTcase
 			}
 			if (iNdEx + skippy) > l {
@@ -1623,7 +1632,10 @@ func (m *MsgEditTestCaseRes) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
+			if skippy < 0 {
+				return ErrInvalidLengthTxTcase
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthTxTcase
 			}
 			if (iNdEx + skippy) > l {

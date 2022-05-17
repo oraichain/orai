@@ -898,7 +898,10 @@ func (m *OracleScriptInfoReq) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
+			if skippy < 0 {
+				return ErrInvalidLengthQueryOscript
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthQueryOscript
 			}
 			if (iNdEx + skippy) > l {
@@ -1176,7 +1179,10 @@ func (m *OracleScriptInfoRes) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
+			if skippy < 0 {
+				return ErrInvalidLengthQueryOscript
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthQueryOscript
 			}
 			if (iNdEx + skippy) > l {
@@ -1296,7 +1302,10 @@ func (m *ListOracleScriptsReq) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
+			if skippy < 0 {
+				return ErrInvalidLengthQueryOscript
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthQueryOscript
 			}
 			if (iNdEx + skippy) > l {
@@ -1399,7 +1408,10 @@ func (m *ListOracleScriptsRes) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
+			if skippy < 0 {
+				return ErrInvalidLengthQueryOscript
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthQueryOscript
 			}
 			if (iNdEx + skippy) > l {
@@ -1500,7 +1512,10 @@ func (m *MinFeesReq) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
+			if skippy < 0 {
+				return ErrInvalidLengthQueryOscript
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthQueryOscript
 			}
 			if (iNdEx + skippy) > l {
@@ -1582,7 +1597,10 @@ func (m *MinFeesRes) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
+			if skippy < 0 {
+				return ErrInvalidLengthQueryOscript
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthQueryOscript
 			}
 			if (iNdEx + skippy) > l {

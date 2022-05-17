@@ -649,7 +649,10 @@ func (m *DataSourceInfoReq) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
+			if skippy < 0 {
+				return ErrInvalidLengthQueryDsource
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthQueryDsource
 			}
 			if (iNdEx + skippy) > l {
@@ -863,7 +866,10 @@ func (m *DataSourceInfoRes) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
+			if skippy < 0 {
+				return ErrInvalidLengthQueryDsource
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthQueryDsource
 			}
 			if (iNdEx + skippy) > l {
@@ -983,7 +989,10 @@ func (m *ListDataSourcesReq) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
+			if skippy < 0 {
+				return ErrInvalidLengthQueryDsource
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthQueryDsource
 			}
 			if (iNdEx + skippy) > l {
@@ -1086,7 +1095,10 @@ func (m *ListDataSourcesRes) Unmarshal(dAtA []byte) error {
 			if err != nil {
 				return err
 			}
-			if (skippy < 0) || (iNdEx+skippy) < 0 {
+			if skippy < 0 {
+				return ErrInvalidLengthQueryDsource
+			}
+			if (iNdEx + skippy) < 0 {
 				return ErrInvalidLengthQueryDsource
 			}
 			if (iNdEx + skippy) > l {
