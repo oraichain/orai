@@ -1,7 +1,7 @@
 syntax = "proto3";
 package oraichain.orai.airesult;
 import "gogoproto/gogo.proto";
-import "x/websocket/types/types_validator.proto";
+import "websocket/types/types_validator.proto";
 option go_package = "github.com/oraichain/orai/x/airesult/types";
 
 message AIRequestResult {

@@ -3,7 +3,7 @@ package oraichain.orai.airequest;
 //import "cosmos/base/v1beta1/coin.proto";
 import "gogoproto/gogo.proto";
 option go_package = "github.com/oraichain/orai/x/airequest/types";
-//import "x/provider/types/types_ds.proto";
+//import "provider/types/types_ds.proto";
 
 // MsgSetAIRequest submit ai request metadata onto Oraichain
 message MsgSetAIRequest {

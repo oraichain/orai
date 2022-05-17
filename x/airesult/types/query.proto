@@ -1,8 +1,8 @@
 syntax = "proto3";
 package oraichain.orai.airesult;
 // this line is used by starport scaffolding # 1
-import "x/airesult/types/query_full_req.proto";
-import "x/airesult/types/query_reward.proto";
+import "airesult/types/query_full_req.proto";
+import "airesult/types/query_reward.proto";
 
 option go_package = "github.com/oraichain/orai/x/airesult/types";
 

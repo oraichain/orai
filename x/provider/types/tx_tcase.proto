@@ -3,7 +3,7 @@ package oraichain.orai.provider;
 //import "cosmos/base/v1beta1/coin.proto";
 import "gogoproto/gogo.proto";
 option go_package = "github.com/oraichain/orai/x/provider/types";
-//import "x/provider/types/types_ds.proto";
+//import "provider/types/types_ds.proto";
 
 // MsgCreateTestCase submit test case metadata onto Oraichain
 message MsgCreateTestCase {
