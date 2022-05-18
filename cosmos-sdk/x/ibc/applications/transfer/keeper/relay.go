@@ -163,11 +163,13 @@ func (k Keeper) SendTransfer(
 	}
 
 	defer func() {
-		telemetry.SetGaugeWithLabels(
+		if token.Amount.IsInt64() {
+			telemetry.SetGaugeWithLabels(
 			[]string{"tx", "msg", "ibc", "transfer"},
 			float32(token.Amount.Int64()),
 			[]metrics.Label{telemetry.NewLabel(coretypes.LabelDenom, fullDenomPath)},
-		)
+			)
+		}
 
 		telemetry.IncrCounterWithLabels(
 			[]string{"ibc", types.ModuleName, "send"},

@@ -425,7 +425,7 @@ func (am AppModule) OnTimeoutPacket(
 			sdk.NewAttribute(sdk.AttributeKeyModule, types.ModuleName),
 			sdk.NewAttribute(types.AttributeKeyRefundReceiver, data.Sender),
 			sdk.NewAttribute(types.AttributeKeyRefundDenom, data.Denom),
-			sdk.NewAttribute(types.AttributeKeyRefundAmount, fmt.Sprintf("%d", data.Amount)),
+			sdk.NewAttribute(types.AttributeKeyRefundAmount, data.Amount),
 		),
 	)
 
