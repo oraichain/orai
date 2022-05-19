@@ -47,7 +47,7 @@ func NewDefaultGenesisState(cdc codec.JSONMarshaler) GenesisState {
 	stakingGenesis.Params.HistoricalEntries = 1000
 
 	// TODO: testnet figures only
-	stakingGenesis.Params.UnbondingTime = time.Hour * 2
+	// stakingGenesis.Params.UnbondingTime = time.Hour * 2
 	stakingGenesis.Params.MaxValidators = 100
 	// maximum bonded validators
 	distrGenesis.Params.BaseProposerReward = sdk.NewDecWithPrec(1, 2)  // 1%
