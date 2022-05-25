@@ -6,9 +6,9 @@ package oraichain.orai.airesult;
 
 import "gogoproto/gogo.proto";
 // import "cosmos/base/v1beta1/coin.proto";
-import "x/airequest/types/types_ai_request.proto";
-import "x/websocket/types/types_report.proto";
-import "x/airesult/types/types_result.proto";
+import "airequest/types/types_ai_request.proto";
+import "websocket/types/types_report.proto";
+import "airesult/types/types_result.proto";
 option go_package = "github.com/oraichain/orai/x/airesult/types";
 
 // QueryFullRequestReq is the request type for the Query/QueryFullRequest RPC method

@@ -6,8 +6,8 @@ package oraichain.orai.airequest;
 
 import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
-import "x/provider/types/types_ds.proto";
-import "x/provider/types/types_tc.proto";
+import "provider/types/types_ds.proto";
+import "provider/types/types_tc.proto";
 option go_package = "github.com/oraichain/orai/x/airequest/types";
 
 // QueryAIRequestReq is the request type for the Query/QueryAIRequest RPC method

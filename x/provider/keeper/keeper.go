@@ -254,7 +254,7 @@ func (k *Keeper) GetPaginatedOracleScriptNames(ctx sdk.Context, page, limit uint
 func (k Keeper) EditOracleScript(ctx sdk.Context, oldName, newName string, oScript *types.OracleScript) error {
 
 	// check if there exists an AIDataSource given a name or not
-	if !k.HasDataSource(ctx, oldName) {
+	if !k.HasOracleScript(ctx, oldName) {
 		return fmt.Errorf("")
 	}
 

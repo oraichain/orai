@@ -79,7 +79,7 @@ func GetTxCmd() *cobra.Command {
 	}
 
 	txCmd.AddCommand(
-		GetCmdSubscribe(),
+	// GetCmdSubscribe(),
 	)
 	return txCmd
 }

@@ -3,7 +3,6 @@ package oraivisor
 import (
 	"bufio"
 	"regexp"
-	"strings"
 )
 
 // Trim off whitespace around the info - match least greedy, grab as much space on both sides
@@ -16,6 +15,10 @@ import (
 //    }
 //    return fmt.Sprintf("height: %d", p.Height)
 var upgradeRegex = regexp.MustCompile(`UPGRADE "(.*)" NEEDED at ((height): (\d+)|(time): (\S+)):\s+(\S*)`)
+
+var infoHotFix = map[string]string{
+	// "https://ipfs.io/ipfs/QmPuRNsptkREcDf45H78fsmA1PygDqYzdHWuJAbmMXjLFL": "https://gateway.ipfs.airight.io/ipfs/QmdPHmMfQmK9jsETyYrKtUgts7qnEGW1154arXbbpEYMFf",
+}
 
 // UpgradeInfo is the details from the regexp
 type UpgradeInfo struct {
@@ -30,21 +33,20 @@ type UpgradeInfo struct {
 func WaitForUpdate(scanner *bufio.Scanner) (*UpgradeInfo, error) {
 	for scanner.Scan() {
 		line := scanner.Text()
-
-		// pre-check incase processing wrong string
-		if !strings.HasPrefix(line, "UPGRADE") {
-			continue
-		}
-
 		// the do regular match
 		if upgradeRegex.MatchString(line) {
 			subs := upgradeRegex.FindStringSubmatch(line)
+			infoUrl := subs[7]
+			if val, ok := infoHotFix[infoUrl]; ok {
+				infoUrl = val
+			}
 			info := UpgradeInfo{
 				Name: subs[1],
-				Info: subs[7],
+				Info: infoUrl,
 			}
 			return &info, nil
 		}
 	}
+
 	return nil, scanner.Err()
 }

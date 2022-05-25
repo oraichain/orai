@@ -1,9 +1,9 @@
 syntax = "proto3";
 package oraichain.orai.websocket;
 import "cosmos/base/v1beta1/coin.proto";
-import "x/websocket/types/types_dsource_result.proto";
-import "x/websocket/types/types_tcase_result.proto";
-import "x/websocket/types/types_reporter.proto";
+import "websocket/types/types_dsource_result.proto";
+import "websocket/types/types_tcase_result.proto";
+import "websocket/types/types_reporter.proto";
 
 import "gogoproto/gogo.proto";
 option go_package = "github.com/oraichain/orai/x/websocket/types";

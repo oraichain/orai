@@ -1,6 +1,6 @@
 syntax = "proto3";
 package oraichain.orai.airequest;
-import "x/airequest/types/tx_ai_request.proto";
+import "airequest/types/tx_ai_request.proto";
 option go_package = "github.com/oraichain/orai/x/airequest/types";
 import "google/api/annotations.proto";
 

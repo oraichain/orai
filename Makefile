@@ -1,7 +1,8 @@
 #!/usr/bin/make -f
 
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
-VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
+#VERSION := $(shell echo $(shell git describe --always) | sed 's/^v//')
+VERSION := v0.40.4_ibc
 COMMIT := $(shell git log -1 --format='%H')
 LEDGER_ENABLED ?= false
 GOMOD_FLAGS ?= -mod=readonly
@@ -74,6 +75,7 @@ watch:
 
 build:
 	BUILD_TAGS=muslc make go-build
+	cp build/oraid /bin
 
 go-build: go.sum
 ifeq ($(OS),Windows_NT)
@@ -160,7 +162,7 @@ format:
 ###############################################################################
 
 
-proto-all: proto-gen proto-lint proto-check-breaking
+proto-all: proto-gen proto-check-breaking
 .PHONY: proto-all
 
 proto-gen: 
@@ -174,10 +176,6 @@ proto-js:
 proto-swagger: 
 	./scripts/protocgen-swagger.sh $(SRC_DIR)
 .PHONY: proto-swagger
-
-proto-lint:
-	buf check lint --error-format=json
-.PHONY: proto-lint
 
 proto-check-breaking:
 	buf check breaking --against-input $(HTTPS_GIT)#branch=master

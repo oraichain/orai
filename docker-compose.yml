@@ -1,33 +1,32 @@
 version: '3.3'
 services:
   orai:
-    image: orai/orai:alpine-wasm
+    container_name: orai_node
+    image: orai/orai:0.40.3-alpine-dev
     working_dir: /workspace
-    tty: true    
+    tty: true
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
     ports:
       - 1317:1317
       - 26656:26656
-      - 26657:26657    
+      - 26657:26657
+      - 9090:9090
+    cap_add:
+      - SYS_PTRACE
     env_file:
       - orai.dev.env
-    volumes:        
+    volumes:
       - ./:/workspace
-
-  rust:
-    image: cosmwasm/rust-optimizer:0.10.7
-    entrypoint: tail -f /dev/null
-    volumes:
-      - .registry_cache:/usr/local/cargo/registry:delegated
-      - ./smart-contracts:/code
-
-  simulate:
-    image: orai/cosmwasm-simulate:0.11-slim
-    tty: true 
-    volumes:
-      - ./smart-contracts:/code
+      - oraivisor:/root/oraivisor
 
   proto:
     image: cosmwasm/prototools-docker
     tty: true
     volumes:
       - ./:/work
+      
+volumes:
+  oraivisor: null

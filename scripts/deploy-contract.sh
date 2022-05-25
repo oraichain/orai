@@ -21,5 +21,3 @@ fi
 # quote string with "" with escape content inside which contains " characters
 (echo $passphrase;echo $passphrase) | oraid tx wasm instantiate $code_id "$init" --from $USER --label "$label" --gas auto --gas-adjustment 1.2 --chain-id=$CHAIN_ID -y
 contract_address=$(oraid query wasm list-contract-by-code $code_id | grep address | awk '{print $(NF)}')
-
-echo "Contract address: $contract_address"

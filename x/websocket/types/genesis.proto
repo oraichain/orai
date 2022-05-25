@@ -1,8 +1,8 @@
 syntax = "proto3";
 package oraichain.orai.websocket;
 
-import "x/websocket/types/types_report.proto";
-import "x/websocket/types/types_reporter.proto";
+import "websocket/types/types_report.proto";
+import "websocket/types/types_reporter.proto";
 import "gogoproto/gogo.proto";
 
 option go_package = "github.com/oraichain/orai/x/websocket/types";

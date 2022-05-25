@@ -23,6 +23,11 @@ for dir in $proto_dirs; do
   proto_files=("${proto_files[@]} $(find "${dir}" -maxdepth 1 -name '*.proto')")
 done
 
+# create dir & file if it does not exist
+mkdir -p $SOURCEDIR/generated  
+
+# echo ${proto_files[@]}
+
 # gen files
 pbjs \
   -o $SOURCEDIR/generated/proto.js \
@@ -37,9 +42,6 @@ pbjs \
 pbts \
   -o $SOURCEDIR/generated/proto.d.ts \
   $SOURCEDIR/generated/proto.js
-
-# fix for node 14
-# node -e "var fs = require('fs'),file='$SOURCEDIR/generated/proto.js',result = fs.readFileSync(file).toString().replace('import * as', 'import');fs.writeFileSync(file, result)"
 
 # show results
 du -hd1 $SOURCEDIR/generated/*

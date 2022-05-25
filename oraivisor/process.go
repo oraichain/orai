@@ -36,8 +36,21 @@ func LaunchProcess(cfg *Config, args []string, stdout, stderr io.Writer) (bool, 
 		return false, err
 	}
 
-	scanOut := bufio.NewScanner(io.TeeReader(outpipe, stdout))
+	// set scanner's buffer size to cfg.LogBufferSize, and ensure larger than bufio.MaxScanTokenSize otherwise fallback to bufio.MaxScanTokenSize
+	var maxCapacity int
+	if cfg.LogBufferSize < bufio.MaxScanTokenSize {
+		maxCapacity = bufio.MaxScanTokenSize
+	} else {
+		maxCapacity = cfg.LogBufferSize
+	}
+
 	scanErr := bufio.NewScanner(io.TeeReader(errpipe, stderr))
+	bufErr := make([]byte, maxCapacity)
+	scanErr.Buffer(bufErr, maxCapacity)
+
+	scanOut := bufio.NewScanner(io.TeeReader(outpipe, stdout))
+	bufOut := make([]byte, maxCapacity)
+	scanOut.Buffer(bufOut, maxCapacity)
 
 	if err := cmd.Start(); err != nil {
 		return false, fmt.Errorf("launching process %s %s: %w", bin, strings.Join(args, " "), err)

@@ -36,7 +36,10 @@ func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *websocket.Repor
 	// collect data source owners that have their data sources executed to reward
 	for _, dataSourceResult := range rep.GetDataSourceResults() {
 		if dataSourceResult.GetStatus() == k.webSocketKeeper.GetKeyResultSuccess() {
-			dataSource, _ := k.providerKeeper.GetAIDataSource(ctx, dataSourceResult.GetName())
+			dataSource, err := k.providerKeeper.GetAIDataSource(ctx, dataSourceResult.GetName())
+			if err != nil || dataSource == nil {
+				continue
+			}
 			reward.DataSources = append(reward.DataSources, *dataSource)
 			reward.ProviderFees = reward.ProviderFees.Add(dataSource.GetFees()...)
 		}
@@ -44,7 +47,10 @@ func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *websocket.Repor
 
 	// collect data source owners that have their data sources executed to reward
 	for _, testCaseResult := range rep.GetTestCaseResults() {
-		testCase, _ := k.providerKeeper.GetTestCase(ctx, testCaseResult.GetName())
+		testCase, err := k.providerKeeper.GetTestCase(ctx, testCaseResult.GetName())
+		if err != nil || testCase == nil {
+			continue
+		}
 		reward.TestCases = append(reward.TestCases, *testCase)
 		reward.ProviderFees = reward.ProviderFees.Add(testCase.GetFees()...)
 	}
@@ -59,7 +65,11 @@ func (k Keeper) ResolveRequestsFromReports(ctx sdk.Context, rep *websocket.Repor
 	reward.ValidatorFees = reward.ValidatorFees.Add(valFees...)
 	// store information into the reward struct to reward these entities in the next begin block
 	valAddress := rep.GetReporter().GetValidator()
-	validator := k.webSocketKeeper.NewValidator(valAddress, k.stakingKeeper.Validator(ctx, valAddress).GetConsensusPower(), "active")
+
+	// collect validator current status
+	val := k.stakingKeeper.Validator(ctx, valAddress)
+	// create a new validator wrapper and append to reward obj
+	validator := k.webSocketKeeper.NewValidator(valAddress, val.GetConsensusPower(), val.GetStatus().String())
 	reward.Validators = append(reward.Validators, *validator)
 	reward.TotalPower += validator.GetVotingPower()
 
@@ -92,6 +102,19 @@ func (k Keeper) validateBasic(ctx sdk.Context, req *airequest.AIRequest, rep *we
 		k.Logger(ctx).Error("test case result length is different")
 		return false
 	}
+
+	// Check if validator exists and active
+	_, isExist := k.stakingKeeper.GetValidator(ctx, rep.GetReporter().GetValidator())
+	if !isExist {
+		k.Logger(ctx).Error(fmt.Sprintf("error in validating the report: validator does not exist"))
+		return false
+	}
+
+	// // check if validator is bonded or not
+	// if isBonded := validator.IsBonded(); !isBonded {
+	// 	k.Logger(ctx).Error(fmt.Sprintf("error in validating the report: validator is not bonded, cannot send reports to receive rewards"))
+	// 	return false
+	// }
 
 	// TODO
 	err := k.webSocketKeeper.ValidateReport(ctx, rep.GetReporter(), req)

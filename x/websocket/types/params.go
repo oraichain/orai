@@ -8,6 +8,8 @@ import (
 const (
 	DefaultParamspace = ModuleName
 	// TODO: Define your default parameters
+	ReporterNameLen = 20000  // 20KB
+	MsgLen          = 200000 // 200KB
 )
 
 // Parameter store keys

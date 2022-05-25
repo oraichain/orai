@@ -29,7 +29,7 @@ func (msg *MsgCreateAIDataSource) ValidateBasic() error {
 		return sdkerrors.Wrap(ErrEmpty, "Name and/or Contract cannot be empty")
 	}
 
-	if !isStringAlphabetic(msg.Name) || !isStringAlphabetic(msg.Contract) || !isStringAlphabetic(msg.Description) {
+	if !IsStringAlphabetic(msg.Name) || !IsStringAlphabetic(msg.Contract) || !IsStringAlphabetic(msg.Description) {
 		return sdkerrors.Wrap(ErrCannotSetDataSource, "Input contains invalid characters")
 	}
 	// verify contract address
@@ -73,7 +73,7 @@ func (msg *MsgEditAIDataSource) ValidateBasic() error {
 	if len(msg.OldName) == 0 || len(msg.Contract) == 0 || len(msg.NewName) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Name and/or Contract cannot be empty")
 	}
-	if !isStringAlphabetic(msg.OldName) || !isStringAlphabetic(msg.Contract) || !isStringAlphabetic(msg.NewName) || !isStringAlphabetic(msg.Description) {
+	if !IsStringAlphabetic(msg.OldName) || !IsStringAlphabetic(msg.Contract) || !IsStringAlphabetic(msg.NewName) || !IsStringAlphabetic(msg.Description) {
 		return sdkerrors.Wrap(ErrCannotSetDataSource, "input contains invalid characters")
 	}
 

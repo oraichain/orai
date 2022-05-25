@@ -1,7 +1,7 @@
 syntax = "proto3";
 package oraichain.orai.airesult;
 
-import "x/airesult/types/types_result.proto";
+import "airesult/types/types_result.proto";
 import "gogoproto/gogo.proto";
 
 option go_package = "github.com/oraichain/orai/x/airesult/types";

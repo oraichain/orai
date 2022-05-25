@@ -10,7 +10,6 @@ import (
 const (
 	DefaultParamspace = ModuleName
 	// TODO: Define your default parameters
-	DefaultMaximumRequestBytes   = 1024
 	MaximumRequestBytesThreshold = 1 * 1024 * 1024 // 1MB
 )
 
@@ -65,7 +64,7 @@ func validateMaximumRequestBytes(i interface{}) error {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
 
-	if v < 0 || v > MaximumRequestBytesThreshold {
+	if v < 0 {
 		return fmt.Errorf("invalid maximum bytes: %d", v)
 	}
 
