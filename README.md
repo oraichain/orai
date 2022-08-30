@@ -1,6 +1,12 @@
 # Oraichain
 
+![Banner!](https://orai.io/images/logos/logo-full-h-light.png)
+
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Project Status: Active -- The project has reached a stable, usable
+state and is being actively
+developed.](https://img.shields.io/badge/repo%20status-Active-green.svg)](https://www.repostatus.org/#active)
+
 
 Oraichain is the world’s first AI-powered oracle and ecosystem for blockchains. 
 
@@ -94,7 +100,7 @@ See also the list of [contributors](https://github.com/oraichain/orai/contributo
 
 ## License
 
-This project is licensed under the Apache 2.0 license - see the [LICENSE](LICENSE) file for details
+This project is licensed under the Apache 2.0 license - see the [LICENSE](LICENSE) file for details.
 
 <!-- ## Acknowledgments
 
