@@ -22,5 +22,11 @@ services:
       - ./:/workspace
       - oraivisor:/root/oraivisor
 
+  proto:
+    image: cosmwasm/prototools-docker
+    tty: true
+    volumes:
+      - ./:/work
+
 volumes:
   oraivisor: null
