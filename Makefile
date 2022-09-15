@@ -2,7 +2,7 @@
 
 PACKAGES_SIMTEST=$(shell go list ./... | grep '/simulation')
 #VERSION := $(shell echo $(shell git describe --always) | sed 's/^v//')
-VERSION := v0.42.0
+VERSION := v0.43.0
 COMMIT := $(shell git log -1 --format='%H')
 LEDGER_ENABLED ?= false
 GOMOD_FLAGS ?= -mod=readonly
@@ -64,6 +64,8 @@ ifeq ($(WITH_CLEVELDB),yes)
 endif
 ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
+
+ldflags += -w -s
 
 BUILD_FLAGS := -tags "$(build_tags_comma_sep)" -ldflags '$(ldflags)' -trimpath
 

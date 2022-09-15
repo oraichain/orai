@@ -2,10 +2,7 @@
 **/node_modules
 .registry_cache
 build
-.oraid
-.cache 
-.devcontainer
-.vscode
+.*
 smart-contracts
 testfiles
 third_party

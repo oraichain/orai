@@ -1,4 +1,4 @@
-FROM golang:1.15-alpine3.12 AS go-builder
+FROM golang:1.17-alpine AS go-builder
 
 # this comes from standard alpine nightly file
 #  https://github.com/rust-lang/docker-rust-nightly/blob/master/alpine3.12/Dockerfile
@@ -13,12 +13,11 @@ WORKDIR /workspace
 COPY . /workspace/
 
 # See https://github.com/CosmWasm/wasmvm/releases
-ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.0.0-beta6/libwasmvm_muslc.a /lib/libwasmvm_muslc.a
+ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.0.0/libwasmvm_muslc.x86_64.a /lib/libwasmvm_muslc.a
 # RUN sha256sum /lib/libwasmvm_muslc.a | grep 39dc389cc6b556280cbeaebeda2b62cf884993137b83f90d1398ac47d09d3900
 
 # force it to use static lib (from above) not standard libgo_cosmwasm.so file
 RUN make build LEDGER_ENABLED=false BUILD_TAGS=muslc GOMOD_FLAGS=
-RUN go get github.com/pwaller/goupx
 # RUN go get github.com/cosmtrek/air
 
 # then remove
