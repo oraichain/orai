@@ -36,6 +36,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
+
 	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
@@ -90,11 +91,6 @@ import (
 	porttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
-	"github.com/oraichain/orai/x/airequest"
-	"github.com/oraichain/orai/x/airesult"
-	"github.com/oraichain/orai/x/websocket"
-
-	"github.com/oraichain/orai/x/provider"
 
 	// unnamed import of statik for swagger UI support
 	_ "github.com/oraichain/orai/doc/statik"
@@ -109,14 +105,14 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/feegrant"
 	ibcclientclient "github.com/cosmos/ibc-go/v3/modules/core/02-client/client"
 	appparams "github.com/oraichain/orai/app/params"
+	appconfig "github.com/oraichain/orai/cmd/config"
 )
 
 const appName = "Oraichain"
 
 // We pull these out so we can set them with LDFLAGS in the Makefile
 var (
-	NodeDir      = ".oraid"
-	Bech32Prefix = provider.Denom
+	NodeDir = ".oraid"
 
 	// If EnabledSpecificProposals is "", and this is "true", then enable all x/wasm proposals.
 	// If EnabledSpecificProposals is "", and this is not "true", then disable all x/wasm proposals.
@@ -152,17 +148,17 @@ var (
 	DefaultNodeHome = os.ExpandEnv("$PWD/") + NodeDir
 
 	// Bech32PrefixAccAddr defines the Bech32 prefix of an account's address
-	Bech32PrefixAccAddr = Bech32Prefix
+	Bech32PrefixAccAddr = appconfig.Bech32Prefix
 	// Bech32PrefixAccPub defines the Bech32 prefix of an account's public key
-	Bech32PrefixAccPub = Bech32Prefix + sdk.PrefixPublic
+	Bech32PrefixAccPub = appconfig.Bech32Prefix + sdk.PrefixPublic
 	// Bech32PrefixValAddr defines the Bech32 prefix of a validator's operator address
-	Bech32PrefixValAddr = Bech32Prefix + sdk.PrefixValidator + sdk.PrefixOperator
+	Bech32PrefixValAddr = appconfig.Bech32Prefix + sdk.PrefixValidator + sdk.PrefixOperator
 	// Bech32PrefixValPub defines the Bech32 prefix of a validator's operator public key
-	Bech32PrefixValPub = Bech32Prefix + sdk.PrefixValidator + sdk.PrefixOperator + sdk.PrefixPublic
+	Bech32PrefixValPub = appconfig.Bech32Prefix + sdk.PrefixValidator + sdk.PrefixOperator + sdk.PrefixPublic
 	// Bech32PrefixConsAddr defines the Bech32 prefix of a consensus node address
-	Bech32PrefixConsAddr = Bech32Prefix + sdk.PrefixValidator + sdk.PrefixConsensus
+	Bech32PrefixConsAddr = appconfig.Bech32Prefix + sdk.PrefixValidator + sdk.PrefixConsensus
 	// Bech32PrefixConsPub defines the Bech32 prefix of a consensus node public key
-	Bech32PrefixConsPub = Bech32Prefix + sdk.PrefixValidator + sdk.PrefixConsensus + sdk.PrefixPublic
+	Bech32PrefixConsPub = appconfig.Bech32Prefix + sdk.PrefixValidator + sdk.PrefixConsensus + sdk.PrefixPublic
 )
 
 var (
@@ -197,10 +193,6 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		provider.AppModuleBasic{},
-		airequest.AppModuleBasic{},
-		websocket.AppModuleBasic{},
-		airesult.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
 	)
@@ -263,10 +255,6 @@ type OraichainApp struct {
 	AuthzKeeper      authzkeeper.Keeper
 
 	// custom modules here
-	providerKeeper  *provider.Keeper
-	airequestKeeper *airequest.Keeper
-	websocketKeeper *websocket.Keeper
-	airesultKeeper  *airesult.Keeper
 
 	// make scoped keepers public for test purposes
 	scopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -301,7 +289,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		wasm.StoreKey, provider.StoreKey, airequest.StoreKey, websocket.StoreKey, airesult.StoreKey, feegrant.StoreKey, authzkeeper.StoreKey,
+		wasm.StoreKey, feegrant.StoreKey, authzkeeper.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -469,32 +457,6 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	)
 	/****  Module Options ****/
 
-	app.providerKeeper = provider.NewKeeper(
-		appCodec, keys[provider.StoreKey], &app.wasmKeeper, app.getSubspace(provider.ModuleName),
-	)
-
-	app.airequestKeeper = airequest.NewKeeper(
-		appCodec, keys[airequest.StoreKey], &app.wasmKeeper, app.getSubspace(airequest.ModuleName), app.stakingKeeper, app.bankKeeper, app.providerKeeper,
-	)
-
-	app.websocketKeeper = websocket.NewKeeper(
-		appCodec, keys[websocket.StoreKey], &app.wasmKeeper, app.providerKeeper, app.stakingKeeper, app.airequestKeeper,
-	)
-
-	app.airesultKeeper = airesult.NewKeeper(
-		appCodec, keys[airesult.StoreKey],
-		&app.wasmKeeper,
-		app.getSubspace(airesult.ModuleName),
-		app.stakingKeeper,
-		app.providerKeeper,
-		app.bankKeeper,
-		app.distrKeeper,
-		app.accountKeeper,
-		app.websocketKeeper,
-		app.airequestKeeper,
-		authtypes.FeeCollectorName,
-	)
-
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
 	// we prefer to be more strict in what arguments the modules expect.
 	var skipGenesisInvariants = cast.ToBool(appOpts.Get(crisis.FlagSkipGenesisInvariants))
@@ -523,10 +485,6 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		params.NewAppModule(app.paramsKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.accountKeeper, app.bankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.accountKeeper, app.bankKeeper, app.interfaceRegistry),
-		provider.NewAppModule(appCodec, app.providerKeeper),
-		airequest.NewAppModule(appCodec, app.airequestKeeper),
-		websocket.NewAppModule(appCodec, app.websocketKeeper, &app.stakingKeeper),
-		airesult.NewAppModule(appCodec, app.airesultKeeper),
 		transferModule,
 	)
 
@@ -555,10 +513,6 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		ibchost.ModuleName,
 		ibctransfertypes.ModuleName,
 		wasm.ModuleName,
-		provider.ModuleName,
-		airequest.ModuleName,
-		websocket.ModuleName,
-		airesult.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		crisistypes.ModuleName,
@@ -581,10 +535,6 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		ibchost.ModuleName,
 		ibctransfertypes.ModuleName,
 		wasm.ModuleName,
-		provider.ModuleName,
-		airequest.ModuleName,
-		websocket.ModuleName,
-		airesult.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -616,10 +566,6 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		ibctransfertypes.ModuleName,
 		// wasm after ibc transfer
 		wasm.ModuleName,
-		provider.ModuleName,
-		airequest.ModuleName,
-		websocket.ModuleName,
-		airesult.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.crisisKeeper)
@@ -842,9 +788,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
-	paramsKeeper.Subspace(provider.ModuleName)
-	paramsKeeper.Subspace(airequest.ModuleName)
-	paramsKeeper.Subspace(airesult.ModuleName)
 
 	return paramsKeeper
 }
@@ -871,10 +814,6 @@ func (app *OraichainApp) upgradeHandler() {
 			"genutil":      1,
 			"transfer":     1,
 			"wasm":         1,
-			// "provider":  1,
-			// "airequest": 1,
-			// "websocket": 1,
-			// "airesult":  1,
 		}
 
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)

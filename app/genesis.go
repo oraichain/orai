@@ -10,7 +10,7 @@ import (
 	gov "github.com/cosmos/cosmos-sdk/x/gov/types"
 	mint "github.com/cosmos/cosmos-sdk/x/mint/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
-	provider "github.com/oraichain/orai/x/provider/types"
+	appconfig "github.com/oraichain/orai/cmd/config"
 )
 
 // GenesisState default state for the application
@@ -25,7 +25,7 @@ func NewDefaultGenesisState(cdc codec.Codec) GenesisState {
 	govGenesis := gov.DefaultGenesisState()
 	crisisGenesis := crisis.DefaultGenesisState()
 
-	stakingGenesis.Params.BondDenom = provider.Denom
+	stakingGenesis.Params.BondDenom = appconfig.Bech32Prefix
 	stakingGenesis.Params.HistoricalEntries = 1000
 
 	// TODO: testnet figures only
@@ -34,15 +34,15 @@ func NewDefaultGenesisState(cdc codec.Codec) GenesisState {
 	genesisState[staking.ModuleName] = cdc.MustMarshalJSON(stakingGenesis)
 
 	mintGenesis.Params.BlocksPerYear = 6311200 // target 5-second block time
-	mintGenesis.Params.MintDenom = provider.Denom
+	mintGenesis.Params.MintDenom = appconfig.Bech32Prefix
 	genesisState[mint.ModuleName] = cdc.MustMarshalJSON(mintGenesis)
 
-	govGenesis.DepositParams.MinDeposit = sdk.NewCoins(sdk.NewCoin(provider.Denom, sdk.TokensFromConsensusPower(10, sdk.NewInt(1000000))))
+	govGenesis.DepositParams.MinDeposit = sdk.NewCoins(sdk.NewCoin(appconfig.Bech32Prefix, sdk.TokensFromConsensusPower(10, sdk.NewInt(1000000))))
 	// TODO: testing
 	govGenesis.VotingParams.VotingPeriod = time.Second * 30 // test for 10 mins voting period
 	genesisState[gov.ModuleName] = cdc.MustMarshalJSON(govGenesis)
 
-	crisisGenesis.ConstantFee = sdk.NewCoin(provider.Denom, sdk.TokensFromConsensusPower(10, sdk.NewInt(1000000)))
+	crisisGenesis.ConstantFee = sdk.NewCoin(appconfig.Bech32Prefix, sdk.TokensFromConsensusPower(10, sdk.NewInt(1000000)))
 	genesisState[crisis.ModuleName] = cdc.MustMarshalJSON(crisisGenesis)
 
 	// slashingGenesis.Params.SignedBlocksWindow = 30000                         // approximately 1 day
