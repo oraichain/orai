@@ -77,7 +77,7 @@ ldflags += -w -s
 ldflags += $(LDFLAGS)
 ldflags := $(strip $(ldflags))
 
-BUILD_FLAGS := -tags "$(build_tags)" -ldflags '$(ldflags)'
+BUILD_FLAGS := -mod=readonly -tags "$(build_tags)" -ldflags '$(ldflags)'
 # check for nostrip option
 ifeq (,$(findstring nostrip,$(ORAI_BUILD_OPTIONS)))
   BUILD_FLAGS += -trimpath
@@ -92,4 +92,32 @@ install: go.sum
 	go install -mod=readonly $(BUILD_FLAGS) ./cmd/oraid
 
 build:
-	go build $(BUILD_FLAGS) -o /bin/oraid ./cmd/oraid
+	go build $(BUILD_FLAGS) -o oraid ./cmd/oraid
+
+###############################################################################
+###                                Protobuf                                 ###
+###############################################################################
+
+
+proto-all: proto-gen proto-check-breaking
+.PHONY: proto-all
+
+proto-gen: 
+	./scripts/protocgen.sh $(PROTO_DIR)
+.PHONY: proto-gen
+
+proto-js: 
+	./scripts/protocgen-js.sh $(SRC_DIR)
+.PHONY: proto-js
+
+proto-swagger: 
+	./scripts/protocgen-swagger.sh $(SRC_DIR)
+.PHONY: proto-swagger
+
+proto-check-breaking:
+	buf check breaking --against-input $(HTTPS_GIT)#branch=master
+.PHONY: proto-check-breaking
+
+.PHONY: all build-linux install install-debug \
+	go-mod-cache draw-deps clean build format \
+	test test-all test-build test-cover test-unit test-race
