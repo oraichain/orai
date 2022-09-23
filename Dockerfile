@@ -30,13 +30,13 @@ RUN upx --best --lzma /workspace/oraid
 # # then remove
 # RUN rm -rf /workspace/*
 
-FROM alpine:3.16
+FROM golang:1.18-alpine
 
 WORKDIR /workspace
 
 RUN apk update
 
 # need to install build-base to run go oraid binary
-RUN apk add build-base bash git jq 
+RUN apk add build-base bash jq 
 
 COPY --from=builder /workspace/oraid /bin
