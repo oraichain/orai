@@ -813,8 +813,10 @@ func (app *OraichainApp) upgradeHandler() {
 			"ibc":          1,
 			"genutil":      1,
 			"transfer":     1,
-			"wasm":         1,
+			// "wasm":         1,
 		}
+
+		fromVM["wasm"] = wasm.AppModule{}.ConsensusVersion()
 
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
