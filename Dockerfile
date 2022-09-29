@@ -18,13 +18,13 @@ COPY go.sum /workspace/
 COPY Makefile /workspace/
 
 # See https://github.com/CosmWasm/wasmvm/releases
-ADD ./libwasmvm_muslc.a /lib/libwasmvm_muslc.a
+ADD ./libwasmvm_muslc_112.a /lib/libwasmvm_muslc.a
 # # RUN sha256sum /lib/libwasmvm_muslc.a | grep 39dc389cc6b556280cbeaebeda2b62cf884993137b83f90d1398ac47d09d3900
 
 # RUN go mod tidy && go get ./...
 
 # # force it to use static lib (from above) not standard libgo_cosmwasm.so file
-RUN make build LEDGER_ENABLED=false BUILD_TAGS=muslc GOMOD_FLAGS=
+RUN make build LEDGER_ENABLED=false BUILD_TAGS=muslc GOMOD_FLAGS= VERSION=0.41.0
 RUN upx --best --lzma /workspace/oraid
 
 # # then remove
