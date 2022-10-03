@@ -94,6 +94,8 @@ install: go.sum
 build:
 	go build $(BUILD_FLAGS) -o oraid ./cmd/oraid
 
+  # the oraid binary will be built to the root directory of the project (if in docker container then it's workspace/oraid)
+
 ###############################################################################
 ###                                Protobuf                                 ###
 ###############################################################################
