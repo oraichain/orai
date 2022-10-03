@@ -114,6 +114,8 @@ const appName = "Oraichain"
 var (
 	NodeDir = ".oraid"
 
+	BinaryVersion = "v0.41.0"
+
 	// If EnabledSpecificProposals is "", and this is "true", then enable all x/wasm proposals.
 	// If EnabledSpecificProposals is "", and this is not "true", then disable all x/wasm proposals.
 	ProposalsEnabled = "true"
@@ -792,8 +794,30 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	return paramsKeeper
 }
 
+func MigrateWasmDir(nodeHome string) {
+	wasmModuleDir := filepath.Join(filepath.Join(nodeHome, "wasm"), "wasm")
+	cacheModuleDir := filepath.Join(wasmModuleDir, "cache", "modules")
+	stateWasmDir := filepath.Join(wasmModuleDir, "state", "wasm")
+
+	// rename pre-made cache & state dir to different names
+	if err := os.Rename(cacheModuleDir, filepath.Join(wasmModuleDir, "module-deprecated")); err != nil {
+		panic(err)
+	}
+	if err := os.Rename(stateWasmDir, filepath.Join(wasmModuleDir, "wasm-deprecated")); err != nil {
+		panic(err)
+	}
+
+	// finally, move old contracts to new cache & state dirs
+	if err := os.Rename(filepath.Join(wasmModuleDir, "modules"), cacheModuleDir); err != nil {
+		panic(err)
+	}
+	if err := os.Rename(filepath.Join(wasmModuleDir, "wasm"), stateWasmDir); err != nil {
+		panic(err)
+	}
+}
+
 func (app *OraichainApp) upgradeHandler() {
-	app.upgradeKeeper.SetUpgradeHandler("v0.41.0", func(ctx sdk.Context, plan upgradetypes.Plan, _ module.VersionMap) (module.VersionMap, error) {
+	app.upgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, _ module.VersionMap) (module.VersionMap, error) {
 		// 1st-time running in-store migrations, using 1 as fromVersion to
 		// avoid running InitGenesis.
 		fromVM := map[string]uint64{
@@ -818,6 +842,9 @@ func (app *OraichainApp) upgradeHandler() {
 
 		fromVM["wasm"] = wasm.AppModule{}.ConsensusVersion()
 
+		// from v0.13.2 to 1.0 CosmWasm has changed wasm dir names from modules/ & wasm/ to cache/modules/ and state/wasm
+		MigrateWasmDir(filepath.Join(os.ExpandEnv("$PWD/"), NodeDir))
+
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
 
@@ -826,12 +853,12 @@ func (app *OraichainApp) upgradeHandler() {
 		panic(err)
 	}
 
+	// special case, only apply when migrating from cosmos sdk 0.42.11 to 0.45.8
 	if upgradeInfo.Name == "v0.41.0" && !app.upgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		storeUpgrades := storetypes.StoreUpgrades{
 			Added:   []string{"authz", "feegrant"},
 			Deleted: []string{},
 		}
-
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
 	}
