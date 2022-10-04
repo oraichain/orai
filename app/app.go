@@ -795,7 +795,10 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 }
 
 func MigrateWasmDir(nodeHome string) {
+	// wasm files location: .oraid/wasm/wasm
 	wasmModuleDir := filepath.Join(filepath.Join(nodeHome, "wasm"), "wasm")
+	// old version we have .oraid/wasm/wasm/modules & .oraid/wasm/wasm/wasm
+	// new version we have .oraid/wasm/wasm/cache/modules & .oraid/wasm/wasm/state/wasm
 	cacheModuleDir := filepath.Join(wasmModuleDir, "cache", "modules")
 	stateWasmDir := filepath.Join(wasmModuleDir, "state", "wasm")
 
