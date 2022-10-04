@@ -16,6 +16,7 @@ COPY doc/statik /workspace/doc/statik
 COPY go.mod /workspace/
 COPY go.sum /workspace/
 COPY Makefile /workspace/
+COPY oraivisor/ /workspace/oraivisor
 
 # See https://github.com/Oraichain/wasmvm/releases (branch multiwasm-1.1.2-zk)
 ADD ./libwasmvm_muslc_112.a /lib/libwasmvm_muslc.a
@@ -25,7 +26,11 @@ ADD ./libwasmvm_muslc_112.a /lib/libwasmvm_muslc.a
 
 # # force it to use static lib (from above) not standard libgo_cosmwasm.so file
 RUN make build LEDGER_ENABLED=false BUILD_TAGS=muslc GOMOD_FLAGS= VERSION=0.41.0
-RUN upx --best --lzma /workspace/oraid
+RUN upx --best --lzma /workspace/build/oraid
+
+# install oraivisor
+RUN cd oraivisor && make build
+RUN upx --best --lzma /workspace/oraivisor/build/oraivisor
 
 # # then remove
 # RUN rm -rf /workspace/*
@@ -37,8 +42,14 @@ WORKDIR /workspace
 RUN apk update
 
 # need to install build-base to run go oraid binary
-RUN apk add bash build-base jq 
+RUN apk add bash build-base jq
 
-COPY --from=builder /workspace/oraid /bin
+ENV DAEMON_ALLOW_DOWNLOAD_BINARIES=true DAEMON_RESTART_AFTER_UPGRADE=true DAEMON_NAME=oraid DAEMON_HOME=/root
+ENV PATH="${DAEMON_HOME}/oraivisor/current/bin:${PATH}"
+RUN mkdir -p $DAEMON_HOME/oraivisor/genesis/bin 
 
-# TODO: need to add cosmovisor
+# init first symbolic link to run oraid and later oraivisor will update the link
+RUN ln -s $DAEMON_HOME/oraivisor/genesis $DAEMON_HOME/oraivisor/current
+
+COPY --from=builder /workspace/oraivisor/build/oraivisor /usr/bin
+COPY --from=builder /workspace/build/oraid $DAEMON_HOME/oraivisor/genesis/bin
