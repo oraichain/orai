@@ -1,7 +1,7 @@
 # Oraichain
 
-![Banner!](https://orai.io/images/logos/logo-full-h-light.png#gh-light-mode-only)
-![Banner!](https://orai.io/images/logos/logo-full-h-dark.png#gh-dark-mode-only)
+![Banner!](./doc/logo-full-h-light.png#gh-light-mode-only)
+![Banner!](./doc/logo-full-h-dark.png#gh-dark-mode-only)
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Project Status: Active -- The project has reached a stable, usable
