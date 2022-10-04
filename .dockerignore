@@ -3,9 +3,6 @@
 .registry_cache
 build
 .*
-smart-contracts
-testfiles
-third_party
 scripts
 proto
 doc/*.md 

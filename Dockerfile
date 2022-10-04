@@ -25,18 +25,5 @@ ADD ./libwasmvm_muslc_112.a /lib/libwasmvm_muslc.a
 
 # # force it to use static lib (from above) not standard libgo_cosmwasm.so file
 RUN make build LEDGER_ENABLED=false BUILD_TAGS=muslc GOMOD_FLAGS= VERSION=0.41.0
-RUN upx --best --lzma /workspace/oraid
-
-# # then remove
-# RUN rm -rf /workspace/*
-
-FROM golang:1.18-alpine
-
-WORKDIR /workspace
-
-RUN apk update
-
-# need to install build-base to run go oraid binary
-RUN apk add build-base bash jq 
-
-COPY --from=builder /workspace/oraid /bin
+RUN cp /workspace/oraid /bin/oraid
+# RUN upx --best --lzma /workspace/oraid
