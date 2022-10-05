@@ -25,5 +25,5 @@ ADD ./libwasmvm_muslc_112.a /lib/libwasmvm_muslc.a
 
 # # force it to use static lib (from above) not standard libgo_cosmwasm.so file
 RUN make build LEDGER_ENABLED=false BUILD_TAGS=muslc GOMOD_FLAGS= VERSION=0.41.0
-RUN cp /workspace/oraid /bin/oraid
+RUN cp /workspace/build/oraid /bin/oraid
 # RUN upx --best --lzma /workspace/oraid
