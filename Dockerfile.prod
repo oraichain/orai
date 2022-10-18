@@ -19,7 +19,7 @@ COPY Makefile /workspace/
 COPY oraivisor/ /workspace/oraivisor
 
 # See https://github.com/Oraichain/wasmvm/releases (branch multiwasm-1.1.2-zk)
-ADD ./libwasmvm_muslc_112.a /lib/libwasmvm_muslc.a
+ADD ./libwasmvm_muslc.a /lib/libwasmvm_muslc.a
 # # RUN sha256sum /lib/libwasmvm_muslc.a | grep 39dc389cc6b556280cbeaebeda2b62cf884993137b83f90d1398ac47d09d3900
 
 # RUN go mod tidy && go get ./...
