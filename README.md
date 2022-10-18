@@ -81,7 +81,7 @@ docker build -t <image:tag> -f Dockerfile.prod .
 
 * Start the proto docker: `docker-compose up -d proto`
 
-* Install neccessary tools: `docker-compose exec proto ash -c 'apk add build-base bash'`
+* Install neccessary tools: `docker-compose exec proto ash -c 'apk add build-base bash && go get ./...'`
 
 * Gen protobuf: `docker-compose exec proto ash -c 'make proto-gen'`
 
