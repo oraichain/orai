@@ -125,3 +125,7 @@ make proto-swagger
 go get github.com/rakyll/statik
 statik -src doc/swagger-ui/ -dest doc -f
 ```
+
+## oraid binary checksum
+
+current commit: ee82a09fe36b370b5c5e36a4032e734f
