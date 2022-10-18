@@ -152,7 +152,7 @@ echo '{"binaries":{"linux/amd64":"https://orai.s3.amazonaws.com/oraid?versionId=
 aws s3 cp build/manifest.json s3://orai --acl public-read
 
 # then submit proposal
-oraid tx gov submit-proposal software-upgrade "v0.41.0" --title "upgrade Oraichain network to v0.41.0" --description "Please visit https://github.com/oraichain/orai to view the CHANGELOG for this upgrade" --from $USER --upgrade-height 2268215 --upgrade-info "https://orai.s3.us-east-2.amazonaws.com/v0.41.0/manifest.json" --deposit 10000000orai --chain-id $CHAIN_ID -y
+oraid tx gov submit-proposal software-upgrade "v0.41.1" --title "upgrade Oraichain network to v0.41.1 that patches the Dragonberry advisory" --description "Please visit https://github.com/oraichain/orai to view the CHANGELOG for this upgrade" --from $USER --upgrade-height 9654707 --upgrade-info "https://orai.s3.us-east-2.amazonaws.com/v0.41.1/manifest.json" --deposit 10000000orai --chain-id Oraichain-testnet -y
 
 ```
 

@@ -30,7 +30,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -114,7 +113,7 @@ const appName = "Oraichain"
 var (
 	NodeDir = ".oraid"
 
-	BinaryVersion = "v0.41.0"
+	BinaryVersion = "v0.41.1"
 
 	// If EnabledSpecificProposals is "", and this is "true", then enable all x/wasm proposals.
 	// If EnabledSpecificProposals is "", and this is not "true", then disable all x/wasm proposals.
@@ -820,49 +819,38 @@ func MigrateWasmDir(nodeHome string) {
 }
 
 func (app *OraichainApp) upgradeHandler() {
-	app.upgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, _ module.VersionMap) (module.VersionMap, error) {
+	app.upgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
 		// 1st-time running in-store migrations, using 1 as fromVersion to
 		// avoid running InitGenesis.
-		fromVM := map[string]uint64{
-			"auth":         1,
-			"bank":         1,
-			"capability":   1,
-			"crisis":       1,
-			"distribution": 1,
-			"evidence":     1,
-			"gov":          1,
-			"mint":         1,
-			"params":       1,
-			"slashing":     1,
-			"staking":      1,
-			"upgrade":      1,
-			"vesting":      1,
-			"ibc":          1,
-			"genutil":      1,
-			"transfer":     1,
-			// "wasm":         1,
-		}
+		// fromVM := map[string]uint64{
+		// 	"auth":         1,
+		// 	"authz":        1,
+		// 	"feegrant":     2,
+		// 	"bank":         2,
+		// 	"capability":   2,
+		// 	"crisis":       2,
+		// 	"distribution": 2,
+		// 	"evidence":     2,
+		// 	"gov":          2,
+		// 	"mint":         2,
+		// 	"params":       2,
+		// 	"slashing":     2,
+		// 	"staking":      2,
+		// 	"upgrade":      2,
+		// 	"vesting":      2,
+		// 	"ibc":          2,
+		// 	"genutil":      2,
+		// 	"transfer":     2,
+		// 	"wasm":         1,
+		// }
 
-		fromVM["wasm"] = wasm.AppModule{}.ConsensusVersion()
+		// fromVM["wasm"] = wasm.AppModule{}.ConsensusVersion()
 
 		// from v0.13.2 to 1.0 CosmWasm has changed wasm dir names from modules/ & wasm/ to cache/modules/ and state/wasm
-		MigrateWasmDir(filepath.Join(os.ExpandEnv("$PWD/"), NodeDir))
+		// MigrateWasmDir(filepath.Join(os.ExpandEnv("$PWD/"), NodeDir))
 
-		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
+		return app.mm.RunMigrations(ctx, app.configurator, vm)
 	})
 
-	upgradeInfo, err := app.upgradeKeeper.ReadUpgradeInfoFromDisk()
-	if err != nil {
-		panic(err)
-	}
-
 	// special case, only apply when migrating from cosmos sdk 0.42.11 to 0.45.8
-	if upgradeInfo.Name == "v0.41.0" && !app.upgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
-		storeUpgrades := storetypes.StoreUpgrades{
-			Added:   []string{"authz", "feegrant"},
-			Deleted: []string{},
-		}
-		// configure store loader that checks if version == upgradeHeight and applies store upgrades
-		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
-	}
 }
