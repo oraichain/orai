@@ -88,6 +88,7 @@ import (
 	ibc "github.com/cosmos/ibc-go/v3/modules/core"
 	ibcclient "github.com/cosmos/ibc-go/v3/modules/core/02-client"
 	ibcclienttypes "github.com/cosmos/ibc-go/v3/modules/core/02-client/types"
+	ibcconnectiontypes "github.com/cosmos/ibc-go/v3/modules/core/03-connection/types"
 	porttypes "github.com/cosmos/ibc-go/v3/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/v3/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v3/modules/core/keeper"
@@ -840,10 +841,10 @@ func (app *OraichainApp) upgradeHandler() {
 			"ibc":          1,
 			"genutil":      1,
 			"transfer":     1,
-			// "wasm":         1,
+			"wasm":         1,
 		}
 
-		fromVM["wasm"] = wasm.AppModule{}.ConsensusVersion()
+		app.ibcKeeper.ConnectionKeeper.SetParams(ctx, ibcconnectiontypes.DefaultParams())
 
 		// from v0.13.2 to 1.0 CosmWasm has changed wasm dir names from modules/ & wasm/ to cache/modules/ and state/wasm
 		MigrateWasmDir(filepath.Join(os.ExpandEnv("$PWD/"), NodeDir))
