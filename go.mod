@@ -130,7 +130,7 @@ require (
 
 replace (
 	// go list -m -json github.com/oraichain/wasmd@multiwasm | jq '.|"\(.Path) \(.Version)"' -r
-	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.29.0-multiwasm-rc3.0.20221026023211-0a0795f28c3f
+	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.29.0-multiwasm-rc3.0.20221030182034-b394a0e82f66
 	github.com/confio/ics23/go => github.com/cosmos/cosmos-sdk/ics23/go v0.8.0
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
