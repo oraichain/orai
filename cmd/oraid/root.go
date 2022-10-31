@@ -8,10 +8,10 @@ import (
 	"os"
 	"path/filepath"
 
+	clientconfig "github.com/cosmos/cosmos-sdk/client/config"
+	srvconfig "github.com/cosmos/cosmos-sdk/server/config"
 	"github.com/pkg/errors"
 	cfg "github.com/tendermint/tendermint/config"
-
-	srvconfig "github.com/cosmos/cosmos-sdk/server/config"
 	tmos "github.com/tendermint/tendermint/libs/os"
 	tmrand "github.com/tendermint/tendermint/libs/rand"
 
@@ -89,6 +89,17 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		Use:   version.AppName,
 		Short: "Orai Daemon (server)",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
+
+			initClientCtx, err := client.ReadPersistentCommandFlags(initClientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			initClientCtx, err = clientconfig.ReadFromClientConfig(initClientCtx)
+			if err != nil {
+				return err
+			}
+
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err
 			}
