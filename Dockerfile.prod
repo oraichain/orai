@@ -1,34 +1,49 @@
-FROM golang:1.15-alpine3.12 AS go-builder
+FROM golang:1.18-alpine as builder
 
 # this comes from standard alpine nightly file
 #  https://github.com/rust-lang/docker-rust-nightly/blob/master/alpine3.12/Dockerfile
 # with some changes to support our toolchain, etc
 RUN set -eux; apk add --no-cache ca-certificates build-base;
-RUN apk add make git upx
+RUN apk add upx
 # NOTE: add these to run with LEDGER_ENABLED=true
 # RUN apk add libusb-dev linux-headers
 
-WORKDIR /code
-COPY . /code
+WORKDIR /workspace
+COPY app/ /workspace/app
+COPY cmd/ /workspace/cmd
+COPY packages/ /workspace/packages
+COPY doc/statik /workspace/doc/statik
+COPY go.mod /workspace/
+COPY go.sum /workspace/
+COPY Makefile /workspace/
+COPY oraivisor/ /workspace/oraivisor
 
-# See https://github.com/CosmWasm/wasmvm/releases
-ADD https://github.com/CosmWasm/wasmvm/releases/download/v0.13.0/libwasmvm_muslc.a /lib/libwasmvm_muslc.a
-RUN sha256sum /lib/libwasmvm_muslc.a | grep 39dc389cc6b556280cbeaebeda2b62cf884993137b83f90d1398ac47d09d3900
+# See https://github.com/Oraichain/wasmvm/releases (branch multiwasm-1.1.2-zk)
+ADD ./libwasmvm_muslc.a /lib/libwasmvm_muslc.a
+# # RUN sha256sum /lib/libwasmvm_muslc.a | grep 39dc389cc6b556280cbeaebeda2b62cf884993137b83f90d1398ac47d09d3900
 
-# force it to use static lib (from above) not standard libgo_cosmwasm.so file
-RUN make build LEDGER_ENABLED=false BUILD_TAGS=muslc GOMOD_FLAGS=
+# RUN go mod tidy && go get ./...
+
+# # force it to use static lib (from above) not standard libgo_cosmwasm.so file
+RUN make build LEDGER_ENABLED=false BUILD_TAGS=muslc GOMOD_FLAGS= VERSION=0.41.0
+RUN upx --best --lzma /workspace/build/oraid
+
+# install oraivisor
 RUN cd oraivisor && make build
+RUN upx --best --lzma /workspace/oraivisor/build/oraivisor
 
-# make size smaller
-RUN go get github.com/pwaller/goupx
-RUN goupx /code/build/oraid
-RUN goupx /code/oraivisor/build/oraivisor
+# # then remove
+# RUN rm -rf /workspace/*
 
-# --------------------------------------------------------
-FROM alpine:3.12
+FROM alpine:3.16
 
 WORKDIR /workspace
-# allow auto download and upgrade form a URL, and set daemon home different from workspace for later mapping
+
+RUN apk update
+
+# need to install build-base to run go oraid binary
+RUN apk add bash build-base jq
+
 ENV DAEMON_ALLOW_DOWNLOAD_BINARIES=true DAEMON_RESTART_AFTER_UPGRADE=true DAEMON_NAME=oraid DAEMON_HOME=/root
 ENV PATH="${DAEMON_HOME}/oraivisor/current/bin:${PATH}"
 RUN mkdir -p $DAEMON_HOME/oraivisor/genesis/bin 
@@ -36,21 +51,5 @@ RUN mkdir -p $DAEMON_HOME/oraivisor/genesis/bin
 # init first symbolic link to run oraid and later oraivisor will update the link
 RUN ln -s $DAEMON_HOME/oraivisor/genesis $DAEMON_HOME/oraivisor/current
 
-# copy binaries
-COPY --from=go-builder /code/oraivisor/build/oraivisor /usr/bin
-COPY --from=go-builder /code/build/oraid $DAEMON_HOME/oraivisor/genesis/bin
-
-RUN apk add nano jq bash ncurses
-
-# COPY fn.sh /usr/bin/fn
-
-# rest server
-EXPOSE 1317
-# tendermint p2p
-EXPOSE 26656
-# tendermint rpc
-EXPOSE 26657
-
-EXPOSE 9090
-
-# ENTRYPOINT fn start
+COPY --from=builder /workspace/oraivisor/build/oraivisor /usr/bin
+COPY --from=builder /workspace/build/oraid $DAEMON_HOME/oraivisor/genesis/bin

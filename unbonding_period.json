@@ -1,0 +1,12 @@
+{
+    "title": "New unbonding period: 14 days",
+    "description": "Update unbonding period to 14 days with value in nano seconds",
+    "changes": [
+        {
+            "subspace": "staking",
+            "key": "UnbondingTime",
+            "value": "1209600000000000"
+        }
+    ],
+    "deposit": "10000000orai"
+}

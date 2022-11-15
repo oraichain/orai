@@ -14,7 +14,6 @@ COPY oraivisor /code
 RUN make build
 
 # make size smaller
-RUN go get github.com/pwaller/goupx
 RUN goupx /code/build/oraivisor
 
 # ----- Update oraivisor from mainnet-alpine ---------------------------------------------------

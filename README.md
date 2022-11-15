@@ -119,6 +119,6 @@ This project is licensed under the Apache 2.0 license - see the [LICENSE](LICENS
 docker-compose exec proto ash
 make proto-swagger
 # then create static file
-go get github.com/rakyll/statik
+go install github.com/rakyll/statik
 statik -src doc/swagger-ui/ -dest doc -f
 ``` -->
