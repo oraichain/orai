@@ -63,7 +63,6 @@ libwasmvm_muslc*.a
 .gitconfig
 
 # ignore generated files
-x/**/types/*.pb.*
 tmp
 go.sum
 .config/

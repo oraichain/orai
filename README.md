@@ -1,132 +1,124 @@
-## Installation
+# Oraichain
+
+![Banner!](./doc/logo-full-h-light.png#gh-light-mode-only)
+![Banner!](./doc/logo-full-h-dark.png#gh-dark-mode-only)
+
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Project Status: Active -- The project has reached a stable, usable
+state and is being actively
+developed.](https://img.shields.io/badge/repo%20status-Active-green.svg)](https://www.repostatus.org/#active)
+
+
+Oraichain is the world’s first AI-powered oracle and ecosystem for blockchains. 
+
+Beyond data oracles, Oraichain aims to become the first AI Layer 1 in the Blockchain sphere with a complete AI ecosystem, serving as a foundational layer for the creation of a new generation of smart contracts and Dapps. With AI as the cornerstone, Oraichain has developed many essential and innovative products and services including AI price feeds, fully on-chain VRF, Data Hub, AI Marketplace with 100+ AI APIs, AI-based NFT generation and NFT copyright protection, Royalty Protocol, AI-powered Yield Aggregator Platform, and Cosmwasm IDE.
+
+This repository contains the source code & how to build the Oraichain mainnet, a Cosmos-based blockchain network that levarages the [CosmWasm](https://github.com/CosmWasm/cosmwasm) technology to integrate AI into the ecosystem.
+
+## Getting Started
+
+[These instructions](https://docs.orai.io/developers/tutorials/getting-setup) will get you a copy of the project up and running on your local machine for development and testing purposes. See [deployment](#deployment) for notes on how to deploy the project on a live system.
+
+### Prerequisites
+
+* If you want to build the binary using Docker (recommended), then you only need Docker.
+
+* If you want to build the binary from scratch, you will need:
+
+    - Go 1.15+
+
+    - Make
+
+    - Wasmvm library: https://github.com/CosmWasm/wasmvm/releases/download/v0.13.0/libwasmvm_muslc.a (you can download it and put in /lib/libwasmvm_muslc.a). The file is used by CosmWasm when building the binary
+
+### Hardware requirements
+
+[Please visit the official hardware requirement for Oraichain mainnet here](https://docs.orai.io/developers/networks/mainnet#node-hardwarde-specification)
+
+### Installing
+
+* **Install Golang**
+
+[Please visit the official Golang website to download & install Go](https://go.dev/doc/install)
+
+* **Install make**
+
+Normally, for Linux-based machines, you already have Make installed by default.
+
+* **Install libwasmvm**
+
+the wasmd module of CosmWasm uses a wasm vm library, which should be included when building the chain binary. Hence, we need to download and place it in a specific location.
+
+For Linux based machines, please run the following command:
 
 ```bash
-docker-compose up -d
-
-# enter protoc container and generate the proto files
-docker-compose exec protoc ash
-
-# first time
-go get ./...
-
-# build protobuf templates
-make proto-gen
-
-# exit the container
-exit
-
-docker-compose exec orai ash
-
-# wget https://github.com/CosmWasm/wasmvm/releases/download/v0.13.0/libwasmvm_muslc.a -O /lib/libwasmvm_muslc.a
-make build GOMOD_FLAGS=
-ln -s $PWD/build/oraid /usr/bin/oraid
-
-# setup blockchain and run
-./scripts/setup_oraid.sh 12345678
-
-# start node
-oraid start --rpc.laddr tcp://0.0.0.0:26657 --log_level error
-
-# replace oraid with oraivisor for auto-upgrade
-oraivisor start --rpc.laddr tcp://0.0.0.0:26657 --log_level error
-
-# start websocket subscribe for processing event log in another terminal
-oraid tx websocket subscribe --max-try 10 --from $USER --gas="auto" --gas-adjustment="1.5" --chain-id=$CHAIN_ID -y
-
-# run as a background process
-docker-compose exec -d orai ash -c "echo $KEYRING_PASS | oraid tx websocket subscribe --max-try 10 --from $USER --gas="auto" --gas-adjustment="1.5" --chain-id=$CHAIN_ID -y"
+sudo wget https://github.com/CosmWasm/wasmvm/releases/download/v0.13.0/libwasmvm_muslc.a -O /lib/libwasmvm_muslc.a
 ```
 
-## Build smart contract and interact with it
+* **Download Go dependencies**
+
+`go get ./...`
+
+* **Build the binary**
+
+`make install`
+
+* **Verify the binary version**
+
+`oraid version`
+
+## Deployment
+
+We recommend using Docker to deploy the network. To do so, please type:
 
 ```bash
-# go to rust-optimizer container
-docker-compose exec rust bash
-# similarly, build other smart contracts
-cd datasource-eth
-optimize.sh .
-
-# can run using simulate environment
-docker-compose exec simulate bash
-cosmwasm-simulate oscript-price/artifacts/oscript_price.wasm
-
-# run unit-test
-RUST_BACKTRACE=1 cargo unit-test -- --exact contract::tests::increment --show-output
-
-# can using automated deployment
-# if the smart contract has been stored using oraid tx wasm store, then use the below command with suitable code id
-./scripts/deploy-contract.sh smart-contracts/testcase-price/artifacts/testcase_price.wasm "testcase-price 1" '{"ai_data_source":["datasource_eth"],"testcase":["testcase_price"]}' [code_id]
-# if not, then don't add the [code-id] field, it will give an error because the smart contract has not had a code id yet.
-
-# query a data source through cli
-oraid query wasm contract-state smart $CONTRACT '{"get":{"input":"{\"image\":\"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfx__RoRYzLDgXDiJxYGxLihJC4zoqV3V0xg&usqp=CAU\",\"model\":\"inception_v3\",\"name\":\"test_image\"}"}}'
-
-# query wasm through lcd
-curl <url>/wasm/v1beta1/contract/<contract-address>/smart/<json-string-encoded-in-base64>
-
-oraid query wasm contract-state smart orai16at0lzgx3slnqlgvcc7r79056f5wkuczenn09k '{"test":{"input":"{\"image\":\"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfx__RoRYzLDgXDiJxYGxLihJC4zoqV3V0xg&usqp=CAU\",\"model\":\"inception_v3\",\"name\":\"test_image\"}","output":"a","contract":"orai1aysde07zjurpp99jgl4xa7vskr8xnlcfkedkd9"}}'
-
+docker build -t <image:tag> -f Dockerfile.prod .
 ```
 
-## Some basic commands to test with the node
+## Protobuf & protobuf swagger generation
 
-Run websocket as background process
+* [Install Docker](https://docs.docker.com/engine/install)
 
-```bash
-echo <passphrase> | oraid tx websocket subscribe --max-try 10 --from $USER --gas="auto" --gas-adjustment="1.5" --chain-id=$CHAIN_ID -y
-```
+* Start the proto docker: `docker-compose up -d proto`
 
-Init smart contracts and create an AI request. To run the script, your current dir must contain the smart-contracts/ directory that already have wasm files built. The directory name with the wasm file should also be consistent. Eg: dir name: classification, then the wasm file is classification.wasm
+* Install neccessary tools: `docker-compose exec proto ash -c 'apk add build-base bash && go get ./...'`
 
-```bash
+* Gen protobuf: `docker-compose exec proto ash -c 'make proto-gen'`
 
-./scripts/deploy_ai_services.sh <list-of-datasource-names> <list-of-testcase-names> <oscript-name> <datasource-init-input> <testcase-input> <script-indexing> <path to the oraiwasm directory> <passphrase>
+## Contributing
 
-Eg: ./scripts/deploy_ai_services.sh classification,cv009 classification_testcase classification_oscript '' '' '{"ai_data_source":["classification","cv009"],"testcase":["classification_testcase"]}' 1 /workspace/oraiwasm 123456789
+Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
-# open another terminal and run
-oraid tx airequest set-aireq oscript_price "5" "6" 30000orai 1 --from $USER --chain-id $CHAIN_ID -y
+## Versioning
 
-# interact with the AI services
-oraid tx airequest set-aireq classification_oscript '{"image":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfx__RoRYzLDgXDiJxYGxLihJC4zoqV3V0xg&usqp=CAU","model":"inception_v3","name":"test_image"}' "6" 30000orai 1 --from $USER --chain-id $CHAIN_ID -y
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/oraichain/orai/tags). 
 
-# Check if the AI request has finished executing
-oraid query airesult fullreq <request-id>
+## Authors
 
-```
+* [Duc Le Pham](https://github.com/ducphamle2)
 
-Most of the time, the initial inputs for data sources and test cases are unecessary. However, you must set the input json for the oracle script with data source and test case information.
+See also the list of [contributors](https://github.com/oraichain/orai/contributors) who participated in this project.
 
-## Run test
+## License
 
-`make test-method PACKAGE=github.com/oraichain/orai/x/airequest/keeper METHOD=TestCalucateMol`
+This project is licensed under the Apache 2.0 license - see the [LICENSE](LICENSE) file for details.
 
-## Build docker image
+<!-- ## Acknowledgments
 
-development `docker build -t orai/orai:alpine-wasm .`  
-production `docker build -t orai/orai:0.18-alpine -f Dockerfile.prod .`  
-oraivisor-upgrade `docker build -t orai/orai:mainnet-alpine-0.1 -f Dockerfile.oraivisor .`
+* Hat tip to anyone whose code was used
+* Inspiration
+* etc -->
 
-## Development with oraivisor
+<!-- ## Run test
+`make test-method PACKAGE=github.com/oraichain/orai/x/airequest/keeper METHOD=TestCalucateMol` -->
 
-```bash
-ln -s /workspace/oraivisor/build/oraivisor /usr/bin/oraivisor
-mkdir -p /oraivisor/genesis/bin
-ln -s /workspace/build/oraid /oraivisor/genesis/bin/oraid
-DAEMON_NAME=oraid DAEMON_HOME=/ oraivisor start
-```
-
-## Create swagger documentation
+<!-- ## Create swagger documentation
 
 ```bash
 # go to proto
-docker-compose exec proto bash
+docker-compose exec proto ash
 make proto-swagger
 # then create static file
 go install github.com/rakyll/statik
 statik -src doc/swagger-ui/ -dest doc -f
-```
-
-## oraid binary checksum
-
-current commit: ee82a09fe36b370b5c5e36a4032e734f
+``` -->
