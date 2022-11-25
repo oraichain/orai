@@ -105,10 +105,6 @@ build:
 proto-all: proto-gen proto-check-breaking
 .PHONY: proto-all
 
-proto-gen: 
-	./scripts/protocgen.sh $(PROTO_DIR)
-.PHONY: proto-gen
-
 proto-js: 
 	./scripts/protocgen-js.sh $(SRC_DIR)
 .PHONY: proto-js
