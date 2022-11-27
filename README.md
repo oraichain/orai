@@ -127,6 +127,6 @@ go install github.com/rakyll/statik
 statik -src doc/swagger-ui/ -dest doc -f
 ```
 
-## oraid binary checksum
+## Non-docker build
 
-current commit: ee82a09fe36b370b5c5e36a4032e734f
+make build LEDGER_ENABLED=false GOMOD_FLAGS= VERSION=0.41.0
