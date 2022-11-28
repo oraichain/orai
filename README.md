@@ -121,4 +121,8 @@ make proto-swagger
 # then create static file
 go install github.com/rakyll/statik
 statik -src doc/swagger-ui/ -dest doc -f
-``` -->
+```
+
+## Non-docker build
+
+make build LEDGER_ENABLED=false GOMOD_FLAGS= VERSION=0.41.0
