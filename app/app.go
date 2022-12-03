@@ -230,6 +230,8 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		ibcfeetypes.ModuleName:         nil,
+		icatypes.ModuleName:            nil,
 		wasm.ModuleName:                {authtypes.Burner},
 	}
 
@@ -286,10 +288,10 @@ type OraichainApp struct {
 	// custom modules here
 
 	// make scoped keepers public for test purposes
-	scopedIBCKeeper           capabilitykeeper.ScopedKeeper
-	scopedTransferKeeper      capabilitykeeper.ScopedKeeper
-	scopedWasmKeeper          capabilitykeeper.ScopedKeeper
-	scopedIBCFeeKeeper        capabilitykeeper.ScopedKeeper
+	scopedIBCKeeper      capabilitykeeper.ScopedKeeper
+	scopedTransferKeeper capabilitykeeper.ScopedKeeper
+	scopedWasmKeeper     capabilitykeeper.ScopedKeeper
+	// scopedIBCFeeKeeper        capabilitykeeper.ScopedKeeper
 	scopedICAHostKeeper       capabilitykeeper.ScopedKeeper
 	scopedICAControllerKeeper capabilitykeeper.ScopedKeeper
 	scopedInterTxKeeper       capabilitykeeper.ScopedKeeper
@@ -427,10 +429,18 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.upgradeKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.ibcKeeper.ClientKeeper))
 
+	// IBC Fee Module keeper
+	app.ibcFeeKeeper = ibcfeekeeper.NewKeeper(
+		appCodec, keys[ibcfeetypes.StoreKey], app.getSubspace(ibcfeetypes.ModuleName),
+		app.ibcKeeper.ChannelKeeper, // may be replaced with IBC middleware
+		app.ibcKeeper.ChannelKeeper,
+		&app.ibcKeeper.PortKeeper, app.accountKeeper, app.bankKeeper,
+	)
+
 	// Create Transfer Keepers
 	app.transferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec, keys[ibctransfertypes.StoreKey], app.getSubspace(ibctransfertypes.ModuleName),
-		app.ibcKeeper.ChannelKeeper, app.ibcKeeper.ChannelKeeper, &app.ibcKeeper.PortKeeper,
+		app.ibcFeeKeeper, app.ibcKeeper.ChannelKeeper, &app.ibcKeeper.PortKeeper,
 		app.accountKeeper, app.bankKeeper, scopedTransferKeeper,
 	)
 
