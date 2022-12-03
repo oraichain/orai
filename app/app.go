@@ -352,6 +352,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	scopedICAHostKeeper := app.capabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
 	scopedICAControllerKeeper := app.capabilityKeeper.ScopeToModule(icacontrollertypes.SubModuleName)
 	scopedInterTxKeeper := app.capabilityKeeper.ScopeToModule(intertxtypes.ModuleName)
+	app.capabilityKeeper.Seal()
 
 	// add keepers
 	app.accountKeeper = authkeeper.NewAccountKeeper(
@@ -433,42 +434,6 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		app.accountKeeper, app.bankKeeper, scopedTransferKeeper,
 	)
 
-	// Create Transfer Stack
-	var transferStack porttypes.IBCModule
-	transferStack = transfer.NewIBCModule(app.transferKeeper)
-	transferStack = ibcfee.NewIBCMiddleware(transferStack, app.ibcFeeKeeper)
-
-	// Create Interchain Accounts Stack
-	// SendPacket, since it is originating from the application to core IBC:
-	// icaAuthModuleKeeper.SendTx -> icaController.SendPacket -> fee.SendPacket -> channel.SendPacket
-
-	// Note: please do your research before using this in production app, this is a demo and not an officially
-	// supported IBC team implementation. Do your own research before using it.
-	var icaControllerStack porttypes.IBCModule
-	// You will likely want to use your own reviewed and maintained ica auth module
-	icaControllerStack = intertx.NewIBCModule(app.interTxKeeper)
-	icaControllerStack = icacontroller.NewIBCMiddleware(icaControllerStack, app.icaControllerKeeper)
-	icaControllerStack = ibcfee.NewIBCMiddleware(icaControllerStack, app.ibcFeeKeeper)
-
-	// RecvPacket, message that originates from core IBC and goes down to app, the flow is:
-	// channel.RecvPacket -> fee.OnRecvPacket -> icaHost.OnRecvPacket
-	var icaHostStack porttypes.IBCModule
-	icaHostStack = icahost.NewIBCModule(app.icaHostKeeper)
-	icaHostStack = ibcfee.NewIBCMiddleware(icaHostStack, app.ibcFeeKeeper)
-
-	// Create fee enabled wasm ibc Stack
-	var wasmStack porttypes.IBCModule
-	wasmStack = wasm.NewIBCHandler(app.wasmKeeper, app.ibcKeeper.ChannelKeeper, app.ibcFeeKeeper)
-	wasmStack = ibcfee.NewIBCMiddleware(wasmStack, app.ibcFeeKeeper)
-
-	// create static IBC router, add transfer route, then set and seal it
-	ibcRouter := porttypes.NewRouter().
-		AddRoute(ibctransfertypes.ModuleName, transferStack).
-		AddRoute(wasm.ModuleName, wasmStack).
-		AddRoute(intertxtypes.ModuleName, icaControllerStack).
-		AddRoute(icacontrollertypes.SubModuleName, icaControllerStack).
-		AddRoute(icahosttypes.SubModuleName, icaHostStack)
-
 	// create evidence keeper with router
 	evidenceKeeper := evidencekeeper.NewKeeper(
 		appCodec, keys[evidencetypes.StoreKey], &app.stakingKeeper, app.slashingKeeper,
@@ -534,6 +499,42 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	if len(enabledProposals) != 0 {
 		govRouter.AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.wasmKeeper, enabledProposals))
 	}
+
+	// Create Transfer Stack
+	var transferStack porttypes.IBCModule
+	transferStack = transfer.NewIBCModule(app.transferKeeper)
+	transferStack = ibcfee.NewIBCMiddleware(transferStack, app.ibcFeeKeeper)
+
+	// Create Interchain Accounts Stack
+	// SendPacket, since it is originating from the application to core IBC:
+	// icaAuthModuleKeeper.SendTx -> icaController.SendPacket -> fee.SendPacket -> channel.SendPacket
+
+	// Note: please do your research before using this in production app, this is a demo and not an officially
+	// supported IBC team implementation. Do your own research before using it.
+	var icaControllerStack porttypes.IBCModule
+	// You will likely want to use your own reviewed and maintained ica auth module
+	icaControllerStack = intertx.NewIBCModule(app.interTxKeeper)
+	icaControllerStack = icacontroller.NewIBCMiddleware(icaControllerStack, app.icaControllerKeeper)
+	icaControllerStack = ibcfee.NewIBCMiddleware(icaControllerStack, app.ibcFeeKeeper)
+
+	// RecvPacket, message that originates from core IBC and goes down to app, the flow is:
+	// channel.RecvPacket -> fee.OnRecvPacket -> icaHost.OnRecvPacket
+	var icaHostStack porttypes.IBCModule
+	icaHostStack = icahost.NewIBCModule(app.icaHostKeeper)
+	icaHostStack = ibcfee.NewIBCMiddleware(icaHostStack, app.ibcFeeKeeper)
+
+	// Create fee enabled wasm ibc Stack
+	var wasmStack porttypes.IBCModule
+	wasmStack = wasm.NewIBCHandler(app.wasmKeeper, app.ibcKeeper.ChannelKeeper, app.ibcFeeKeeper)
+	wasmStack = ibcfee.NewIBCMiddleware(wasmStack, app.ibcFeeKeeper)
+
+	// create static IBC router, add transfer route, then set and seal it
+	ibcRouter := porttypes.NewRouter().
+		AddRoute(ibctransfertypes.ModuleName, transferStack).
+		AddRoute(wasm.ModuleName, wasmStack).
+		AddRoute(intertxtypes.ModuleName, icaControllerStack).
+		AddRoute(icacontrollertypes.SubModuleName, icaControllerStack).
+		AddRoute(icahosttypes.SubModuleName, icaHostStack)
 
 	app.ibcKeeper.SetRouter(ibcRouter)
 
@@ -745,8 +746,6 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		if err := app.wasmKeeper.InitializePinnedCodes(ctx); err != nil {
 			tmos.Exit(fmt.Sprintf("failed initialize pinned codes %s", err))
 		}
-
-		app.capabilityKeeper.Seal()
 	}
 
 	app.scopedIBCKeeper = scopedIBCKeeper

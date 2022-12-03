@@ -73,7 +73,6 @@ endif
 ifeq ($(LINK_STATICALLY),true)
   ldflags += -linkmode=external -extldflags "-Wl,-z,muldefs -static"
 endif
-ldflags += -w -s
 ldflags += $(LDFLAGS)
 ldflags += -w -s # optimize reduce size
 ldflags := $(strip $(ldflags))
