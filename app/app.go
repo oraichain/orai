@@ -38,6 +38,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 
+	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
@@ -133,7 +134,7 @@ const appName = "Oraichain"
 var (
 	NodeDir = ".oraid"
 
-	BinaryVersion = "v0.41.0"
+	BinaryVersion = "v0.41.2"
 
 	// If EnabledSpecificProposals is "", and this is "true", then enable all x/wasm proposals.
 	// If EnabledSpecificProposals is "", and this is not "true", then disable all x/wasm proposals.
@@ -743,6 +744,17 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetAnteHandler(anteHandler)
 	app.SetEndBlocker(app.EndBlocker)
+
+	// handle statesync for cosmwasm
+	if manager := app.SnapshotManager(); manager != nil {
+		err = manager.RegisterExtensions(
+			wasmkeeper.NewWasmSnapshotter(app.CommitMultiStore(), &app.wasmKeeper),
+		)
+		if err != nil {
+			panic("failed to register snapshot extension: " + err.Error())
+		}
+	}
+
 	// set upgrade module
 	app.upgradeHandler()
 
@@ -918,59 +930,11 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	return paramsKeeper
 }
 
-func MigrateWasmDir(nodeHome string) {
-	// wasm files location: .oraid/wasm/wasm
-	wasmModuleDir := filepath.Join(filepath.Join(nodeHome, "wasm"), "wasm")
-	// old version we have .oraid/wasm/wasm/modules & .oraid/wasm/wasm/wasm
-	// new version we have .oraid/wasm/wasm/cache/modules & .oraid/wasm/wasm/state/wasm
-	cacheModuleDir := filepath.Join(wasmModuleDir, "cache", "modules")
-	stateWasmDir := filepath.Join(wasmModuleDir, "state", "wasm")
-
-	// rename pre-made cache & state dir to different names
-	if err := os.Rename(cacheModuleDir, filepath.Join(wasmModuleDir, "module-deprecated")); err != nil {
-		panic(err)
-	}
-	if err := os.Rename(stateWasmDir, filepath.Join(wasmModuleDir, "wasm-deprecated")); err != nil {
-		panic(err)
-	}
-
-	// finally, move old contracts to new cache & state dirs
-	if err := os.Rename(filepath.Join(wasmModuleDir, "modules"), cacheModuleDir); err != nil {
-		panic(err)
-	}
-	if err := os.Rename(filepath.Join(wasmModuleDir, "wasm"), stateWasmDir); err != nil {
-		panic(err)
-	}
-}
-
 func (app *OraichainApp) upgradeHandler() {
-	app.upgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, _ module.VersionMap) (module.VersionMap, error) {
+	app.upgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		// 1st-time running in-store migrations, using 1 as fromVersion to
 		// avoid running InitGenesis.
-		fromVM := map[string]uint64{
-			"auth":         1,
-			"bank":         1,
-			"capability":   1,
-			"crisis":       1,
-			"distribution": 1,
-			"evidence":     1,
-			"gov":          1,
-			"mint":         1,
-			"params":       1,
-			"slashing":     1,
-			"staking":      1,
-			"upgrade":      1,
-			"vesting":      1,
-			"ibc":          1,
-			"genutil":      1,
-			"transfer":     1,
-			"wasm":         1,
-		}
-
 		app.ibcKeeper.ConnectionKeeper.SetParams(ctx, ibcconnectiontypes.DefaultParams())
-
-		// from v0.13.2 to 1.0 CosmWasm has changed wasm dir names from modules/ & wasm/ to cache/modules/ and state/wasm
-		MigrateWasmDir(filepath.Join(os.ExpandEnv("$PWD/"), NodeDir))
 
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
@@ -980,11 +944,9 @@ func (app *OraichainApp) upgradeHandler() {
 		panic(err)
 	}
 
-	// special case, only apply when migrating from cosmos sdk 0.42.11 to 0.45.8
-	if upgradeInfo.Name == "v0.41.0" && !app.upgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+	if upgradeInfo.Name == BinaryVersion && !app.upgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		storeUpgrades := storetypes.StoreUpgrades{
-			Added:   []string{"authz", "feegrant"},
-			Deleted: []string{},
+			Added: []string{},
 		}
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))

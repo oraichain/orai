@@ -3,7 +3,6 @@ package app
 import (
 	"encoding/json"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -53,12 +52,6 @@ func TestBlockedAddrs(t *testing.T) {
 func TestGetMaccPerms(t *testing.T) {
 	dup := GetMaccPerms()
 	require.Equal(t, maccPerms, dup, "duplicated module account permissions differed from actual module account permissions")
-}
-
-func TestMigrateWasmDir(t *testing.T) {
-	// TODO: need to handle permission error
-	MigrateWasmDir(filepath.Join(os.ExpandEnv("$PWD/"), "../", NodeDir))
-	// require.Equal(t, maccPerms, dup, "duplicated module account permissions differed from actual module account permissions")
 }
 
 func TestGetEnabledProposals(t *testing.T) {

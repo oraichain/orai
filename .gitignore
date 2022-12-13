@@ -64,7 +64,6 @@ libwasmvm_muslc*.a
 
 # ignore generated files
 tmp
-go.sum
 .config/
 .npm/
 
