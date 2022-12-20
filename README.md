@@ -126,3 +126,17 @@ statik -src doc/swagger-ui/ -dest doc -f
 ## Non-docker build
 
 make build LEDGER_ENABLED=false GOMOD_FLAGS= VERSION=0.41.0
+
+if update cosmwasm repo => pull new cosmwasm code, then push, then create new release
+next, move to wasmvm repo, pull latest code, then edit Cargo.toml to point to cosmwasm release tag, then: cargo update to fetch new deps, then make build-release to update the libwasmvm files
+then push to git, then create a new release
+next, move to wasmd repo, pull latest code, then go get ./... to pump version, change wasmvm version to release tag
+next, move to orai repo: pump wasmd and wasmvm version and build
+next, fork oraichain mainnet using oraichain-fork
+next, create a new upgrade proposal on the fork version, then halt the network before the upgrade. Then, copy data/ and wasm/ to back up the fork network (this is for if the upgrade does not work, we can rollback quickly without creating another upgrade proposal).
+next, build the new oraid version, and start the network again til upgrade point using the old binary, and change to the new oraid version to start upgrading. If it passes => good. If fail => rollback snapshot and re-do it again.
+Next, after successfully upgrading => we manual or run scripts to create test inputs (like deploy, migrate contracts)
+
+then, create a new full node that uses the snapshot before the upgrade, and start syncing. If it can sync using non-docker & docker binaries => success. If not, then go back and find out what went wrong.
+
+v0.41.2: test statesync & consistency between non-docker & docker binaries
