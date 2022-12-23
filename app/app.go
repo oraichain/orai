@@ -22,6 +22,7 @@ import (
 
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
@@ -101,7 +102,6 @@ import (
 	ibc "github.com/cosmos/ibc-go/v4/modules/core"
 	ibcclient "github.com/cosmos/ibc-go/v4/modules/core/02-client"
 	ibcclienttypes "github.com/cosmos/ibc-go/v4/modules/core/02-client/types"
-	ibcconnectiontypes "github.com/cosmos/ibc-go/v4/modules/core/03-connection/types"
 	porttypes "github.com/cosmos/ibc-go/v4/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/v4/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v4/modules/core/keeper"
@@ -932,9 +932,56 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 
 func (app *OraichainApp) upgradeHandler() {
 	app.upgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx.Logger().Info("start to run module migrations...")
 		// 1st-time running in-store migrations, using 1 as fromVersion to
 		// avoid running InitGenesis.
-		app.ibcKeeper.ConnectionKeeper.SetParams(ctx, ibcconnectiontypes.DefaultParams())
+		// initialize ICS27 module
+		icaModule, correctTypecast := app.mm.Modules[icatypes.ModuleName].(ica.AppModule)
+		if !correctTypecast {
+			panic("mm.Modules[icatypes.ModuleName] is not of type ica.AppModule")
+		}
+		fromVM[icatypes.ModuleName] = icaModule.ConsensusVersion()
+		controllerParams := icacontrollertypes.Params{
+			ControllerEnabled: true,
+		}
+		// create ICS27 Host submodule params
+		hostParams := icahosttypes.Params{
+			HostEnabled: true,
+			AllowMessages: []string{
+				sdk.MsgTypeURL(&banktypes.MsgSend{}),
+				sdk.MsgTypeURL(&banktypes.MsgMultiSend{}),
+				sdk.MsgTypeURL(&stakingtypes.MsgDelegate{}),
+				sdk.MsgTypeURL(&stakingtypes.MsgBeginRedelegate{}),
+				sdk.MsgTypeURL(&stakingtypes.MsgUndelegate{}),
+				sdk.MsgTypeURL(&stakingtypes.MsgCreateValidator{}),
+				sdk.MsgTypeURL(&stakingtypes.MsgEditValidator{}),
+				sdk.MsgTypeURL(&distrtypes.MsgWithdrawDelegatorReward{}),
+				sdk.MsgTypeURL(&distrtypes.MsgSetWithdrawAddress{}),
+				sdk.MsgTypeURL(&distrtypes.MsgWithdrawValidatorCommission{}),
+				sdk.MsgTypeURL(&distrtypes.MsgFundCommunityPool{}),
+				sdk.MsgTypeURL(&govtypes.MsgVote{}),
+				sdk.MsgTypeURL(&govtypes.MsgVoteWeighted{}),
+				sdk.MsgTypeURL(&govtypes.MsgSubmitProposal{}),
+				sdk.MsgTypeURL(&govtypes.MsgDeposit{}),
+				sdk.MsgTypeURL(&authz.MsgExec{}),
+				sdk.MsgTypeURL(&authz.MsgGrant{}),
+				sdk.MsgTypeURL(&authz.MsgRevoke{}),
+				// wasm
+				sdk.MsgTypeURL(&wasmtypes.MsgStoreCode{}),
+				sdk.MsgTypeURL(&wasmtypes.MsgInstantiateContract{}),
+				sdk.MsgTypeURL(&wasmtypes.MsgInstantiateContract2{}),
+				sdk.MsgTypeURL(&wasmtypes.MsgExecuteContract{}),
+				sdk.MsgTypeURL(&wasmtypes.MsgMigrateContract{}),
+				sdk.MsgTypeURL(&wasmtypes.MsgUpdateAdmin{}),
+				sdk.MsgTypeURL(&wasmtypes.MsgClearAdmin{}),
+				sdk.MsgTypeURL(&wasmtypes.MsgIBCSend{}),
+				sdk.MsgTypeURL(&wasmtypes.MsgIBCCloseChannel{}),
+			},
+		}
+
+		ctx.Logger().Info("start to init interchainaccount module...")
+		// initialize ICS27 module
+		icaModule.InitModule(ctx, controllerParams, hostParams)
 
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
@@ -946,7 +993,7 @@ func (app *OraichainApp) upgradeHandler() {
 
 	if upgradeInfo.Name == BinaryVersion && !app.upgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		storeUpgrades := storetypes.StoreUpgrades{
-			Added: []string{icacontrollertypes.StoreKey, icahosttypes.StoreKey},
+			Added: []string{icacontrollertypes.SubModuleName, icahosttypes.SubModuleName, ibcfeetypes.ModuleName, intertxtypes.ModuleName},
 		}
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
