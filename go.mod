@@ -4,7 +4,6 @@ go 1.18
 
 require (
 	github.com/CosmWasm/wasmd v1.0.0
-	github.com/confio/ics23/go v0.9.0
 	github.com/cosmos/cosmos-sdk v0.45.11
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/cosmos/ibc-go/v4 v4.2.0
@@ -37,8 +36,9 @@ require (
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/coinbase/rosetta-sdk-go v0.7.0 // indirect
+	github.com/confio/ics23/go v0.9.0 // indirect
 	github.com/cosmos/btcutil v1.0.4 // indirect
-	github.com/cosmos/cosmos-proto v1.0.0-alpha8 // indirect
+	github.com/cosmos/cosmos-proto v1.0.0-beta.1 // indirect
 	github.com/cosmos/gogoproto v1.4.3 // indirect
 	github.com/cosmos/gorocksdb v1.2.0 // indirect
 	github.com/cosmos/iavl v0.19.4 // indirect
@@ -132,10 +132,10 @@ require (
 )
 
 replace (
-	// go list -m -json github.com/oraichain/wasmd@multiwasm | jq '.|"\(.Path) \(.Version)"' -r
-	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.0
-	// go list -m -json github.com/oraichain/wasmvm@multiwasm-zk | jq '.|"\(.Path) \(.Version)"' -r
-	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.1.3
+	// go list -m -json github.com/oraichain/wasmd@main | jq '.|"\(.Path) \(.Version)"' -r
+	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.1-0.20230105035512-096e5c1f5526
+	// go list -m -json github.com/oraichain/wasmvm@main | jq '.|"\(.Path) \(.Version)"' -r
+	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.1.4-0.20230105035406-ba876602b31c
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 // Fix upstream GHSA-h395-qcrw-5vmq vulnerability.
