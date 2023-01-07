@@ -101,7 +101,7 @@ build:
 ###############################################################################
 
 
-proto-all: proto-gen proto-check-breaking
+proto-all: proto-check-breaking
 .PHONY: proto-all
 
 proto-js: 
