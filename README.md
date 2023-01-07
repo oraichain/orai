@@ -8,8 +8,7 @@
 state and is being actively
 developed.](https://img.shields.io/badge/repo%20status-Active-green.svg)](https://www.repostatus.org/#active)
 
-
-Oraichain is the world’s first AI-powered oracle and ecosystem for blockchains. 
+Oraichain is the world’s first AI-powered oracle and ecosystem for blockchains.
 
 Beyond data oracles, Oraichain aims to become the first AI Layer 1 in the Blockchain sphere with a complete AI ecosystem, serving as a foundational layer for the creation of a new generation of smart contracts and Dapps. With AI as the cornerstone, Oraichain has developed many essential and innovative products and services including AI price feeds, fully on-chain VRF, Data Hub, AI Marketplace with 100+ AI APIs, AI-based NFT generation and NFT copyright protection, Royalty Protocol, AI-powered Yield Aggregator Platform, and Cosmwasm IDE.
 
@@ -21,15 +20,15 @@ This repository contains the source code & how to build the Oraichain mainnet, a
 
 ### Prerequisites
 
-* If you want to build the binary using Docker (recommended), then you only need Docker.
+- If you want to build the binary using Docker (recommended), then you only need Docker.
 
-* If you want to build the binary from scratch, you will need:
+- If you want to build the binary from scratch, you will need:
 
-    - Go 1.15+
+  - Go 1.15+
 
-    - Make
+  - Make
 
-    - Wasmvm library: https://github.com/CosmWasm/wasmvm/releases/download/v0.13.0/libwasmvm_muslc.a (you can download it and put in /lib/libwasmvm_muslc.a). The file is used by CosmWasm when building the binary
+  - Wasmvm library: https://github.com/CosmWasm/wasmvm/releases/download/v0.13.0/libwasmvm_muslc.a (you can download it and put in /lib/libwasmvm_muslc.a). The file is used by CosmWasm when building the binary
 
 ### Hardware requirements
 
@@ -37,15 +36,15 @@ This repository contains the source code & how to build the Oraichain mainnet, a
 
 ### Installing
 
-* **Install Golang**
+- **Install Golang**
 
 [Please visit the official Golang website to download & install Go](https://go.dev/doc/install)
 
-* **Install make**
+- **Install make**
 
 Normally, for Linux-based machines, you already have Make installed by default.
 
-* **Install libwasmvm**
+- **Install libwasmvm**
 
 the wasmd module of CosmWasm uses a wasm vm library, which should be included when building the chain binary. Hence, we need to download and place it in a specific location.
 
@@ -55,15 +54,15 @@ For Linux based machines, please run the following command:
 sudo wget https://github.com/CosmWasm/wasmvm/releases/download/v0.13.0/libwasmvm_muslc.a -O /lib/libwasmvm_muslc.a
 ```
 
-* **Download Go dependencies**
+- **Download Go dependencies**
 
 `go get ./...`
 
-* **Build the binary**
+- **Build the binary**
 
 `make install`
 
-* **Verify the binary version**
+- **Verify the binary version**
 
 `oraid version`
 
@@ -77,13 +76,11 @@ docker build -t <image:tag> -f Dockerfile.prod .
 
 ## Protobuf & protobuf swagger generation
 
-* [Install Docker](https://docs.docker.com/engine/install)
+- [Install Docker](https://docs.docker.com/engine/install)
 
-* Start the proto docker: `docker-compose up -d proto`
+- Start the proto docker: `docker-compose up -d proto`
 
-* Install neccessary tools: `docker-compose exec proto ash -c 'apk add build-base bash && go get ./...'`
-
-* Gen protobuf: `docker-compose exec proto ash -c 'make proto-gen'`
+- Install neccessary tools: `docker-compose exec proto ash -c 'apk add build-base bash && go get ./...'`
 
 ## Contributing
 
@@ -91,11 +88,11 @@ Please read [CONTRIBUTING.md](./CONTRIBUTING.md) for details on our code of cond
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/oraichain/orai/tags). 
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/oraichain/orai/tags).
 
 ## Authors
 
-* [Duc Le Pham](https://github.com/ducphamle2)
+- [Duc Le Pham](https://github.com/ducphamle2)
 
 See also the list of [contributors](https://github.com/oraichain/orai/contributors) who participated in this project.
 
