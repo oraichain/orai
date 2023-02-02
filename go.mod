@@ -135,7 +135,7 @@ replace (
 	// go list -m -json github.com/oraichain/wasmd@multiwasm | jq '.|"\(.Path) \(.Version)"' -r
 	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.0
 	// go list -m -json github.com/oraichain/wasmvm@multiwasm-zk | jq '.|"\(.Path) \(.Version)"' -r
-	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.1.3
+	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.2.0
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 // Fix upstream GHSA-h395-qcrw-5vmq vulnerability.
