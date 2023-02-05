@@ -1,22 +1,58 @@
-#!/bin/sh
+#!/bin/bash
 
 # setup the network using the old binary
 
-
-./multinode-local-testnet.sh
-
-#!/bin/sh
-
-store_ret=oraid tx wasm store ../oraiwasm/package/plus/swapmap/artifacts/swapmap.wasm --from validator1 --chain-id testing -y --home ~/.oraid/validator1/ -y --keyring-backend test --fees 200orai --gas 20000000 -b block
-
-code_id=$(echo $store_ret | jq -r '.logs[0].events[0].attributes[] | select(.key | contains("code_id")).value')
-
-oraid tx wasm instantiate $code_id '{}' --label 'testing' --from validator1 --gas auto --gas-adjustment 1.2 --chain-id testing -y --keyring-backend test --home ~/.oraid/validator1/ -b block --admin $(oraid keys show validator1 --keyring-backend test --home ~/.oraid/validator1/ -a)  --fees 200orai
-
-VERSION=${VERSION:-"v0.41.2"}
-HEIGHT=${HEIGHT:-200}
+OLD_VERSION=${OLD_VERSION:-"v0.41.1"}
+WASM_PATH=${WASM_PATH:-"../oraiwasm/package/plus/swapmap/artifacts/swapmap.wasm"}
+ARGS="--chain-id testing -y --keyring-backend test --fees 200orai --gas auto --gas-adjustment 1.5 -b block"
+NEW_VERSION=${NEW_VERSION:-"v0.41.2"}
 VALIDATOR_HOME=${VALIDATOR_HOME:-"$HOME/.oraid/validator1"}
+MIGRATE_MSG=${MIGRATE_MSG:-'{}'}
 
-oraid tx gov submit-proposal software-upgrade "v0.41.2" --title "foobar" --description "foobar"  --from validator1 --upgrade-height $HEIGHT --upgrade-info "x" --deposit 10000000orai --chain-id testing --keyring-backend test --home $VALIDATOR_HOME -y --fees 2orai -b block
+# kill all running binaries
+pkill oraid && sleep 2s
 
+# download current production binary
+wget -O $(which oraid) https://orai.s3.us-east-2.amazonaws.com/$OLD_VERSION/oraid_$OLD_VERSION
+
+# setup local network
+sh $PWD/scripts/multinode-local-testnet.sh
+
+# deploy new contract
+store_ret=$(oraid tx wasm store $WASM_PATH --from validator1 --home $VALIDATOR_HOME $ARGS --output json)
+code_id=$(echo $store_ret | jq -r '.logs[0].events[1].attributes[] | select(.key | contains("code_id")).value')
+oraid tx wasm instantiate $code_id '{}' --label 'testing' --from validator1 --home $VALIDATOR_HOME -b block --admin $(oraid keys show validator1 --keyring-backend test --home $VALIDATOR_HOME -a) $ARGS
+contract_address=$(oraid query wasm list-contract-by-code $code_id --output json | jq -r '.contracts[0]')
+
+echo "contract address: $contract_address"
+
+# # create new upgrade proposal
+UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-30}
+oraid tx gov submit-proposal software-upgrade $NEW_VERSION --title "foobar" --description "foobar"  --from validator1 --upgrade-height $UPGRADE_HEIGHT --upgrade-info "x" --deposit 10000000orai --chain-id testing --keyring-backend test --home $VALIDATOR_HOME -y --fees 2orai -b block
 oraid tx gov vote 1 yes --from validator1 --chain-id testing -y --keyring-backend test --home "$HOME/.oraid/validator1" --fees 2orai -b block && oraid tx gov vote 1 yes --from validator2 --chain-id testing -y --keyring-backend test --home "$HOME/.oraid/validator2" --fees 2orai -b block
+
+# sleep to wait til the proposal passes
+echo "Sleep til the proposal passes..."
+sleep 3m
+
+# kill all processes to upgrade new binary
+pkill oraid && sleep 3s
+
+# install new binary for the upgrade
+echo "install new binary"
+make install
+
+# re-run all validators. All should run
+screen -S validator1 -d -m oraid start --home=$HOME/.oraid/validator1 --minimum-gas-prices=0.00001orai
+screen -S validator2 -d -m oraid start --home=$HOME/.oraid/validator2 --minimum-gas-prices=0.00001orai
+screen -S validator3 -d -m oraid start --home=$HOME/.oraid/validator3 --minimum-gas-prices=0.00001orai
+
+# sleep a bit for the network to start 
+echo "Sleep to wait for the network to start..."
+sleep 7s
+# test contract migration
+echo "Migrate the contract"
+store_ret=$(oraid tx wasm store $WASM_PATH --from validator1 --home $VALIDATOR_HOME $ARGS --output json)
+new_code_id=$(echo $store_ret | jq -r '.logs[0].events[1].attributes[] | select(.key | contains("code_id")).value')
+
+oraid tx wasm migrate $contract_address $new_code_id $MIGRATE_MSG --from validator1 $ARGS --home $VALIDATOR_HOME

@@ -1,7 +1,23 @@
 #!/bin/sh
+set -o errexit -o nounset -o pipefail
 
-store_ret=oraid tx wasm store ../oraiwasm/package/plus/swapmap/artifacts/swapmap.wasm --from validator1 --chain-id testing -y --home ~/.oraid/validator1/ -y --keyring-backend test --fees 200orai --gas 20000000 -b block
+contract_path=$1
+label=$2
+init=${3:-{\}}
+code_id=${4:-}
+CHAIN_ID=${CHAIN_ID:-Oraichain}
 
-code_id=$(echo $store_ret | jq -r '.logs[0].events[0].attributes[] | select(.key | contains("code_id")).value')
+echo "Enter passphrase:"
+read -s passphrase
 
-oraid tx wasm instantiate $code_id '{}' --label 'testing' --from validator1 --gas auto --gas-adjustment 1.2 --chain-id testing -y --keyring-backend test --home ~/.oraid/validator1/ -b block --admin $(oraid keys show validator1 --keyring-backend test --home ~/.oraid/validator1/ -a)  --fees 200orai
+if [ -z $code_id ]
+then 
+    store_ret=$(echo $passphrase | oraid tx wasm store $contract_path --from $USER --gas="auto" --gas-adjustment="1.2" --chain-id=$CHAIN_ID -y)
+    echo $store_ret
+    code_id=$(echo $store_ret | jq -r '.logs[0].events[1].attributes[] | select(.key | contains("code_id")).value')
+fi 
+
+# echo "oraid tx wasm instantiate $code_id '$init' --from $USER --label '$label' --gas auto --gas-adjustment 1.2 --chain-id=$CHAIN_ID -y"
+# quote string with "" with escape content inside which contains " characters
+(echo $passphrase;echo $passphrase) | oraid tx wasm instantiate $code_id "$init" --from $USER --label "$label" --gas auto --gas-adjustment 1.2 --chain-id=$CHAIN_ID -y
+contract_address=$(oraid query wasm list-contract-by-code $code_id | grep address | awk '{print $(NF)}')
