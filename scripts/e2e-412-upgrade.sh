@@ -28,8 +28,8 @@ echo "contract address: $contract_address"
 
 # # create new upgrade proposal
 UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-30}
-oraid tx gov submit-proposal software-upgrade $NEW_VERSION --title "foobar" --description "foobar"  --from validator1 --upgrade-height $UPGRADE_HEIGHT --upgrade-info "x" --deposit 10000000orai --chain-id testing --keyring-backend test --home $VALIDATOR_HOME -y --fees 2orai -b block
-oraid tx gov vote 1 yes --from validator1 --chain-id testing -y --keyring-backend test --home "$HOME/.oraid/validator1" --fees 2orai -b block && oraid tx gov vote 1 yes --from validator2 --chain-id testing -y --keyring-backend test --home "$HOME/.oraid/validator2" --fees 2orai -b block
+oraid tx gov submit-proposal software-upgrade $NEW_VERSION --title "foobar" --description "foobar"  --from validator1 --upgrade-height $UPGRADE_HEIGHT --upgrade-info "x" --deposit 10000000orai $ARGS --home $VALIDATOR_HOME
+oraid tx gov vote 1 yes --from validator1 --home "$HOME/.oraid/validator1" $ARGS && oraid tx gov vote 1 yes --from validator2 --home "$HOME/.oraid/validator2" $ARGS
 
 # sleep to wait til the proposal passes
 echo "Sleep til the proposal passes..."
