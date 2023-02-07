@@ -17,9 +17,8 @@ COPY go.mod /workspace/
 COPY go.sum /workspace/
 COPY Makefile /workspace/
 
-# See https://github.com/CosmWasm/wasmvm/releases
-ADD ./libwasmvm_muslc.a /lib/libwasmvm_muslc.a
-# # RUN sha256sum /lib/libwasmvm_muslc.a | grep 39dc389cc6b556280cbeaebeda2b62cf884993137b83f90d1398ac47d09d3900
+# See https://github.com/Oraichain/wasmvm/releases (tag v1.2.0)
+RUN wget -O /lib/libwasmvm_muslc.a https://github.com/oraichain/wasmvm/releases/download/v1.2.0/libwasmvm_muslc.a
 
 # RUN go mod tidy && go get ./...
 
