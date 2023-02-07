@@ -74,7 +74,7 @@ sed -i -E 's|tcp://0.0.0.0:1317|tcp://0.0.0.0:1315|g' $VALIDATOR3_APP_TOML
 sed -i -E 's|0.0.0.0:9090|0.0.0.0:9086|g' $VALIDATOR3_APP_TOML
 sed -i -E 's|0.0.0.0:9091|0.0.0.0:9087|g' $VALIDATOR3_APP_TOML
 
-# Pruning
+# Pruning - comment this configuration if you want to run upgrade script
 pruning="custom"
 pruning_keep_recent="5"
 pruning_keep_every="10"
@@ -95,7 +95,7 @@ sed -i -e "s%^pruning-keep-recent *=.*%pruning-keep-recent = \"$pruning_keep_rec
 sed -i -e "s%^pruning-keep-every *=.*%pruning-keep-every = \"$pruning_keep_every\"%; " $VALIDATOR3_APP_TOML
 sed -i -e "s%^pruning-interval *=.*%pruning-interval = \"$pruning_interval\"%; " $VALIDATOR3_APP_TOML
 
-# state sync
+# state sync  - comment this configuration if you want to run upgrade script
 snapshot_interval="10"
 snapshot_keep_recent="2"
 
