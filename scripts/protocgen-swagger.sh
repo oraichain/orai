@@ -4,7 +4,8 @@ set -eo pipefail
 
 # go get ./...
 # go install github.com/cosmos/gogoproto/protoc-gen-gocosmos
-# apk add nodejs-current 
+# go install github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger@v1.16.0
+# apk add nodejs-current npm
 # npm install -g swagger-combine
 
 BASEDIR=$(dirname $0)
@@ -15,10 +16,11 @@ DOC_DIR=$(realpath $PROJECTDIR/doc)
 
 COSMOS_SDK_DIR=${COSMOS_SDK_DIR:-$(go list -f "{{ .Dir }}" -m github.com/cosmos/cosmos-sdk)}
 COSMOS_WASM_DIR=${COSMOS_WASM_DIR:-$(go list -f "{{ .Dir }}" -m github.com/CosmWasm/wasmd)}
-IBC_DIR=${IBC_DIR:-$(go list -f "{{ .Dir }}" -m github.com/cosmos/ibc-go/v3)}
+IBC_DIR=${IBC_DIR:-$(go list -f "{{ .Dir }}" -m github.com/cosmos/ibc-go/v4)}
+INTERCHAIN_DIR=${INTERCHAIN_DIR:-$(go list -f "{{ .Dir }}" -m github.com/cosmos/interchain-accounts)}
 
 # scan all folders that contain proto file
-proto_dirs=$(find $PROJECTDIR/proto $COSMOS_SDK_DIR/proto $COSMOS_SDK_DIR/third_party/proto $IBC_DIR/proto $COSMOS_WASM_DIR -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
+proto_dirs=$(find $PROJECTDIR/proto $COSMOS_SDK_DIR/proto $COSMOS_SDK_DIR/third_party/proto $INTERCHAIN_DIR/proto $IBC_DIR/proto $COSMOS_WASM_DIR -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
 
 GEN_DIR=$SOURCEDIR/swagger-gen
 # clean swagger files
@@ -33,6 +35,7 @@ for dir in $proto_dirs; do
     -I="$PROJECTDIR/proto" \
     -I="$COSMOS_WASM_DIR/proto" \
     -I="$IBC_DIR/proto" \
+    -I="$INTERCHAIN_DIR/proto" \
     -I="$COSMOS_SDK_DIR/third_party/proto" \
     -I="$COSMOS_SDK_DIR/proto" \
     --gocosmos_out=Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types,Mgoogle/protobuf/empty.proto=github.com/gogo/protobuf/types,plugins=interfacetype+grpc,paths=source_relative:$COSMOS_SDK_DIR \
@@ -44,8 +47,9 @@ for dir in $proto_dirs; do
 done
 
 sed -i 's/UpgradedConsensusState/UpgradedIBCConsensusState/' $GEN_DIR/ibc/core/client/v1/query.swagger.json
+sed -i 's/InterchainAccount/IBCInterchainAccount/' $GEN_DIR/ibc/applications/interchain_accounts/controller/v1/query.swagger.json
 
-swagger_files=$(find $GEN_DIR/ibc $GEN_DIR/cosmwasm  -name 'query.swagger.json' | xargs)
+swagger_files=$(find $GEN_DIR/ibc $GEN_DIR/cosmwasm $GEN_DIR/intertx -name 'query.swagger.json' | xargs)
 
 node -e "var fs = require('fs'),file='$COSMOS_SDK_DIR/client/docs/config.json',result = fs.readFileSync(file).toString().replace('./client','$COSMOS_SDK_DIR/client').replace(/.\/tmp-swagger-gen/g, '$GEN_DIR');
 var swaggerFiles = '$swagger_files'.split(' '), obj = JSON.parse(result);

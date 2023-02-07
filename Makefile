@@ -73,7 +73,6 @@ endif
 ifeq ($(LINK_STATICALLY),true)
   ldflags += -linkmode=external -extldflags "-Wl,-z,muldefs -static"
 endif
-ldflags += -w -s
 ldflags += $(LDFLAGS)
 ldflags += -w -s # optimize reduce size
 ldflags := $(strip $(ldflags))
@@ -102,7 +101,7 @@ build:
 ###############################################################################
 
 
-proto-all: proto-gen proto-check-breaking
+proto-all: proto-check-breaking
 .PHONY: proto-all
 
 proto-js: 
