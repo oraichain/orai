@@ -43,7 +43,7 @@ func (min MinCommissionDecorator) AnteHandle(
 		switch msg := m.(type) {
 		case *stakingtypes.MsgCreateValidator:
 			// prevent new validators joining the set with
-			// commission set below 5%
+			// commission set below 3%
 			c := msg.Commission
 			if c.Rate.LT(minCommissionRate) {
 				return sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "commission can't be lower than 3%")
