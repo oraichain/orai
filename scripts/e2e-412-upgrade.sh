@@ -13,7 +13,7 @@ MIGRATE_MSG=${MIGRATE_MSG:-'{}'}
 pkill oraid && sleep 2s
 
 # download current production binary
-wget -O $(which oraid) https://orai.s3.us-east-2.amazonaws.com/$OLD_VERSION/oraid_$OLD_VERSION
+git clone https://github.com/oraichain/orai.git && cd orai/ && git checkout $OLD_VERSION && go get ./... && make install && cd ../ && rm -rf orai/
 
 # setup local network
 sh $PWD/scripts/multinode-local-testnet.sh
