@@ -18,14 +18,13 @@ COPY go.sum /workspace/
 COPY Makefile /workspace/
 COPY oraivisor/ /workspace/oraivisor
 
-# See https://github.com/Oraichain/wasmvm/releases (branch multiwasm-1.1.2-zk)
-ADD ./libwasmvm_muslc.a /lib/libwasmvm_muslc.a
-# # RUN sha256sum /lib/libwasmvm_muslc.a | grep 39dc389cc6b556280cbeaebeda2b62cf884993137b83f90d1398ac47d09d3900
+# See https://github.com/Oraichain/wasmvm/releases (tag v1.2.0)
+RUN wget -O /lib/libwasmvm_muslc.a https://github.com/oraichain/wasmvm/releases/download/v1.2.0/libwasmvm_muslc.a
 
 # RUN go mod tidy && go get ./...
 
 # # force it to use static lib (from above) not standard libgo_cosmwasm.so file
-RUN make build LEDGER_ENABLED=false BUILD_TAGS=muslc GOMOD_FLAGS=
+RUN make build LEDGER_ENABLED=false BUILD_TAGS=muslc GOMOD_FLAGS= VERSION=0.41.2
 RUN upx --best --lzma /workspace/build/oraid
 
 # install oraivisor
