@@ -35,7 +35,7 @@ oraid tx gov vote 1 yes --from validator1 --home "$HOME/.oraid/validator1" $ARGS
 echo "Sleep til the proposal passes..."
 sleep 3m
 
-# kill all processes to upgrade new binary
+# kill all processes when lastest height = UPGRADE_HEIGHT - 1 = 29
 pkill oraid && sleep 3s
 
 # install new binary for the upgrade
