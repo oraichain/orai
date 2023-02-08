@@ -56,3 +56,17 @@ store_ret=$(oraid tx wasm store $WASM_PATH --from validator1 --home $VALIDATOR_H
 new_code_id=$(echo $store_ret | jq -r '.logs[0].events[1].attributes[] | select(.key | contains("code_id")).value')
 
 oraid tx wasm migrate $contract_address $new_code_id $MIGRATE_MSG --from validator1 $ARGS --home $VALIDATOR_HOME
+
+height_before=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
+
+# sleep for 2 mins to make sure the network is still running
+sleep 1m
+
+height_after=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
+
+if [ $height_after -gt $height_before ]
+then
+echo "Test done"
+else
+echo "Test failed"
+fi
