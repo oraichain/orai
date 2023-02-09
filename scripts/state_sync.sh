@@ -67,6 +67,8 @@ echo "TRUST HASH: $TRUST_HASH"
 
 sed -i.bak -E "s|^(enable[[:space:]]+=[[:space:]]+).*$|\1true| ; \
 
+s|^(allow_duplicate_ip[[:space:]]+=[[:space:]]+).*$|\1true| ; \
+
 s|^(addr_book_strict[[:space:]]+=[[:space:]]+).*$|\1false| ; \
 
 s|^(persistent_peers[[:space:]]+=[[:space:]]+).*$|\1\"$PEER\"| ; \
@@ -78,8 +80,6 @@ s|^(trust_height[[:space:]]+=[[:space:]]+).*$|\1$BLOCK_HEIGHT| ; \
 s|^(trust_hash[[:space:]]+=[[:space:]]+).*$|\1\"$TRUST_HASH\"| ; \
 
 s|^(seeds[[:space:]]+=[[:space:]]+).*$|\1\"\"|" $STATESYNC_CONFIG
-
-sed -i "s/allow_duplicate_ip *= *.*/allow_duplicate_ip = true/g" .oraid/state_sync/config/config.toml
 
 echo "Waiting 1 seconds to start state sync"
 sleep 1
