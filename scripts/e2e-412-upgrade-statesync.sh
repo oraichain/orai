@@ -66,6 +66,9 @@ oraid keys add alice --keyring-backend=test --home=$STATE_SYNC_HOME
 echo "## Send fund to state sync account"
 oraid tx send $(oraid keys show validator1 -a --keyring-backend=test --home=$VALIDATOR_HOME) $(oraid keys show alice -a --keyring-backend=test --home=$STATE_SYNC_HOME) 500000orai --home=$VALIDATOR_HOME --node http://localhost:26657 $ARGS
 
-# test wasm transaction
+echo "Sleep 6s to prevent account sequence error"
+sleep 6s
+
+# test wasm transaction using statesync node (port 26647)
 echo "## Test execute wasm transaction"
-oraid tx wasm execute $contract_address $EXECUTE_MSG --from=alice --home=$STATE_SYNC_HOME --node tcp://localhost:26647 $ARGS
+oraid tx wasm execute $contract_address $EXECUTE_MSG --from=validator1 --home=$VALIDATOR_HOME --node tcp://localhost:26647 $ARGS
