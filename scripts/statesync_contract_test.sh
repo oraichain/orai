@@ -18,7 +18,7 @@ oraid tx send $(oraid keys show validator1 -a --keyring-backend=test --home=$HOM
 echo "-----------------------"
 echo "## Create new contract instance"
 INIT='{"purchase_price":{"amount":"100","denom":"orai"},"transfer_price":{"amount":"999","denom":"orai"}}'
-TXFLAG=(--node "tcp://localhost:26647" --chain-id=testing --gas-prices 0.0001orai --gas auto --gas-adjustment 1.3)
+TXFLAG=${TX_FLAG:-"--node tcp://localhost:26647 --chain-id=testing --gas-prices 0.0001orai --gas auto --gas-adjustment 1.3 -b block"}
 
 # Instantiate the first contract. This contract was deploy in multinode-local-testnet.sh script
 oraid tx wasm instantiate 1 "$INIT" --from=wallet --admin="$(oraid keys show wallet -a --keyring-backend=test --home=.oraid/state_sync)" --keyring-backend=test --home=.oraid/state_sync --label "name service" $TXFLAG -y
