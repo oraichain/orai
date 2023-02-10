@@ -92,7 +92,7 @@ install: go.sum
 	go install -mod=readonly $(BUILD_FLAGS) ./cmd/oraid
 
 build:
-	go build $(BUILD_FLAGS) -o build/oraid ./cmd/oraid && cp build/oraid /bin/oraid
+	go build $(BUILD_FLAGS) -o build/oraid ./cmd/oraid
 
   # the oraid binary will be built to the root directory of the project (if in docker container then it's workspace/oraid)
 

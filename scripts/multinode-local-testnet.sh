@@ -112,15 +112,15 @@ sed -i -e "s%^snapshot-keep-recent *=.*%snapshot-keep-recent = \"$snapshot_keep_
 sed -i -E 's|allow_duplicate_ip = false|allow_duplicate_ip = true|g' $VALIDATOR1_CONFIG
 
 # validator2
-sed -i -E 's|tcp://127.0.0.1:26658|tcp://127.0.0.1:26655|g' $VALIDATOR2_CONFIG
-sed -i -E 's|tcp://127.0.0.1:26657|tcp://127.0.0.1:26654|g' $VALIDATOR2_CONFIG
+sed -i -E 's|tcp://127.0.0.1:26658|tcp://0.0.0.0:26655|g' $VALIDATOR2_CONFIG
+sed -i -E 's|tcp://127.0.0.1:26657|tcp://0.0.0.0:26654|g' $VALIDATOR2_CONFIG
 sed -i -E 's|tcp://0.0.0.0:26656|tcp://0.0.0.0:26653|g' $VALIDATOR2_CONFIG
 sed -i -E 's|tcp://0.0.0.0:26656|tcp://0.0.0.0:26650|g' $VALIDATOR2_CONFIG
 sed -i -E 's|allow_duplicate_ip = false|allow_duplicate_ip = true|g' $VALIDATOR2_CONFIG
 
 # validator3
-sed -i -E 's|tcp://127.0.0.1:26658|tcp://127.0.0.1:26652|g' $VALIDATOR3_CONFIG
-sed -i -E 's|tcp://127.0.0.1:26657|tcp://127.0.0.1:26651|g' $VALIDATOR3_CONFIG
+sed -i -E 's|tcp://127.0.0.1:26658|tcp://0.0.0.0:26652|g' $VALIDATOR3_CONFIG
+sed -i -E 's|tcp://127.0.0.1:26657|tcp://0.0.0.0:26651|g' $VALIDATOR3_CONFIG
 sed -i -E 's|tcp://0.0.0.0:26656|tcp://0.0.0.0:26650|g' $VALIDATOR3_CONFIG
 sed -i -E 's|tcp://0.0.0.0:26656|tcp://0.0.0.0:26650|g' $VALIDATOR3_CONFIG
 sed -i -E 's|allow_duplicate_ip = false|allow_duplicate_ip = true|g' $VALIDATOR3_CONFIG
@@ -150,3 +150,26 @@ oraid tx staking create-validator --amount=500000000orai --from=validator2 --pub
 oraid tx staking create-validator --amount=400000000orai --from=validator3 --pubkey=$(oraid tendermint show-validator --home=$HOME/.oraid/validator3) --moniker="validator3" --chain-id="testing" --commission-rate="0.1" --commission-max-rate="0.2" --commission-max-change-rate="0.05" --min-self-delegation="400000000" --keyring-backend=test --home=$HOME/.oraid/validator3 --broadcast-mode block --gas 200000 --fees 2orai --node http://localhost:26657 --yes
 
 echo "All 3 Validators are up and running!"
+
+echo "-----------------------"
+echo "## Add new CosmWasm contract"
+RESP=$(oraid tx wasm store scripts/wasm_file/cw_nameservice-aarch64.wasm \
+--from=validator1 --keyring-backend=test --home=$HOME/.oraid/validator1 --gas 1500000 --fees 150orai --chain-id="testing" -y --node=http://localhost:26657 -b block -o json)
+
+# first contract with code id = 1
+CODE_ID=$(echo "$RESP" | jq -r '.logs[0].events[1].attributes[-1].value')
+CODE_HASH=$(echo "$RESP" | jq -r '.logs[0].events[1].attributes[-2].value')
+echo "* Code id: $CODE_ID"
+echo "* Code checksum: $CODE_HASH"
+
+echo "-----------------------"
+echo "## Migrate contract"
+echo "### Upload new code"
+RESP=$(oraid tx wasm store scripts/wasm_file/burner.wasm \
+  --from=validator1 --keyring-backend=test --home=$HOME/.oraid/validator1 --node=http://localhost:26657 --gas 1500000 --fees 150orai --chain-id="testing" -y -b block -o json)
+
+# second contract with code id = 2
+CODE_ID=$(echo "$RESP" | jq -r '.logs[0].events[1].attributes[-1].value')
+CODE_HASH=$(echo "$RESP" | jq -r '.logs[0].events[1].attributes[-2].value')
+echo "* Code id: $CODE_ID"
+echo "* Code checksum: $CODE_HASH"
