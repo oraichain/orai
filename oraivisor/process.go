@@ -123,7 +123,7 @@ func (u *WaitResult) SetUpgrade(up *UpgradeInfo) {
 // It returns (info, nil) if an upgrade should be initiated (and we killed the process)
 // It returns (nil, err) if the process died by itself, or there was an issue reading the pipes
 // It returns (nil, nil) if the process exited normally without triggering an upgrade. This is very unlikely
-// to happened with "start" but may happened with short-lived commands like `gaiad export ...`
+// to happened with "start" but may happened with short-lived commands like `oraid export ...`
 func WaitForUpgradeOrExit(cmd *exec.Cmd, scanOut, scanErr *bufio.Scanner) (*UpgradeInfo, error) {
 	var res WaitResult
 
@@ -142,7 +142,7 @@ func WaitForUpgradeOrExit(cmd *exec.Cmd, scanOut, scanErr *bufio.Scanner) (*Upgr
 	go waitScan(scanOut)
 	go waitScan(scanErr)
 
-	// if the command exits normally (eg. short command like `gaiad version`), just return (nil, nil)
+	// if the command exits normally (eg. short command like `oraid version`), just return (nil, nil)
 	// we often get broken read pipes if it runs too fast.
 	// if we had upgrade info, we would have killed it, and thus got a non-nil error code
 	err := cmd.Wait()
