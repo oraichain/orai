@@ -2361,9 +2361,9 @@ paths:
                               1 denom = 1^exponent base_denom
 
                               (e.g. with a base_denom of orai, one can create a
-                              DenomUnit of 'atom' with
+                              DenomUnit of 'ORAI' with
 
-                              exponent = 6, thus: 1 atom = 10^6 orai).
+                              exponent = 6, thus: 1 ORAI = 10^6 orai).
                           aliases:
                             type: array
                             items:
@@ -2390,12 +2390,12 @@ paths:
                     name:
                       type: string
                       description: 'Since: cosmos-sdk 0.43'
-                      title: 'name defines the name of the token (eg: Cosmos Atom)'
+                      title: 'name defines the name of the token (eg: ORAI)'
                     symbol:
                       type: string
                       description: >-
                         symbol is the token symbol usually shown on exchanges
-                        (eg: ATOM). This can
+                        (eg: ORAI). This can
 
                         be the same as the display.
 
@@ -2549,9 +2549,9 @@ paths:
                             1 denom = 1^exponent base_denom
 
                             (e.g. with a base_denom of orai, one can create a
-                            DenomUnit of 'atom' with
+                            DenomUnit of 'ORAI' with
 
-                            exponent = 6, thus: 1 atom = 10^6 orai).
+                            exponent = 6, thus: 1 ORAI = 10^6 orai).
                         aliases:
                           type: array
                           items:
@@ -2578,12 +2578,12 @@ paths:
                   name:
                     type: string
                     description: 'Since: cosmos-sdk 0.43'
-                    title: 'name defines the name of the token (eg: Cosmos Atom)'
+                    title: 'name defines the name of the token (eg: ORAI)'
                   symbol:
                     type: string
                     description: >-
                       symbol is the token symbol usually shown on exchanges (eg:
-                      ATOM). This can
+                      ORAI). This can
 
                       be the same as the display.
 
@@ -7505,7 +7505,7 @@ paths:
                   max_deposit_period:
                     type: string
                     description: >-
-                      Maximum period for Atom holders to deposit on a proposal.
+                      Maximum period for ORAI holders to deposit on a proposal.
                       Initial value: 2
                        months.
               tally_params:
@@ -10308,7 +10308,7 @@ paths:
                     title: minimum inflation rate
                   goal_bonded:
                     type: string
-                    title: goal of percent bonded atoms
+                    title: goal of percent bonded ORAIs
                   blocks_per_year:
                     type: string
                     format: uint64
@@ -39179,10 +39179,10 @@ definitions:
 
           1 denom = 1^exponent base_denom
 
-          (e.g. with a base_denom of orai, one can create a DenomUnit of 'atom'
+          (e.g. with a base_denom of orai, one can create a DenomUnit of 'ORAI'
           with
 
-          exponent = 6, thus: 1 atom = 10^6 orai).
+          exponent = 6, thus: 1 ORAI = 10^6 orai).
       aliases:
         type: array
         items:
@@ -39218,9 +39218,9 @@ definitions:
                 1 denom = 1^exponent base_denom
 
                 (e.g. with a base_denom of orai, one can create a DenomUnit of
-                'atom' with
+                'ORAI' with
 
-                exponent = 6, thus: 1 atom = 10^6 orai).
+                exponent = 6, thus: 1 ORAI = 10^6 orai).
             aliases:
               type: array
               items:
@@ -39243,11 +39243,11 @@ definitions:
       name:
         type: string
         description: 'Since: cosmos-sdk 0.43'
-        title: 'name defines the name of the token (eg: Cosmos Atom)'
+        title: 'name defines the name of the token (eg: ORAI)'
       symbol:
         type: string
         description: >-
-          symbol is the token symbol usually shown on exchanges (eg: ATOM). This
+          symbol is the token symbol usually shown on exchanges (eg: ORAI). This
           can
 
           be the same as the display.
@@ -39366,9 +39366,9 @@ definitions:
                     1 denom = 1^exponent base_denom
 
                     (e.g. with a base_denom of orai, one can create a DenomUnit
-                    of 'atom' with
+                    of 'ORAI' with
 
-                    exponent = 6, thus: 1 atom = 10^6 orai).
+                    exponent = 6, thus: 1 ORAI = 10^6 orai).
                 aliases:
                   type: array
                   items:
@@ -39391,11 +39391,11 @@ definitions:
           name:
             type: string
             description: 'Since: cosmos-sdk 0.43'
-            title: 'name defines the name of the token (eg: Cosmos Atom)'
+            title: 'name defines the name of the token (eg: ORAI)'
           symbol:
             type: string
             description: >-
-              symbol is the token symbol usually shown on exchanges (eg: ATOM).
+              symbol is the token symbol usually shown on exchanges (eg: ORAI).
               This can
 
               be the same as the display.
@@ -39442,9 +39442,9 @@ definitions:
                       1 denom = 1^exponent base_denom
 
                       (e.g. with a base_denom of orai, one can create a
-                      DenomUnit of 'atom' with
+                      DenomUnit of 'ORAI' with
 
-                      exponent = 6, thus: 1 atom = 10^6 orai).
+                      exponent = 6, thus: 1 ORAI = 10^6 orai).
                   aliases:
                     type: array
                     items:
@@ -39467,12 +39467,12 @@ definitions:
             name:
               type: string
               description: 'Since: cosmos-sdk 0.43'
-              title: 'name defines the name of the token (eg: Cosmos Atom)'
+              title: 'name defines the name of the token (eg: ORAI)'
             symbol:
               type: string
               description: >-
                 symbol is the token symbol usually shown on exchanges (eg:
-                ATOM). This can
+                ORAI). This can
 
                 be the same as the display.
 
@@ -44601,7 +44601,7 @@ definitions:
       max_deposit_period:
         type: string
         description: >-
-          Maximum period for Atom holders to deposit on a proposal. Initial
+          Maximum period for ORAI holders to deposit on a proposal. Initial
           value: 2
            months.
     description: DepositParams defines the params for deposits on governance proposals.
@@ -44982,7 +44982,7 @@ definitions:
           max_deposit_period:
             type: string
             description: >-
-              Maximum period for Atom holders to deposit on a proposal. Initial
+              Maximum period for ORAI holders to deposit on a proposal. Initial
               value: 2
                months.
       tally_params:
@@ -45844,7 +45844,7 @@ definitions:
         title: minimum inflation rate
       goal_bonded:
         type: string
-        title: goal of percent bonded atoms
+        title: goal of percent bonded ORAIs
       blocks_per_year:
         type: string
         format: uint64
@@ -45891,7 +45891,7 @@ definitions:
             title: minimum inflation rate
           goal_bonded:
             type: string
-            title: goal of percent bonded atoms
+            title: goal of percent bonded ORAIs
           blocks_per_year:
             type: string
             format: uint64
