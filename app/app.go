@@ -1079,10 +1079,6 @@ func (app *OraichainApp) upgradeHandler() {
 	if upgradeInfo.Name == BinaryVersion && !app.upgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		storeUpgrades := storetypes.StoreUpgrades{
 			Added: []string{
-				icacontrollertypes.SubModuleName,
-				icahosttypes.SubModuleName,
-				ibcfeetypes.ModuleName,
-				intertxtypes.ModuleName,
 				providertypes.ModuleName,
 			},
 		}
