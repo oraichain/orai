@@ -2,10 +2,10 @@
 
 # setup the network using the old binary
 
-OLD_VERSION=${OLD_VERSION:-"v0.41.1"}
+OLD_VERSION=${OLD_VERSION:-"v0.41.2"}
 WASM_PATH=${WASM_PATH:-"../oraiwasm/package/plus/swapmap/artifacts/swapmap.wasm"}
 ARGS="--chain-id testing -y --keyring-backend test --fees 200orai --gas auto --gas-adjustment 1.5 -b block"
-NEW_VERSION=${NEW_VERSION:-"v0.41.2"}
+NEW_VERSION=${NEW_VERSION:-"v0.41.3"}
 VALIDATOR_HOME=${VALIDATOR_HOME:-"$HOME/.oraid/validator1"}
 MIGRATE_MSG=${MIGRATE_MSG:-'{}'}
 

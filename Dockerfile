@@ -23,6 +23,6 @@ RUN wget -O /lib/libwasmvm_muslc.a https://github.com/oraichain/wasmvm/releases/
 # RUN go mod tidy && go get ./...
 
 # # force it to use static lib (from above) not standard libgo_cosmwasm.so file
-RUN make build LEDGER_ENABLED=false BUILD_TAGS=muslc GOMOD_FLAGS= VERSION=0.41.2
+RUN make build LEDGER_ENABLED=false BUILD_TAGS=muslc GOMOD_FLAGS= VERSION=0.41.3
 RUN cp /workspace/build/oraid /bin/oraid
 RUN upx --best --lzma /workspace/build/oraid
