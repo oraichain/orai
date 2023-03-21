@@ -2347,7 +2347,7 @@ paths:
                             type: string
                             description: >-
                               denom represents the string name of the given
-                              denom unit (e.g uatom).
+                              denom unit (e.g orai).
                           exponent:
                             type: integer
                             format: int64
@@ -2360,10 +2360,10 @@ paths:
 
                               1 denom = 1^exponent base_denom
 
-                              (e.g. with a base_denom of uatom, one can create a
+                              (e.g. with a base_denom of orai, one can create a
                               DenomUnit of 'atom' with
 
-                              exponent = 6, thus: 1 atom = 10^6 uatom).
+                              exponent = 6, thus: 1 atom = 10^6 orai).
                           aliases:
                             type: array
                             items:
@@ -2535,7 +2535,7 @@ paths:
                           type: string
                           description: >-
                             denom represents the string name of the given denom
-                            unit (e.g uatom).
+                            unit (e.g orai).
                         exponent:
                           type: integer
                           format: int64
@@ -2548,10 +2548,10 @@ paths:
 
                             1 denom = 1^exponent base_denom
 
-                            (e.g. with a base_denom of uatom, one can create a
+                            (e.g. with a base_denom of orai, one can create a
                             DenomUnit of 'atom' with
 
-                            exponent = 6, thus: 1 atom = 10^6 uatom).
+                            exponent = 6, thus: 1 atom = 10^6 orai).
                         aliases:
                           type: array
                           items:
@@ -39168,7 +39168,7 @@ definitions:
     properties:
       denom:
         type: string
-        description: denom represents the string name of the given denom unit (e.g uatom).
+        description: denom represents the string name of the given denom unit (e.g orai).
       exponent:
         type: integer
         format: int64
@@ -39179,10 +39179,10 @@ definitions:
 
           1 denom = 1^exponent base_denom
 
-          (e.g. with a base_denom of uatom, one can create a DenomUnit of 'atom'
+          (e.g. with a base_denom of orai, one can create a DenomUnit of 'atom'
           with
 
-          exponent = 6, thus: 1 atom = 10^6 uatom).
+          exponent = 6, thus: 1 atom = 10^6 orai).
       aliases:
         type: array
         items:
@@ -39205,7 +39205,7 @@ definitions:
               type: string
               description: >-
                 denom represents the string name of the given denom unit (e.g
-                uatom).
+                orai).
             exponent:
               type: integer
               format: int64
@@ -39217,10 +39217,10 @@ definitions:
 
                 1 denom = 1^exponent base_denom
 
-                (e.g. with a base_denom of uatom, one can create a DenomUnit of
+                (e.g. with a base_denom of orai, one can create a DenomUnit of
                 'atom' with
 
-                exponent = 6, thus: 1 atom = 10^6 uatom).
+                exponent = 6, thus: 1 atom = 10^6 orai).
             aliases:
               type: array
               items:
@@ -39353,7 +39353,7 @@ definitions:
                   type: string
                   description: >-
                     denom represents the string name of the given denom unit
-                    (e.g uatom).
+                    (e.g orai).
                 exponent:
                   type: integer
                   format: int64
@@ -39365,10 +39365,10 @@ definitions:
 
                     1 denom = 1^exponent base_denom
 
-                    (e.g. with a base_denom of uatom, one can create a DenomUnit
+                    (e.g. with a base_denom of orai, one can create a DenomUnit
                     of 'atom' with
 
-                    exponent = 6, thus: 1 atom = 10^6 uatom).
+                    exponent = 6, thus: 1 atom = 10^6 orai).
                 aliases:
                   type: array
                   items:
@@ -39429,7 +39429,7 @@ definitions:
                     type: string
                     description: >-
                       denom represents the string name of the given denom unit
-                      (e.g uatom).
+                      (e.g orai).
                   exponent:
                     type: integer
                     format: int64
@@ -39441,10 +39441,10 @@ definitions:
 
                       1 denom = 1^exponent base_denom
 
-                      (e.g. with a base_denom of uatom, one can create a
+                      (e.g. with a base_denom of orai, one can create a
                       DenomUnit of 'atom' with
 
-                      exponent = 6, thus: 1 atom = 10^6 uatom).
+                      exponent = 6, thus: 1 atom = 10^6 orai).
                   aliases:
                     type: array
                     items:
