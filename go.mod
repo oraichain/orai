@@ -6,7 +6,7 @@ require (
 	github.com/CosmWasm/wasmd v1.0.0
 	github.com/cosmos/cosmos-sdk v0.45.12
 	github.com/cosmos/go-bip39 v1.0.0
-	github.com/cosmos/ibc-go/v4 v4.3.0
+	github.com/cosmos/ibc-go/v4 v4.3.1
 	github.com/cosmos/interchain-accounts v0.2.6
 	github.com/gorilla/mux v1.8.0
 	github.com/oasisprotocol/oasis-core/go v0.2012.4
