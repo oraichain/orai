@@ -1,4 +1,4 @@
-FROM golang:1.18-alpine as builder
+FROM golang:1.19-alpine as builder
 
 # this comes from standard alpine nightly file
 #  https://github.com/rust-lang/docker-rust-nightly/blob/master/alpine3.12/Dockerfile
