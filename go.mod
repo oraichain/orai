@@ -138,7 +138,7 @@ replace (
 	// go list -m -json github.com/oraichain/wasmd@main | jq '.|"\(.Path) \(.Version)"' -r
 	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.1
 	// go list -m -json github.com/oraichain/wasmvm@main | jq '.|"\(.Path) \(.Version)"' -r
-	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.2.0
+	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.2.4
 	// same version as cosmos-sdk
 	github.com/btcsuite/btcd => github.com/btcsuite/btcd v0.22.2
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1

@@ -2018,8 +2018,8 @@ github.com/openzipkin/zipkin-go v0.2.2/go.mod h1:NaW6tEwdmWMaCDZzg8sh+IBNOxHMPnh
 github.com/openzipkin/zipkin-go v0.2.5/go.mod h1:KpXfKdgRDnnhsxw4pNIH9Md5lyFqKUa4YDFlwRYAMyE=
 github.com/oraichain/wasmd v0.30.1 h1:xYIjyi/m493k+4X9nxIORGKHoFPq90ltmzOlM1g7Fm0=
 github.com/oraichain/wasmd v0.30.1/go.mod h1:/gl58AKGQOcVs5fLaKx0Mhh9W52ZgDyBQiMEUWX+CPM=
-github.com/oraichain/wasmvm v1.2.0 h1:9g+j1AkImpJosARzbPQwIrFxwjIBQS8fHQLK8FdBooQ=
-github.com/oraichain/wasmvm v1.2.0/go.mod h1:OIhXFPi9BbcEL1USBj4OIrBTtSSds+9eEql56fsdyfE=
+github.com/oraichain/wasmvm v1.2.4 h1:K2n1Xm5Ot2NoysPTed1bCGP/FpKs0PyjTaXamqaXtFw=
+github.com/oraichain/wasmvm v1.2.4/go.mod h1:vW/E3h8j9xBQs9bCoijDuawKo9kCtxOaS8N8J7KFtkc=
 github.com/ory/dockertest v3.3.5+incompatible h1:iLLK6SQwIhcbrG783Dghaaa3WPzGc+4Emza6EbVUUGA=
 github.com/ory/dockertest v3.3.5+incompatible/go.mod h1:1vX4m9wsvi00u5bseYwXaSnhNrne+V0E6LAcBILJdPs=
 github.com/ory/dockertest/v3 v3.9.1/go.mod h1:42Ir9hmvaAPm0Mgibk6mBPi7SFvTXxEcnztDYOJ//uM=
