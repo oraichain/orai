@@ -35,7 +35,7 @@ oraid tx gov vote 1 yes --from validator1 --home "$HOME/.oraid/validator1" $ARGS
 
 # sleep to wait til the proposal passes
 echo "Sleep til the proposal passes..."
-sleep 3m
+sleep 2m
 
 # kill all processes when lastest height = UPGRADE_HEIGHT - 1 = 29
 pkill oraid && sleep 3s
