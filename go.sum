@@ -480,8 +480,6 @@ github.com/CloudyKit/fastprinter v0.0.0-20170127035650-74b38d55f37a/go.mod h1:EF
 github.com/CloudyKit/fastprinter v0.0.0-20200109182630-33d98a066a53/go.mod h1:+3IMCy2vIlbG1XG/0ggNQv0SvxCAIpPM5b1nCz56Xno=
 github.com/CloudyKit/jet v2.1.3-0.20180809161101-62edd43e4f88+incompatible/go.mod h1:HPYO+50pSWkPoj9Q/eq0aRGByCL6ScRlUmiEX5Zgm+w=
 github.com/CloudyKit/jet/v3 v3.0.0/go.mod h1:HKQPgSJmdK8hdoAbKUUWajkHyHo4RaU5rMdUywE7VMo=
-github.com/CosmWasm/wasmd v0.31.0 h1:xACf6A/SkCeGWQWrKGsR4X9PQb5G4XYuNfnrl+HQ1mE=
-github.com/CosmWasm/wasmd v0.31.0/go.mod h1:VcyDGk/ISVlMUeW+1GGL0zdHWBS2FPwLEV2qZ86l7l8=
 github.com/DATA-DOG/go-sqlmock v1.3.3/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q5eFN3EC/SaM=
 github.com/DATA-DOG/go-sqlmock v1.5.0/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q5eFN3EC/SaM=
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
@@ -2378,6 +2376,8 @@ github.com/openzipkin/zipkin-go v0.2.2/go.mod h1:NaW6tEwdmWMaCDZzg8sh+IBNOxHMPnh
 github.com/openzipkin/zipkin-go v0.2.5/go.mod h1:KpXfKdgRDnnhsxw4pNIH9Md5lyFqKUa4YDFlwRYAMyE=
 github.com/oraichain/cometbft v0.34.29 h1:9zfZ/EWm80Zl8ww6CP7sPRzosGdOGussN5sx/65oa0s=
 github.com/oraichain/cometbft v0.34.29/go.mod h1:L9shMfbkZ8B+7JlwANEr+NZbBcn+hBpwdbeYvA5rLCw=
+github.com/oraichain/wasmd v0.30.2-0.20230704072512-1f776e9a4dcf h1:0J0WfaoT514X1H5TlwZ5io+UnbKeERkK4MVqD2PPwjw=
+github.com/oraichain/wasmd v0.30.2-0.20230704072512-1f776e9a4dcf/go.mod h1:aFru9X4TNvW0z8dTm1k+C75sXszmVRH8myjkCEadtqs=
 github.com/oraichain/wasmvm v1.2.4 h1:K2n1Xm5Ot2NoysPTed1bCGP/FpKs0PyjTaXamqaXtFw=
 github.com/oraichain/wasmvm v1.2.4/go.mod h1:vW/E3h8j9xBQs9bCoijDuawKo9kCtxOaS8N8J7KFtkc=
 github.com/ory/dockertest v3.3.5+incompatible h1:iLLK6SQwIhcbrG783Dghaaa3WPzGc+4Emza6EbVUUGA=

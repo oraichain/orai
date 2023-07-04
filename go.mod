@@ -152,12 +152,12 @@ require (
 replace (
 	// Use cosmos keyring
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
+	// fork wasmd so that we have legacy wasm types
+	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20230704072512-1f776e9a4dcf
 	// go list -m -json github.com/oraichain/wasmvm@main | jq '.|"\(.Path) \(.Version)"' -r
 	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.2.4
 	// same version as cosmos-sdk
 	github.com/btcsuite/btcd => github.com/btcsuite/btcd v0.22.2
-	// fork wasmd so that we have legacy wasm types
-	github.com/cosmwasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20230704072512-1f776e9a4dcf
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
 	// use informal system fork of tendermint
