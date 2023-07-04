@@ -156,11 +156,13 @@ replace (
 	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.2.4
 	// same version as cosmos-sdk
 	github.com/btcsuite/btcd => github.com/btcsuite/btcd v0.22.2
+	// fork wasmd so that we have legacy wasm types
+	github.com/cosmwasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20230704072512-1f776e9a4dcf
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
 	// use informal system fork of tendermint
 	// (https://github.com/informalsystems/tendermint/releases/tag/v0.34.25).
-	github.com/tendermint/tendermint => github.com/cometbft/cometbft v0.34.29
+	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.29
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 
 // Fix upstream GHSA-h395-qcrw-5vmq vulnerability.
