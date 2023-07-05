@@ -162,7 +162,7 @@ replace (
 
 	// use informal system fork of tendermint
 	// (https://github.com/informalsystems/tendermint/releases/tag/v0.34.25).
-	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.29
+	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20230705111657-c5ff5c738fbc
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 
 // Fix upstream GHSA-h395-qcrw-5vmq vulnerability.
