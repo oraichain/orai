@@ -2374,8 +2374,8 @@ github.com/openzipkin/zipkin-go v0.1.6/go.mod h1:QgAqvLzwWbR/WpD4A3cGpPtJrZXNIiJ
 github.com/openzipkin/zipkin-go v0.2.1/go.mod h1:NaW6tEwdmWMaCDZzg8sh+IBNOxHMPnhQw8ySjnjRyN4=
 github.com/openzipkin/zipkin-go v0.2.2/go.mod h1:NaW6tEwdmWMaCDZzg8sh+IBNOxHMPnhQw8ySjnjRyN4=
 github.com/openzipkin/zipkin-go v0.2.5/go.mod h1:KpXfKdgRDnnhsxw4pNIH9Md5lyFqKUa4YDFlwRYAMyE=
-github.com/oraichain/cometbft v0.34.30-0.20230705162140-bb00925fc480 h1:L8LZPfQV7QgDvxOuDnBKTQy2MeZFn55Sh/bnzN+k3Xc=
-github.com/oraichain/cometbft v0.34.30-0.20230705162140-bb00925fc480/go.mod h1:L9shMfbkZ8B+7JlwANEr+NZbBcn+hBpwdbeYvA5rLCw=
+github.com/oraichain/cometbft v0.34.30-0.20230711110635-482cde0c4e04 h1:YEF6VhvB3xrUqLRoEKyJprOXlZ5iaxMzB/87HapgV0s=
+github.com/oraichain/cometbft v0.34.30-0.20230711110635-482cde0c4e04/go.mod h1:L9shMfbkZ8B+7JlwANEr+NZbBcn+hBpwdbeYvA5rLCw=
 github.com/oraichain/wasmd v0.30.2-0.20230704072512-1f776e9a4dcf h1:0J0WfaoT514X1H5TlwZ5io+UnbKeERkK4MVqD2PPwjw=
 github.com/oraichain/wasmd v0.30.2-0.20230704072512-1f776e9a4dcf/go.mod h1:aFru9X4TNvW0z8dTm1k+C75sXszmVRH8myjkCEadtqs=
 github.com/oraichain/wasmvm v1.2.4 h1:K2n1Xm5Ot2NoysPTed1bCGP/FpKs0PyjTaXamqaXtFw=
