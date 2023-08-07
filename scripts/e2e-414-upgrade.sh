@@ -5,11 +5,9 @@
 OLD_VERSION=${OLD_VERSION:-"v0.41.2"}
 WASM_PATH=${WASM_PATH:-"../oraiwasm/package/plus/swapmap/artifacts/swapmap.wasm"}
 ARGS="--chain-id testing -y --keyring-backend test --fees 200orai --gas auto --gas-adjustment 1.5 -b block"
-NEW_VERSION=${NEW_VERSION:-"v0.41.3"}
+NEW_VERSION=${NEW_VERSION:-"v0.41.4"}
 VALIDATOR_HOME=${VALIDATOR_HOME:-"$HOME/.oraid/validator1"}
 MIGRATE_MSG=${MIGRATE_MSG:-'{}'}
-EXECUTE_MSG=${EXECUTE_MSG:-'{"ping":{}}'}
-STATE_SYNC_HOME=${STATE_SYNC_HOME:-".oraid/state_sync"}
 
 # kill all running binaries
 pkill oraid && sleep 2s
@@ -35,7 +33,7 @@ oraid tx gov vote 1 yes --from validator1 --home "$HOME/.oraid/validator1" $ARGS
 
 # sleep to wait til the proposal passes
 echo "Sleep til the proposal passes..."
-sleep 2m
+sleep 90s
 
 # kill all processes when lastest height = UPGRADE_HEIGHT - 1 = 29
 pkill oraid && sleep 3s
@@ -50,25 +48,25 @@ screen -S validator2 -d -m oraid start --home=$HOME/.oraid/validator2 --minimum-
 screen -S validator3 -d -m oraid start --home=$HOME/.oraid/validator3 --minimum-gas-prices=0.00001orai
 
 # sleep a bit for the network to start 
-echo "Sleep to wait for the network to start and wait for new snapshot intervals are after the upgrade to take place..."
+echo "Sleep to wait for the network to start..."
+sleep 7s
+# test contract migration
+echo "Migrate the contract"
+store_ret=$(oraid tx wasm store $WASM_PATH --from validator1 --home $VALIDATOR_HOME $ARGS --output json)
+new_code_id=$(echo $store_ret | jq -r '.logs[0].events[1].attributes[] | select(.key | contains("code_id")).value')
+
+oraid tx wasm migrate $contract_address $new_code_id $MIGRATE_MSG --from validator1 $ARGS --home $VALIDATOR_HOME
+
+height_before=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
+
+# sleep for 2 mins to make sure the network is still running
 sleep 1m
 
-# now we setup statesync node
-sh $PWD/scripts/state_sync.sh
+height_after=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 
-echo "Sleep 1 min to get statesync done..."
-sleep 1m
-
-# add new key so we test sending wasm transaction afters statesync
-# create new key
-oraid keys add alice --keyring-backend=test --home=$STATE_SYNC_HOME
-
-echo "## Send fund to state sync account"
-oraid tx send $(oraid keys show validator1 -a --keyring-backend=test --home=$VALIDATOR_HOME) $(oraid keys show alice -a --keyring-backend=test --home=$STATE_SYNC_HOME) 500000orai --home=$VALIDATOR_HOME --node http://localhost:26657 $ARGS
-
-echo "Sleep 6s to prevent account sequence error"
-sleep 6s
-
-# test wasm transaction using statesync node (port 26647)
-echo "## Test execute wasm transaction"
-oraid tx wasm execute $contract_address $EXECUTE_MSG --from=validator1 --home=$VALIDATOR_HOME --node tcp://localhost:26647 $ARGS
+if [ $height_after -gt $height_before ]
+then
+echo "Test done"
+else
+echo "Test failed"
+fi
