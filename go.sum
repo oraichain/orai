@@ -2696,8 +2696,8 @@ github.com/stbenjam/no-sprintf-host-port v0.1.1/go.mod h1:TLhvtIvONRzdmkFiio4O8L
 github.com/stefanberger/go-pkcs11uri v0.0.0-20201008174630-78d3cae3a980/go.mod h1:AO3tvPzVZ/ayst6UlUKUv6rcPQInYe3IknH3jYhAKu8=
 github.com/steveyen/gtreap v0.1.0/go.mod h1:kl/5J7XbrOmlIbYIXdRHDDE5QxHqpk0cmkT7Z4dM9/Y=
 github.com/stoewer/go-strcase v1.2.0/go.mod h1:IBiWB2sKIp3wVVQ3Y035++gc+knqhUQag1KpM8ahLw8=
-github.com/strangelove-ventures/packet-forward-middleware/v4 v4.0.5 h1:KKUqeGhVBK38+1LwThC8IeIcsJZ6COX5kvhiJroFqCM=
-github.com/strangelove-ventures/packet-forward-middleware/v4 v4.0.5/go.mod h1:4zAtg449/JISRmf+sbmqolqSLP+QJBh+EtWkWtt/AKE=
+github.com/strangelove-ventures/packet-forward-middleware/v4 v4.0.6 h1:aY64yjKZyDyzlIbDOkGBPvVpR0ArzIjunpCRKqoIm7o=
+github.com/strangelove-ventures/packet-forward-middleware/v4 v4.0.6/go.mod h1:4zAtg449/JISRmf+sbmqolqSLP+QJBh+EtWkWtt/AKE=
 github.com/streadway/amqp v0.0.0-20190404075320-75d898a42a94/go.mod h1:AZpEONHx3DKn8O/DFsRAY58/XVQiIPMTMB1SddzLXVw=
 github.com/streadway/amqp v0.0.0-20190827072141-edfb9018d271/go.mod h1:AZpEONHx3DKn8O/DFsRAY58/XVQiIPMTMB1SddzLXVw=
 github.com/streadway/amqp v1.0.0/go.mod h1:AZpEONHx3DKn8O/DFsRAY58/XVQiIPMTMB1SddzLXVw=

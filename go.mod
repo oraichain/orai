@@ -18,7 +18,7 @@ require (
 	github.com/snikch/goodman v0.0.0-20171125024755-10e37e294daa
 	github.com/spf13/cast v1.5.0
 	github.com/spf13/cobra v1.6.1
-	github.com/strangelove-ventures/packet-forward-middleware/v4 v4.0.5
+	github.com/strangelove-ventures/packet-forward-middleware/v4 v4.0.6
 	github.com/stretchr/testify v1.8.2
 	github.com/tendermint/tendermint v0.34.29
 	github.com/tendermint/tm-db v0.6.8-0.20220506192307-f628bb5dc95b
