@@ -62,7 +62,6 @@ oraid tx wasm execute $contract_address $EXECUTE_MSG --from validator1 $ARGS --h
 
 height_before=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 
-# sleep for 30s to make sure the network is still running
 sleep 30s
 
 height_after=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
