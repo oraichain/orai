@@ -42,7 +42,7 @@ update_genesis '.app_state["staking"]["params"]["unbonding_time"]="240s"'
 update_genesis '.app_state["crisis"]["constant_fee"]["denom"]="orai"'
 
 # udpate gov genesis
-update_genesis '.app_state["gov"]["voting_params"]["voting_period"]="60s"'
+update_genesis '.app_state["gov"]["voting_params"]["voting_period"]="15s"'
 update_genesis '.app_state["gov"]["deposit_params"]["min_deposit"][0]["denom"]="orai"'
 
 # update mint genesis

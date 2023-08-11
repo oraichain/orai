@@ -1001,6 +1001,18 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 func (app *OraichainApp) upgradeHandler() {
 	app.upgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		ctx.Logger().Info("start to migrate modules...")
+		// set ibchooks and packet forward consensus version
+		ibchooksModule, correctTypecast := app.mm.Modules[ibchookstypes.ModuleName].(ibchooks.AppModule)
+		if !correctTypecast {
+			panic("mm.Modules[ibchookstypes.ModuleName] is not of type ibchooks.AppModule")
+		}
+		pfmModule, correctTypecast := app.mm.Modules[packetforwardtypes.ModuleName].(packetforward.AppModule)
+		if !correctTypecast {
+			panic("mm.Modules[packetforwardtypes.ModuleName] is not of type packetforward.AppModule")
+		}
+		fromVM[ibchookstypes.ModuleName] = ibchooksModule.ConsensusVersion()
+		fromVM[packetforwardtypes.ModuleName] = pfmModule.ConsensusVersion()
+		ctx.Logger().Info("vm module: %v\n", fromVM)
 		// Packet Forward middleware initial params
 		app.PacketForwardKeeper.SetParams(ctx, packetforwardtypes.DefaultParams())
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
