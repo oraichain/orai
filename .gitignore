@@ -81,3 +81,4 @@ Cargo.lock
 
 manifest.json
 oraid
+**/node_modules

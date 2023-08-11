@@ -1,0 +1,21 @@
+{
+  "name": "e2e-tests",
+  "version": "1.0.0",
+  "description": "e2e tests for Oraichain mainnet",
+  "main": "index.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Oraichain Labs",
+  "license": "MIT",
+  "dependencies": {
+    "@cosmjs/amino": "^0.31.0",
+    "@cosmjs/cosmwasm-stargate": "^0.31.0",
+    "@cosmjs/crypto": "^0.31.0",
+    "@cosmjs/proto-signing": "^0.31.0",
+    "@cosmjs/stargate": "^0.31.0",
+    "cosmjs-types": "^0.8.0",
+    "@oraichain/common-contracts-build": "1.0.26",
+    "@oraichain/common-contracts-sdk": "1.0.24"
+  }
+}
