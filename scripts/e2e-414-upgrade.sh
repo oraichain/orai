@@ -3,7 +3,7 @@
 # setup the network using the old binary
 
 OLD_VERSION=${OLD_VERSION:-"v0.41.3"}
-WASM_PATH=${WASM_PATH:-"../oraiwasm/package/plus/swapmap/artifacts/swapmap.wasm"}
+WASM_PATH=${WASM_PATH:-"./scripts/wasm_file/swapmap.wasm"}
 ARGS="--chain-id testing -y --keyring-backend test --fees 200orai --gas auto --gas-adjustment 1.5 -b block"
 NEW_VERSION=${NEW_VERSION:-"v0.41.4"}
 VALIDATOR_HOME=${VALIDATOR_HOME:-"$HOME/.oraid/validator1"}
@@ -34,9 +34,9 @@ oraid tx gov vote 1 yes --from validator1 --home "$HOME/.oraid/validator1" $ARGS
 
 # sleep to wait til the proposal passes
 echo "Sleep til the proposal passes..."
-sleep 45s
+sleep 1m
 
-# kill all processes when lastest height = UPGRADE_HEIGHT - 1 = 29
+# kill all processes
 pkill oraid && sleep 3s
 
 # install new binary for the upgrade
