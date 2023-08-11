@@ -62,13 +62,23 @@ oraid tx wasm execute $contract_address $EXECUTE_MSG --from validator1 $ARGS --h
 
 height_before=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 
+re='^[0-9]+$'
+if ! [[ $height_before =~ $re ]] ; then
+   echo "error: Not a number" >&2; exit 1
+fi
+
 sleep 30s
 
 height_after=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 
+re='^[0-9]+$'
+if ! [[ $height_after =~ $re ]] ; then
+   echo "error: Not a number" >&2; exit 1
+fi
+
 if [ $height_after -gt $height_before ]
 then
-echo "Test done"
+echo "Test Passed"
 else
-echo "Test failed"
+echo "Test Failed"
 fi
