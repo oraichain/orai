@@ -9,7 +9,6 @@ require (
 	github.com/cosmos/ibc-go/v4 v4.3.1
 	github.com/cosmos/interchain-accounts v0.2.6
 	github.com/gorilla/mux v1.8.0
-	github.com/oasisprotocol/oasis-core/go v0.2012.4
 	github.com/osmosis-labs/osmosis/x/ibc-hooks v0.0.0-20230201151635-ef43e092d196
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.14.0
