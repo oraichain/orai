@@ -320,7 +320,7 @@
   resolved "https://registry.yarnpkg.com/@oraichain/cosmwasm-vm-zk-nodejs/-/cosmwasm-vm-zk-nodejs-0.0.7.tgz#d640c4a144c35157ac0e4292a02b92e357d90cf0"
   integrity sha512-ZbRFSWL81a/gDrPUsHzpwOttI0SdGNrYEDcmGGcl4cN0853XAzFkYt71PM2xckWZ0Mlh21erbTpZJNTFH78FYg==
 
-"@oraichain/cw-simulate@^2.8.35":
+"@oraichain/cw-simulate@^2.8.47":
   version "2.8.49"
   resolved "https://registry.yarnpkg.com/@oraichain/cw-simulate/-/cw-simulate-2.8.49.tgz#d44eb608824deb615a68960cd0273344a92cb1e6"
   integrity sha512-LuDp31e7oSItogdjwN+rR4ZEmMXRkptYkGptYyB0ldNpZyX+IukqIhHQ768Sm6sBHGsM4599o5eqQK6z6/tFGA==
