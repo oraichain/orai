@@ -1,34 +1,15 @@
 import { GasPrice } from "@cosmjs/stargate";
 import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
-import { spawn } from "child_process";
-import { __dirname, deployMultiExecuteContract } from "./utils.mjs";
+import {
+  __dirname,
+  deployMultiExecuteContract,
+  executeSpawn,
+} from "./utils.mjs";
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
 import "dotenv/config";
 import path from "path";
 
 const scriptPath = path.join(__dirname, "..", "scripts");
-
-async function executeSpawn(command, params) {
-  const proc = spawn(command, params);
-  proc.stderr.pipe(process.stdout);
-
-  return new Promise((resolve, reject) => {
-    proc.stdout.on("data", function (data) {
-      console.log(data.toString());
-    });
-
-    // proc.stderr.on("data", function (data) {
-    //   //   console.log("stderr: " + data.toString());
-    //   //   reject(data.toString());
-    // });
-
-    proc.on("exit", function (code) {
-      // console.log("child process exited with code ", code);
-      if (code === 0) resolve(code);
-      reject(code);
-    });
-  });
-}
 
 async function initCosmWasmClient() {
   const wallet = await DirectSecp256k1HdWallet.fromMnemonic(

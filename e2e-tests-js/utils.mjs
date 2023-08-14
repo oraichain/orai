@@ -1,8 +1,31 @@
 import { fileURLToPath } from "url";
 import path from "path";
 import { readFileSync } from "fs";
+import { spawn } from "child_process";
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);
+
+export async function executeSpawn(command, params) {
+  const proc = spawn(command, params);
+  proc.stderr.pipe(process.stdout);
+
+  return new Promise((resolve, reject) => {
+    proc.stdout.on("data", function (data) {
+      console.log(data.toString());
+    });
+
+    // proc.stderr.on("data", function (data) {
+    //   //   console.log("stderr: " + data.toString());
+    //   //   reject(data.toString());
+    // });
+
+    proc.on("exit", function (code) {
+      // console.log("child process exited with code ", code);
+      if (code === 0) resolve(code);
+      reject(code);
+    });
+  });
+}
 
 function getContractDir(contractDir, name) {
   return path.join(contractDir, name + ".wasm");
