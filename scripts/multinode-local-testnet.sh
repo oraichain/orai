@@ -144,6 +144,8 @@ sleep 7
 
 oraid tx send $(oraid keys show validator1 -a --keyring-backend=test --home=$HOME/.oraid/validator1) $(oraid keys show validator2 -a --keyring-backend=test --home=$HOME/.oraid/validator2) 5000000000orai --keyring-backend=test --home=$HOME/.oraid/validator1 --chain-id=testing --broadcast-mode block --gas 200000 --fees 2orai --node http://localhost:26657 --yes
 oraid tx send $(oraid keys show validator1 -a --keyring-backend=test --home=$HOME/.oraid/validator1) $(oraid keys show validator3 -a --keyring-backend=test --home=$HOME/.oraid/validator3) 4000000000orai --keyring-backend=test --home=$HOME/.oraid/validator1 --chain-id=testing --broadcast-mode block --gas 200000 --fees 2orai --node http://localhost:26657 --yes
+# send test orai to a test account
+oraid tx send $(oraid keys show validator1 -a --keyring-backend=test --home=$HOME/.oraid/validator1) orai14n3tx8s5ftzhlxvq0w5962v60vd82h30rha573 5000000000orai --keyring-backend=test --home=$HOME/.oraid/validator1 --chain-id=testing --broadcast-mode block --gas 200000 --fees 2orai --node http://localhost:26657 --yes
 
 # create second & third validator
 oraid tx staking create-validator --amount=500000000orai --from=validator2 --pubkey=$(oraid tendermint show-validator --home=$HOME/.oraid/validator2) --moniker="validator2" --chain-id="testing" --commission-rate="0.1" --commission-max-rate="0.2" --commission-max-change-rate="0.05" --min-self-delegation="500000000" --keyring-backend=test --home=$HOME/.oraid/validator2 --broadcast-mode block --gas 200000 --fees 2orai --node http://localhost:26657 --yes
