@@ -1,9 +1,6 @@
 import { StargateClient } from "@cosmjs/stargate";
 import { spawn } from "child_process";
-import { fileURLToPath } from "url";
-import path from "path";
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { __dirname } from "./utils.mjs";
 
 const scriptPath = path.join(__dirname, "..", "scripts");
 

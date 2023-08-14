@@ -16,6 +16,7 @@
     "@cosmjs/stargate": "^0.31.0",
     "cosmjs-types": "^0.8.0",
     "@oraichain/common-contracts-build": "1.0.26",
-    "@oraichain/common-contracts-sdk": "1.0.24"
+    "@oraichain/common-contracts-sdk": "1.0.24",
+    "@oraichain/cw-simulate": "^2.8.35"
   }
 }
