@@ -7,7 +7,6 @@ moniker="NODE_SYNC"
 
 # make orai state sync directories
 mkdir .oraid
-mkdir .oraid/state_sync
 
 SNAP_IP3="134.209.106.91"
 SNAP_IP2="35.227.96.96"
@@ -40,14 +39,14 @@ PEER1="$PEER_ID@$SNAP_IP1:$PEER_P2P_PORT"
 PEER="$PEER_ID@$SNAP_IP:$PEER_P2P_PORT"
 
 # MAKE HOME FOLDER AND GET GENESIS
-oraid init $moniker --chain-id $CHAIN_ID --home=.oraid/state_sync
-wget -O .oraid/state_sync/config/genesis.json https://raw.githubusercontent.com/oraichain/oraichain-static-files/master/genesis.json
+oraid init $moniker --chain-id $CHAIN_ID --home=.oraid
+wget -O .oraid/config/genesis.json https://raw.githubusercontent.com/oraichain/oraichain-static-files/master/genesis.json
 
 # reset the node
-oraid tendermint unsafe-reset-all --home=.oraid/state_sync
+oraid tendermint unsafe-reset-all --home=.oraid
 
 # change app.toml values
-STATESYNC_APP_TOML=.oraid/state_sync/config/app.toml
+STATESYNC_APP_TOML=.oraid/config/app.toml
 
 # state_sync
 sed -i -E 's|tcp://0.0.0.0:1317|tcp://0.0.0.0:1350|g' $STATESYNC_APP_TOML
@@ -55,7 +54,7 @@ sed -i -E 's|0.0.0.0:9090|0.0.0.0:9080|g' $STATESYNC_APP_TOML
 sed -i -E 's|0.0.0.0:9091|0.0.0.0:9081|g' $STATESYNC_APP_TOML
 
 # change config.toml values
-STATESYNC_CONFIG=.oraid/state_sync/config/config.toml
+STATESYNC_CONFIG=.oraid/config/config.toml
 
 # state sync node
 sed -i -E 's|tcp://127.0.0.1:26658|tcp://0.0.0.0:26648|g' $STATESYNC_CONFIG
@@ -99,4 +98,4 @@ echo "Waiting 1 seconds to start state sync"
 sleep 1
 
 # THERE, NOW IT'S SYNCED AND YOU CAN PLAY
-oraid start --home=.oraid/state_sync --minimum-gas-prices=0.00001orai
+oraid start --home=.oraid --minimum-gas-prices=0.00001orai
