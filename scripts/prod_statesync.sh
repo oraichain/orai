@@ -8,10 +8,10 @@ moniker="NODE_SYNC"
 # make orai state sync directories
 mkdir .oraid
 
-SNAP_IP3="134.209.106.91"
-SNAP_IP2="35.227.96.96"
-SNAP_IP1="3.134.19.98"
-SNAP_IP="35.237.59.125"
+SNAP_IP3=${SNAP_IP3:-"134.209.106.91"}
+SNAP_IP2=${SNAP_IP2:-"35.227.96.96"}
+SNAP_IP1=${SNAP_IP1:-"3.134.19.98"}
+SNAP_IP=${SNAP_IP:-"35.237.59.125"}
 CHAIN_ID="Oraichain"
 TRUST_HEIGHT_RANGE=${TRUST_HEIGHT_RANGE:-10000}
 
@@ -84,9 +84,9 @@ s|^(allow_duplicate_ip[[:space:]]+=[[:space:]]+).*$|\1true| ; \
 
 s|^(addr_book_strict[[:space:]]+=[[:space:]]+).*$|\1false| ; \
 
-s|^(persistent_peers[[:space:]]+=[[:space:]]+).*$|\1\"$PEER,$PEER1,$PEER2\"| ; \
+s|^(persistent_peers[[:space:]]+=[[:space:]]+).*$|\1\"$PEER,$PEER1,$PEER2,$PEER3\"| ; \
 
-s|^(rpc_servers[[:space:]]+=[[:space:]]+).*$|\1\"$SNAP_RPC,$SNAP_RPC1,$SNAP_RPC2\"| ; \
+s|^(rpc_servers[[:space:]]+=[[:space:]]+).*$|\1\"$SNAP_RPC,$SNAP_RPC1,$SNAP_RPC2,$SNAP_RPC3\"| ; \
 
 s|^(trust_height[[:space:]]+=[[:space:]]+).*$|\1$BLOCK_HEIGHT| ; \
 
