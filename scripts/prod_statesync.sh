@@ -9,25 +9,39 @@ moniker="NODE_SYNC"
 mkdir .oraid
 mkdir .oraid/state_sync
 
-SNAP_RPC2="http://0.0.0.0:26651"
-SNAP_RPC1="http://0.0.0.0:26657"
-SNAP_RPC="http://0.0.0.0:26654"
-CHAIN_ID="testing"
+SNAP_IP3="134.209.106.91"
+SNAP_IP2="35.227.96.96"
+SNAP_IP1="3.134.19.98"
+SNAP_IP="35.237.59.125"
+CHAIN_ID="Oraichain"
 TRUST_HEIGHT_RANGE=${TRUST_HEIGHT_RANGE:-10000}
 
 PEER_RPC_PORT=26657
 PEER_P2P_PORT=26656
-PEER_ID=$(curl --no-progress-meter http://0.0.0.0:$PEER_RPC_PORT/status | jq -r '.result.node_info.id')
 
+SNAP_RPC3=http://$SNAP_IP3:$PEER_RPC_PORT
+SNAP_RPC2=http://$SNAP_IP2:$PEER_RPC_PORT
+SNAP_RPC1=http://$SNAP_IP1:$PEER_RPC_PORT
+SNAP_RPC=http://$SNAP_IP:$PEER_RPC_PORT
+
+PEER_ID3=$(curl --no-progress-meter $SNAP_RPC3/status | jq -r '.result.node_info.id')
+PEER_ID2=$(curl --no-progress-meter $SNAP_RPC2/status | jq -r '.result.node_info.id')
+PEER_ID1=$(curl --no-progress-meter $SNAP_RPC1/status | jq -r '.result.node_info.id')
+PEER_ID=$(curl --no-progress-meter $SNAP_RPC/status | jq -r '.result.node_info.id')
+
+echo "peer id 2: $PEER_ID2"
+echo "peer id 1: $PEER_ID1"
 echo "peer id: $PEER_ID"
 
 # persistent_peers
-PEER="$PEER_ID@0.0.0.0:$PEER_P2P_PORT"
+PEER3="$PEER_ID@$SNAP_IP3:$PEER_P2P_PORT"
+PEER2="$PEER_ID@$SNAP_IP2:$PEER_P2P_PORT"
+PEER1="$PEER_ID@$SNAP_IP1:$PEER_P2P_PORT"
+PEER="$PEER_ID@$SNAP_IP:$PEER_P2P_PORT"
 
 # MAKE HOME FOLDER AND GET GENESIS
 oraid init $moniker --chain-id $CHAIN_ID --home=.oraid/state_sync
-cp ~/.oraid/validator1/config/genesis.json .oraid/state_sync/config
-# cp -R ~/.oraid/validator1/wasm .oraid/state_sync/
+wget -O .oraid/state_sync/config/genesis.json https://raw.githubusercontent.com/oraichain/oraichain-static-files/master/genesis.json
 
 # reset the node
 oraid tendermint unsafe-reset-all --home=.oraid/state_sync
@@ -56,9 +70,9 @@ sed -i -e "s%^moniker *=.*%moniker = \"$moniker\"%; " $STATESYNC_CONFIG
 sed -i -e "s%^indexer *=.*%indexer = \"null\"%; " $STATESYNC_CONFIG
 
 # GET TRUST HASH AND TRUST HEIGHT
-LATEST_HEIGHT=$(curl -s $SNAP_RPC/block | jq -r .result.block.header.height); \
+LATEST_HEIGHT=$(curl -s $SNAP_RPC2/block | jq -r .result.block.header.height); \
 BLOCK_HEIGHT=$((LATEST_HEIGHT - $TRUST_HEIGHT_RANGE)); \
-TRUST_HASH=$(curl -s "$SNAP_RPC/block?height=$BLOCK_HEIGHT" | jq -r .result.block_id.hash)
+TRUST_HASH=$(curl -s "$SNAP_RPC2/block?height=$BLOCK_HEIGHT" | jq -r .result.block_id.hash)
 
 # TELL USER WHAT WE ARE DOING
 echo "LATEST HEIGHT: $LATEST_HEIGHT"
@@ -71,7 +85,7 @@ s|^(allow_duplicate_ip[[:space:]]+=[[:space:]]+).*$|\1true| ; \
 
 s|^(addr_book_strict[[:space:]]+=[[:space:]]+).*$|\1false| ; \
 
-s|^(persistent_peers[[:space:]]+=[[:space:]]+).*$|\1\"$PEER\"| ; \
+s|^(persistent_peers[[:space:]]+=[[:space:]]+).*$|\1\"$PEER,$PEER1,$PEER2\"| ; \
 
 s|^(rpc_servers[[:space:]]+=[[:space:]]+).*$|\1\"$SNAP_RPC,$SNAP_RPC1,$SNAP_RPC2\"| ; \
 
@@ -85,4 +99,4 @@ echo "Waiting 1 seconds to start state sync"
 sleep 1
 
 # THERE, NOW IT'S SYNCED AND YOU CAN PLAY
-screen -S state_sync -d -m oraid start --home=.oraid/state_sync --minimum-gas-prices=0.00001orai
+oraid start --home=.oraid/state_sync --minimum-gas-prices=0.00001orai
