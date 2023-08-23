@@ -172,7 +172,7 @@ replace (
 	// use Oraichain fork of cometbft
 	// go list -m -json github.com/oraichain/cometbft@482cde0c4e04479d4164b1b4f7a0b90071c58b7f | jq '.|"\(.Path) \(.Version)"' -r
 	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20230711110635-482cde0c4e04
-	google.golang.org/grpc => google.golang.org/grpc v1.33.2
+	google.golang.org/grpc => google.golang.org/grpc v1.52.3
 
 // Fix upstream GHSA-h395-qcrw-5vmq vulnerability.
 // TODO Remove it: https://github.com/cosmos/cosmos-sdk/issues/10409
