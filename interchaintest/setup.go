@@ -25,7 +25,7 @@ var (
 		Name:                "juno",
 		ChainID:             "juno-2",
 		Images:              []ibc.DockerImage{JunoImage},
-		Bin:                 "junod",
+		Bin:                 "oraid",
 		Bech32Prefix:        "juno",
 		Denom:               "ujuno",
 		CoinType:            "118",

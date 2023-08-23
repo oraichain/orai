@@ -29,7 +29,7 @@ func ExecuteMsgWithAmount(t *testing.T, ctx context.Context, chain *cosmos.Cosmo
 	// amount is #utoken
 
 	// There has to be a way to do this in ictest?
-	cmd := []string{"junod", "tx", "wasm", "execute", contractAddr, message,
+	cmd := []string{"oraid", "tx", "wasm", "execute", contractAddr, message,
 		"--node", chain.GetRPCAddress(),
 		"--home", chain.HomeDir(),
 		"--chain-id", chain.Config().ChainID,
@@ -54,7 +54,7 @@ func ExecuteMsgWithFee(t *testing.T, ctx context.Context, chain *cosmos.CosmosCh
 	// amount is #utoken
 
 	// There has to be a way to do this in ictest?
-	cmd := []string{"junod", "tx", "wasm", "execute", contractAddr, message,
+	cmd := []string{"oraid", "tx", "wasm", "execute", contractAddr, message,
 		"--node", chain.GetRPCAddress(),
 		"--home", chain.HomeDir(),
 		"--chain-id", chain.Config().ChainID,

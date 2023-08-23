@@ -13,7 +13,7 @@ import (
 
 func RegisterFeeShare(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, user ibc.Wallet, contract, withdrawAddr string) {
 	// TF gas to create cost 2mil, so we set to 2.5 to be safe
-	cmd := []string{"junod", "tx", "feeshare", "register", contract, withdrawAddr,
+	cmd := []string{"oraid", "tx", "feeshare", "register", contract, withdrawAddr,
 		"--node", chain.GetRPCAddress(),
 		"--home", chain.HomeDir(),
 		"--chain-id", chain.Config().ChainID,
