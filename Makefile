@@ -94,6 +94,18 @@ install: go.sum
 build:
 	go build $(BUILD_FLAGS) -o build/oraid ./cmd/oraid
 
+
+###############################################################################
+###                                  local-image                            ###
+###############################################################################
+
+
+local-image:
+	@echo "--> Building oraid local image"
+	@docker build -t orai:local .
+
+
+.PHONY: local-image
   # the oraid binary will be built to the root directory of the project (if in docker container then it's workspace/oraid)
 
 ###############################################################################
