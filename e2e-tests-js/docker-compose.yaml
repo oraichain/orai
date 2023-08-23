@@ -1,0 +1,31 @@
+version: '3.3'
+services:
+  earth:
+    image: alpine:3.12
+    tty: true
+    env_file:
+      - ../orai/.env
+    environment:
+      - DENOM=earth
+      - CHAIN_ID=Earth
+    working_dir: /workspace
+    command: /workspace/scripts/setup_genesis.sh
+    volumes:
+      - ./.earth:/workspace/.earth
+      - ../orai/scripts:/workspace/scripts
+      - ../orai/build:/usr/local/bin      
+
+  mars:
+    image: alpine:3.12
+    tty: true
+    env_file:
+      - ../orai/.env
+    environment:
+      - DENOM=mars
+      - CHAIN_ID=Mars
+    working_dir: /workspace
+    command: /workspace/scripts/setup_genesis.sh
+    volumes:
+      - ./.mars:/workspace/.mars
+      - ../orai/scripts:/workspace/scripts
+      - ../orai/build:/usr/local/bin      
