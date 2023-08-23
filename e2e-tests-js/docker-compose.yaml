@@ -29,3 +29,13 @@ services:
       - ./.mars:/workspace/.mars
       - ../orai/scripts:/workspace/scripts
       - ../orai/build:/usr/local/bin      
+
+  ibc:
+    image: node:18-alpine3.13
+    working_dir: /workspace
+    tty: true
+    ports:
+      - 8888:80
+    volumes:
+      - ./:/workspace      
+    command: yarn start    

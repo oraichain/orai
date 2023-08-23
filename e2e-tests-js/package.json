@@ -19,5 +19,8 @@
     "@oraichain/cw-simulate": "^2.8.47",
     "cosmjs-types": "^0.8.0",
     "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@confio/relayer": "^0.10.0"
   }
 }
