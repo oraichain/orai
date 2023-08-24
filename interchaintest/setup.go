@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	simappparams "github.com/cosmos/cosmos-sdk/simapp/params"
 	"github.com/docker/docker/client"
 	interchaintest "github.com/strangelove-ventures/interchaintest/v4"
@@ -21,7 +22,7 @@ import (
 var (
 	VotingPeriod     = "15s"
 	MaxDepositPeriod = "10s"
-	Denom            = "uorai"
+	Denom            = "orai"
 
 	IBCRelayerImage   = "ghcr.io/cosmos/relayer"
 	IBCRelayerVersion = "main"
@@ -34,15 +35,15 @@ var (
 
 	defaultGenesisKV = []cosmos.GenesisKV{
 		{
-			Key:   "app_state.gov.params.voting_period",
+			Key:   "app_state.gov.voting_params.voting_period",
 			Value: VotingPeriod,
 		},
 		{
-			Key:   "app_state.gov.params.max_deposit_period",
+			Key:   "app_state.gov.deposit_params.max_deposit_period",
 			Value: MaxDepositPeriod,
 		},
 		{
-			Key:   "app_state.gov.params.min_deposit.0.denom",
+			Key:   "app_state.gov.deposit_params.min_deposit.0.denom",
 			Value: Denom,
 		},
 	}
@@ -78,7 +79,7 @@ func init() {
 func junoEncoding() *simappparams.EncodingConfig {
 	cfg := cosmos.DefaultEncoding()
 	// register custom types
-	// wasmtypes.RegisterInterfaces(cfg.InterfaceRegistry)
+	wasmtypes.RegisterInterfaces(cfg.InterfaceRegistry)
 	ibclocalhost.RegisterInterfaces(cfg.InterfaceRegistry)
 
 	return &cfg

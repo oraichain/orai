@@ -33,8 +33,6 @@ func TestOraiIBCHooks(t *testing.T) {
 	cfg2.Name = "orai-counterparty"
 	cfg2.ChainID = "counterparty-2"
 
-	fmt.Println("cfg2", cfg2)
-
 	cf := interchaintest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*interchaintest.ChainSpec{
 		{
 			Name:          "orai",
@@ -43,7 +41,7 @@ func TestOraiIBCHooks(t *testing.T) {
 			NumFullNodes:  &numFullNodes,
 		},
 		{
-			Name:          "gaia",
+			Name:          "orai2",
 			ChainConfig:   cfg2,
 			NumValidators: &numVals,
 			NumFullNodes:  &numFullNodes,
@@ -103,17 +101,23 @@ func TestOraiIBCHooks(t *testing.T) {
 	})
 
 	// Create some user accounts on both chains
-	users := interchaintest.GetAndFundTestUsers(t, ctx, t.Name(), genesisWalletAmount, orai, orai2)
 
+	users := make([]ibc.Wallet, 0, 10)
+
+	users = append(users,
+		helpers.GetAndFundTestUserWithMnemonic(t, ctx, t.Name(), "", genesisWalletAmount, orai),
+		helpers.GetAndFundTestUserWithMnemonic(t, ctx, t.Name(), "", genesisWalletAmount, orai2),
+	)
+	// users.app
 	// Wait a few blocks for relayer to start and for user accounts to be created
 	err = testutil.WaitForBlocks(ctx, 5, orai, orai2)
 	require.NoError(t, err)
 
 	// Get our Bech32 encoded user addresses
-	junoUser, juno2User := users[0], users[1]
+	oraiUser, orai2User := users[0], users[1]
 
-	junoUserAddr := junoUser.FormattedAddress()
-	// juno2UserAddr := juno2User.FormattedAddress()
+	oraiUserAddr := oraiUser.FormattedAddress()
+	// orai2UserAddr := orai2User.FormattedAddress()
 
 	channel, err := ibc.GetTransferChannel(ctx, r, eRep, orai.Config().ChainID, orai2.Config().ChainID)
 	require.NoError(t, err)
@@ -130,7 +134,7 @@ func TestOraiIBCHooks(t *testing.T) {
 		},
 	)
 
-	_, contractAddr := helpers.SetupContract(t, ctx, orai2, juno2User.KeyName(), "contracts/ibchooks_counter.wasm", `{"count":0}`)
+	_, contractAddr := helpers.SetupContract(t, ctx, orai2, orai2User.KeyName(), "contracts/ibchooks_counter.wasm", `{"count":0}`)
 
 	// do an ibc transfer through the memo to the other chain.
 	transfer := ibc.WalletAmount{
@@ -140,11 +144,11 @@ func TestOraiIBCHooks(t *testing.T) {
 	}
 
 	memo := ibc.TransferOptions{
-		Memo: fmt.Sprintf(`{"wasm":{"contract":"%s","msg":%s}}`, contractAddr, `{"increment":{}}`),
+		Memo: fmt.Sprintf(``),
 	}
 
 	// Initial transfer. Account is created by the wasm execute is not so we must do this twice to properly set up
-	transferTx, err := orai.SendIBCTransfer(ctx, channel.ChannelID, junoUser.KeyName(), transfer, memo)
+	transferTx, err := orai.SendIBCTransfer(ctx, channel.ChannelID, oraiUser.KeyName(), transfer, memo)
 	require.NoError(t, err)
 	junoHeight, err := orai.Height(ctx)
 	require.NoError(t, err)
@@ -153,7 +157,7 @@ func TestOraiIBCHooks(t *testing.T) {
 	require.NoError(t, err)
 
 	// Second time, this will make the counter == 1 since the account is now created.
-	transferTx, err = orai.SendIBCTransfer(ctx, channel.ChannelID, junoUser.KeyName(), transfer, memo)
+	transferTx, err = orai.SendIBCTransfer(ctx, channel.ChannelID, oraiUser.KeyName(), transfer, memo)
 	require.NoError(t, err)
 	junoHeight, err = orai.Height(ctx)
 	require.NoError(t, err)
@@ -162,7 +166,7 @@ func TestOraiIBCHooks(t *testing.T) {
 	require.NoError(t, err)
 
 	// Get the address on the other chain's side
-	addr := helpers.GetIBCHooksUserAddress(t, ctx, orai, channel.ChannelID, junoUserAddr)
+	addr := helpers.GetIBCHooksUserAddress(t, ctx, orai, channel.ChannelID, oraiUserAddr)
 	require.NotEmpty(t, addr)
 
 	// Get funds on the receiving chain

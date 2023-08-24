@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/oraichain/orai/tests/interchaintest/helpers"
 	"github.com/strangelove-ventures/interchaintest/v4"
 	"github.com/strangelove-ventures/interchaintest/v4/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v4/ibc"
@@ -31,7 +32,7 @@ func TestOraiGaiaIBCTransfer(t *testing.T) {
 
 	cf := interchaintest.NewBuiltinChainFactory(zaptest.NewLogger(t), []*interchaintest.ChainSpec{
 		{
-			Name:          "gaia",
+			Name:          "orai",
 			ChainConfig:   oraiConfig,
 			NumValidators: &numVals,
 			NumFullNodes:  &numFullNodes,
@@ -96,14 +97,15 @@ func TestOraiGaiaIBCTransfer(t *testing.T) {
 	})
 
 	// Create some user accounts on both chains
-	users := interchaintest.GetAndFundTestUsers(t, ctx, t.Name(), genesisWalletAmount, orai, gaia)
+	oraiUser := helpers.GetAndFundTestUserWithMnemonic(t, ctx, t.Name(), "", genesisWalletAmount, orai)
+	users := interchaintest.GetAndFundTestUsers(t, ctx, t.Name(), genesisWalletAmount, gaia)
 
 	// Wait a few blocks for relayer to start and for user accounts to be created
 	err = testutil.WaitForBlocks(ctx, 5, orai, gaia)
 	require.NoError(t, err)
 
 	// Get our Bech32 encoded user addresses
-	oraiUser, gaiaUser := users[0], users[1]
+	gaiaUser := users[0]
 
 	oraiUserAddr := oraiUser.FormattedAddress()
 	gaiaUserAddr := gaiaUser.FormattedAddress()
