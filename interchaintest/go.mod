@@ -7,8 +7,8 @@ replace (
 	// github.com/cosmos/cosmos-sdk => github.com/cosmos/cosmos-sdk v0.45.13-ics
 	github.com/ChainSafe/go-schnorrkel => github.com/ChainSafe/go-schnorrkel v0.0.0-20200405005733-88cbf1b4c40d
 	github.com/ChainSafe/go-schnorrkel/1 => github.com/ChainSafe/go-schnorrkel v1.0.0
-	github.com/CosmWasm/wasmd => github.com/CosmWasm/wasmd v0.33.0
-	github.com/CosmWasm/wasmvm => github.com/CosmWasm/wasmvm v1.3.0
+	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20230822113616-27ffe7fdd4d1
+	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.2.4
 	github.com/coinbase/rosetta-sdk-go => github.com/coinbase/rosetta-sdk-go v0.7.9
 	github.com/coinbase/rosetta-sdk-go/types => github.com/coinbase/rosetta-sdk-go/types v1.0.0
 	github.com/coinbase/rosetta-sdk-go/types v1.0.0 => github.com/coinbase/rosetta-sdk-go/types v0.8.3

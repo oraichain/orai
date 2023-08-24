@@ -41,7 +41,7 @@ func TestOraiIBCHooks(t *testing.T) {
 			NumFullNodes:  &numFullNodes,
 		},
 		{
-			Name:          "orai2",
+			Name:          "orai-2",
 			ChainConfig:   cfg2,
 			NumValidators: &numVals,
 			NumFullNodes:  &numFullNodes,
@@ -144,7 +144,7 @@ func TestOraiIBCHooks(t *testing.T) {
 	}
 
 	memo := ibc.TransferOptions{
-		Memo: fmt.Sprintf(``),
+		Memo: fmt.Sprintf(`{"wasm":{"contract":"%s","msg":%s}}`, contractAddr, `{"increment":{}}`),
 	}
 
 	// Initial transfer. Account is created by the wasm execute is not so we must do this twice to properly set up
