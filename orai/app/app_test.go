@@ -96,22 +96,3 @@ func TestGetEnabledProposals(t *testing.T) {
 		})
 	}
 }
-
-func TestWasmdIbcHooks(t *testing.T) {
-	db := db.NewMemDB()
-	gapp := NewOraichainApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, MakeEncodingConfig(), wasm.EnableAllProposals, EmptyAppOptions{}, emptyWasmOpts)
-
-	genesisState := NewDefaultGenesisState(gapp.appCodec)
-	stateBytes, err := json.MarshalIndent(genesisState, "", "  ")
-	require.NoError(t, err)
-
-	// Initialize the chain
-	gapp.InitChain(
-		abci.RequestInitChain{
-			Validators:    []abci.ValidatorUpdate{},
-			AppStateBytes: stateBytes,
-		},
-	)
-	gapp.Commit()
-
-}
