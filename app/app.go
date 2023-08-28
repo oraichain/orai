@@ -453,7 +453,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 
 	prefix := sdk.GetConfig().GetBech32AccountAddrPrefix()
 	// set the contract keeper for the Ics20WasmHooks
-	wasmHooks := ibchooks.NewWasmHooks(app.IBCHooksKeeper, app.ContractKeeper, prefix) // The contract keeper needs to be set later
+	wasmHooks := ibchooks.NewWasmHooks(app.IBCHooksKeeper, nil, prefix) // The contract keeper needs to be set later
 	app.Ics20WasmHooks = &wasmHooks
 	app.HooksICS4Wrapper = ibchooks.NewICS4Middleware(
 		app.ibcKeeper.ChannelKeeper,
@@ -556,8 +556,8 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	)
 
 	app.ContractKeeper = wasmkeeper.NewDefaultPermissionKeeper(app.wasmKeeper)
-	fmt.Println("ContractKeeper", app.ContractKeeper)
-	fmt.Println("wasmHooksContract", app.Ics20WasmHooks.ContractKeeper)
+	app.Ics20WasmHooks.ContractKeeper = app.ContractKeeper
+
 	// The gov proposal types can be individually enabled
 	if len(enabledProposals) != 0 {
 		govRouter.AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.wasmKeeper, enabledProposals))

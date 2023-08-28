@@ -16,7 +16,6 @@ COPY doc/statik /workspace/doc/statik
 COPY go.mod /workspace/
 COPY go.sum /workspace/
 COPY Makefile /workspace/
-COPY local-module/ tmp
 
 # See https://github.com/Oraichain/wasmvm/releases (tag v1.2.0)
 RUN wget -O /lib/libwasmvm_muslc.a https://github.com/oraichain/wasmvm/releases/download/v1.2.4/libwasmvm_muslc.aarch64.a
