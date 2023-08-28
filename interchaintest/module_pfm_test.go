@@ -282,6 +282,8 @@ func TestPacketForwardMiddlewareRouter(t *testing.T) {
 
 		chainDBalance, err := chainD.GetBalance(ctx, userD.FormattedAddress(), thirdHopIBCDenom)
 		require.NoError(t, err)
+		err = testutil.WaitForBlocks(ctx, 50, chainA, chainB, chainC, chainD)
+		require.NoError(t, err)
 
 		require.Equal(t, userFunds-transferAmount, chainABalance)
 		require.Equal(t, int64(0), chainBBalance)

@@ -33,9 +33,9 @@ func GetIBCHookTotalFunds(t *testing.T, ctx context.Context, chain *cosmos.Cosmo
 	return res
 }
 
-func GetIBCHookCount(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, contract string, uaddr string) GetCountResponse {
+func GetIBCHookCount(t *testing.T, ctx context.Context, chain *cosmos.CosmosChain, contract string) GetCountResponse {
 	var res GetCountResponse
-	err := chain.QueryContract(ctx, contract, QueryMsg{GetCount: &GetCountQuery{Addr: uaddr}}, &res)
+	err := chain.QueryContract(ctx, contract, QueryMsg{GetCount: &GetCountQuery{}}, &res)
 	require.NoError(t, err)
 	return res
 }

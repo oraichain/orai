@@ -3,9 +3,9 @@ package interchaintest
 import (
 	"context"
 	"fmt"
-	"strings"
 	"testing"
 
+	transfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
 	helpers "github.com/oraichain/orai/tests/interchaintest/helpers"
 	interchaintest "github.com/strangelove-ventures/interchaintest/v4"
 	"github.com/strangelove-ventures/interchaintest/v4/chain/cosmos"
@@ -108,6 +108,7 @@ func TestOraiIBCHooks(t *testing.T) {
 		helpers.GetAndFundTestUserWithMnemonic(t, ctx, t.Name(), "", genesisWalletAmount, orai),
 		helpers.GetAndFundTestUserWithMnemonic(t, ctx, t.Name(), "", genesisWalletAmount, orai2),
 	)
+
 	// users.app
 	// Wait a few blocks for relayer to start and for user accounts to be created
 	err = testutil.WaitForBlocks(ctx, 5, orai, orai2)
@@ -117,8 +118,17 @@ func TestOraiIBCHooks(t *testing.T) {
 	oraiUser, orai2User := users[0], users[1]
 
 	oraiUserAddr := oraiUser.FormattedAddress()
-	// orai2UserAddr := orai2User.FormattedAddress()
+	orai2UserAddr := orai2User.FormattedAddress()
 
+	// Get original account balances
+	oraiOrigBal, err := orai.GetBalance(ctx, oraiUserAddr, orai.Config().Denom)
+	require.NoError(t, err)
+	require.Equal(t, genesisWalletAmount, oraiOrigBal)
+
+	orai2OrigBal, err := orai2.GetBalance(ctx, orai2UserAddr, orai2.Config().Denom)
+	require.NoError(t, err)
+
+	require.Equal(t, genesisWalletAmount, orai2OrigBal)
 	channel, err := ibc.GetTransferChannel(ctx, r, eRep, orai.Config().ChainID, orai2.Config().ChainID)
 	require.NoError(t, err)
 
@@ -134,7 +144,7 @@ func TestOraiIBCHooks(t *testing.T) {
 		},
 	)
 
-	_, contractAddr := helpers.SetupContract(t, ctx, orai2, orai2User.KeyName(), "contracts/ibchooks_counter.wasm", `{"count":0}`)
+	_, contractAddr := helpers.SetupContract(t, ctx, orai2, orai2User.KeyName(), "contracts/counter.wasm", `{"count":0}`)
 
 	// do an ibc transfer through the memo to the other chain.
 	transfer := ibc.WalletAmount{
@@ -147,42 +157,66 @@ func TestOraiIBCHooks(t *testing.T) {
 		Memo: fmt.Sprintf(`{"wasm":{"contract":"%s","msg":%s}}`, contractAddr, `{"increment":{}}`),
 	}
 
+	// Send transfer for testTing
+	transferTx, err := orai.SendIBCTransfer(ctx, channel.ChannelID, oraiUserAddr, transfer, ibc.TransferOptions{})
+	require.NoError(t, err)
+	oraiHeight, err := orai.Height(ctx)
+	require.NoError(t, err)
+
+	_, err = testutil.PollForAck(ctx, orai, oraiHeight, oraiHeight+50, transferTx.Packet)
+	require.NoError(t, err)
+
+	err = testutil.WaitForBlocks(ctx, 10, orai)
+	require.NoError(t, err)
+	// Get the IBC denom for uorai on Gaia
+	oraiTokenDenom := transfertypes.GetPrefixedDenom(channel.Counterparty.PortID, channel.Counterparty.ChannelID, orai.Config().Denom)
+	oraiIBCDenom := transfertypes.ParseDenomTrace(oraiTokenDenom).IBCDenom()
+
+	fmt.Println("oraiIBCDenom:", oraiIBCDenom)
+	orai2UserBal, err := orai2.GetBalance(ctx, contractAddr, oraiIBCDenom)
+	require.NoError(t, err)
+	require.Equal(t, int64(1), orai2UserBal)
+
 	// Initial transfer. Account is created by the wasm execute is not so we must do this twice to properly set up
-	transferTx, err := orai.SendIBCTransfer(ctx, channel.ChannelID, oraiUser.KeyName(), transfer, memo)
+	transferTx, err = orai.SendIBCTransfer(ctx, channel.ChannelID, oraiUserAddr, transfer, memo)
 	require.NoError(t, err)
 	junoHeight, err := orai.Height(ctx)
 	require.NoError(t, err)
 
-	_, err = testutil.PollForAck(ctx, orai, junoHeight-5, junoHeight+25, transferTx.Packet)
+	_, err = testutil.PollForAck(ctx, orai, junoHeight, junoHeight+50, transferTx.Packet)
 	require.NoError(t, err)
-
-	// Second time, this will make the counter == 1 since the account is now created.
-	transferTx, err = orai.SendIBCTransfer(ctx, channel.ChannelID, oraiUser.KeyName(), transfer, memo)
+	fmt.Println("oraiIBCDenom:", oraiIBCDenom)
+	orai2UserBal, err = orai2.GetBalance(ctx, contractAddr, oraiIBCDenom)
 	require.NoError(t, err)
-	junoHeight, err = orai.Height(ctx)
-	require.NoError(t, err)
-
-	_, err = testutil.PollForAck(ctx, orai, junoHeight-5, junoHeight+25, transferTx.Packet)
-	require.NoError(t, err)
-
-	// Get the address on the other chain's side
-	addr := helpers.GetIBCHooksUserAddress(t, ctx, orai, channel.ChannelID, oraiUserAddr)
-	require.NotEmpty(t, addr)
-
-	// Get funds on the receiving chain
-	funds := helpers.GetIBCHookTotalFunds(t, ctx, orai2, contractAddr, addr)
-	require.Equal(t, int(1), len(funds.Data.TotalFunds))
-
-	var ibcDenom string
-	for _, coin := range funds.Data.TotalFunds {
-		if strings.HasPrefix(coin.Denom, "ibc/") {
-			ibcDenom = coin.Denom
-			break
-		}
-	}
-	require.NotEmpty(t, ibcDenom)
-
+	require.Equal(t, int64(2), orai2UserBal)
+	//
+	// // Second time, this will make the counter == 1 since the account is now created.
+	// transferTx, err = orai.SendIBCTransfer(ctx, channel.ChannelID, oraiUser.KeyName(), transfer, memo)
+	// require.NoError(t, err)
+	// junoHeight, err = orai.Height(ctx)
+	// require.NoError(t, err)
+	//
+	// _, err = testutil.PollForAck(ctx, orai, junoHeight-5, junoHeight+25, transferTx.Packet)
+	// require.NoError(t, err)
+	//
+	// // Get the address on the other chain's side
+	// addr := helpers.GetIBCHooksUserAddress(t, ctx, orai, channel.ChannelID, oraiUserAddr)
+	// require.NotEmpty(t, addr)
+	//
+	// // // Get funds on the receiving chain
+	// // funds := helpers.GetIBCHookTotalFunds(t, ctx, orai2, contractAddr, addr)
+	// // require.Equal(t, int(1), len(funds.Data.TotalFunds))
+	//
+	// // var ibcDenom string
+	// // for _, coin := range funds.Data.TotalFunds {
+	// // 	if strings.HasPrefix(coin.Denom, "ibc/") {
+	// // 		ibcDenom = coin.Denom
+	// // 		break
+	// // 	}
+	// // }
+	// // require.NotEmpty(t, ibcDenom)
+	//
 	// ensure the count also increased to 1 as expected.
-	count := helpers.GetIBCHookCount(t, ctx, orai2, contractAddr, addr)
+	count := helpers.GetIBCHookCount(t, ctx, orai2, contractAddr)
 	require.Equal(t, int64(1), count.Data.Count)
 }

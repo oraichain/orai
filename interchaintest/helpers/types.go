@@ -73,14 +73,15 @@ type WasmCoin struct {
 	Amount string `json:"amount"`
 }
 
-type GetCountQuery struct {
-	// {"get_total_funds":{"addr":"juno1..."}}
-	Addr string `json:"addr"`
-}
-type GetCountResponse struct {
-	// {"data":{"count":0}}
-	Data *GetCountObj `json:"data"`
-}
+type (
+	GetCountQuery    struct{}
+	GetCountResponse struct {
+		// {"data":{"count":0}}
+		Data *GetCountObj `json:"data"`
+	}
+)
+
 type GetCountObj struct {
 	Count int64 `json:"count"`
 }
+
