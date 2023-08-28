@@ -16,6 +16,14 @@ import (
 
 var emptyWasmOpts []wasm.Option = nil
 
+// EmptyAppOptions is a stub implementing AppOptions
+type EmptyAppOptions struct{}
+
+// Get implements AppOptions
+func (ao EmptyAppOptions) Get(o string) interface{} {
+	return nil
+}
+
 func TestWasmdExport(t *testing.T) {
 	db := db.NewMemDB()
 	gapp := NewOraichainApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, MakeEncodingConfig(), wasm.EnableAllProposals, EmptyAppOptions{}, emptyWasmOpts)
@@ -85,12 +93,13 @@ func TestGetEnabledProposals(t *testing.T) {
 	}
 }
 
-func setGenesis(gapp *OraichainApp) error {
+func TestWasmdIbcHooks(t *testing.T) {
+	db := db.NewMemDB()
+	gapp := NewOraichainApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, MakeEncodingConfig(), wasm.EnableAllProposals, EmptyAppOptions{}, emptyWasmOpts)
+
 	genesisState := NewDefaultGenesisState(gapp.appCodec)
-	stateBytes, err := json.MarshalIndent(genesisState, "", " ")
-	if err != nil {
-		return err
-	}
+	stateBytes, err := json.MarshalIndent(genesisState, "", "  ")
+	require.NoError(t, err)
 
 	// Initialize the chain
 	gapp.InitChain(
@@ -99,7 +108,6 @@ func setGenesis(gapp *OraichainApp) error {
 			AppStateBytes: stateBytes,
 		},
 	)
-
 	gapp.Commit()
-	return nil
+
 }
