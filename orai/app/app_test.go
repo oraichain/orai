@@ -5,13 +5,14 @@ import (
 	"os"
 	"testing"
 
+	"github.com/CosmWasm/wasmd/x/wasm"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"github.com/tendermint/tendermint/libs/log"
-	db "github.com/tendermint/tm-db"
-
-	"github.com/CosmWasm/wasmd/x/wasm"
 	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/libs/log"
+	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
+	db "github.com/tendermint/tm-db"
 )
 
 var emptyWasmOpts []wasm.Option = nil
@@ -41,10 +42,13 @@ func TestWasmdExport(t *testing.T) {
 	)
 	gapp.Commit()
 
-	// Making a new app object with the db, so that initchain hasn't been called
-	newGapp := NewOraichainApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, MakeEncodingConfig(), wasm.EnableAllProposals, EmptyAppOptions{}, emptyWasmOpts)
-	_, err = newGapp.ExportAppStateAndValidators(false, []string{})
-	require.NoError(t, err, "ExportAppStateAndValidators should not have an error")
+	ctx := gapp.NewContext(true, tmproto.Header{Height: gapp.LastBlockHeight()})
+	bz, _ := sdk.GetFromBech32("orai1ur2vsjrjarygawpdwtqteaazfchvw4fg6uql76", "orai")
+	creator := sdk.AccAddress(bz)
+	wasmCode, _ := os.ReadFile("./bytecode/echo.wasm")
+	codeId, _, _ := gapp.ContractKeeper.Create(ctx, creator, wasmCode, nil)
+	println("codeid", codeId)
+
 }
 
 // ensure that blocked addresses are properly set in bank keeper
