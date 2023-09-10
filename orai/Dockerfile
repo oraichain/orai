@@ -9,26 +9,24 @@ RUN apk add upx bash jq
 # RUN apk add libusb-dev linux-headers
 
 WORKDIR /workspace
-COPY app/ /workspace/app
-COPY cmd/ /workspace/cmd
-# COPY packages/ /workspace/packages
-COPY doc/statik /workspace/doc/statik
-COPY go.mod /workspace/
-COPY go.sum /workspace/
-COPY Makefile /workspace/
+COPY orai/app/ /workspace/app
+COPY orai/cmd/ /workspace/cmd
+COPY orai/doc/statik /workspace/doc/statik
+COPY orai/go.mod /workspace/
+COPY orai/go.sum /workspace/
+COPY orai/Makefile /workspace/
 
-# See https://github.com/Oraichain/wasmvm/releases (tag v1.2.0)
-RUN wget -O /lib/libwasmvm_muslc.a https://github.com/oraichain/wasmvm/releases/download/v1.2.4/libwasmvm_muslc.aarch64.a
-# RUN set -eux; \    
-#     export ARCH=$(uname -m); \
-#     WASM_VERSION=$(go list -m all | grep github.com/CosmWasm/wasmvm | awk '{print $2}'); \
-#     if [ ! -z "${WASM_VERSION}" ]; then \
-#       wget -O /lib/libwasmvm_muslc.a https://github.com/CosmWasm/wasmvm/releases/download/${WASM_VERSION}/libwasmvm_muslc.${ARCH}.a; \      
-#     fi; \
-#     go mod download;
-# RUN go mod tidy && go get ./...
+# See https://github.com/Oraichain/wasmvm/releases (tag v1.2.4)
+RUN set -eux; \    
+    export ARCH=$(uname -m); \
+    WASM_VERSION=$(go list -m -json github.com/oraichain/wasmvm@v1.2.4 | jq '.|"\(.Path) \(.Version)"' -r | awk '{print $2}'); \
+    if [ ! -z "${WASM_VERSION}" ]; then \
+    wget -O /lib/libwasmvm_muslc.a https://github.com/oraichain/wasmvm/releases/download/${WASM_VERSION}/libwasmvm_muslc.${ARCH}.a; \      
+    fi; 
+
+RUN go mod download
 
 # # force it to use static lib (from above) not standard libgo_cosmwasm.so file
-RUN make build LEDGER_ENABLED=false BUILD_TAGS=muslc GOMOD_FLAGS= VERSION=0.41.3
+RUN make build LEDGER_ENABLED=false BUILD_TAGS=muslc GOMOD_FLAGS= VERSION=0.41.4
 RUN cp /workspace/build/oraid /bin/oraid
 RUN upx --best --lzma /workspace/build/oraid

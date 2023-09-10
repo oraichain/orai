@@ -80,6 +80,5 @@ Cargo.lock
 **/*.rs.bk
 
 manifest.json
-oraid
 **/node_modules
 **/.env
