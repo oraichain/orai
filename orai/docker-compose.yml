@@ -17,7 +17,7 @@ services:
     cap_add:
       - SYS_PTRACE
     env_file:
-      - orai.dev.env
+      - orai.env
     volumes:
       - ./:/workspace
       - oraivisor:/root/oraivisor
