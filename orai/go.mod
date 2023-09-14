@@ -116,6 +116,7 @@ require (
 	github.com/minio/highwayhash v1.0.2 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mtibben/percent v0.2.1 // indirect
+	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/osmosis-labs/osmosis/osmoutils v0.0.0-20230105184425-1e6fcd979d99 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.9 // indirect
@@ -135,7 +136,6 @@ require (
 	github.com/spf13/viper v1.16.0 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
 	github.com/syndtr/goleveldb v1.0.1-0.20220721030215-126854af5e6d // indirect
-	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/tendermint/go-amino v0.16.0 // indirect
 	github.com/tidwall/btree v1.5.0 // indirect
 	github.com/zondax/hid v0.9.1 // indirect
@@ -174,12 +174,12 @@ replace (
 
 	github.com/cosmos/cosmos-sdk => github.com/cosmos/cosmos-sdk v0.45.16-ics
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
-
-	// use Oraichain fork of cometbft
-	// go list -m -json github.com/oraichain/cometbft@482cde0c4e04479d4164b1b4f7a0b90071c58b7f | jq '.|"\(.Path) \(.Version)"' -r
-	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20230711110635-482cde0c4e04
 	// Fix upstream GHSA-h395-qcrw-5vmq vulnerability.
 	// TODO Remove it: https://github.com/cosmos/cosmos-sdk/issues/10409
 
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
+
+	// use Oraichain fork of cometbft
+	// go list -m -json github.com/oraichain/cometbft@482cde0c4e04479d4164b1b4f7a0b90071c58b7f | jq '.|"\(.Path) \(.Version)"' -r
+	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20230711110635-482cde0c4e04
 )
