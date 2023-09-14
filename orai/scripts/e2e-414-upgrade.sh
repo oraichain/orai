@@ -15,9 +15,9 @@ pkill oraid && sleep 2s
 
 # download current production binary
 current_dir=$PWD
-git clone https://github.com/oraichain/orai.git ../../orai-old && cd ../../orai-old/ && git checkout $OLD_VERSION && go mod tidy && make install
+rm -rf ../../orai-old/ && git clone https://github.com/oraichain/orai.git ../../orai-old && cd ../../orai-old/ && git checkout $OLD_VERSION && go mod tidy && make install
 
-rm -rf ../../orai-old/ && cd $current_dir
+cd $current_dir
 
 # setup local network
 sh $PWD/scripts/multinode-local-testnet.sh
