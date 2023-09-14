@@ -1,0 +1,65 @@
+FROM golang:1.19-alpine as orai-builder
+
+# this comes from standard alpine nightly file
+#  https://github.com/rust-lang/docker-rust-nightly/blob/master/alpine3.12/Dockerfile
+# with some changes to support our toolchain, etc
+RUN set -eux; apk add --no-cache ca-certificates build-base;
+RUN apk add upx jq
+# NOTE: add these to run with LEDGER_ENABLED=true
+# RUN apk add libusb-dev linux-headers
+
+WORKDIR /workspace
+COPY orai/app/ /workspace/app
+COPY orai/cmd/ /workspace/cmd
+COPY orai/doc/statik /workspace/doc/statik
+COPY orai/go.mod orai/go.sum orai/Makefile /workspace/
+COPY oraivisor/ /workspace/oraivisor
+COPY oraivisor/Makefile /workspace/oraivisor/Makefile
+
+# See https://github.com/Oraichain/wasmvm/releases (tag v1.2.4)
+RUN set -eux; \    
+    export ARCH=$(uname -m); \
+    WASM_VERSION=$(go list -m -json github.com/oraichain/wasmvm@v1.2.4 | jq '.|"\(.Path) \(.Version)"' -r | awk '{print $2}'); \
+    wget -O /lib/libwasmvm_muslc.a https://github.com/oraichain/wasmvm/releases/download/${WASM_VERSION}/libwasmvm_muslc.${ARCH}.a;
+
+RUN go mod download
+
+# # force it to use static lib (from above) not standard libgo_cosmwasm.so file
+RUN make build LEDGER_ENABLED=false BUILD_TAGS=muslc GOMOD_FLAGS= VERSION=0.41.4
+RUN cp /workspace/build/oraid /bin/oraid
+RUN upx --best --lzma /workspace/build/oraid
+
+FROM golang:1.19-alpine as oraivisor-builder
+
+RUN set -eux; apk add --no-cache ca-certificates build-base;
+RUN apk add upx jq
+WORKDIR /workspace
+COPY oraivisor/ /workspace/
+
+# install oraivisor
+RUN pwd
+RUN go mod download && go mod tidy
+RUN make build
+RUN upx --best --lzma /workspace/build/oraivisor
+
+# # then remove
+# RUN rm -rf /workspace/*
+
+FROM alpine:3.16
+
+WORKDIR /workspace
+
+RUN apk update
+
+# need to install build-base to run go oraid binary
+RUN apk add bash build-base jq
+
+ENV DAEMON_ALLOW_DOWNLOAD_BINARIES=true DAEMON_RESTART_AFTER_UPGRADE=true DAEMON_NAME=oraid DAEMON_HOME=/root
+ENV PATH="${DAEMON_HOME}/oraivisor/current/bin:${PATH}"
+RUN mkdir -p $DAEMON_HOME/oraivisor/genesis/bin 
+
+# init first symbolic link to run oraid and later oraivisor will update the link
+RUN ln -s $DAEMON_HOME/oraivisor/genesis $DAEMON_HOME/oraivisor/current
+
+COPY --from=oraivisor-builder /workspace/build/oraivisor /usr/bin
+COPY --from=orai-builder /workspace/build/oraid $DAEMON_HOME/oraivisor/genesis/bin
