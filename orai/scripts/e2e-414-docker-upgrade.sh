@@ -8,16 +8,16 @@ ARGS="--chain-id testing -y --keyring-backend test --fees 200orai --gas 20000000
 NEW_VERSION=${NEW_VERSION:-"v0.41.4"}
 MIGRATE_MSG=${MIGRATE_MSG:-'{}'}
 EXECUTE_MSG=${EXECUTE_MSG:-'{"ping":{}}'}
-docker_command="docker-compose -f docker-compose-e2e-upgrade.yml exec"
+docker_command="docker-compose -f $PWD/docker-compose-e2e-upgrade.yml exec"
 validator1_command="$docker_command validator1 bash -c"
 validator2_command="$docker_command validator2 bash -c"
 working_dir=/workspace
 oraid_dir=$working_dir/.oraid
 VALIDATOR_HOME=${VALIDATOR_HOME:-"$oraid_dir/validator1"}
-WASM_PATH=${WASM_PATH:-"$working_dir/wasm_file/swapmap.wasm"}
+WASM_PATH=${WASM_PATH:-"$working_dir/scripts/wasm_file/swapmap.wasm"}
 
 # setup local network
-sh $PWD/multinode-docker.sh
+sh $PWD/scripts/multinode-docker.sh
 
 # # deploy new contract
 store_ret=`$validator1_command "oraid tx wasm store $WASM_PATH --from validator1 --home $VALIDATOR_HOME $ARGS --output json"`
