@@ -137,8 +137,8 @@ screen -S validator2 -d -m oraid start --home=$HOME/.oraid/validator2 --minimum-
 screen -S validator3 -d -m oraid start --home=$HOME/.oraid/validator3 --minimum-gas-prices=0.00001orai
 
 # send orai from first validator to second validator
-echo "Waiting 7 seconds to send funds to validators 2 and 3..."
-sleep 7
+echo "Waiting 10 seconds to send funds to validators 2 and 3..."
+sleep 10
 
 oraid tx send $(oraid keys show validator1 -a --keyring-backend=test --home=$HOME/.oraid/validator1) $(oraid keys show validator2 -a --keyring-backend=test --home=$HOME/.oraid/validator2) 5000000000orai --keyring-backend=test --home=$HOME/.oraid/validator1 --chain-id=testing --broadcast-mode block --gas 200000 --fees 2orai --node http://localhost:26657 --yes
 oraid tx send $(oraid keys show validator1 -a --keyring-backend=test --home=$HOME/.oraid/validator1) $(oraid keys show validator3 -a --keyring-backend=test --home=$HOME/.oraid/validator3) 4000000000orai --keyring-backend=test --home=$HOME/.oraid/validator1 --chain-id=testing --broadcast-mode block --gas 200000 --fees 2orai --node http://localhost:26657 --yes

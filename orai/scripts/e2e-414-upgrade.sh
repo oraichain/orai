@@ -3,7 +3,7 @@
 # setup the network using the old binary
 
 OLD_VERSION=${OLD_VERSION:-"v0.41.3"}
-WASM_PATH=${WASM_PATH:-"./scripts/wasm_file/swapmap.wasm"}
+WASM_PATH=${WASM_PATH:-"$PWD/scripts/wasm_file/swapmap.wasm"}
 ARGS="--chain-id testing -y --keyring-backend test --fees 200orai --gas auto --gas-adjustment 1.5 -b block"
 NEW_VERSION=${NEW_VERSION:-"v0.41.4"}
 VALIDATOR_HOME=${VALIDATOR_HOME:-"$HOME/.oraid/validator1"}
@@ -57,7 +57,7 @@ store_ret=$(oraid tx wasm store $WASM_PATH --from validator1 --home $VALIDATOR_H
 echo "Execute the contract..."
 new_code_id=$(echo $store_ret | jq -r '.logs[0].events[1].attributes[] | select(.key | contains("code_id")).value')
 
-oraid tx wasm migrate $contract_address $new_code_id $MIGRATE_MSG --from validator1 $ARGS --home $VALIDATOR_HOME
+# oraid tx wasm migrate $contract_address $new_code_id $MIGRATE_MSG --from validator1 $ARGS --home $VALIDATOR_HOME
 oraid tx wasm execute $contract_address $EXECUTE_MSG --from validator1 $ARGS --home $VALIDATOR_HOME
 
 height_before=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
