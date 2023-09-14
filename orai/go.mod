@@ -173,6 +173,8 @@ replace (
 
 	github.com/cosmos/cosmos-sdk => github.com/cosmos/cosmos-sdk v0.45.16-ics
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
+	// downgrade of goleveldb to avoid issues: see https://github.com/cosmos/cosmos-sdk/issues/14949
+	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 
 	// use Oraichain fork of cometbft
 	// go list -m -json github.com/oraichain/cometbft@482cde0c4e04479d4164b1b4f7a0b90071c58b7f | jq '.|"\(.Path) \(.Version)"' -r
