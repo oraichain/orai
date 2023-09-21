@@ -27,6 +27,6 @@ RUN set -eux; \
 RUN go mod download
 
 # # force it to use static lib (from above) not standard libgo_cosmwasm.so file
-RUN make build LEDGER_ENABLED=false BUILD_TAGS=muslc GOMOD_FLAGS= VERSION=0.41.4
+RUN make build LEDGER_ENABLED=false BUILD_TAGS=muslc GOMOD_FLAGS= VERSION=0.41.5
 RUN cp /workspace/build/oraid /bin/oraid
 RUN upx --best --lzma /workspace/build/oraid

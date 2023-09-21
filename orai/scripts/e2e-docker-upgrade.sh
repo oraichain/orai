@@ -3,9 +3,9 @@ set -ux
 
 # setup the network using the old binary
 
-OLD_VERSION=${OLD_VERSION:-"v0.41.3"}
+OLD_VERSION=${OLD_VERSION:-"v0.41.4"}
 ARGS="--chain-id testing -y --keyring-backend test --fees 200orai --gas 20000000 --gas-adjustment 1.5 -b block"
-NEW_VERSION=${NEW_VERSION:-"v0.41.4"}
+NEW_VERSION=${NEW_VERSION:-"v0.41.5"}
 MIGRATE_MSG=${MIGRATE_MSG:-'{}'}
 EXECUTE_MSG=${EXECUTE_MSG:-'{"ping":{}}'}
 docker_command="docker-compose -f $PWD/docker-compose-e2e-upgrade.yml exec"
@@ -30,7 +30,7 @@ echo "contract address: $contract_address"
 
 # create new upgrade proposal
 UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-19}
-$validator1_command "oraid tx gov submit-proposal software-upgrade $NEW_VERSION --title 'foobar' --description 'foobar' --from validator1 --upgrade-height $UPGRADE_HEIGHT --upgrade-info 'https://github.com/oraichain/orai/releases/download/v0.41.4/manifest.json' --deposit 10000000orai $ARGS --home $VALIDATOR_HOME"
+$validator1_command "oraid tx gov submit-proposal software-upgrade $NEW_VERSION --title 'foobar' --description 'foobar' --from validator1 --upgrade-height $UPGRADE_HEIGHT --upgrade-info 'https://github.com/oraichain/orai/releases/download/v0.41.5/manifest.json' --deposit 10000000orai $ARGS --home $VALIDATOR_HOME"
 $validator1_command "oraid tx gov vote 1 yes --from validator1 --home $VALIDATOR_HOME $ARGS"
 $validator1_command "oraid tx gov vote 1 yes --from validator2 --home $oraid_dir/validator2 $ARGS"
 
