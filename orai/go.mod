@@ -105,7 +105,7 @@ require (
 	github.com/klauspost/compress v1.16.3 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
-	github.com/lib/pq v1.10.6 // indirect
+	github.com/lib/pq v1.10.7 // indirect
 	github.com/libp2p/go-buffer-pool v0.1.0 // indirect
 	github.com/linxGnu/grocksdb v1.7.16 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
@@ -165,10 +165,6 @@ require (
 replace (
 	// Use cosmos keyring
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
-	// fork wasmd so that we have legacy wasm types
-	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20230822113616-27ffe7fdd4d1
-	// go list -m -json github.com/oraichain/wasmvm@main | jq '.|"\(.Path) \(.Version)"' -r
-	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.2.4
 	// same version as cosmos-sdk
 	github.com/btcsuite/btcd => github.com/btcsuite/btcd v0.22.2
 
