@@ -15,7 +15,7 @@ pkill oraid && sleep 2s
 
 # download current production binary
 current_dir=$PWD
-rm -rf ../../orai-old/ && git clone https://github.com/oraichain/orai.git ../../orai-old && cd ../../orai-old/ && git checkout $OLD_VERSION && go mod tidy && make install
+rm -rf ../../orai-old/ && git clone https://github.com/oraichain/orai.git ../../orai-old && cd ../../orai-old/orai && git checkout $OLD_VERSION && go mod tidy && make install
 
 cd $current_dir
 
@@ -65,7 +65,7 @@ oraid tx wasm execute $contract_address $EXECUTE_MSG --from validator1 $ARGS --h
 
 height_before=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 
-re='^[0-9]+$'
+re='^[0-9]+([.][0-9]+)?$'
 if ! [[ $height_before =~ $re ]] ; then
    echo "error: Not a number" >&2; exit 1
 fi
@@ -74,7 +74,6 @@ sleep 30s
 
 height_after=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 
-re='^[0-9]+$'
 if ! [[ $height_after =~ $re ]] ; then
    echo "error: Not a number" >&2; exit 1
 fi
@@ -85,3 +84,11 @@ echo "Test Passed"
 else
 echo "Test Failed"
 fi
+
+inflation=$(curl --no-progress-meter http://localhost:1317/cosmos/mint/v1beta1/inflation | jq '.inflation | tonumber')
+if ! [[ $inflation =~ $re ]] ; then
+   echo "Error: Cannot query inflation => Potentially missing Go GRPC backport" >&2;
+   echo "Tests Failed"; exit 1
+fi
+
+echo "Tests Passed"
