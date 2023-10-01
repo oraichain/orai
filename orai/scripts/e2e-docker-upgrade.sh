@@ -37,7 +37,17 @@ $validator1_command "oraid tx gov vote 1 yes --from validator2 --home $oraid_dir
 
 # sleep to wait til the proposal passes
 echo "Sleep til the proposal passes..."
-sleep 1m
+sleep 12
+
+# Check if latest height is less than the upgrade height
+latest_height=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
+echo $latest_height
+while [ $latest_height -lt $UPGRADE_HEIGHT ];
+do
+   sleep 7
+   ((latest_height=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')))
+   echo $latest_height
+done
 
 $validator1_command "oraid tx wasm execute $contract_address $(echo $EXECUTE_MSG | jq '@json') --from validator1 $ARGS --home $VALIDATOR_HOME"
 
@@ -48,7 +58,7 @@ if ! [[ $height_before =~ $re ]] ; then
    echo "error: Not a number" >&2; exit 1
 fi
 
-sleep 30s
+sleep 30
 
 height_after=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 
