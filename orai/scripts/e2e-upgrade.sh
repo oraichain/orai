@@ -11,7 +11,7 @@ MIGRATE_MSG=${MIGRATE_MSG:-'{}'}
 EXECUTE_MSG=${EXECUTE_MSG:-'{"ping":{}}'}
 
 # kill all running binaries
-pkill oraid && sleep 2s
+pkill oraid && sleep 2
 
 # download current production binary
 current_dir=$PWD
@@ -37,7 +37,16 @@ oraid tx gov vote 1 yes --from validator1 --home "$HOME/.oraid/validator1" $ARGS
 
 # sleep to wait til the proposal passes
 echo "Sleep til the proposal passes..."
-sleep 1m
+sleep 12
+
+# Check if latest height is less than the upgrade height
+latest_height=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
+while [ $latest_height -lt $UPGRADE_HEIGHT ];
+do
+   sleep 7
+   ((latest_height=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')))
+   echo $latest_height
+done
 
 # kill all processes
 pkill oraid && sleep 3s
@@ -53,7 +62,7 @@ screen -S validator3 -d -m oraid start --home=$HOME/.oraid/validator3 --minimum-
 
 # sleep a bit for the network to start 
 echo "Sleep to wait for the network to start..."
-sleep 7s
+sleep 7
 # test contract migration
 echo "Migrate the contract..."
 store_ret=$(oraid tx wasm store $WASM_PATH --from validator1 --home $VALIDATOR_HOME $ARGS --output json)
@@ -70,7 +79,7 @@ if ! [[ $height_before =~ $re ]] ; then
    echo "error: Not a number" >&2; exit 1
 fi
 
-sleep 30s
+sleep 30
 
 height_after=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 
