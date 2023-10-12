@@ -3,9 +3,10 @@ set -ux
 
 # setup the network using the old binary
 
-OLD_VERSION=${OLD_VERSION:-"v0.41.3"}
+OLD_VERSION=${OLD_VERSION:-"v0.41.4"}
 ARGS="--chain-id testing -y --keyring-backend test --fees 200orai --gas 20000000 --gas-adjustment 1.5 -b block"
-NEW_VERSION=${NEW_VERSION:-"v0.41.4"}
+NEW_VERSION=${NEW_VERSION:-"v0.41.5"}
+UPGRADE_INFO_VERSION=${UPGRADE_INFO_VERSION:-"v0.41.5"}
 MIGRATE_MSG=${MIGRATE_MSG:-'{}'}
 EXECUTE_MSG=${EXECUTE_MSG:-'{"ping":{}}'}
 docker_command="docker-compose -f $PWD/docker-compose-e2e-upgrade.yml exec"
@@ -30,35 +31,52 @@ echo "contract address: $contract_address"
 
 # create new upgrade proposal
 UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-19}
-$validator1_command "oraid tx gov submit-proposal software-upgrade $NEW_VERSION --title 'foobar' --description 'foobar' --from validator1 --upgrade-height $UPGRADE_HEIGHT --upgrade-info 'https://github.com/oraichain/orai/releases/download/v0.41.4/manifest.json' --deposit 10000000orai $ARGS --home $VALIDATOR_HOME"
+$validator1_command "oraid tx gov submit-proposal software-upgrade $NEW_VERSION --title 'foobar' --description 'foobar' --from validator1 --upgrade-height $UPGRADE_HEIGHT --upgrade-info 'https://github.com/oraichain/orai/releases/download/$UPGRADE_INFO_VERSION/manifest.json' --deposit 10000000orai $ARGS --home $VALIDATOR_HOME"
 $validator1_command "oraid tx gov vote 1 yes --from validator1 --home $VALIDATOR_HOME $ARGS"
 $validator1_command "oraid tx gov vote 1 yes --from validator2 --home $oraid_dir/validator2 $ARGS"
 
 # sleep to wait til the proposal passes
 echo "Sleep til the proposal passes..."
-sleep 1m
+sleep 12
+
+# Check if latest height is less than the upgrade height
+latest_height=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
+echo $latest_height
+while [ $latest_height -lt $UPGRADE_HEIGHT ];
+do
+   sleep 7
+   ((latest_height=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')))
+   echo $latest_height
+done
 
 $validator1_command "oraid tx wasm execute $contract_address $(echo $EXECUTE_MSG | jq '@json') --from validator1 $ARGS --home $VALIDATOR_HOME"
 
 height_before=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 
-re='^[0-9]+$'
+re='^[0-9]+([.][0-9]+)?$'
 if ! [[ $height_before =~ $re ]] ; then
    echo "error: Not a number" >&2; exit 1
 fi
 
-sleep 30s
+sleep 30
 
 height_after=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 
-re='^[0-9]+$'
 if ! [[ $height_after =~ $re ]] ; then
    echo "error: Not a number" >&2; exit 1
 fi
 
 if [ $height_after -gt $height_before ]
 then
-echo "Test Passed"
+echo "Upgrade Passed"
 else
-echo "Test Failed"
+echo "Upgarde Failed"
 fi
+
+inflation=$(curl --no-progress-meter http://localhost:1317/cosmos/mint/v1beta1/inflation | jq '.inflation | tonumber')
+if ! [[ $inflation =~ $re ]] ; then
+   echo "Error: Cannot query inflation => Potentially missing Go GRPC backport" >&2;
+   echo "Tests Failed"; exit 1
+fi
+
+echo "Tests Passed"

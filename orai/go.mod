@@ -105,7 +105,7 @@ require (
 	github.com/klauspost/compress v1.16.3 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
-	github.com/lib/pq v1.10.6 // indirect
+	github.com/lib/pq v1.10.7 // indirect
 	github.com/libp2p/go-buffer-pool v0.1.0 // indirect
 	github.com/linxGnu/grocksdb v1.7.16 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
@@ -165,6 +165,7 @@ require (
 replace (
 	// Use cosmos keyring
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
+
 	// fork wasmd so that we have legacy wasm types
 	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20230822113616-27ffe7fdd4d1
 	// go list -m -json github.com/oraichain/wasmvm@main | jq '.|"\(.Path) \(.Version)"' -r
@@ -180,4 +181,6 @@ replace (
 	// use Oraichain fork of cometbft
 	// go list -m -json github.com/oraichain/cometbft@482cde0c4e04479d4164b1b4f7a0b90071c58b7f | jq '.|"\(.Path) \(.Version)"' -r
 	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20230711110635-482cde0c4e04
+
+	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )

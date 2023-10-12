@@ -141,7 +141,7 @@ const appName = "Oraichain"
 var (
 	NodeDir = ".oraid"
 
-	BinaryVersion = "v0.41.4"
+	BinaryVersion = "v0.41.5"
 
 	// If EnabledSpecificProposals is "", and this is "true", then enable all x/wasm proposals.
 	// If EnabledSpecificProposals is "", and this is not "true", then disable all x/wasm proposals.
@@ -453,6 +453,36 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 
 	prefix := sdk.GetConfig().GetBech32AccountAddrPrefix()
 	// set the contract keeper for the Ics20WasmHooks
+	// just re-use the full router - do we want to limit this more?
+	wasmDir := filepath.Join(homePath, "wasm")
+
+	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
+	if err != nil {
+		panic("error while reading wasm config: " + err.Error())
+	}
+	// The last arguments can contain custom message handlers, and custom query handlers,
+	// if we want to allow any custom callbacks
+	supportedFeatures := "iterator,staking,stargate"
+
+	app.wasmKeeper = wasm.NewKeeper(
+		appCodec,
+		keys[wasm.StoreKey],
+		app.getSubspace(wasm.ModuleName),
+		app.accountKeeper,
+		app.bankKeeper,
+		app.stakingKeeper,
+		app.distrKeeper,
+		app.ibcKeeper.ChannelKeeper,
+		&app.ibcKeeper.PortKeeper,
+		scopedWasmKeeper,
+		app.transferKeeper,
+		app.MsgServiceRouter(),
+		app.GRPCQueryRouter(),
+		wasmDir,
+		wasmConfig,
+		supportedFeatures,
+		wasmOpts...,
+	)
 	app.ContractKeeper = wasmkeeper.NewDefaultPermissionKeeper(app.wasmKeeper)
 	wasmHooks := ibchooks.NewWasmHooks(app.IBCHooksKeeper, app.ContractKeeper, prefix) // The contract keeper needs to be set later
 	app.Ics20WasmHooks = &wasmHooks
@@ -524,37 +554,6 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 
 	// For wasmd we use the demo controller from https://github.com/cosmos/interchain-accounts but see notes below
 	app.interTxKeeper = intertxkeeper.NewKeeper(appCodec, keys[intertxtypes.StoreKey], app.icaControllerKeeper, scopedInterTxKeeper)
-
-	// just re-use the full router - do we want to limit this more?
-	wasmDir := filepath.Join(homePath, "wasm")
-
-	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
-	if err != nil {
-		panic("error while reading wasm config: " + err.Error())
-	}
-	// The last arguments can contain custom message handlers, and custom query handlers,
-	// if we want to allow any custom callbacks
-	supportedFeatures := "iterator,staking,stargate"
-
-	app.wasmKeeper = wasm.NewKeeper(
-		appCodec,
-		keys[wasm.StoreKey],
-		app.getSubspace(wasm.ModuleName),
-		app.accountKeeper,
-		app.bankKeeper,
-		app.stakingKeeper,
-		app.distrKeeper,
-		app.ibcKeeper.ChannelKeeper,
-		&app.ibcKeeper.PortKeeper,
-		scopedWasmKeeper,
-		app.transferKeeper,
-		app.MsgServiceRouter(),
-		app.GRPCQueryRouter(),
-		wasmDir,
-		wasmConfig,
-		supportedFeatures,
-		wasmOpts...,
-	)
 
 	// The gov proposal types can be individually enabled
 	if len(enabledProposals) != 0 {
@@ -1001,20 +1000,20 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 func (app *OraichainApp) upgradeHandler() {
 	app.upgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		ctx.Logger().Info("start to migrate modules...")
-		// set ibchooks and packet forward consensus version
-		ibchooksModule, correctTypecast := app.mm.Modules[ibchookstypes.ModuleName].(ibchooks.AppModule)
-		if !correctTypecast {
-			panic("mm.Modules[ibchookstypes.ModuleName] is not of type ibchooks.AppModule")
-		}
-		pfmModule, correctTypecast := app.mm.Modules[packetforwardtypes.ModuleName].(packetforward.AppModule)
-		if !correctTypecast {
-			panic("mm.Modules[packetforwardtypes.ModuleName] is not of type packetforward.AppModule")
-		}
-		fromVM[ibchookstypes.ModuleName] = ibchooksModule.ConsensusVersion()
-		fromVM[packetforwardtypes.ModuleName] = pfmModule.ConsensusVersion()
-		ctx.Logger().Info("vm module: %v\n", fromVM)
-		// Packet Forward middleware initial params
-		app.PacketForwardKeeper.SetParams(ctx, packetforwardtypes.DefaultParams())
+		// // set ibchooks and packet forward consensus version
+		// ibchooksModule, correctTypecast := app.mm.Modules[ibchookstypes.ModuleName].(ibchooks.AppModule)
+		// if !correctTypecast {
+		// 	panic("mm.Modules[ibchookstypes.ModuleName] is not of type ibchooks.AppModule")
+		// }
+		// pfmModule, correctTypecast := app.mm.Modules[packetforwardtypes.ModuleName].(packetforward.AppModule)
+		// if !correctTypecast {
+		// 	panic("mm.Modules[packetforwardtypes.ModuleName] is not of type packetforward.AppModule")
+		// }
+		// fromVM[ibchookstypes.ModuleName] = ibchooksModule.ConsensusVersion()
+		// fromVM[packetforwardtypes.ModuleName] = pfmModule.ConsensusVersion()
+		// ctx.Logger().Info("vm module: %v\n", fromVM)
+		// // Packet Forward middleware initial params
+		// app.PacketForwardKeeper.SetParams(ctx, packetforwardtypes.DefaultParams())
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
 
@@ -1025,8 +1024,6 @@ func (app *OraichainApp) upgradeHandler() {
 
 	if upgradeInfo.Name == BinaryVersion && !app.upgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
-		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storetypes.StoreUpgrades{
-			Added: []string{ibchookstypes.StoreKey, packetforwardtypes.StoreKey},
-		}))
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storetypes.StoreUpgrades{}))
 	}
 }

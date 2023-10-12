@@ -1,8 +1,8 @@
-version: '3.3'
+version: "3.3"
 services:
   orai:
     container_name: orai_node
-    image: oraichain/foundation-orai:0.41.4-alpine-dev
+    image: oraichain/foundation-orai:0.41.5-alpine-dev
     working_dir: /workspace
     tty: true
     ulimits:

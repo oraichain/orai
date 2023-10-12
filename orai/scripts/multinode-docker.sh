@@ -9,6 +9,7 @@ mkdir $PWD/.oraid
 mkdir $PWD/.oraid/validator1
 mkdir $PWD/.oraid/validator2
 mkdir $PWD/.oraid/validator3
+docker volume rm orai_oraivisor
 docker-compose -f docker-compose-e2e-upgrade.yml up -d --force-recreate
 docker_command="docker-compose -f docker-compose-e2e-upgrade.yml exec"
 validator1_command="$docker_command validator1 bash -c"
