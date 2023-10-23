@@ -233,7 +233,6 @@ var (
 		ibcfee.AppModuleBasic{},
 		clock.AppModuleBasic{},
 		ibchooks.AppModuleBasic{},
-		clock.AppModuleBasic{},
 		packetforward.AppModuleBasic{},
 	)
 
