@@ -133,6 +133,8 @@ import (
 	ibcclientclient "github.com/cosmos/ibc-go/v4/modules/core/02-client/client"
 	appparams "github.com/oraichain/orai/app/params"
 	appconfig "github.com/oraichain/orai/cmd/config"
+
+	clock "github.com/CosmosContracts/juno/v18/x/clock"
 )
 
 const appName = "Oraichain"
@@ -228,6 +230,7 @@ var (
 		intertx.AppModuleBasic{},
 		ibcfee.AppModuleBasic{},
 		ibchooks.AppModuleBasic{},
+		clock.AppModuleBasic{},
 		packetforward.AppModuleBasic{},
 	)
 

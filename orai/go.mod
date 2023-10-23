@@ -10,6 +10,7 @@ require (
 	github.com/cosmos/interchain-accounts v0.2.6
 	github.com/gorilla/mux v1.8.0
 	github.com/osmosis-labs/osmosis/x/ibc-hooks v0.0.0-20230201151635-ef43e092d196
+	github.com/CosmosContracts/juno/v18 v18.0.0-20231011205927-62c4d7ee0a9b
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.16.0
 	github.com/rakyll/statik v0.1.7
@@ -170,6 +171,8 @@ replace (
 	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20230822113616-27ffe7fdd4d1
 	// go list -m -json github.com/oraichain/wasmvm@main | jq '.|"\(.Path) \(.Version)"' -r
 	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.2.4
+
+	github.com/CosmosContracts/juno/v18 => github.com/oraichain/juno/v18 v18.0.0-20231022135419-27d0f62d0858
 	// same version as cosmos-sdk
 	github.com/btcsuite/btcd => github.com/btcsuite/btcd v0.22.2
 
