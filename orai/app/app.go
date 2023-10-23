@@ -347,7 +347,8 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		wasm.StoreKey, feegrant.StoreKey, authzkeeper.StoreKey, icahosttypes.StoreKey,
-		icacontrollertypes.StoreKey, intertxtypes.StoreKey, ibcfeetypes.StoreKey, ibchookstypes.StoreKey, packetforwardtypes.StoreKey,
+		icacontrollertypes.StoreKey, intertxtypes.StoreKey, ibcfeetypes.StoreKey,
+		ibchookstypes.StoreKey, clocktypes.StoreKey, packetforwardtypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -1013,6 +1014,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(icacontrollertypes.SubModuleName)
 	paramsKeeper.Subspace(wasm.ModuleName)
 	paramsKeeper.Subspace(ibchookstypes.ModuleName)
+	paramsKeeper.Subspace(clocktypes.ModuleName)
 
 	return paramsKeeper
 }
@@ -1020,20 +1022,14 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 func (app *OraichainApp) upgradeHandler() {
 	app.upgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		ctx.Logger().Info("start to migrate modules...")
-		// // set ibchooks and packet forward consensus version
-		// ibchooksModule, correctTypecast := app.mm.Modules[ibchookstypes.ModuleName].(ibchooks.AppModule)
-		// if !correctTypecast {
-		// 	panic("mm.Modules[ibchookstypes.ModuleName] is not of type ibchooks.AppModule")
-		// }
-		// pfmModule, correctTypecast := app.mm.Modules[packetforwardtypes.ModuleName].(packetforward.AppModule)
-		// if !correctTypecast {
-		// 	panic("mm.Modules[packetforwardtypes.ModuleName] is not of type packetforward.AppModule")
-		// }
-		// fromVM[ibchookstypes.ModuleName] = ibchooksModule.ConsensusVersion()
-		// fromVM[packetforwardtypes.ModuleName] = pfmModule.ConsensusVersion()
-		// ctx.Logger().Info("vm module: %v\n", fromVM)
-		// // Packet Forward middleware initial params
-		// app.PacketForwardKeeper.SetParams(ctx, packetforwardtypes.DefaultParams())
+		// set clock
+		clockModule, correctTypecast := app.mm.Modules[clocktypes.ModuleName].(clock.AppModule)
+		if !correctTypecast {
+			panic("mm.Modules[clocktypes.ModuleName] is not of type clock.AppModule")
+		}
+
+		fromVM[clocktypes.ModuleName] = clockModule.ConsensusVersion()
+		ctx.Logger().Info("vm module: %v\n", fromVM)
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
 
