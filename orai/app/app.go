@@ -1022,13 +1022,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 func (app *OraichainApp) upgradeHandler() {
 	app.upgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		ctx.Logger().Info("start to migrate modules...")
-		// set clock
-		clockModule, correctTypecast := app.mm.Modules[clocktypes.ModuleName].(clock.AppModule)
-		if !correctTypecast {
-			panic("mm.Modules[clocktypes.ModuleName] is not of type clock.AppModule")
-		}
-
-		fromVM[clocktypes.ModuleName] = clockModule.ConsensusVersion()
 		ctx.Logger().Info("vm module: %v\n", fromVM)
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
