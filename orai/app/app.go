@@ -1023,6 +1023,10 @@ func (app *OraichainApp) upgradeHandler() {
 	app.upgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		ctx.Logger().Info("start to migrate modules...")
 		ctx.Logger().Info("vm module: %v\n", fromVM)
+		// x/clock
+		if err := app.ClockKeeper.SetParams(ctx, clocktypes.DefaultParams()); err != nil {
+			return nil, err
+		}
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
 
