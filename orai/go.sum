@@ -623,8 +623,8 @@ github.com/openzipkin/zipkin-go v0.2.1/go.mod h1:NaW6tEwdmWMaCDZzg8sh+IBNOxHMPnh
 github.com/openzipkin/zipkin-go v0.2.2/go.mod h1:NaW6tEwdmWMaCDZzg8sh+IBNOxHMPnhQw8ySjnjRyN4=
 github.com/oraichain/cometbft v0.34.30-0.20230711110635-482cde0c4e04 h1:YEF6VhvB3xrUqLRoEKyJprOXlZ5iaxMzB/87HapgV0s=
 github.com/oraichain/cometbft v0.34.30-0.20230711110635-482cde0c4e04/go.mod h1:L9shMfbkZ8B+7JlwANEr+NZbBcn+hBpwdbeYvA5rLCw=
-github.com/oraichain/juno/x/clock v0.0.0-20231023090736-72ff689e0514 h1:nobTePWCGL9X/dLCBBnugm1NWuWTicJ96A8fTnNymNQ=
-github.com/oraichain/juno/x/clock v0.0.0-20231023090736-72ff689e0514/go.mod h1:l4ThN/GfymtLnCqEwvP7cQfoVYVOI+osfRlYXklnKuA=
+github.com/oraichain/juno/x/clock v0.0.0-20231030052404-f920219e62a7 h1:nIf5LgiZTXvGubyKFJtGFpmq8S5zK7v3J7kKdMw3txU=
+github.com/oraichain/juno/x/clock v0.0.0-20231030052404-f920219e62a7/go.mod h1:l4ThN/GfymtLnCqEwvP7cQfoVYVOI+osfRlYXklnKuA=
 github.com/oraichain/wasmd v0.30.2-0.20230822113616-27ffe7fdd4d1 h1:zuyxYHrgoQ8+jkNj8VayWj4CLcvYS5zw2EFakBgDm7o=
 github.com/oraichain/wasmd v0.30.2-0.20230822113616-27ffe7fdd4d1/go.mod h1:DUWz5+p7h3BbDxXAt7IBovagwt5NRPCGVuQkweIixzM=
 github.com/oraichain/wasmvm v1.2.4 h1:K2n1Xm5Ot2NoysPTed1bCGP/FpKs0PyjTaXamqaXtFw=
