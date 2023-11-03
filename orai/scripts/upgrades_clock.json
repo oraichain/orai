@@ -1,9 +1,0 @@
-{
-    "type": "/juno.clock.v1.UpdateParams",
-    "title": "Clock params change",
-    "description": "Add contract to clock module",
-    "params": {
-        "contract_addresses":["test"],
-        "contract_gas_limit": "1000000000"
-    }
-}
