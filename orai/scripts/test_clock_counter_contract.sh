@@ -1,9 +1,6 @@
 WASM_PATH=${WASM_PATH:-"$PWD/scripts/wasm_file/cw-clock-example.wasm"}
-PROPOSAL_PATH="scripts/clock_proposal.json"
 ARGS="--chain-id testing -y --keyring-backend test --fees 200orai --gas auto --gas-adjustment 1.5 -b block"
 VALIDATOR_HOME=${VALIDATOR_HOME:-"$HOME/.oraid/validator1"}
-MIGRATE_MSG=${MIGRATE_MSG:-'{}'}
-EXECUTE_MSG=${EXECUTE_MSG:-'{"ping":{}}'}
 
 # setup local network
 sh $PWD/scripts/multinode-local-testnet.sh
