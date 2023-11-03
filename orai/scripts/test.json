@@ -1,0 +1,12 @@
+{
+    "title": "Clock Param Change",
+    "description": "Update contract",
+    "changes":[
+        {
+           "subspace":"clock",
+           "key":"/juno/clock/v1/contracts",
+           "value": ["orai14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9savsjyw"]
+        }
+     ],
+    "deposit": "100000orai"
+}

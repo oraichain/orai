@@ -171,7 +171,7 @@ replace (
 	// go list -m -json github.com/oraichain/wasmvm@main | jq '.|"\(.Path) \(.Version)"' -r
 	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.2.4
 
-	github.com/CosmosContracts/juno/v18/x/clock => github.com/oraichain/juno/x/clock v0.0.0-20231030052404-f920219e62a7
+	github.com/CosmosContracts/juno/v18/x/clock => github.com/oraichain/juno/x/clock v0.0.0-20231103100256-4c83cb3f8224
 	// same version as cosmos-sdk
 	github.com/btcsuite/btcd => github.com/btcsuite/btcd v0.22.2
 

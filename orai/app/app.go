@@ -860,7 +860,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	app.scopedICAHostKeeper = scopedICAHostKeeper
 	app.scopedICAControllerKeeper = scopedICAControllerKeeper
 	app.scopedInterTxKeeper = scopedInterTxKeeper
-
+	clockkeeper.RegisterProposalTypes()
 	return app
 }
 
