@@ -1,5 +1,4 @@
-#!/bin/sh
-set -o errexit -o nounset -o pipefail
+#!/bin/bash
 
 echo -n "Enter passphrase:"
 read -s PASSWORD
@@ -12,7 +11,7 @@ rm -rf .oraid/
 
 oraid init --chain-id "$CHAIN_ID" "$MONIKER"
 
-(echo "$PASSWORD"; echo "$PASSWORD") | oraid keys add $USER
+(echo "y") | oraid keys add $USER
 
 # hardcode the validator account for this instance
 (echo "$PASSWORD") | oraid add-genesis-account $USER "100000000000000orai"
