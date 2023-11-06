@@ -172,8 +172,8 @@ github.com/cosmos/gorocksdb v1.2.0 h1:d0l3jJG8M4hBouIZq0mDUHZ+zjOx044J3nGRskwTb4
 github.com/cosmos/gorocksdb v1.2.0/go.mod h1:aaKvKItm514hKfNJpUJXnnOWeBnk2GL4+Qw9NHizILw=
 github.com/cosmos/iavl v0.19.5 h1:rGA3hOrgNxgRM5wYcSCxgQBap7fW82WZgY78V9po/iY=
 github.com/cosmos/iavl v0.19.5/go.mod h1:X9PKD3J0iFxdmgNLa7b2LYWdsGd90ToV5cAONApkEPw=
-github.com/cosmos/ibc-go/v4 v4.4.2 h1:PG4Yy0/bw6Hvmha3RZbc53KYzaCwuB07Ot4GLyzcBvo=
-github.com/cosmos/ibc-go/v4 v4.4.2/go.mod h1:j/kD2JCIaV5ozvJvaEkWhLxM2zva7/KTM++EtKFYcB8=
+github.com/cosmos/ics23/go v0.10.0 h1:iXqLLgp2Lp+EdpIuwXTYIQU+AiHj9mOC2X9ab++bZDM=
+github.com/cosmos/ics23/go v0.10.0/go.mod h1:ZfJSmng/TBNTBkFemHHHj5YY7VAU/MBU980F4VU1NG0=
 github.com/cosmos/interchain-accounts v0.2.6 h1:TV2M2g1/Rb9MCNw1YePdBKE0rcEczNj1RGHT+2iRYas=
 github.com/cosmos/interchain-accounts v0.2.6/go.mod h1:lUzWNzCiCtIEYZefac5+YgEBz2aR39nMS374jIv1c7o=
 github.com/cosmos/keyring v1.2.0 h1:8C1lBP9xhImmIabyXW4c3vFjjLiBdGCmfLUfeZlV1Yo=
@@ -623,6 +623,8 @@ github.com/openzipkin/zipkin-go v0.2.1/go.mod h1:NaW6tEwdmWMaCDZzg8sh+IBNOxHMPnh
 github.com/openzipkin/zipkin-go v0.2.2/go.mod h1:NaW6tEwdmWMaCDZzg8sh+IBNOxHMPnhQw8ySjnjRyN4=
 github.com/oraichain/cometbft v0.34.30-0.20230711110635-482cde0c4e04 h1:YEF6VhvB3xrUqLRoEKyJprOXlZ5iaxMzB/87HapgV0s=
 github.com/oraichain/cometbft v0.34.30-0.20230711110635-482cde0c4e04/go.mod h1:L9shMfbkZ8B+7JlwANEr+NZbBcn+hBpwdbeYvA5rLCw=
+github.com/oraichain/ibc-go/v4 v4.0.0-20231106030109-14073084847c h1:MAzh8QJATimK88LUbqO4LLOHcnC2nhJhSdwbxLWV07E=
+github.com/oraichain/ibc-go/v4 v4.0.0-20231106030109-14073084847c/go.mod h1:hrCiC6m8AkuNxbd8gYKwraGO549u+yPxbXqa6aEg8XE=
 github.com/oraichain/juno/x/clock v0.0.0-20231104204142-9bedf967a294 h1:22CZITFka+bEXz6Ob9wt+RdOsjKAbxzsOJ9wKQS+GIc=
 github.com/oraichain/juno/x/clock v0.0.0-20231104204142-9bedf967a294/go.mod h1:9bcy6YbLhOQ3IXqlOk1O5un+mFWUoSnCYTon5zANNkM=
 github.com/oraichain/wasmd v0.30.2-0.20230822113616-27ffe7fdd4d1 h1:zuyxYHrgoQ8+jkNj8VayWj4CLcvYS5zw2EFakBgDm7o=
