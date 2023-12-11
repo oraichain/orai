@@ -567,7 +567,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	app.ContractKeeper = wasmkeeper.NewDefaultPermissionKeeper(app.wasmKeeper)
 	validateKeeper(app.ContractKeeper)
 	app.Ics20WasmHooks.ContractKeeper = app.ContractKeeper
-	
+
 	app.ClockKeeper = clockkeeper.NewKeeper(
 		app.keys[clocktypes.StoreKey],
 		appCodec,

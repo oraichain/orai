@@ -43,13 +43,13 @@ sleep 12
 latest_height=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 while [ $latest_height -lt $UPGRADE_HEIGHT ];
 do
-   sleep 7
+   sleep 5
    ((latest_height=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')))
    echo $latest_height
 done
 
 # kill all processes
-pkill oraid && sleep 3s
+pkill oraid
 
 # install new binary for the upgrade
 echo "install new binary"

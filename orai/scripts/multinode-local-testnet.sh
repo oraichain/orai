@@ -50,7 +50,7 @@ update_genesis '.app_state["mint"]["params"]["mint_denom"]="orai"'
 
 
 # update voting period
-update_genesis '.app_state["gov"]["voting_params"]["voting_period"]="120s"'
+update_genesis '.app_state["gov"]["voting_params"]["voting_period"]="30s"'
 # port key (validator1 uses default ports)
 # validator1 1317, 9090, 9091, 26658, 26657, 26656, 6060
 # validator2 1316, 9088, 9089, 26655, 26654, 26653, 6061
