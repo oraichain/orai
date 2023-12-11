@@ -386,9 +386,11 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	app.bankKeeper = bankkeeper.NewBaseKeeper(
 		appCodec, keys[banktypes.StoreKey], app.accountKeeper, app.getSubspace(banktypes.ModuleName), app.BlockedAddrs(),
 	)
+	validateKeeper(app.accountKeeper, app.bankKeeper)
 	stakingKeeper := stakingkeeper.NewKeeper(
 		appCodec, keys[stakingtypes.StoreKey], app.accountKeeper, app.bankKeeper, app.getSubspace(stakingtypes.ModuleName),
 	)
+	validateKeeper(stakingKeeper)
 	app.mintKeeper = mintkeeper.NewKeeper(
 		appCodec, keys[minttypes.StoreKey], app.getSubspace(minttypes.ModuleName), &stakingKeeper,
 		app.accountKeeper, app.bankKeeper, authtypes.FeeCollectorName,
@@ -430,11 +432,13 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
+	validateKeeper(app.distrKeeper, app.slashingKeeper)
 	app.stakingKeeper = *stakingKeeper.SetHooks(
 		stakingtypes.NewMultiStakingHooks(app.distrKeeper.Hooks(), app.slashingKeeper.Hooks()),
 	)
 
 	// Create IBC Keeper
+	validateKeeper(scopedIBCKeeper, app.upgradeKeeper)
 	app.ibcKeeper = ibckeeper.NewKeeper(
 		appCodec,
 		keys[ibchost.StoreKey],
@@ -448,56 +452,31 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	hooksKeeper := ibchookskeeper.NewKeeper(
 		app.keys[ibchookstypes.StoreKey],
 	)
+	validateKeeper(hooksKeeper)
 	app.IBCHooksKeeper = &hooksKeeper
 
-	prefix := sdk.GetConfig().GetBech32AccountAddrPrefix()
-	// set the contract keeper for the Ics20WasmHooks
-	// just re-use the full router - do we want to limit this more?
-	wasmDir := filepath.Join(homePath, "wasm")
-
-	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
-	if err != nil {
-		panic("error while reading wasm config: " + err.Error())
-	}
-	// The last arguments can contain custom message handlers, and custom query handlers,
-	// if we want to allow any custom callbacks
-	supportedFeatures := "iterator,staking,stargate"
-
-	app.wasmKeeper = wasm.NewKeeper(
-		appCodec,
-		keys[wasm.StoreKey],
-		app.getSubspace(wasm.ModuleName),
-		app.accountKeeper,
-		app.bankKeeper,
-		app.stakingKeeper,
-		app.distrKeeper,
-		app.ibcKeeper.ChannelKeeper,
-		&app.ibcKeeper.PortKeeper,
-		scopedWasmKeeper,
-		app.transferKeeper,
-		app.MsgServiceRouter(),
-		app.GRPCQueryRouter(),
-		wasmDir,
-		wasmConfig,
-		supportedFeatures,
-		wasmOpts...,
-	)
-	app.ContractKeeper = wasmkeeper.NewDefaultPermissionKeeper(app.wasmKeeper)
-
-	app.ClockKeeper = clockkeeper.NewKeeper(
-		app.keys[clocktypes.StoreKey],
-		appCodec,
-		*app.ContractKeeper,
-	)
-
-	wasmHooks := ibchooks.NewWasmHooks(app.IBCHooksKeeper, app.ContractKeeper, prefix) // The contract keeper needs to be set later
+	validateKeeper(app.IBCHooksKeeper)
+	wasmHooks := ibchooks.NewWasmHooks(app.IBCHooksKeeper, nil, sdk.GetConfig().GetBech32AccountAddrPrefix()) // The contract keeper needs to be set later
 	app.Ics20WasmHooks = &wasmHooks
+	validateKeeper(app.ibcKeeper, app.ibcKeeper.ChannelKeeper, app.Ics20WasmHooks)
 	app.HooksICS4Wrapper = ibchooks.NewICS4Middleware(
 		app.ibcKeeper.ChannelKeeper,
 		app.Ics20WasmHooks,
 	)
 
+	// IBC Fee Module keeper
+	validateKeeper(app.HooksICS4Wrapper, app.ibcKeeper.PortKeeper)
+	app.ibcFeeKeeper = ibcfeekeeper.NewKeeper(
+		appCodec, keys[ibcfeetypes.StoreKey], app.getSubspace(ibcfeetypes.ModuleName),
+		app.HooksICS4Wrapper, // may be replaced with IBC middleware
+		app.ibcKeeper.ChannelKeeper,
+		&app.ibcKeeper.PortKeeper,
+		app.accountKeeper,
+		app.bankKeeper,
+	)
+
 	// Initialize packet forward middleware router
+	validateKeeper(app.ibcFeeKeeper)
 	app.PacketForwardKeeper = packetforwardkeeper.NewKeeper(
 		appCodec, app.keys[packetforwardtypes.StoreKey],
 		app.getSubspace(packetforwardtypes.ModuleName),
@@ -509,17 +488,8 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		&app.ibcFeeKeeper,
 	)
 
-	// IBC Fee Module keeper
-	app.ibcFeeKeeper = ibcfeekeeper.NewKeeper(
-		appCodec, keys[ibcfeetypes.StoreKey], app.getSubspace(ibcfeetypes.ModuleName),
-		app.HooksICS4Wrapper, // may be replaced with IBC middleware
-		app.ibcKeeper.ChannelKeeper,
-		&app.ibcKeeper.PortKeeper,
-		app.accountKeeper,
-		app.bankKeeper,
-	)
-
 	// Create Transfer Keepers
+	validateKeeper(app.PacketForwardKeeper, scopedTransferKeeper)
 	app.transferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec, keys[ibctransfertypes.StoreKey], app.getSubspace(ibctransfertypes.ModuleName),
 		app.PacketForwardKeeper,
@@ -537,6 +507,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	)
 	app.evidenceKeeper = *evidenceKeeper
 
+	validateKeeper(scopedICAHostKeeper)
 	app.icaHostKeeper = icahostkeeper.NewKeeper(
 		appCodec,
 		keys[icahosttypes.StoreKey],
@@ -547,6 +518,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		scopedICAHostKeeper,
 		app.MsgServiceRouter(),
 	)
+	validateKeeper(scopedICAControllerKeeper)
 	app.icaControllerKeeper = icacontrollerkeeper.NewKeeper(
 		appCodec,
 		keys[icacontrollertypes.StoreKey],
@@ -558,8 +530,49 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		app.MsgServiceRouter(),
 	)
 
+	validateKeeper(app.icaControllerKeeper, scopedInterTxKeeper)
 	// For wasmd we use the demo controller from https://github.com/cosmos/interchain-accounts but see notes below
 	app.interTxKeeper = intertxkeeper.NewKeeper(appCodec, keys[intertxtypes.StoreKey], app.icaControllerKeeper, scopedInterTxKeeper)
+
+	// set the contract keeper for the Ics20WasmHooks
+	// just re-use the full router - do we want to limit this more?
+	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
+	if err != nil {
+		panic("error while reading wasm config: " + err.Error())
+	}
+
+	validateKeeper(scopedWasmKeeper, app.transferKeeper)
+	app.wasmKeeper = wasm.NewKeeper(
+		appCodec,
+		keys[wasm.StoreKey],
+		app.getSubspace(wasm.ModuleName),
+		app.accountKeeper,
+		app.bankKeeper,
+		app.stakingKeeper,
+		app.distrKeeper,
+		app.ibcKeeper.ChannelKeeper,
+		&app.ibcKeeper.PortKeeper,
+		scopedWasmKeeper,
+		app.transferKeeper,
+		app.MsgServiceRouter(),
+		app.GRPCQueryRouter(),
+		filepath.Join(homePath, "wasm"),
+		wasmConfig,
+		strings.Join(AllCapabilities(), ","),
+		wasmOpts...,
+	)
+
+	// set the contract keeper for the Ics20WasmHooks
+	validateKeeper(app.wasmKeeper)
+	app.ContractKeeper = wasmkeeper.NewDefaultPermissionKeeper(app.wasmKeeper)
+	validateKeeper(app.ContractKeeper)
+	app.Ics20WasmHooks.ContractKeeper = app.ContractKeeper
+	
+	app.ClockKeeper = clockkeeper.NewKeeper(
+		app.keys[clocktypes.StoreKey],
+		appCodec,
+		*app.ContractKeeper,
+	)
 
 	// register the proposal types
 	govRouter := govtypes.NewRouter()
@@ -621,6 +634,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 
 	app.ibcKeeper.SetRouter(ibcRouter)
 
+	validateKeeper(govRouter)
 	app.govKeeper = govkeeper.NewKeeper(
 		appCodec,
 		keys[govtypes.StoreKey],
@@ -1038,5 +1052,20 @@ func (app *OraichainApp) upgradeHandler() {
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storetypes.StoreUpgrades{
 			Added: []string{clocktypes.StoreKey},
 		}))
+	}
+}
+
+// AllCapabilities returns all capabilities available with the current wasmvm
+// See https://github.com/CosmWasm/cosmwasm/blob/main/docs/CAPABILITIES-BUILT-IN.md
+// This functionality is going to be moved upstream: https://github.com/CosmWasm/wasmvm/issues/425
+func AllCapabilities() []string {
+	return []string{
+		"iterator",
+		"staking",
+		"stargate",
+		"cosmwasm_1_1",
+		"cosmwasm_1_2",
+		"cosmwasm_1_3",
+		"cosmwasm_1_4",
 	}
 }
