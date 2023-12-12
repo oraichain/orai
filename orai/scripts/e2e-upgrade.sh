@@ -100,4 +100,4 @@ if ! [[ $inflation =~ $re ]] ; then
    echo "Tests Failed"; exit 1
 fi
 
-echo "Tests Passed"
+sh $PWD/scripts/test_clock_counter_contract.sh

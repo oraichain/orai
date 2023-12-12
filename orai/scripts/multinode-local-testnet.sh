@@ -37,19 +37,12 @@ oraid validate-genesis --home=$HOME/.oraid/validator1
 
 # update staking genesis
 update_genesis '.app_state["staking"]["params"]["unbonding_time"]="240s"'
-
 # update crisis variable to orai
 update_genesis '.app_state["crisis"]["constant_fee"]["denom"]="orai"'
-
 # udpate gov genesis
-update_genesis '.app_state["gov"]["voting_params"]["voting_period"]="15s"'
 update_genesis '.app_state["gov"]["deposit_params"]["min_deposit"][0]["denom"]="orai"'
-
 # update mint genesis
 update_genesis '.app_state["mint"]["params"]["mint_denom"]="orai"'
-
-
-# update voting period
 update_genesis '.app_state["gov"]["voting_params"]["voting_period"]="30s"'
 # port key (validator1 uses default ports)
 # validator1 1317, 9090, 9091, 26658, 26657, 26656, 6060
