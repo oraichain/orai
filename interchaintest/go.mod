@@ -6,7 +6,7 @@ replace (
 	// fork wasmd so that we have legacy wasm types
 	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20230822113616-27ffe7fdd4d1
 	// go list -m -json github.com/oraichain/wasmvm@main | jq '.|"\(.Path) \(.Version)"' -r
-	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.2.4
+	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.5.0
 	// interchaintest supports ICS features so we need this for now
 	github.com/cosmos/cosmos-sdk => github.com/cosmos/cosmos-sdk v0.45.16-ics
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
