@@ -30,7 +30,7 @@ contract_address=$(oraid query wasm list-contract-by-code $code_id --output json
 
 echo "contract address: $contract_address"
 
-# # create new upgrade proposal
+# create new upgrade proposal
 UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-19}
 oraid tx gov submit-proposal software-upgrade $NEW_VERSION --title "foobar" --description "foobar"  --from validator1 --upgrade-height $UPGRADE_HEIGHT --upgrade-info "x" --deposit 10000000orai $ARGS --home $VALIDATOR_HOME
 oraid tx gov vote 1 yes --from validator1 --home "$HOME/.oraid/validator1" $ARGS && oraid tx gov vote 1 yes --from validator2 --home "$HOME/.oraid/validator2" $ARGS
@@ -43,13 +43,13 @@ sleep 12
 latest_height=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 while [ $latest_height -lt $UPGRADE_HEIGHT ];
 do
-   sleep 7
+   sleep 5
    ((latest_height=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')))
    echo $latest_height
 done
 
 # kill all processes
-pkill oraid && sleep 3s
+pkill oraid
 
 # install new binary for the upgrade
 echo "install new binary"
@@ -100,4 +100,4 @@ if ! [[ $inflation =~ $re ]] ; then
    echo "Tests Failed"; exit 1
 fi
 
-echo "Tests Passed"
+sh $PWD/scripts/test_clock_counter_contract.sh
