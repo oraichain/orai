@@ -541,6 +541,8 @@ github.com/opentracing/opentracing-go v1.2.0/go.mod h1:GxEUsuufX4nBwe+T+Wl9TAgYr
 github.com/openzipkin/zipkin-go v0.2.5/go.mod h1:KpXfKdgRDnnhsxw4pNIH9Md5lyFqKUa4YDFlwRYAMyE=
 github.com/oraichain/juno/x/clock v0.0.0-20231103100256-4c83cb3f8224 h1:bEt/DUaqXbvaRLp7/XWqvAFTJT7/3DdyVjdD2KL7Ioo=
 github.com/oraichain/juno/x/clock v0.0.0-20231103100256-4c83cb3f8224/go.mod h1:9bcy6YbLhOQ3IXqlOk1O5un+mFWUoSnCYTon5zANNkM=
+github.com/oraichain/wasmvm v1.5.2 h1:hN5Pa4EPlRb0BYKkNh2cgixd0+L6kPpzc+s30Il2W/Q=
+github.com/oraichain/wasmvm v1.5.2/go.mod h1:fXB+m2gyh4v9839zlIXdMZGeLAxqUdYdFQqYsTha2hc=
 github.com/ory/dockertest v3.3.5+incompatible/go.mod h1:1vX4m9wsvi00u5bseYwXaSnhNrne+V0E6LAcBILJdPs=
 github.com/otiai10/copy v1.2.0/go.mod h1:rrF5dJ5F0t/EWSYODDu4j9/vEeYHMkc8jt0zJChqQWw=
 github.com/otiai10/mint v1.3.1/go.mod h1:/yxELlJQ0ufhjUwhshSj+wFjZ78CnZ48/1wtmBH1OTc=
