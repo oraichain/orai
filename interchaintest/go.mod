@@ -8,7 +8,7 @@ replace (
 	// go list -m -json github.com/oraichain/wasmvm@main | jq '.|"\(.Path) \(.Version)"' -r
 	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.5.2
 	// interchaintest supports ICS features so we need this for now
-	github.com/cosmos/cosmos-sdk => github.com/cosmos/cosmos-sdk v0.45.16-ics
+	github.com/cosmos/cosmos-sdk => github.com/oraichain/cosmos-sdk v0.45.16-ics-epi-191
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20230711110635-482cde0c4e04
