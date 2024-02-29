@@ -2,7 +2,7 @@
 
 # setup the network using the old binary
 
-OLD_VERSION=${OLD_VERSION:-"v0.41.5"}
+OLD_VERSION=${OLD_VERSION:-"v0.41.6"}
 WASM_PATH=${WASM_PATH:-"../oraiwasm/package/plus/swapmap/artifacts/swapmap.wasm"}
 ARGS="--chain-id testing -y --keyring-backend test --fees 200orai --gas auto --gas-adjustment 1.5 -b block"
 NEW_VERSION=${NEW_VERSION:-"v0.41.7"}
