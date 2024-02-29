@@ -145,7 +145,7 @@ const appName = "Oraichain"
 var (
 	NodeDir = ".oraid"
 
-	BinaryVersion = "v0.41.5"
+	BinaryVersion = "v0.41.7"
 
 	// If EnabledSpecificProposals is "", and this is "true", then enable all x/wasm proposals.
 	// If EnabledSpecificProposals is "", and this is not "true", then disable all x/wasm proposals.
@@ -1035,10 +1035,6 @@ func (app *OraichainApp) upgradeHandler() {
 	app.upgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		ctx.Logger().Info("start to migrate modules...")
 		ctx.Logger().Info("vm module: %v\n", fromVM)
-		// x/clock
-		if err := app.ClockKeeper.SetParams(ctx, clocktypes.DefaultParams()); err != nil {
-			return nil, err
-		}
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
 
@@ -1050,7 +1046,7 @@ func (app *OraichainApp) upgradeHandler() {
 	if upgradeInfo.Name == BinaryVersion && !app.upgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storetypes.StoreUpgrades{
-			Added: []string{clocktypes.StoreKey},
+			Added: []string{},
 		}))
 	}
 }
