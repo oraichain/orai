@@ -2,7 +2,7 @@
 
 rm -rf .oraid
 
-oraid init --chain-id "foo" "bar"
+oraid init --chain-id "foo" "bar" --home .oraid
 
 timeout_commit=$(awk -F ' = ' '/^timeout_commit/ {gsub(/"/, "", $2); print $2}' .oraid/config/config.toml)
 
