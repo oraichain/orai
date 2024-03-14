@@ -7,11 +7,13 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"time"
 
 	clientconfig "github.com/cosmos/cosmos-sdk/client/config"
 	srvconfig "github.com/cosmos/cosmos-sdk/server/config"
 	"github.com/pkg/errors"
 	cfg "github.com/tendermint/tendermint/config"
+	"github.com/tendermint/tendermint/libs/cli"
 	tmos "github.com/tendermint/tendermint/libs/os"
 	tmrand "github.com/tendermint/tendermint/libs/rand"
 
@@ -24,7 +26,6 @@ import (
 	"github.com/cosmos/go-bip39"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
-	"github.com/tendermint/tendermint/libs/cli"
 	tmcli "github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
 	"github.com/tendermint/tendermint/types"
@@ -311,7 +312,7 @@ func (ac appCreator) createOraichainAppAndExport(
 
 // initCmd returns a command that initializes all files needed for Tendermint
 // and the respective application.
-func initCmd(mbm module.BasicManager, customAppState app.GenesisState, defaultNodeHome string) *cobra.Command {
+func initCmd(_ module.BasicManager, customAppState app.GenesisState, defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "init [moniker]",
 		Short: "Initialize private validator, p2p, genesis, and application configuration files",
@@ -357,6 +358,7 @@ func initCmd(mbm module.BasicManager, customAppState app.GenesisState, defaultNo
 			config.Moniker = args[0]
 			config.P2P.MaxNumInboundPeers = 100
 			config.P2P.MaxNumOutboundPeers = 100
+			config.Consensus.TimeoutCommit = 500 * time.Millisecond
 
 			genFile := config.GenesisFile()
 			overwrite, _ := cmd.Flags().GetBool(FlagOverwrite)
