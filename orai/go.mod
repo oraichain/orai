@@ -40,6 +40,8 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bgentry/speakeasy v0.1.1-0.20220910012023-760eaf8b6816 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.3.2 // indirect
+	github.com/btcsuite/btcd/btcutil v1.1.5 // indirect
+	github.com/btcsuite/btcd/chaincfg/chainhash v1.1.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
@@ -173,7 +175,7 @@ replace (
 
 	github.com/CosmosContracts/juno/v18/x/clock => github.com/oraichain/juno/x/clock v0.0.0-20231104204142-9bedf967a294
 	// same version as cosmos-sdk
-	github.com/btcsuite/btcd => github.com/btcsuite/btcd v0.22.2
+	github.com/btcsuite/btcd => github.com/btcsuite/btcd v0.24.0
 
 	github.com/cosmos/cosmos-sdk => github.com/oraichain/cosmos-sdk v0.45.16-ics-epi-191
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
