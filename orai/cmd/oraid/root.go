@@ -358,7 +358,9 @@ func initCmd(_ module.BasicManager, customAppState app.GenesisState, defaultNode
 			config.Moniker = args[0]
 			config.P2P.MaxNumInboundPeers = 100
 			config.P2P.MaxNumOutboundPeers = 100
+			config.P2P.FlushThrottleTimeout= 10 * time.Millisecond
 			config.Consensus.TimeoutCommit = 500 * time.Millisecond
+			config.Consensus.PeerGossipSleepDuration = 10 * time.Millisecond
 
 			genFile := config.GenesisFile()
 			overwrite, _ := cmd.Flags().GetBool(FlagOverwrite)
