@@ -1,0 +1,16 @@
+{
+  "title": "Change time_iota_ms to 1ms to mitigate future blocks",
+  "description": "Change time_iota_ms to 1ms to mitigate future blocks bug. This proposal makes sure we also keep other block param values as well",
+  "changes": [
+    {
+      "subspace": "baseapp",
+      "key": "EvidenceParams",
+      "value": {
+        "max_age_num_blocks": "5000",
+        "max_age_duration": "172800000000000",
+        "max_bytes": "1048576"
+      }
+    }
+  ],
+  "deposit": "10000000orai"
+}

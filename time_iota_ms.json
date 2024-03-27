@@ -1,0 +1,16 @@
+{
+  "title": "Change time_iota_ms to 1ms to mitigate future blocks",
+  "description": "Change time_iota_ms to 1ms to mitigate future blocks bug. This proposal makes sure we also keep other block param values as well",
+  "changes": [
+    {
+      "subspace": "baseapp",
+      "key": "BlockParams",
+      "value": {
+        "max_bytes": "32020096",
+        "max_gas": "-1",
+        "time_iota_ms": "100"
+      }
+    }
+  ],
+  "deposit": "10000000orai"
+}
