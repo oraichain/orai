@@ -185,4 +185,6 @@ replace (
 	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20230711110635-482cde0c4e04
 
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
+
+	github.com/cosmos/ibc-go/v4 => ../../ibc-go
 )
