@@ -9,6 +9,7 @@ mkdir $PWD/.oraid
 mkdir $PWD/.oraid/validator1
 mkdir $PWD/.oraid/validator2
 mkdir $PWD/.oraid/validator3
+docker-compose -f docker-compose-e2e-upgrade.yml down --remove-orphans
 docker volume rm orai_oraivisor
 docker-compose -f docker-compose-e2e-upgrade.yml up -d --force-recreate
 docker_command="docker-compose -f docker-compose-e2e-upgrade.yml exec"
