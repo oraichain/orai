@@ -184,7 +184,7 @@ replace (
 
 	// use Oraichain fork of cometbft
 	// go list -m -json github.com/oraichain/cometbft@482cde0c4e04479d4164b1b4f7a0b90071c58b7f | jq '.|"\(.Path) \(.Version)"' -r
-	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20240329015336-24dcc6856c88
+	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20240425173150-09d3515b75aa
 
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )
