@@ -11,7 +11,7 @@ replace (
 	github.com/cosmos/cosmos-sdk => github.com/oraichain/cosmos-sdk v0.45.16-ics-epi-191
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
-	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20240329015336-24dcc6856c88
+	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20240425173150-09d3515b75aa
 	// github.com/tidwall/btree => github.com/tidwall/btree v1.5.0
 	github.com/vedhavyas/go-subkey => github.com/strangelove-ventures/go-subkey v1.0.7
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2

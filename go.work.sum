@@ -541,6 +541,8 @@ github.com/opencontainers/selinux v1.10.0/go.mod h1:2i0OySw99QjzBBQByd1Gr9gSjvuh
 github.com/opentracing/opentracing-go v1.0.3-0.20180606204148-bd9c31933947/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
 github.com/opentracing/opentracing-go v1.2.0/go.mod h1:GxEUsuufX4nBwe+T+Wl9TAgYrxe9dPLANfrWvHYVTgc=
 github.com/openzipkin/zipkin-go v0.2.5/go.mod h1:KpXfKdgRDnnhsxw4pNIH9Md5lyFqKUa4YDFlwRYAMyE=
+github.com/oraichain/cometbft v0.34.30-0.20240425173150-09d3515b75aa h1:VYk/7NyyDIjiSPhTZJVjF4xbidyxikD/C1EH+ZXSzo0=
+github.com/oraichain/cometbft v0.34.30-0.20240425173150-09d3515b75aa/go.mod h1:L9shMfbkZ8B+7JlwANEr+NZbBcn+hBpwdbeYvA5rLCw=
 github.com/oraichain/juno/x/clock v0.0.0-20231103100256-4c83cb3f8224 h1:bEt/DUaqXbvaRLp7/XWqvAFTJT7/3DdyVjdD2KL7Ioo=
 github.com/oraichain/juno/x/clock v0.0.0-20231103100256-4c83cb3f8224/go.mod h1:9bcy6YbLhOQ3IXqlOk1O5un+mFWUoSnCYTon5zANNkM=
 github.com/ory/dockertest v3.3.5+incompatible/go.mod h1:1vX4m9wsvi00u5bseYwXaSnhNrne+V0E6LAcBILJdPs=

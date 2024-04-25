@@ -523,7 +523,7 @@ github.com/opencontainers/go-digest v1.0.0/go.mod h1:0JzlMkj0TRzQZfJkVvzbP0HBR3I
 github.com/opencontainers/image-spec v1.1.0-rc2 h1:2zx/Stx4Wc5pIPDvIxHXvXtQFW/7XWJGmnM7r3wg034=
 github.com/opencontainers/image-spec v1.1.0-rc2/go.mod h1:3OVijpioIKYWTqjiG0zfF6wvoJ4fAXGbjdZuI2NgsRQ=
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
-github.com/oraichain/cometbft v0.34.30-0.20240329015336-24dcc6856c88 h1:TCLtpL/CLFq+awORdJK3JzVJ1C+I1hS9vX+PTBcz2f4=
+github.com/oraichain/cometbft v0.34.30-0.20240425173150-09d3515b75aa h1:VYk/7NyyDIjiSPhTZJVjF4xbidyxikD/C1EH+ZXSzo0=
 github.com/oraichain/cosmos-sdk v0.45.16-ics-epi-191 h1:xQrW8zgHNvuzeGxD7Yd2KPS4rZH4uTGsjFrWVHOW4eQ=
 github.com/oraichain/wasmd v0.30.2-0.20230822113616-27ffe7fdd4d1 h1:zuyxYHrgoQ8+jkNj8VayWj4CLcvYS5zw2EFakBgDm7o=
 github.com/oraichain/wasmvm v1.5.2 h1:hN5Pa4EPlRb0BYKkNh2cgixd0+L6kPpzc+s30Il2W/Q=
