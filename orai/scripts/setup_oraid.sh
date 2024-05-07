@@ -8,7 +8,7 @@ rm -rf .oraid/
 
 oraid init --chain-id "$CHAIN_ID" "$MONIKER"
 
-(cat .env) | oraid keys add $USER --recover --keyring-backend test
+oraid keys add $USER --keyring-backend test
 
 # hardcode the validator account for this instance
 oraid add-genesis-account $USER "100000000000000orai" --keyring-backend test
