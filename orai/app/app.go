@@ -492,20 +492,21 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	)
 
 	app.evmutilKeeper = evmutilkeeper.NewKeeper(
-		app.appCodec,
+		appCodec,
 		keys[evmutiltypes.StoreKey],
 		evmutilSubspace,
 		app.bankKeeper,
 		app.accountKeeper,
 	)
 
+	validateKeeper(app.feeMarketKeeper)
+	validateKeeper(app.evmutilKeeper)
 	evmBankKeeper := evmutilkeeper.NewEvmBankKeeper(app.evmutilKeeper, app.bankKeeper, app.accountKeeper)
 	app.evmKeeper = evmkeeper.NewKeeper(
 		appCodec, keys[evmtypes.StoreKey], tkeys[evmtypes.TransientKey], evmSubspace,
 		app.accountKeeper, evmBankKeeper, app.stakingKeeper, app.feeMarketKeeper,
 		options.EVMTrace,
 	)
-
 	app.evmutilKeeper.SetEvmKeeper(app.evmKeeper)
 
 	// Configure the hooks keeper
@@ -731,6 +732,8 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.stakingKeeper, app.accountKeeper, app.bankKeeper),
 		evidence.NewAppModule(app.evidenceKeeper),
 		ibc.NewAppModule(app.ibcKeeper),
+		evm.NewAppModule(app.evmKeeper, app.accountKeeper),
+		feemarket.NewAppModule(app.feeMarketKeeper),
 		params.NewAppModule(app.paramsKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.accountKeeper, app.bankKeeper, app.feeGrantKeeper, app.interfaceRegistry),
 		authzmodule.NewAppModule(appCodec, app.authzKeeper, app.accountKeeper, app.bankKeeper, app.interfaceRegistry),
@@ -741,8 +744,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		clock.NewAppModule(appCodec, app.ClockKeeper),
 		ibchooks.NewAppModule(app.accountKeeper),
 		packetforward.NewAppModule(app.PacketForwardKeeper),
-		evm.NewAppModule(app.evmKeeper, app.accountKeeper),
-		feemarket.NewAppModule(app.feeMarketKeeper),
+		evmutil.NewAppModule(app.evmutilKeeper, app.bankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -757,13 +759,13 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
 		stakingtypes.ModuleName,
+		feemarkettypes.ModuleName,
+		evmtypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
 		govtypes.ModuleName,
 		crisistypes.ModuleName,
 		genutiltypes.ModuleName,
-		feemarkettypes.ModuleName,
-		evmtypes.ModuleName,
 		authz.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
@@ -1101,6 +1103,9 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(wasm.ModuleName)
 	paramsKeeper.Subspace(ibchookstypes.ModuleName)
 	paramsKeeper.Subspace(clocktypes.ModuleName)
+	paramsKeeper.Subspace(evmtypes.ModuleName)
+	paramsKeeper.Subspace(feemarkettypes.ModuleName)
+	paramsKeeper.Subspace(evmutiltypes.ModuleName)
 
 	return paramsKeeper
 }
