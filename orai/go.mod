@@ -66,7 +66,6 @@ require (
 	github.com/cosmos/gogoproto v1.4.6 // indirect
 	github.com/cosmos/gorocksdb v1.2.0 // indirect
 	github.com/cosmos/iavl v1.0.0 // indirect
-	github.com/cosmos/ibc-go/v3 v3.4.0 // indirect
 	github.com/cosmos/ledger-cosmos-go v0.12.2 // indirect
 	github.com/creachadair/taskgroup v0.4.2 // indirect
 	github.com/danieljoos/wincred v1.1.2 // indirect
@@ -222,7 +221,7 @@ replace (
 	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20240329015336-24dcc6856c88
 
 	// Use ethermint fork that respects min-gas-price with NoBaseFee true and london enabled, and includes eip712 support
-	github.com/tharsis/ethermint => github.com/kava-labs/ethermint v0.14.0-kava-v21.1
+	github.com/tharsis/ethermint => github.com/oraichain/ethermint v0.14.0-orai-v1.0.0
 
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )

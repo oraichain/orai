@@ -657,8 +657,6 @@ github.com/kataras/iris/v12 v12.1.8/go.mod h1:LMYy4VlP67TQ3Zgriz8RE2h2kMZV2SgMYb
 github.com/kataras/neffos v0.0.14/go.mod h1:8lqADm8PnbeFfL7CLXh1WHw53dG27MC3pgi2R1rmoTE=
 github.com/kataras/pio v0.0.2/go.mod h1:hAoW0t9UmXi4R5Oyq5Z4irTbaTsOemSrDGUtaTl7Dro=
 github.com/kataras/sitemap v0.0.5/go.mod h1:KY2eugMKiPwsJgx7+U103YZehfvNGOXURubcGyk0Bz8=
-github.com/kava-labs/ethermint v0.14.0-kava-v21.1 h1:Riu+gLLfLfRd1TvaoeEM+8HylRL5uNrXZlfBUhxZFPI=
-github.com/kava-labs/ethermint v0.14.0-kava-v21.1/go.mod h1:L4wqbHHORlqm04t6Qmv7CYHzqnOAl8jbkJF0yNm9LH4=
 github.com/kava-labs/kava v0.21.1 h1:91LIHnRSHKFAnccNNl+7m/2DsXXM1j2uYg/6oPFtqDU=
 github.com/kava-labs/kava v0.21.1/go.mod h1:3adeVmSpm8xejhI+v0qKZsLA8LNdMpkZSns1kXG9YiA=
 github.com/kisielk/errcheck v1.5.0/go.mod h1:pFxgyoBC7bSaBwPgfKdkLd5X25qrDl4LWUI2bnpBCr8=
@@ -829,7 +827,7 @@ github.com/openzipkin/zipkin-go v0.2.2/go.mod h1:NaW6tEwdmWMaCDZzg8sh+IBNOxHMPnh
 github.com/oraichain/cometbft v0.34.30-0.20240329015336-24dcc6856c88 h1:TCLtpL/CLFq+awORdJK3JzVJ1C+I1hS9vX+PTBcz2f4=
 github.com/oraichain/cometbft v0.34.30-0.20240329015336-24dcc6856c88/go.mod h1:L9shMfbkZ8B+7JlwANEr+NZbBcn+hBpwdbeYvA5rLCw=
 github.com/oraichain/cosmos-sdk v0.45.16-ics-epi-191 h1:xQrW8zgHNvuzeGxD7Yd2KPS4rZH4uTGsjFrWVHOW4eQ=
-github.com/oraichain/cosmos-sdk v0.45.16-ics-epi-191/go.mod h1:bScuNwWAP0TZJpUf+SHXRU3xGoUPp+X9nAzfeIXts40=
+github.com/oraichain/ethermint v0.14.0-orai-v1.0.0 h1:8bnCJO0fyPLT+ASoPs1+PYPQLVZt80N31p6UFFq2rmY=
 github.com/oraichain/juno/x/clock v0.0.0-20231104204142-9bedf967a294 h1:22CZITFka+bEXz6Ob9wt+RdOsjKAbxzsOJ9wKQS+GIc=
 github.com/oraichain/juno/x/clock v0.0.0-20231104204142-9bedf967a294/go.mod h1:9bcy6YbLhOQ3IXqlOk1O5un+mFWUoSnCYTon5zANNkM=
 github.com/oraichain/wasmd v0.30.2-0.20230822113616-27ffe7fdd4d1 h1:zuyxYHrgoQ8+jkNj8VayWj4CLcvYS5zw2EFakBgDm7o=
