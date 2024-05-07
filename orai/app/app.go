@@ -1112,6 +1112,9 @@ func (app *OraichainApp) upgradeHandler() {
 	app.upgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		ctx.Logger().Info("start to migrate modules...")
 		ctx.Logger().Info("vm module: %v\n", fromVM)
+		defaultEvmParams := evmtypes.DefaultParams()
+		defaultEvmParams.EvmDenom = appconfig.EvmDenom // atto orai aka 10^-18
+		app.evmKeeper.SetParams(ctx, defaultEvmParams)
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
 

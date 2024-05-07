@@ -11,6 +11,7 @@ import (
 	mint "github.com/cosmos/cosmos-sdk/x/mint/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
 	appconfig "github.com/oraichain/orai/cmd/config"
+	evm "github.com/tharsis/ethermint/x/evm/types"
 )
 
 // GenesisState default state for the application
@@ -24,6 +25,7 @@ func NewDefaultGenesisState(cdc codec.Codec) GenesisState {
 	mintGenesis := mint.DefaultGenesisState()
 	govGenesis := gov.DefaultGenesisState()
 	crisisGenesis := crisis.DefaultGenesisState()
+	evmGenesis := evm.DefaultGenesisState()
 
 	stakingGenesis.Params.BondDenom = appconfig.Bech32Prefix
 	stakingGenesis.Params.HistoricalEntries = 1000
@@ -44,6 +46,9 @@ func NewDefaultGenesisState(cdc codec.Codec) GenesisState {
 
 	crisisGenesis.ConstantFee = sdk.NewCoin(appconfig.Bech32Prefix, sdk.TokensFromConsensusPower(10, sdk.NewInt(1000000)))
 	genesisState[crisis.ModuleName] = cdc.MustMarshalJSON(crisisGenesis)
+
+	// update default evm denom of evm module
+	evmGenesis.Params.EvmDenom = appconfig.EvmDenom
 
 	// slashingGenesis.Params.SignedBlocksWindow = 30000                         // approximately 1 day
 	// slashingGenesis.Params.MinSignedPerWindow = sdk.NewDecWithPrec(5, 2)      // 5%

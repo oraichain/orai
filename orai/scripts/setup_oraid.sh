@@ -11,11 +11,11 @@ oraid init --chain-id "$CHAIN_ID" "$MONIKER"
 (cat .env) | oraid keys add $USER --recover --keyring-backend test
 
 # hardcode the validator account for this instance
-oraid add-genesis-account $USER "100000000000000orai"
+oraid add-genesis-account $USER "100000000000000orai" --keyring-backend test
 
 # submit a genesis validator tx
 ## Workraround for https://github.com/cosmos/cosmos-sdk/issues/8251
-oraid gentx $USER "250000000orai" --chain-id="$CHAIN_ID" --amount="250000000orai" -y
+oraid gentx $USER "250000000orai" --chain-id="$CHAIN_ID" --amount="250000000orai" -y --keyring-backend test
 
 oraid collect-gentxs
 
