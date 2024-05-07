@@ -49,6 +49,7 @@ func NewDefaultGenesisState(cdc codec.Codec) GenesisState {
 
 	// update default evm denom of evm module
 	evmGenesis.Params.EvmDenom = appconfig.EvmDenom
+	genesisState[evm.ModuleName] = cdc.MustMarshalJSON((evmGenesis))
 
 	// slashingGenesis.Params.SignedBlocksWindow = 30000                         // approximately 1 day
 	// slashingGenesis.Params.MinSignedPerWindow = sdk.NewDecWithPrec(5, 2)      // 5%
@@ -59,7 +60,7 @@ func NewDefaultGenesisState(cdc codec.Codec) GenesisState {
 
 	for _, b := range ModuleBasics {
 		name := b.Name()
-		if name == staking.ModuleName || name == mint.ModuleName || name == gov.ModuleName || name == crisis.ModuleName {
+		if name == staking.ModuleName || name == mint.ModuleName || name == gov.ModuleName || name == crisis.ModuleName || name == evm.ModuleName {
 			continue
 		}
 		genesisState[b.Name()] = b.DefaultGenesis(cdc)
