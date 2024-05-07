@@ -44,7 +44,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
@@ -137,6 +136,19 @@ import (
 	"github.com/CosmosContracts/juno/v18/x/clock"
 	clockkeeper "github.com/CosmosContracts/juno/v18/x/clock/keeper"
 	clocktypes "github.com/CosmosContracts/juno/v18/x/clock/types"
+
+	evmutil "github.com/kava-labs/kava/x/evmutil"
+	evmutilkeeper "github.com/kava-labs/kava/x/evmutil/keeper"
+	evmutiltypes "github.com/kava-labs/kava/x/evmutil/types"
+	evmante "github.com/tharsis/ethermint/app/ante"
+	ethermintconfig "github.com/tharsis/ethermint/server/config"
+	"github.com/tharsis/ethermint/x/evm"
+	evmrest "github.com/tharsis/ethermint/x/evm/client/rest"
+	evmkeeper "github.com/tharsis/ethermint/x/evm/keeper"
+	evmtypes "github.com/tharsis/ethermint/x/evm/types"
+	"github.com/tharsis/ethermint/x/feemarket"
+	feemarketkeeper "github.com/tharsis/ethermint/x/feemarket/keeper"
+	feemarkettypes "github.com/tharsis/ethermint/x/feemarket/types"
 )
 
 const appName = "Oraichain"
@@ -145,7 +157,7 @@ const appName = "Oraichain"
 var (
 	NodeDir = ".oraid"
 
-	BinaryVersion = "v0.41.8"
+	BinaryVersion = "v0.42.0"
 
 	// If EnabledSpecificProposals is "", and this is "true", then enable all x/wasm proposals.
 	// If EnabledSpecificProposals is "", and this is not "true", then disable all x/wasm proposals.
@@ -225,6 +237,8 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
+		evm.AppModuleBasic{},
+		feemarket.AppModuleBasic{},
 		feegrantmodule.AppModuleBasic{},
 		authzmodule.AppModuleBasic{},
 		wasm.AppModuleBasic{},
@@ -234,6 +248,7 @@ var (
 		clock.AppModuleBasic{},
 		ibchooks.AppModuleBasic{},
 		packetforward.AppModuleBasic{},
+		evmutil.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -245,6 +260,8 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
+		evmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
+		evmutiltypes.ModuleName:        {authtypes.Minter, authtypes.Burner},
 		ibcfeetypes.ModuleName:         nil,
 		icatypes.ModuleName:            nil,
 		wasm.ModuleName:                {authtypes.Burner},
@@ -261,6 +278,20 @@ var (
 	_ simapp.App              = (*OraichainApp)(nil)
 	_ servertypes.Application = (*OraichainApp)(nil)
 )
+
+// Options bundles several configuration params for an App.
+type EvmOptions struct {
+	MempoolEnableAuth    bool
+	MempoolAuthAddresses []sdk.AccAddress
+	EVMTrace             string
+	EVMMaxGasWanted      uint64
+}
+
+// DefaultOptions is a sensible default Options value.
+var DefaultEvmOptions = EvmOptions{
+	EVMTrace:        ethermintconfig.DefaultEVMTracer,
+	EVMMaxGasWanted: ethermintconfig.DefaultMaxTxGasWanted,
+}
 
 // OraichainApp extended ABCI application
 type OraichainApp struct {
@@ -289,6 +320,9 @@ type OraichainApp struct {
 	upgradeKeeper    upgradekeeper.Keeper
 	paramsKeeper     paramskeeper.Keeper
 	ibcKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	evmKeeper        *evmkeeper.Keeper
+	evmutilKeeper    evmutilkeeper.Keeper
+	feeMarketKeeper  feemarketkeeper.Keeper
 	evidenceKeeper   evidencekeeper.Keeper
 	transferKeeper   ibctransferkeeper.Keeper
 	wasmKeeper       wasm.Keeper
@@ -331,7 +365,7 @@ type OraichainApp struct {
 // NewOraichainApp returns a reference to an initialized OraichainApp.
 func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool,
 	skipUpgradeHeights map[int64]bool, homePath string, invCheckPeriod uint, encodingConfig appparams.EncodingConfig, enabledProposals []wasm.ProposalType,
-	appOpts servertypes.AppOptions, wasmOpts []wasm.Option, baseAppOptions ...func(*baseapp.BaseApp)) *OraichainApp {
+	appOpts servertypes.AppOptions, wasmOpts []wasm.Option, options EvmOptions, baseAppOptions ...func(*baseapp.BaseApp)) *OraichainApp {
 
 	appCodec, legacyAmino := encodingConfig.Codec, encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
@@ -345,12 +379,12 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		authtypes.StoreKey, banktypes.StoreKey, stakingtypes.StoreKey,
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
-		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
+		evidencetypes.StoreKey, ibctransfertypes.StoreKey, evmtypes.StoreKey, feemarkettypes.StoreKey, capabilitytypes.StoreKey,
 		wasm.StoreKey, feegrant.StoreKey, authzkeeper.StoreKey, icahosttypes.StoreKey,
 		icacontrollertypes.StoreKey, intertxtypes.StoreKey, ibcfeetypes.StoreKey,
-		ibchookstypes.StoreKey, clocktypes.StoreKey, packetforwardtypes.StoreKey,
+		ibchookstypes.StoreKey, clocktypes.StoreKey, packetforwardtypes.StoreKey, evmutiltypes.StoreKey,
 	)
-	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
+	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
 
 	app := &OraichainApp{
@@ -368,6 +402,10 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 
 	// set the BaseApp's parameter store
 	bApp.SetParamStore(app.paramsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramskeeper.ConsensusParamsKeyTable()))
+
+	feemarketSubspace := app.paramsKeeper.Subspace(feemarkettypes.ModuleName)
+	evmSubspace := app.paramsKeeper.Subspace(evmtypes.ModuleName)
+	evmutilSubspace := app.paramsKeeper.Subspace(evmutiltypes.ModuleName)
 
 	// add capability keeper and ScopeToModule for ibc module
 	app.capabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
@@ -447,6 +485,28 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		app.upgradeKeeper,
 		scopedIBCKeeper,
 	)
+
+	// Create Ethermint keepers
+	app.feeMarketKeeper = feemarketkeeper.NewKeeper(
+		appCodec, keys[feemarkettypes.StoreKey], feemarketSubspace,
+	)
+
+	app.evmutilKeeper = evmutilkeeper.NewKeeper(
+		app.appCodec,
+		keys[evmutiltypes.StoreKey],
+		evmutilSubspace,
+		app.bankKeeper,
+		app.accountKeeper,
+	)
+
+	evmBankKeeper := evmutilkeeper.NewEvmBankKeeper(app.evmutilKeeper, app.bankKeeper, app.accountKeeper)
+	app.evmKeeper = evmkeeper.NewKeeper(
+		appCodec, keys[evmtypes.StoreKey], tkeys[evmtypes.TransientKey], evmSubspace,
+		app.accountKeeper, evmBankKeeper, app.stakingKeeper, app.feeMarketKeeper,
+		options.EVMTrace,
+	)
+
+	app.evmutilKeeper.SetEvmKeeper(app.evmKeeper)
 
 	// Configure the hooks keeper
 	hooksKeeper := ibchookskeeper.NewKeeper(
@@ -681,6 +741,8 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		clock.NewAppModule(appCodec, app.ClockKeeper),
 		ibchooks.NewAppModule(app.accountKeeper),
 		packetforward.NewAppModule(app.PacketForwardKeeper),
+		evm.NewAppModule(app.evmKeeper, app.accountKeeper),
+		feemarket.NewAppModule(app.feeMarketKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -700,6 +762,8 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		govtypes.ModuleName,
 		crisistypes.ModuleName,
 		genutiltypes.ModuleName,
+		feemarkettypes.ModuleName,
+		evmtypes.ModuleName,
 		authz.ModuleName,
 		feegrant.ModuleName,
 		paramstypes.ModuleName,
@@ -714,11 +778,15 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		wasm.ModuleName,
 		ibchookstypes.ModuleName,
 		clocktypes.ModuleName,
+		evmutiltypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		crisistypes.ModuleName,
 		govtypes.ModuleName,
 		stakingtypes.ModuleName,
+		evmtypes.ModuleName,
+		// fee market module must go after evm module in order to retrieve the block gas used.
+		feemarkettypes.ModuleName,
 		capabilitytypes.ModuleName,
 		authtypes.ModuleName,
 		banktypes.ModuleName,
@@ -742,6 +810,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		wasm.ModuleName,
 		ibchookstypes.ModuleName,
 		clocktypes.ModuleName,
+		evmutiltypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -775,6 +844,9 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		packetforwardtypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		intertxtypes.ModuleName,
+		evmtypes.ModuleName,
+		feemarkettypes.ModuleName,
+		evmutiltypes.ModuleName,
 		// wasm after ibc transfer
 		wasm.ModuleName,
 		ibchookstypes.ModuleName,
@@ -820,13 +892,14 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 
 	anteHandler, err := NewAnteHandler(
 		HandlerOptions{
-			HandlerOptions: ante.HandlerOptions{
-				AccountKeeper:   app.accountKeeper,
-				BankKeeper:      app.bankKeeper,
-				FeegrantKeeper:  app.feeGrantKeeper,
-				SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
-				SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
-			},
+			AccountKeeper:     app.accountKeeper,
+			BankKeeper:        app.bankKeeper,
+			EvmKeeper:         app.evmKeeper,
+			FeegrantKeeper:    app.feeGrantKeeper,
+			FeeMarketKeeper:   app.feeMarketKeeper,
+			SignModeHandler:   encodingConfig.TxConfig.SignModeHandler(),
+			SigGasConsumer:    evmante.DefaultSigVerificationGasConsumer,
+			MaxTxGasWanted:    options.EVMMaxGasWanted,
 			IBCKeeper:         app.ibcKeeper,
 			TxCounterStoreKey: keys[wasm.StoreKey],
 			WasmConfig:        wasmConfig,
@@ -955,6 +1028,7 @@ func (app *OraichainApp) getSubspace(moduleName string) paramstypes.Subspace {
 func (app *OraichainApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig) {
 	clientCtx := apiSvr.ClientCtx
 	rpc.RegisterRoutes(clientCtx, apiSvr.Router)
+	evmrest.RegisterTxRoutes(clientCtx, apiSvr.Router)
 	// Register legacy tx routes.
 	authrest.RegisterTxRoutes(clientCtx, apiSvr.Router)
 	// Register new tx routes from grpc-gateway.
@@ -1046,7 +1120,7 @@ func (app *OraichainApp) upgradeHandler() {
 	if upgradeInfo.Name == BinaryVersion && !app.upgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storetypes.StoreUpgrades{
-			Added: []string{},
+			Added: []string{evmtypes.ModuleName, feemarkettypes.ModuleName, evmutiltypes.ModuleName},
 		}))
 	}
 }

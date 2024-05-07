@@ -53,6 +53,7 @@ import (
 	"github.com/oraichain/orai/app"
 	"github.com/oraichain/orai/app/params"
 	"github.com/prometheus/client_golang/prometheus"
+	ethermintflags "github.com/tharsis/ethermint/server/flags"
 )
 
 const (
@@ -61,6 +62,9 @@ const (
 
 	// FlagSeed defines a flag to initialize the private validator key from a specific seed.
 	FlagRecover = "recover"
+
+	flagMempoolEnableAuth    = "mempool.enable-authentication"
+	flagMempoolAuthAddresses = "mempool.authorized-addresses"
 )
 
 // NewRootCmd creates a new root command for wasmd. It is called once in the
@@ -248,6 +252,14 @@ func (ac appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, 
 		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
 	}
 
+	mempoolEnableAuth := cast.ToBool(appOpts.Get(flagMempoolEnableAuth))
+	mempoolAuthAddresses, err := accAddressesFromBech32(
+		cast.ToStringSlice(appOpts.Get(flagMempoolAuthAddresses))...,
+	)
+	if err != nil {
+		panic(fmt.Sprintf("could not get authorized address from config: %v", err))
+	}
+
 	return app.NewOraichainApp(logger, db, traceStore, true, skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
@@ -255,6 +267,12 @@ func (ac appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, 
 		app.GetEnabledProposals(),
 		appOpts,
 		wasmOpts,
+		app.EvmOptions{
+			MempoolEnableAuth:    mempoolEnableAuth,
+			MempoolAuthAddresses: mempoolAuthAddresses,
+			EVMTrace:             cast.ToString(appOpts.Get(ethermintflags.EVMTracer)),
+			EVMMaxGasWanted:      cast.ToUint64(appOpts.Get(ethermintflags.EVMMaxTxGasWanted)),
+		},
 		baseapp.SetPruning(pruningOpts),
 		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
 		baseapp.SetHaltHeight(cast.ToUint64(appOpts.Get(server.FlagHaltHeight))),
@@ -287,6 +305,7 @@ func (ac appCreator) createOraichainAppAndExport(
 
 	loadLatest := height == -1
 	var emptyWasmOpts []wasm.Option
+
 	wasmApp = app.NewOraichainApp(
 		logger,
 		db,
@@ -299,6 +318,7 @@ func (ac appCreator) createOraichainAppAndExport(
 		app.GetEnabledProposals(),
 		appOpts,
 		emptyWasmOpts,
+		app.DefaultEvmOptions,
 	)
 
 	if height != -1 {
@@ -358,7 +378,7 @@ func initCmd(_ module.BasicManager, customAppState app.GenesisState, defaultNode
 			config.Moniker = args[0]
 			config.P2P.MaxNumInboundPeers = 100
 			config.P2P.MaxNumOutboundPeers = 100
-			config.P2P.FlushThrottleTimeout= 10 * time.Millisecond
+			config.P2P.FlushThrottleTimeout = 10 * time.Millisecond
 			config.Consensus.TimeoutCommit = 500 * time.Millisecond
 			config.Consensus.PeerGossipSleepDuration = 10 * time.Millisecond
 
@@ -435,4 +455,17 @@ func displayInfo(info printInfo) error {
 	_, err = fmt.Fprintf(os.Stderr, "%s\n", string(sdk.MustSortJSON(out)))
 
 	return err
+}
+
+// accAddressesFromBech32 converts a slice of bech32 encoded addresses into a slice of address types.
+func accAddressesFromBech32(addresses ...string) ([]sdk.AccAddress, error) {
+	var decodedAddresses []sdk.AccAddress
+	for _, s := range addresses {
+		a, err := sdk.AccAddressFromBech32(s)
+		if err != nil {
+			return nil, err
+		}
+		decodedAddresses = append(decodedAddresses, a)
+	}
+	return decodedAddresses, nil
 }
