@@ -8,16 +8,15 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
-	"github.com/cosmos/cosmos-sdk/x/authz"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	ibcante "github.com/cosmos/ibc-go/v4/modules/core/ante"
 	"github.com/cosmos/ibc-go/v4/modules/core/keeper"
+	customante "github.com/oraichain/orai/app/ante"
 	tmlog "github.com/tendermint/tendermint/libs/log"
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
+	vesting "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	evmante "github.com/tharsis/ethermint/app/ante"
 	evmtypes "github.com/tharsis/ethermint/x/evm/types"
 )
@@ -28,9 +27,9 @@ type HandlerOptions struct {
 	AccountKeeper   evmtypes.AccountKeeper
 	BankKeeper      evmtypes.BankKeeper
 	EvmKeeper       evmante.EVMKeeper
-	FeegrantKeeper  authante.FeegrantKeeper
+	FeegrantKeeper  ante.FeegrantKeeper
 	SignModeHandler authsigning.SignModeHandler
-	SigGasConsumer  authante.SignatureVerificationGasConsumer
+	SigGasConsumer  ante.SignatureVerificationGasConsumer
 	FeeMarketKeeper evmtypes.FeeMarketKeeper
 	MaxTxGasWanted  uint64
 
@@ -77,93 +76,10 @@ type cosmosHandlerOptions struct {
 	isEIP712 bool
 }
 
-type MinCommissionDecorator struct {
-	cdc codec.BinaryCodec
-}
-
-func NewMinCommissionDecorator(cdc codec.BinaryCodec) MinCommissionDecorator {
-	return MinCommissionDecorator{cdc}
-}
-
-func (min MinCommissionDecorator) AnteHandle(
-	ctx sdk.Context, tx sdk.Tx,
-	simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	msgs := tx.GetMsgs()
-	minCommissionRate := sdk.NewDecWithPrec(3, 2)
-
-	validMsg := func(m sdk.Msg) error {
-		switch msg := m.(type) {
-		case *stakingtypes.MsgCreateValidator:
-			// prevent new validators joining the set with
-			// commission set below 3%
-			c := msg.Commission
-			if c.Rate.LT(minCommissionRate) {
-				return sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "commission can't be lower than 3%")
-			}
-		case *stakingtypes.MsgEditValidator:
-			// if commission rate is nil, it means only
-			// other fields are affected - skip
-			if msg.CommissionRate == nil {
-				break
-			}
-			if msg.CommissionRate.LT(minCommissionRate) {
-				return sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "commission can't be lower than 3%")
-			}
-		}
-
-		return nil
-	}
-
-	validAuthz := func(execMsg *authz.MsgExec) error {
-		for _, v := range execMsg.Msgs {
-			var innerMsg sdk.Msg
-			err := min.cdc.UnpackAny(v, &innerMsg)
-			if err != nil {
-				return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "cannot unmarshal authz exec msgs")
-			}
-
-			err = validMsg(innerMsg)
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil
-	}
-
-	for _, m := range msgs {
-		if msg, ok := m.(*authz.MsgExec); ok {
-			if err := validAuthz(msg); err != nil {
-				return ctx, err
-			}
-			continue
-		}
-
-		// validate normal msgs
-		err = validMsg(m)
-		if err != nil {
-			return ctx, err
-		}
-	}
-
-	return next(ctx, tx, simulate)
-}
-
 // NewAnteHandler returns an 'AnteHandler' that will run actions before a tx is sent to a module's handler.
 func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
-	if options.EvmKeeper == nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "evm keeper is required for AnteHandler")
-	}
-	if options.AccountKeeper == nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "account keeper is required for ante builder")
-	}
-
-	if options.BankKeeper == nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "bank keeper is required for ante builder")
-	}
-
-	if options.SignModeHandler == nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrLogic, "sign mode handler is required for ante builder")
+	if err := options.Validate(); err != nil {
+		return nil, err
 	}
 
 	return func(
@@ -173,7 +89,7 @@ func NewAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 
 		defer Recover(ctx.Logger(), &err)
 
-		txWithExtensions, ok := tx.(authante.HasExtensionOptionsTx)
+		txWithExtensions, ok := tx.(ante.HasExtensionOptionsTx)
 		if ok {
 			opts := txWithExtensions.GetExtensionOptions()
 			if len(opts) > 1 {
@@ -233,26 +149,30 @@ func newCosmosAnteHandler(options cosmosHandlerOptions) sdk.AnteHandler {
 	decorators := []sdk.AnteDecorator{}
 
 	decorators = append(decorators,
-		evmante.RejectMessagesDecorator{},   // reject MsgEthereumTxs
-		authante.NewSetUpContextDecorator(), // second decorator. SetUpContext must be called before other decorators
+		ante.NewSetUpContextDecorator(),   // second decorator. SetUpContext must be called before other decorators
+		evmante.RejectMessagesDecorator{}, // reject MsgEthereumTxs
 	)
 
 	if !options.isEIP712 {
-		decorators = append(decorators, authante.NewRejectExtensionOptionsDecorator())
+		decorators = append(decorators, ante.NewRejectExtensionOptionsDecorator())
 	}
 
-	var sigVerification sdk.AnteDecorator = authante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler)
+	var sigVerification sdk.AnteDecorator = ante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler)
 	if options.isEIP712 {
 		sigVerification = evmante.NewEip712SigVerificationDecorator(options.AccountKeeper, options.SignModeHandler, options.EvmKeeper)
 	}
 
 	decorators = append(decorators,
-		ante.NewSetUpContextDecorator(), // outermost AnteDecorator. SetUpContext must be called first
-		NewMinCommissionDecorator(options.Cdc),
+		customante.NewEvmMinGasFilter(options.EvmKeeper), // filter out evm denom from min-gas-prices
+		ante.NewMempoolFeeDecorator(),
+		customante.NewVestingAccountDecorator(),
+		customante.NewMinCommissionDecorator(options.Cdc),
+		customante.NewAuthzLimiterDecorator(
+			sdk.MsgTypeURL(&evmtypes.MsgEthereumTx{}),
+			sdk.MsgTypeURL(&vesting.MsgCreateVestingAccount{}),
+		),
 		wasmkeeper.NewLimitSimulationGasDecorator(options.WasmConfig.SimulationGasLimit),
 		wasmkeeper.NewCountTXDecorator(options.TxCounterStoreKey),
-		ante.NewRejectExtensionOptionsDecorator(),
-		ante.NewMempoolFeeDecorator(),
 		ante.NewValidateBasicDecorator(),
 		ante.NewTxTimeoutHeightDecorator(),
 		ante.NewValidateMemoDecorator(options.AccountKeeper),

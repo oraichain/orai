@@ -13,7 +13,6 @@ import (
 	srvconfig "github.com/cosmos/cosmos-sdk/server/config"
 	"github.com/pkg/errors"
 	cfg "github.com/tendermint/tendermint/config"
-	"github.com/tendermint/tendermint/libs/cli"
 	tmos "github.com/tendermint/tendermint/libs/os"
 	tmrand "github.com/tendermint/tendermint/libs/rand"
 
@@ -53,6 +52,9 @@ import (
 	"github.com/oraichain/orai/app"
 	"github.com/oraichain/orai/app/params"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/tharsis/ethermint/crypto/hd"
+	ethermintserver "github.com/tharsis/ethermint/server"
+	servercfg "github.com/tharsis/ethermint/server/config"
 	ethermintflags "github.com/tharsis/ethermint/server/flags"
 )
 
@@ -88,6 +90,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithAccountRetriever(authtypes.AccountRetriever{}).
 		WithBroadcastMode(flags.BroadcastBlock).
 		WithHomeDir(app.DefaultNodeHome).
+		WithKeyringOptions(hd.EthSecp256k1Option()).
 		WithViper("")
 
 	rootCmd := &cobra.Command{
@@ -109,7 +112,9 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 				return err
 			}
 
-			return server.InterceptConfigsPreRunHandler(cmd, "", nil)
+			customAppTemplate, customAppConfig := servercfg.AppConfig("orai")
+
+			return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig)
 		},
 	}
 
@@ -119,8 +124,9 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 }
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
+	initCommand := initCmd(app.ModuleBasics, app.NewDefaultGenesisState(encodingConfig.Codec), app.DefaultNodeHome)
 	rootCmd.AddCommand(
-		initCmd(app.ModuleBasics, app.NewDefaultGenesisState(encodingConfig.Codec), app.DefaultNodeHome),
+		initCommand,
 		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
 		genutilcli.MigrateGenesisCmd(),
 		genutilcli.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
@@ -135,6 +141,8 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		encCfg: encodingConfig,
 	}
 	server.AddCommands(rootCmd, app.DefaultNodeHome, ac.newApp, ac.createOraichainAppAndExport, addModuleInitFlags)
+	// ethermintserver adds additional flags to start the JSON-RPC server for evm support
+	ethermintserver.AddCommands(rootCmd, ethermintserver.NewDefaultStartOptions(ac.newApp, app.DefaultNodeHome), ac.createOraichainAppAndExport, ac.addStartCmdFlags)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
@@ -420,7 +428,7 @@ func initCmd(_ module.BasicManager, customAppState app.GenesisState, defaultNode
 		},
 	}
 
-	cmd.Flags().String(cli.HomeFlag, defaultNodeHome, "node's home directory")
+	cmd.Flags().String(tmcli.HomeFlag, defaultNodeHome, "node's home directory")
 	cmd.Flags().BoolP(FlagOverwrite, "o", false, "overwrite the genesis.json file")
 	cmd.Flags().Bool(FlagRecover, false, "provide seed phrase to recover existing key instead of creating")
 	cmd.Flags().String(flags.FlagChainID, "", "genesis file chain-id, if left blank will be randomly created")
@@ -468,4 +476,9 @@ func accAddressesFromBech32(addresses ...string) ([]sdk.AccAddress, error) {
 		decodedAddresses = append(decodedAddresses, a)
 	}
 	return decodedAddresses, nil
+}
+
+// addStartCmdFlags adds flags to the server start command.
+func (ac appCreator) addStartCmdFlags(startCmd *cobra.Command) {
+	crisis.AddModuleInitFlags(startCmd)
 }
