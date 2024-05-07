@@ -403,10 +403,6 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	// set the BaseApp's parameter store
 	bApp.SetParamStore(app.paramsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramskeeper.ConsensusParamsKeyTable()))
 
-	feemarketSubspace := app.paramsKeeper.Subspace(feemarkettypes.ModuleName)
-	evmSubspace := app.paramsKeeper.Subspace(evmtypes.ModuleName)
-	evmutilSubspace := app.paramsKeeper.Subspace(evmutiltypes.ModuleName)
-
 	// add capability keeper and ScopeToModule for ibc module
 	app.capabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
 	scopedIBCKeeper := app.capabilityKeeper.ScopeToModule(ibchost.ModuleName)
@@ -488,13 +484,13 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 
 	// Create Ethermint keepers
 	app.feeMarketKeeper = feemarketkeeper.NewKeeper(
-		appCodec, keys[feemarkettypes.StoreKey], feemarketSubspace,
+		appCodec, keys[feemarkettypes.StoreKey], app.getSubspace(feemarkettypes.ModuleName),
 	)
 
 	app.evmutilKeeper = evmutilkeeper.NewKeeper(
 		appCodec,
 		keys[evmutiltypes.StoreKey],
-		evmutilSubspace,
+		app.getSubspace(evmutiltypes.ModuleName),
 		app.bankKeeper,
 		app.accountKeeper,
 	)
@@ -503,7 +499,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	validateKeeper(app.evmutilKeeper)
 	evmBankKeeper := evmutilkeeper.NewEvmBankKeeper(app.evmutilKeeper, app.bankKeeper, app.accountKeeper)
 	app.evmKeeper = evmkeeper.NewKeeper(
-		appCodec, keys[evmtypes.StoreKey], tkeys[evmtypes.TransientKey], evmSubspace,
+		appCodec, keys[evmtypes.StoreKey], tkeys[evmtypes.TransientKey], app.getSubspace(evmtypes.ModuleName),
 		app.accountKeeper, evmBankKeeper, app.stakingKeeper, app.feeMarketKeeper,
 		options.EVMTrace,
 	)
