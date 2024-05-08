@@ -149,8 +149,8 @@ func newCosmosAnteHandler(options cosmosHandlerOptions) sdk.AnteHandler {
 	decorators := []sdk.AnteDecorator{}
 
 	decorators = append(decorators,
-		ante.NewSetUpContextDecorator(),   // second decorator. SetUpContext must be called before other decorators
 		evmante.RejectMessagesDecorator{}, // reject MsgEthereumTxs
+		ante.NewSetUpContextDecorator(),   // second decorator. SetUpContext must be called before other decorators
 	)
 
 	if !options.isEIP712 {

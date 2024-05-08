@@ -455,11 +455,12 @@ github.com/opencontainers/runtime-spec v1.0.3-0.20210326190908-1c3f411f0417/go.m
 github.com/opencontainers/selinux v1.10.0/go.mod h1:2i0OySw99QjzBBQByd1Gr9gSjvuho1lHsJxIJ3gGbJI=
 github.com/opentracing/opentracing-go v1.2.0/go.mod h1:GxEUsuufX4nBwe+T+Wl9TAgYrxe9dPLANfrWvHYVTgc=
 github.com/openzipkin/zipkin-go v0.2.5/go.mod h1:KpXfKdgRDnnhsxw4pNIH9Md5lyFqKUa4YDFlwRYAMyE=
-github.com/oraichain/cosmos-sdk v0.45.16-ics-epi-191/go.mod h1:bScuNwWAP0TZJpUf+SHXRU3xGoUPp+X9nAzfeIXts40=
 github.com/oraichain/ethermint v0.14.0-kava-v21.1 h1:JOOHoQqURFMRhBXhLxiU4ey4fLwtsIXE8j0eMre9Oow=
 github.com/oraichain/ethermint v0.14.0-kava-v21.1/go.mod h1:L4wqbHHORlqm04t6Qmv7CYHzqnOAl8jbkJF0yNm9LH4=
 github.com/oraichain/ethermint v0.14.0-orai-v1.0.0 h1:8bnCJO0fyPLT+ASoPs1+PYPQLVZt80N31p6UFFq2rmY=
 github.com/oraichain/ethermint v0.14.0-orai-v1.0.0/go.mod h1:YpPNH17tOeZE9oP+bCQmM/dEstaYw0TAN1lEXLYP5EY=
+github.com/oraichain/ethermint v0.14.0-orai-v1.0.1 h1:PQgABne1PU/MELPTBk1J9T7Fw+4ryJX28Ejo7OhqQFE=
+github.com/oraichain/ethermint v0.14.0-orai-v1.0.1/go.mod h1:YpPNH17tOeZE9oP+bCQmM/dEstaYw0TAN1lEXLYP5EY=
 github.com/oraichain/juno/x/clock v0.0.0-20231103100256-4c83cb3f8224 h1:bEt/DUaqXbvaRLp7/XWqvAFTJT7/3DdyVjdD2KL7Ioo=
 github.com/oraichain/juno/x/clock v0.0.0-20231103100256-4c83cb3f8224/go.mod h1:9bcy6YbLhOQ3IXqlOk1O5un+mFWUoSnCYTon5zANNkM=
 github.com/otiai10/copy v1.2.0/go.mod h1:rrF5dJ5F0t/EWSYODDu4j9/vEeYHMkc8jt0zJChqQWw=
