@@ -349,9 +349,6 @@ func initCmd(_ module.BasicManager, customAppState app.GenesisState, defaultNode
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			serverCtx := server.GetServerContextFromCmd(cmd)
-			// config for app.toml file
-			appConfg := srvconfig.DefaultConfig()
-			appConfg.API.Enable = true
 			// config for config.toml file
 			config := serverCtx.Config
 
@@ -422,8 +419,12 @@ func initCmd(_ module.BasicManager, customAppState app.GenesisState, defaultNode
 			toPrint := newPrintInfo(config.Moniker, chainID, nodeID, "", appState)
 
 			cfg.WriteConfigFile(filepath.Join(config.RootDir, "config", "config.toml"), config)
-			srvconfig.SetConfigTemplate(CustomAppTomlTemplateWithEvm)
-			srvconfig.WriteConfigFile(filepath.Join(config.RootDir, "config/app.toml"), appConfg)
+
+			// config for app.toml file with EVM config
+			appConfigTemplate, defaultAppConfig := servercfg.AppConfig("")
+			defaultAppConfig.API.Enable = true
+			srvconfig.SetConfigTemplate(appConfigTemplate)
+			srvconfig.WriteConfigFile(filepath.Join(config.RootDir, "config/app.toml"), defaultAppConfig)
 			return displayInfo(toPrint)
 		},
 	}

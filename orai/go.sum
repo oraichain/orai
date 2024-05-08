@@ -828,7 +828,8 @@ github.com/oraichain/cometbft v0.34.30-0.20240329015336-24dcc6856c88 h1:TCLtpL/C
 github.com/oraichain/cometbft v0.34.30-0.20240329015336-24dcc6856c88/go.mod h1:L9shMfbkZ8B+7JlwANEr+NZbBcn+hBpwdbeYvA5rLCw=
 github.com/oraichain/cosmos-sdk v0.45.16-ics-epi-191 h1:xQrW8zgHNvuzeGxD7Yd2KPS4rZH4uTGsjFrWVHOW4eQ=
 github.com/oraichain/cosmos-sdk v0.45.16-ics-epi-191/go.mod h1:bScuNwWAP0TZJpUf+SHXRU3xGoUPp+X9nAzfeIXts40=
-github.com/oraichain/ethermint v0.14.0-orai-v1.0.2 h1:j/U9rCucglRnOrV9YOjmgqlyEq0mO67frj06s7RAprU=
+github.com/oraichain/ethermint v0.14.0-orai-v1.0.4 h1:/V5C5ud517uHdpKvMkd9qO5xl0GDSmRrs1mFCLN7xtI=
+github.com/oraichain/ethermint v0.14.0-orai-v1.0.4/go.mod h1:ry+tXrkYJOEE/ICMXSWOGgv4uuDkc6GjuHHln3oKatg=
 github.com/oraichain/juno/x/clock v0.0.0-20231104204142-9bedf967a294 h1:22CZITFka+bEXz6Ob9wt+RdOsjKAbxzsOJ9wKQS+GIc=
 github.com/oraichain/juno/x/clock v0.0.0-20231104204142-9bedf967a294/go.mod h1:9bcy6YbLhOQ3IXqlOk1O5un+mFWUoSnCYTon5zANNkM=
 github.com/oraichain/wasmd v0.30.2-0.20230822113616-27ffe7fdd4d1 h1:zuyxYHrgoQ8+jkNj8VayWj4CLcvYS5zw2EFakBgDm7o=

@@ -29,14 +29,14 @@ contract_address=$(echo "$contract_address_res" | tr -d -c '[:alnum:]') # remove
 echo "contract address: $contract_address"
 
 # create new upgrade proposal
-UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-19}
+UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-40}
 $validator1_command "oraid tx gov submit-proposal software-upgrade $NEW_VERSION --title 'foobar' --description 'foobar' --from validator1 --upgrade-height $UPGRADE_HEIGHT --upgrade-info 'https://github.com/oraichain/orai/releases/download/$UPGRADE_INFO_VERSION/manifest.json' --deposit 10000000orai $ARGS --home $VALIDATOR_HOME"
 $validator1_command "oraid tx gov vote 1 yes --from validator1 --home $VALIDATOR_HOME $ARGS"
 $validator1_command "oraid tx gov vote 1 yes --from validator2 --home $oraid_dir/validator2 $ARGS"
 
 # sleep to wait til the proposal passes
 echo "Sleep til the proposal passes..."
-sleep 12
+sleep 20
 
 # Check if latest height is less than the upgrade height
 latest_height=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
@@ -57,7 +57,7 @@ if ! [[ $height_before =~ $re ]] ; then
    echo "error: Not a number" >&2; exit 1
 fi
 
-sleep 30
+sleep 5
 
 height_after=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 

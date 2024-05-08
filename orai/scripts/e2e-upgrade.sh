@@ -31,13 +31,12 @@ contract_address=$(oraid query wasm list-contract-by-code $code_id --output json
 echo "contract address: $contract_address"
 
 # create new upgrade proposal
-UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-19}
+UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-40}
 oraid tx gov submit-proposal software-upgrade $NEW_VERSION --title "foobar" --description "foobar"  --from validator1 --upgrade-height $UPGRADE_HEIGHT --upgrade-info "x" --deposit 10000000orai $ARGS --home $VALIDATOR_HOME
 oraid tx gov vote 1 yes --from validator1 --home "$HOME/.oraid/validator1" $ARGS && oraid tx gov vote 1 yes --from validator2 --home "$HOME/.oraid/validator2" $ARGS
 
 # sleep to wait til the proposal passes
 echo "Sleep til the proposal passes..."
-sleep 12
 
 # Check if latest height is less than the upgrade height
 latest_height=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
@@ -62,7 +61,30 @@ screen -S validator3 -d -m oraid start --home=$HOME/.oraid/validator3 --minimum-
 
 # sleep a bit for the network to start 
 echo "Sleep to wait for the network to start..."
-sleep 7
+sleep 5
+
+# kill oraid again to modify json rpc address for each validator (only for the ethermint upgrade)
+pkill oraid
+# change app.toml values
+VALIDATOR1_APP_TOML=$HOME/.oraid/validator1/config/app.toml
+VALIDATOR2_APP_TOML=$HOME/.oraid/validator2/config/app.toml
+VALIDATOR3_APP_TOML=$HOME/.oraid/validator3/config/app.toml
+
+sed -i -E 's|0.0.0.0:8545|0.0.0.0:7545|g' $VALIDATOR2_APP_TOML
+sed -i -e "s%^ws-address *=.*%ws-address = \"0.0.0.0:7546\"%; " $VALIDATOR2_APP_TOML
+
+sed -i -E 's|0.0.0.0:8545|0.0.0.0:6545|g' $STATESYNC_APP_TOML $VALIDATOR3_APP_TOML
+sed -i -e "s%^ws-address *=.*%ws-address = \"0.0.0.0:6546\"%; " $VALIDATOR3_APP_TOML
+
+# start again 3 validators
+screen -S validator1 -d -m oraid start --home=$HOME/.oraid/validator1 --minimum-gas-prices=0.00001orai
+screen -S validator2 -d -m oraid start --home=$HOME/.oraid/validator2 --minimum-gas-prices=0.00001orai
+screen -S validator3 -d -m oraid start --home=$HOME/.oraid/validator3 --minimum-gas-prices=0.00001orai
+
+# sleep a bit for the network to start 
+echo "Sleep to wait for the network to start..."
+sleep 5
+
 # test contract migration
 echo "Migrate the contract..."
 store_ret=$(oraid tx wasm store $WASM_PATH --from validator1 --home $VALIDATOR_HOME $ARGS --output json)
@@ -72,6 +94,10 @@ new_code_id=$(echo $store_ret | jq -r '.logs[0].events[1].attributes[] | select(
 # oraid tx wasm migrate $contract_address $new_code_id $MIGRATE_MSG --from validator1 $ARGS --home $VALIDATOR_HOME
 oraid tx wasm execute $contract_address $EXECUTE_MSG --from validator1 $ARGS --home $VALIDATOR_HOME
 
+# sleep about 5 secs to wait for the rest & json rpc server to be u
+echo "Waiting for the REST & JSONRPC servers to be up ..."
+sleep 5
+
 height_before=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 
 re='^[0-9]+([.][0-9]+)?$'
@@ -79,7 +105,7 @@ if ! [[ $height_before =~ $re ]] ; then
    echo "error: Not a number" >&2; exit 1
 fi
 
-sleep 30
+sleep 5
 
 height_after=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 

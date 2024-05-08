@@ -26,15 +26,15 @@ oraid tx gov vote $proposal_id yes --from validator1 --home "$HOME/.oraid/valida
 
 # sleep to wait til the proposal passes
 echo "Sleep til the proposal passes..."
-sleep 30
+sleep 5
 
 # Query the counter
 counter_before=$(oraid query wasm contract-state smart $contract_address $QUERY_MSG --node "tcp://localhost:26657" --output json | jq -r '.data.val | tonumber')
-sleep 7
+sleep 2
 echo "cw-clock counter_before: $counter_before"
 
 counter_after=$(oraid query wasm contract-state smart $contract_address $QUERY_MSG --node "tcp://localhost:26657" --output json | jq -r '.data.val | tonumber')
-sleep 7
+sleep 2
 echo "cw-clock counter_after: $counter_after"
 
 if [ $counter_after -gt $counter_before ]

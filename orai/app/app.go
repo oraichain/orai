@@ -1126,7 +1126,7 @@ func (app *OraichainApp) upgradeHandler() {
 	if upgradeInfo.Name == BinaryVersion && !app.upgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storetypes.StoreUpgrades{
-			Added: []string{evmtypes.ModuleName, feemarkettypes.ModuleName, evmutiltypes.ModuleName},
+			Added: []string{evmtypes.StoreKey, feemarkettypes.StoreKey, evmutiltypes.StoreKey},
 		}))
 	}
 }
