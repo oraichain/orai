@@ -221,7 +221,7 @@ replace (
 	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20240329015336-24dcc6856c88
 
 	// Use ethermint fork that respects min-gas-price with NoBaseFee true and london enabled, and includes eip712 support
-	github.com/tharsis/ethermint => github.com/oraichain/ethermint v0.14.0-orai-v1.0.1
+	github.com/tharsis/ethermint => github.com/oraichain/ethermint v0.14.0-orai-v1.0.2
 
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )

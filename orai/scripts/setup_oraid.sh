@@ -19,5 +19,5 @@ oraid gentx $USER "250000000orai" --chain-id="$CHAIN_ID" --amount="250000000orai
 
 oraid collect-gentxs
 
-oraid start --rpc.laddr tcp://0.0.0.0:26657 --grpc.address 0.0.0.0:9090
+oraid start --json-rpc.address="0.0.0.0:8545" --json-rpc.ws-address="0.0.0.0:8546" --json-rpc.api="eth,web3,net,txpool,debug" --json-rpc.enable
 

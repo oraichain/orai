@@ -459,8 +459,8 @@ github.com/oraichain/ethermint v0.14.0-kava-v21.1 h1:JOOHoQqURFMRhBXhLxiU4ey4fLw
 github.com/oraichain/ethermint v0.14.0-kava-v21.1/go.mod h1:L4wqbHHORlqm04t6Qmv7CYHzqnOAl8jbkJF0yNm9LH4=
 github.com/oraichain/ethermint v0.14.0-orai-v1.0.0 h1:8bnCJO0fyPLT+ASoPs1+PYPQLVZt80N31p6UFFq2rmY=
 github.com/oraichain/ethermint v0.14.0-orai-v1.0.0/go.mod h1:YpPNH17tOeZE9oP+bCQmM/dEstaYw0TAN1lEXLYP5EY=
-github.com/oraichain/ethermint v0.14.0-orai-v1.0.1 h1:PQgABne1PU/MELPTBk1J9T7Fw+4ryJX28Ejo7OhqQFE=
-github.com/oraichain/ethermint v0.14.0-orai-v1.0.1/go.mod h1:YpPNH17tOeZE9oP+bCQmM/dEstaYw0TAN1lEXLYP5EY=
+github.com/oraichain/ethermint v0.14.0-orai-v1.0.2 h1:j/U9rCucglRnOrV9YOjmgqlyEq0mO67frj06s7RAprU=
+github.com/oraichain/ethermint v0.14.0-orai-v1.0.2/go.mod h1:ry+tXrkYJOEE/ICMXSWOGgv4uuDkc6GjuHHln3oKatg=
 github.com/oraichain/juno/x/clock v0.0.0-20231103100256-4c83cb3f8224 h1:bEt/DUaqXbvaRLp7/XWqvAFTJT7/3DdyVjdD2KL7Ioo=
 github.com/oraichain/juno/x/clock v0.0.0-20231103100256-4c83cb3f8224/go.mod h1:9bcy6YbLhOQ3IXqlOk1O5un+mFWUoSnCYTon5zANNkM=
 github.com/otiai10/copy v1.2.0/go.mod h1:rrF5dJ5F0t/EWSYODDu4j9/vEeYHMkc8jt0zJChqQWw=

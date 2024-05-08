@@ -140,9 +140,8 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	ac := appCreator{
 		encCfg: encodingConfig,
 	}
-	server.AddCommands(rootCmd, app.DefaultNodeHome, ac.newApp, ac.createOraichainAppAndExport, addModuleInitFlags)
 	// ethermintserver adds additional flags to start the JSON-RPC server for evm support
-	ethermintserver.AddCommands(rootCmd, ethermintserver.NewDefaultStartOptions(ac.newApp, app.DefaultNodeHome), ac.createOraichainAppAndExport, ac.addStartCmdFlags)
+	ethermintserver.AddCommands(rootCmd, ethermintserver.NewDefaultStartOptions(ac.newApp, app.DefaultNodeHome), ac.createOraichainAppAndExport, addModuleInitFlags)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
@@ -477,9 +476,4 @@ func accAddressesFromBech32(addresses ...string) ([]sdk.AccAddress, error) {
 		decodedAddresses = append(decodedAddresses, a)
 	}
 	return decodedAddresses, nil
-}
-
-// addStartCmdFlags adds flags to the server start command.
-func (ac appCreator) addStartCmdFlags(startCmd *cobra.Command) {
-	crisis.AddModuleInitFlags(startCmd)
 }
