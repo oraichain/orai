@@ -1113,8 +1113,15 @@ func (app *OraichainApp) upgradeHandler() {
 		ctx.Logger().Info("start to migrate modules...")
 		ctx.Logger().Info("vm module: %v\n", fromVM)
 		defaultEvmParams := evmtypes.DefaultParams()
-		defaultEvmParams.EvmDenom = appconfig.EvmDenom // atto orai aka 10^-18
+		defaultEvmParams.EvmDenom = appconfig.EvmDenom // orai aka 10^-6
 		app.evmKeeper.SetParams(ctx, defaultEvmParams)
+
+		defaultFeeMarketParams := feemarkettypes.DefaultParams()
+		defaultFeeMarketParams.BaseFee = appconfig.EvmInitialBaseFee
+		// temporarily disable base fee because even with 1uorai * 21000 gas its still expensive
+		defaultFeeMarketParams.NoBaseFee = true
+		defaultFeeMarketParams.BaseFeeChangeDenominator = 2
+		app.feeMarketKeeper.SetParams(ctx, defaultFeeMarketParams)
 		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
 	})
 
