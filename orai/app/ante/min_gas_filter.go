@@ -27,6 +27,10 @@ func NewEvmMinGasFilter(evmKeeper EVMKeeper) EvmMinGasFilter {
 // AnteHandle checks the EvmDenom from the evmKeeper and filters out the EvmDenom from the ctx
 func (emgf EvmMinGasFilter) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (sdk.Context, error) {
 	evmDenom := emgf.evmKeeper.GetParams(ctx).EvmDenom
+	// this means the evm keeper params has not been initialized yet -> ignore
+	if evmDenom == "" {
+		return next(ctx, tx, simulate)
+	}
 
 	if ctx.MinGasPrices().AmountOf(evmDenom).IsPositive() {
 		filteredMinGasPrices := sdk.NewDecCoins()
