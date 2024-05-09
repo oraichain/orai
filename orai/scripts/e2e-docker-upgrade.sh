@@ -29,26 +29,29 @@ contract_address=$(echo "$contract_address_res" | tr -d -c '[:alnum:]') # remove
 echo "contract address: $contract_address"
 
 # create new upgrade proposal
-UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-40}
+UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-90}
 $validator1_command "oraid tx gov submit-proposal software-upgrade $NEW_VERSION --title 'foobar' --description 'foobar' --from validator1 --upgrade-height $UPGRADE_HEIGHT --upgrade-info 'https://github.com/oraichain/orai/releases/download/$UPGRADE_INFO_VERSION/manifest.json' --deposit 10000000orai $ARGS --home $VALIDATOR_HOME"
 $validator1_command "oraid tx gov vote 1 yes --from validator1 --home $VALIDATOR_HOME $ARGS"
 $validator1_command "oraid tx gov vote 1 yes --from validator2 --home $oraid_dir/validator2 $ARGS"
 
 # sleep to wait til the proposal passes
 echo "Sleep til the proposal passes..."
-sleep 20
 
 # Check if latest height is less than the upgrade height
 latest_height=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 echo $latest_height
 while [ $latest_height -lt $UPGRADE_HEIGHT ];
 do
-   sleep 7
+   sleep 5
    ((latest_height=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')))
    echo $latest_height
 done
 
 $validator1_command "oraid tx wasm execute $contract_address $(echo $EXECUTE_MSG | jq '@json') --from validator1 $ARGS --home $VALIDATOR_HOME"
+
+# sleep about 5 secs to wait for the rest & json rpc server to be u
+echo "Waiting for the REST & JSONRPC servers to be up ..."
+sleep 5
 
 height_before=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 
