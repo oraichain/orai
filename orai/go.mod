@@ -2,8 +2,6 @@ module github.com/oraichain/orai
 
 go 1.21
 
-toolchain go1.21.4
-
 require (
 	github.com/CosmWasm/wasmd v0.33.0
 	github.com/CosmosContracts/juno/v18/x/clock v0.0.0-00010101000000-000000000000
