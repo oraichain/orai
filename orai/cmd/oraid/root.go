@@ -37,7 +37,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/debug"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/input"
-	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/server"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
@@ -51,6 +50,7 @@ import (
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/oraichain/orai/app"
 	"github.com/oraichain/orai/app/params"
+	"github.com/oraichain/orai/cmd"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/tharsis/ethermint/crypto/hd"
 	ethermintserver "github.com/tharsis/ethermint/server"
@@ -148,7 +148,7 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 		rpc.StatusCommand(),
 		queryCommand(),
 		txCommand(),
-		keys.Commands(app.DefaultNodeHome),
+		cmd.KeyCommands(app.DefaultNodeHome),
 	)
 }
 

@@ -657,8 +657,6 @@ github.com/kataras/iris/v12 v12.1.8/go.mod h1:LMYy4VlP67TQ3Zgriz8RE2h2kMZV2SgMYb
 github.com/kataras/neffos v0.0.14/go.mod h1:8lqADm8PnbeFfL7CLXh1WHw53dG27MC3pgi2R1rmoTE=
 github.com/kataras/pio v0.0.2/go.mod h1:hAoW0t9UmXi4R5Oyq5Z4irTbaTsOemSrDGUtaTl7Dro=
 github.com/kataras/sitemap v0.0.5/go.mod h1:KY2eugMKiPwsJgx7+U103YZehfvNGOXURubcGyk0Bz8=
-github.com/kava-labs/kava v0.21.1 h1:91LIHnRSHKFAnccNNl+7m/2DsXXM1j2uYg/6oPFtqDU=
-github.com/kava-labs/kava v0.21.1/go.mod h1:3adeVmSpm8xejhI+v0qKZsLA8LNdMpkZSns1kXG9YiA=
 github.com/kisielk/errcheck v1.5.0/go.mod h1:pFxgyoBC7bSaBwPgfKdkLd5X25qrDl4LWUI2bnpBCr8=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
 github.com/kkdai/bstream v0.0.0-20161212061736-f391b8402d23/go.mod h1:J+Gs4SYgM6CZQHDETBtE9HaSEkGmuNXF86RwHhHUvq4=
@@ -828,10 +826,10 @@ github.com/oraichain/cometbft v0.34.30-0.20240329015336-24dcc6856c88 h1:TCLtpL/C
 github.com/oraichain/cometbft v0.34.30-0.20240329015336-24dcc6856c88/go.mod h1:L9shMfbkZ8B+7JlwANEr+NZbBcn+hBpwdbeYvA5rLCw=
 github.com/oraichain/cosmos-sdk v0.45.16-ics-epi-191 h1:xQrW8zgHNvuzeGxD7Yd2KPS4rZH4uTGsjFrWVHOW4eQ=
 github.com/oraichain/cosmos-sdk v0.45.16-ics-epi-191/go.mod h1:bScuNwWAP0TZJpUf+SHXRU3xGoUPp+X9nAzfeIXts40=
-github.com/oraichain/ethermint v0.14.0-orai-v1.0.4 h1:/V5C5ud517uHdpKvMkd9qO5xl0GDSmRrs1mFCLN7xtI=
-github.com/oraichain/ethermint v0.14.0-orai-v1.0.4/go.mod h1:ry+tXrkYJOEE/ICMXSWOGgv4uuDkc6GjuHHln3oKatg=
+github.com/oraichain/ethermint v0.14.0-orai-v1.0.5 h1:+sXxJWDuKTMNrq58TYn28RxKI/m9PrZNNZpybbOKe0k=
 github.com/oraichain/juno/x/clock v0.0.0-20231104204142-9bedf967a294 h1:22CZITFka+bEXz6Ob9wt+RdOsjKAbxzsOJ9wKQS+GIc=
 github.com/oraichain/juno/x/clock v0.0.0-20231104204142-9bedf967a294/go.mod h1:9bcy6YbLhOQ3IXqlOk1O5un+mFWUoSnCYTon5zANNkM=
+github.com/oraichain/kava v0.21.1-orai-v1.0.1 h1:vI4Zps2ZdzSMjnRVDXDdw0KG/QwFWx+yECdk1LubkLY=
 github.com/oraichain/wasmd v0.30.2-0.20230822113616-27ffe7fdd4d1 h1:zuyxYHrgoQ8+jkNj8VayWj4CLcvYS5zw2EFakBgDm7o=
 github.com/oraichain/wasmd v0.30.2-0.20230822113616-27ffe7fdd4d1/go.mod h1:DUWz5+p7h3BbDxXAt7IBovagwt5NRPCGVuQkweIixzM=
 github.com/oraichain/wasmvm v1.5.2 h1:hN5Pa4EPlRb0BYKkNh2cgixd0+L6kPpzc+s30Il2W/Q=
@@ -1349,6 +1347,7 @@ golang.org/x/time v0.0.0-20190308202827-9d24e82272b4/go.mod h1:tRJNPiyCQ0inRvYxb
 golang.org/x/time v0.0.0-20191024005414-555d28b269f0/go.mod h1:tRJNPiyCQ0inRvYxbN9jk5I+vvW/OXSQhTDSoE431IQ=
 golang.org/x/time v0.0.0-20201208040808-7e3f01d25324/go.mod h1:tRJNPiyCQ0inRvYxbN9jk5I+vvW/OXSQhTDSoE431IQ=
 golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba/go.mod h1:tRJNPiyCQ0inRvYxbN9jk5I+vvW/OXSQhTDSoE431IQ=
+golang.org/x/time v0.3.0 h1:rg5rLMjNzMS1RkNLzCG38eapWhnYLFYXDXj2gOlr8j4=
 golang.org/x/tools v0.0.0-20180525024113-a5b4c53f6e8b/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
 golang.org/x/tools v0.0.0-20180917221912-90fa682c2a6e/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=
 golang.org/x/tools v0.0.0-20181221001348-537d06c36207/go.mod h1:n7NCudcB/nEzxVGmLbDWY5pfWTLqBcC2KZ6jyYvM4mQ=

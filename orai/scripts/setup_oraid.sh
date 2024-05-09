@@ -8,10 +8,13 @@ rm -rf .oraid/
 
 oraid init --chain-id "$CHAIN_ID" "$MONIKER"
 
-oraid keys add $USER --keyring-backend test
+oraid keys add $USER --keyring-backend test 2>&1 | tee account.txt
+oraid keys add $USER-eth --keyring-backend test --eth 2>&1 | tee account-eth.txt
+oraid keys unsafe-export-eth-key $USER-eth --keyring-backend test 2>&1 | tee priv-eth.txt
 
 # hardcode the validator account for this instance
 oraid add-genesis-account $USER "100000000000000orai" --keyring-backend test
+oraid add-genesis-account $USER-eth "100000000000000orai" --keyring-backend test
 
 # submit a genesis validator tx
 ## Workraround for https://github.com/cosmos/cosmos-sdk/issues/8251

@@ -497,7 +497,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 
 	validateKeeper(app.feeMarketKeeper)
 	validateKeeper(app.evmutilKeeper)
-	evmBankKeeper := evmutilkeeper.NewEvmBankKeeper(app.evmutilKeeper, app.bankKeeper, app.accountKeeper)
+	evmBankKeeper := evmutilkeeper.NewEvmBankKeeperWithDenoms(app.evmutilKeeper, app.bankKeeper, app.accountKeeper, appconfig.EvmDenom, appconfig.CosmosDenom)
 	app.evmKeeper = evmkeeper.NewKeeper(
 		appCodec, keys[evmtypes.StoreKey], tkeys[evmtypes.TransientKey], app.getSubspace(evmtypes.ModuleName),
 		app.accountKeeper, evmBankKeeper, app.stakingKeeper, app.feeMarketKeeper,
@@ -1111,18 +1111,12 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 func (app *OraichainApp) upgradeHandler() {
 	app.upgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		response, err := app.mm.RunMigrations(ctx, app.configurator, fromVM)
-		ctx.Logger().Info("Start updating evm and fee market params...")
+		ctx.Logger().Info("Start updating evm params...")
 		defaultEvmParams := evmtypes.DefaultParams()
 		defaultEvmParams.EvmDenom = appconfig.EvmDenom // orai aka 10^-6
 		app.evmKeeper.SetParams(ctx, defaultEvmParams)
 
-		defaultFeeMarketParams := feemarkettypes.DefaultParams()
-		defaultFeeMarketParams.BaseFee = appconfig.EvmInitialBaseFee
-		// temporarily disable base fee because even with 1uorai * 21000 gas its still expensive
-		defaultFeeMarketParams.NoBaseFee = true
-		defaultFeeMarketParams.BaseFeeChangeDenominator = 2
-		app.feeMarketKeeper.SetParams(ctx, defaultFeeMarketParams)
-		ctx.Logger().Info("Finished updating evm and fee market params...")
+		ctx.Logger().Info("Finished updating evm params...")
 		return response, err
 	})
 

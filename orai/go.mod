@@ -178,6 +178,7 @@ require (
 	golang.org/x/sys v0.14.0 // indirect
 	golang.org/x/term v0.14.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.11.0 // indirect
 	google.golang.org/genproto v0.0.0-20230803162519-f966b187b2e5 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20230726155614-23370e0ffb3e // indirect
@@ -186,6 +187,7 @@ require (
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
+	gopkg.in/olebedev/go-duktape.v3 v3.0.0-20200619000410-60c24ae608a6 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	nhooyr.io/websocket v1.8.7 // indirect
@@ -211,6 +213,9 @@ replace (
 	github.com/ethereum/go-ethereum => github.com/ethereum/go-ethereum v1.10.17
 
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
+
+	// use kava fork to change evm denom & cosmos denom of evmutil module to aorai and orai
+	github.com/kava-labs/kava => github.com/oraichain/kava v0.21.1-orai-v1.0.1
 	// downgrade of goleveldb to avoid issues: see https://github.com/cosmos/cosmos-sdk/issues/14949
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 
@@ -219,7 +224,8 @@ replace (
 	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20240329015336-24dcc6856c88
 
 	// Use ethermint fork that respects min-gas-price with NoBaseFee true and london enabled, and includes eip712 support
-	github.com/tharsis/ethermint => github.com/oraichain/ethermint v0.14.0-orai-v1.0.4
+	// also add params query, fix proto account & ibc v3 to v4 compatibility, and get first 4 bytes of sha256(chain_id) when not eip159 compatible
+	github.com/tharsis/ethermint => github.com/oraichain/ethermint v0.14.0-orai-v1.0.5
 
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )
