@@ -15,7 +15,7 @@ pkill oraid && sleep 2
 
 # download current production binary
 current_dir=$PWD
-rm -rf ../../orai-old/ && git clone https://github.com/oraichain/orai.git ../../orai-old && cd ../../orai-old/orai && git checkout $OLD_VERSION && go mod tidy && make install
+rm -rf ../../orai-old/ && git clone https://github.com/oraichain/orai.git ../../orai-old && cd ../../orai-old/orai && git checkout $OLD_VERSION && go mod tidy && GOTOOLCHAIN=go1.21.4 make install
 
 cd $current_dir
 
@@ -31,7 +31,7 @@ contract_address=$(oraid query wasm list-contract-by-code $code_id --output json
 echo "contract address: $contract_address"
 
 # create new upgrade proposal
-UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-40}
+UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-35}
 oraid tx gov submit-proposal software-upgrade $NEW_VERSION --title "foobar" --description "foobar"  --from validator1 --upgrade-height $UPGRADE_HEIGHT --upgrade-info "x" --deposit 10000000orai $ARGS --home $VALIDATOR_HOME
 oraid tx gov vote 1 yes --from validator1 --home "$HOME/.oraid/validator1" $ARGS && oraid tx gov vote 1 yes --from validator2 --home "$HOME/.oraid/validator2" $ARGS
 
@@ -52,7 +52,7 @@ pkill oraid
 
 # install new binary for the upgrade
 echo "install new binary"
-make install
+GOTOOLCHAIN=go1.21.4 make install
 
 # re-run all validators. All should run
 screen -S validator1 -d -m oraid start --home=$HOME/.oraid/validator1 --minimum-gas-prices=0.00001orai
@@ -61,7 +61,7 @@ screen -S validator3 -d -m oraid start --home=$HOME/.oraid/validator3 --minimum-
 
 # sleep a bit for the network to start 
 echo "Sleep to wait for the network to start..."
-sleep 5
+sleep 3
 
 # kill oraid again to modify json rpc address for each validator (only for the ethermint upgrade)
 pkill oraid

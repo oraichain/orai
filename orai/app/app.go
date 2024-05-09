@@ -1110,8 +1110,8 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 
 func (app *OraichainApp) upgradeHandler() {
 	app.upgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		ctx.Logger().Info("start to migrate modules...")
-		ctx.Logger().Info("vm module: %v\n", fromVM)
+		response, err := app.mm.RunMigrations(ctx, app.configurator, fromVM)
+		ctx.Logger().Info("Start updating evm and fee market params...")
 		defaultEvmParams := evmtypes.DefaultParams()
 		defaultEvmParams.EvmDenom = appconfig.EvmDenom // orai aka 10^-6
 		app.evmKeeper.SetParams(ctx, defaultEvmParams)
@@ -1122,7 +1122,8 @@ func (app *OraichainApp) upgradeHandler() {
 		defaultFeeMarketParams.NoBaseFee = true
 		defaultFeeMarketParams.BaseFeeChangeDenominator = 2
 		app.feeMarketKeeper.SetParams(ctx, defaultFeeMarketParams)
-		return app.mm.RunMigrations(ctx, app.configurator, fromVM)
+		ctx.Logger().Info("Finished updating evm and fee market params...")
+		return response, err
 	})
 
 	upgradeInfo, err := app.upgradeKeeper.ReadUpgradeInfoFromDisk()

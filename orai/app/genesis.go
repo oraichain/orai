@@ -12,6 +12,7 @@ import (
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
 	appconfig "github.com/oraichain/orai/cmd/config"
 	evm "github.com/tharsis/ethermint/x/evm/types"
+	feemarket "github.com/tharsis/ethermint/x/feemarket/types"
 )
 
 // GenesisState default state for the application
@@ -26,6 +27,7 @@ func NewDefaultGenesisState(cdc codec.Codec) GenesisState {
 	govGenesis := gov.DefaultGenesisState()
 	crisisGenesis := crisis.DefaultGenesisState()
 	evmGenesis := evm.DefaultGenesisState()
+	feemarketGenesis := feemarket.DefaultGenesisState()
 
 	stakingGenesis.Params.BondDenom = appconfig.Bech32Prefix
 	stakingGenesis.Params.HistoricalEntries = 1000
@@ -49,7 +51,12 @@ func NewDefaultGenesisState(cdc codec.Codec) GenesisState {
 
 	// update default evm denom of evm module
 	evmGenesis.Params.EvmDenom = appconfig.EvmDenom
-	genesisState[evm.ModuleName] = cdc.MustMarshalJSON((evmGenesis))
+	genesisState[evm.ModuleName] = cdc.MustMarshalJSON(evmGenesis)
+
+	feemarketGenesis.Params.BaseFee = sdk.NewInt(1)
+	feemarketGenesis.Params.BaseFeeChangeDenominator = 2
+	feemarketGenesis.Params.NoBaseFee = true
+	genesisState[feemarket.ModuleName] = cdc.MustMarshalJSON(feemarketGenesis)
 
 	// slashingGenesis.Params.SignedBlocksWindow = 30000                         // approximately 1 day
 	// slashingGenesis.Params.MinSignedPerWindow = sdk.NewDecWithPrec(5, 2)      // 5%
@@ -60,7 +67,7 @@ func NewDefaultGenesisState(cdc codec.Codec) GenesisState {
 
 	for _, b := range ModuleBasics {
 		name := b.Name()
-		if name == staking.ModuleName || name == mint.ModuleName || name == gov.ModuleName || name == crisis.ModuleName || name == evm.ModuleName {
+		if name == staking.ModuleName || name == mint.ModuleName || name == gov.ModuleName || name == crisis.ModuleName || name == evm.ModuleName || name == feemarket.ModuleName {
 			continue
 		}
 		genesisState[b.Name()] = b.DefaultGenesis(cdc)
