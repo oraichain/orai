@@ -1,11 +1,13 @@
 #!/bin/bash
 
+set -eu
+
 # setup the network using the old binary
 
-OLD_VERSION=${OLD_VERSION:-"v0.41.7"}
+OLD_VERSION=${OLD_VERSION:-"v0.41.8"}
 WASM_PATH=${WASM_PATH:-"$PWD/scripts/wasm_file/swapmap.wasm"}
 ARGS="--chain-id testing -y --keyring-backend test --fees 200orai --gas auto --gas-adjustment 1.5 -b block"
-NEW_VERSION=${NEW_VERSION:-"v0.41.8"}
+NEW_VERSION=${NEW_VERSION:-"v0.42.0"}
 VALIDATOR_HOME=${VALIDATOR_HOME:-"$HOME/.oraid/validator1"}
 MIGRATE_MSG=${MIGRATE_MSG:-'{}'}
 EXECUTE_MSG=${EXECUTE_MSG:-'{"ping":{}}'}
@@ -15,7 +17,7 @@ pkill oraid && sleep 2
 
 # download current production binary
 current_dir=$PWD
-rm -rf ../../orai-old/ && git clone https://github.com/oraichain/orai.git ../../orai-old && cd ../../orai-old/orai && git checkout $OLD_VERSION && go mod tidy && make install
+rm -rf ../../orai-old/ && git clone https://github.com/oraichain/orai.git ../../orai-old && cd ../../orai-old/orai && git checkout $OLD_VERSION && go mod tidy && GOTOOLCHAIN=go1.21.4 make install
 
 cd $current_dir
 
@@ -31,13 +33,12 @@ contract_address=$(oraid query wasm list-contract-by-code $code_id --output json
 echo "contract address: $contract_address"
 
 # create new upgrade proposal
-UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-19}
+UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-35}
 oraid tx gov submit-proposal software-upgrade $NEW_VERSION --title "foobar" --description "foobar"  --from validator1 --upgrade-height $UPGRADE_HEIGHT --upgrade-info "x" --deposit 10000000orai $ARGS --home $VALIDATOR_HOME
 oraid tx gov vote 1 yes --from validator1 --home "$HOME/.oraid/validator1" $ARGS && oraid tx gov vote 1 yes --from validator2 --home "$HOME/.oraid/validator2" $ARGS
 
 # sleep to wait til the proposal passes
 echo "Sleep til the proposal passes..."
-sleep 12
 
 # Check if latest height is less than the upgrade height
 latest_height=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
@@ -53,7 +54,7 @@ pkill oraid
 
 # install new binary for the upgrade
 echo "install new binary"
-make install
+GOTOOLCHAIN=go1.21.4 make install
 
 # re-run all validators. All should run
 screen -S validator1 -d -m oraid start --home=$HOME/.oraid/validator1 --minimum-gas-prices=0.00001orai
@@ -62,7 +63,30 @@ screen -S validator3 -d -m oraid start --home=$HOME/.oraid/validator3 --minimum-
 
 # sleep a bit for the network to start 
 echo "Sleep to wait for the network to start..."
-sleep 7
+sleep 3
+
+# kill oraid again to modify json rpc address for each validator (only for the ethermint upgrade)
+pkill oraid
+# change app.toml values
+VALIDATOR1_APP_TOML=$HOME/.oraid/validator1/config/app.toml
+VALIDATOR2_APP_TOML=$HOME/.oraid/validator2/config/app.toml
+VALIDATOR3_APP_TOML=$HOME/.oraid/validator3/config/app.toml
+
+sed -i -E 's|0.0.0.0:8545|0.0.0.0:7545|g' $VALIDATOR2_APP_TOML
+sed -i -e "s%^ws-address *=.*%ws-address = \"0.0.0.0:7546\"%; " $VALIDATOR2_APP_TOML
+
+sed -i -E 's|0.0.0.0:8545|0.0.0.0:6545|g' $VALIDATOR3_APP_TOML
+sed -i -e "s%^ws-address *=.*%ws-address = \"0.0.0.0:6546\"%; " $VALIDATOR3_APP_TOML
+
+# start again 3 validators
+screen -S validator1 -d -m oraid start --home=$HOME/.oraid/validator1 --minimum-gas-prices=0.00001orai
+screen -S validator2 -d -m oraid start --home=$HOME/.oraid/validator2 --minimum-gas-prices=0.00001orai
+screen -S validator3 -d -m oraid start --home=$HOME/.oraid/validator3 --minimum-gas-prices=0.00001orai
+
+# sleep a bit for the network to start 
+echo "Sleep to wait for the network to start..."
+sleep 5
+
 # test contract migration
 echo "Migrate the contract..."
 store_ret=$(oraid tx wasm store $WASM_PATH --from validator1 --home $VALIDATOR_HOME $ARGS --output json)
@@ -72,6 +96,15 @@ new_code_id=$(echo $store_ret | jq -r '.logs[0].events[1].attributes[] | select(
 # oraid tx wasm migrate $contract_address $new_code_id $MIGRATE_MSG --from validator1 $ARGS --home $VALIDATOR_HOME
 oraid tx wasm execute $contract_address $EXECUTE_MSG --from validator1 $ARGS --home $VALIDATOR_HOME
 
+# sleep about 5 secs to wait for the rest & json rpc server to be u
+echo "Waiting for the REST & JSONRPC servers to be up ..."
+sleep 5
+
+oraid_version=$(oraid version)
+if [[ $oraid_version =~ $OLD_VERSION ]] ; then
+   echo "The chain has not upgraded yet. There's something wrong!"; exit 1
+fi
+
 height_before=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 
 re='^[0-9]+([.][0-9]+)?$'
@@ -79,7 +112,7 @@ if ! [[ $height_before =~ $re ]] ; then
    echo "error: Not a number" >&2; exit 1
 fi
 
-sleep 30
+sleep 5
 
 height_after=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 
@@ -100,4 +133,17 @@ if ! [[ $inflation =~ $re ]] ; then
    echo "Tests Failed"; exit 1
 fi
 
+evm_denom=$(curl --no-progress-meter http://localhost:1317/ethermint/evm/v1/params | jq '.params.evm_denom')
+if ! [[ $evm_denom =~ "aorai" ]] ; then
+   echo "Error: EVM denom is not correct. The upgraded version is not the latest!" >&2;
+   echo "Tests Failed"; exit 1
+fi
+
 sh $PWD/scripts/test_clock_counter_contract.sh
+
+# send some ORAI to test eth acc for tx fees
+oraid tx send validator1 orai1kzkf6gttxqar9yrkxfe34ye4vg5v4m588ew7c9 100000000orai --from validator1 $ARGS --home $VALIDATOR_HOME
+# test private key. DO NOT USE IT!. orai1kzkf6gttxqar9yrkxfe34ye4vg5v4m588ew7c9 matches the priv key below
+sh $PWD/scripts/test-erc20-deploy.sh
+
+echo "Tests Passed!!"

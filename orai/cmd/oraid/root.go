@@ -13,7 +13,6 @@ import (
 	srvconfig "github.com/cosmos/cosmos-sdk/server/config"
 	"github.com/pkg/errors"
 	cfg "github.com/tendermint/tendermint/config"
-	"github.com/tendermint/tendermint/libs/cli"
 	tmos "github.com/tendermint/tendermint/libs/os"
 	tmrand "github.com/tendermint/tendermint/libs/rand"
 
@@ -38,7 +37,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/debug"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/input"
-	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/server"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
@@ -52,7 +50,12 @@ import (
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/oraichain/orai/app"
 	"github.com/oraichain/orai/app/params"
+	"github.com/oraichain/orai/cmd"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/tharsis/ethermint/crypto/hd"
+	ethermintserver "github.com/tharsis/ethermint/server"
+	servercfg "github.com/tharsis/ethermint/server/config"
+	ethermintflags "github.com/tharsis/ethermint/server/flags"
 )
 
 const (
@@ -61,6 +64,9 @@ const (
 
 	// FlagSeed defines a flag to initialize the private validator key from a specific seed.
 	FlagRecover = "recover"
+
+	flagMempoolEnableAuth    = "mempool.enable-authentication"
+	flagMempoolAuthAddresses = "mempool.authorized-addresses"
 )
 
 // NewRootCmd creates a new root command for wasmd. It is called once in the
@@ -84,6 +90,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithAccountRetriever(authtypes.AccountRetriever{}).
 		WithBroadcastMode(flags.BroadcastBlock).
 		WithHomeDir(app.DefaultNodeHome).
+		WithKeyringOptions(hd.EthSecp256k1Option()).
 		WithViper("")
 
 	rootCmd := &cobra.Command{
@@ -105,7 +112,9 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 				return err
 			}
 
-			return server.InterceptConfigsPreRunHandler(cmd, "", nil)
+			customAppTemplate, customAppConfig := servercfg.AppConfig("orai")
+
+			return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig)
 		},
 	}
 
@@ -115,8 +124,9 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 }
 
 func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
+	initCommand := initCmd(app.ModuleBasics, app.NewDefaultGenesisState(encodingConfig.Codec), app.DefaultNodeHome)
 	rootCmd.AddCommand(
-		initCmd(app.ModuleBasics, app.NewDefaultGenesisState(encodingConfig.Codec), app.DefaultNodeHome),
+		initCommand,
 		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
 		genutilcli.MigrateGenesisCmd(),
 		genutilcli.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
@@ -130,14 +140,15 @@ func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
 	ac := appCreator{
 		encCfg: encodingConfig,
 	}
-	server.AddCommands(rootCmd, app.DefaultNodeHome, ac.newApp, ac.createOraichainAppAndExport, addModuleInitFlags)
+	// ethermintserver adds additional flags to start the JSON-RPC server for evm support
+	ethermintserver.AddCommands(rootCmd, ethermintserver.NewDefaultStartOptions(ac.newApp, app.DefaultNodeHome), ac.createOraichainAppAndExport, addModuleInitFlags)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
 		rpc.StatusCommand(),
 		queryCommand(),
 		txCommand(),
-		keys.Commands(app.DefaultNodeHome),
+		cmd.KeyCommands(app.DefaultNodeHome),
 	)
 }
 
@@ -248,6 +259,14 @@ func (ac appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, 
 		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
 	}
 
+	mempoolEnableAuth := cast.ToBool(appOpts.Get(flagMempoolEnableAuth))
+	mempoolAuthAddresses, err := accAddressesFromBech32(
+		cast.ToStringSlice(appOpts.Get(flagMempoolAuthAddresses))...,
+	)
+	if err != nil {
+		panic(fmt.Sprintf("could not get authorized address from config: %v", err))
+	}
+
 	return app.NewOraichainApp(logger, db, traceStore, true, skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
@@ -255,6 +274,12 @@ func (ac appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, 
 		app.GetEnabledProposals(),
 		appOpts,
 		wasmOpts,
+		app.EvmOptions{
+			MempoolEnableAuth:    mempoolEnableAuth,
+			MempoolAuthAddresses: mempoolAuthAddresses,
+			EVMTrace:             cast.ToString(appOpts.Get(ethermintflags.EVMTracer)),
+			EVMMaxGasWanted:      cast.ToUint64(appOpts.Get(ethermintflags.EVMMaxTxGasWanted)),
+		},
 		baseapp.SetPruning(pruningOpts),
 		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
 		baseapp.SetHaltHeight(cast.ToUint64(appOpts.Get(server.FlagHaltHeight))),
@@ -287,6 +312,7 @@ func (ac appCreator) createOraichainAppAndExport(
 
 	loadLatest := height == -1
 	var emptyWasmOpts []wasm.Option
+
 	wasmApp = app.NewOraichainApp(
 		logger,
 		db,
@@ -299,6 +325,7 @@ func (ac appCreator) createOraichainAppAndExport(
 		app.GetEnabledProposals(),
 		appOpts,
 		emptyWasmOpts,
+		app.DefaultEvmOptions,
 	)
 
 	if height != -1 {
@@ -322,9 +349,6 @@ func initCmd(_ module.BasicManager, customAppState app.GenesisState, defaultNode
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			serverCtx := server.GetServerContextFromCmd(cmd)
-			// config for app.toml file
-			appConfg := srvconfig.DefaultConfig()
-			appConfg.API.Enable = true
 			// config for config.toml file
 			config := serverCtx.Config
 
@@ -358,7 +382,7 @@ func initCmd(_ module.BasicManager, customAppState app.GenesisState, defaultNode
 			config.Moniker = args[0]
 			config.P2P.MaxNumInboundPeers = 100
 			config.P2P.MaxNumOutboundPeers = 100
-			config.P2P.FlushThrottleTimeout= 10 * time.Millisecond
+			config.P2P.FlushThrottleTimeout = 10 * time.Millisecond
 			config.Consensus.TimeoutCommit = 500 * time.Millisecond
 			config.Consensus.PeerGossipSleepDuration = 10 * time.Millisecond
 
@@ -395,12 +419,17 @@ func initCmd(_ module.BasicManager, customAppState app.GenesisState, defaultNode
 			toPrint := newPrintInfo(config.Moniker, chainID, nodeID, "", appState)
 
 			cfg.WriteConfigFile(filepath.Join(config.RootDir, "config", "config.toml"), config)
-			srvconfig.WriteConfigFile(filepath.Join(config.RootDir, "config/app.toml"), appConfg)
+
+			// config for app.toml file with EVM config
+			appConfigTemplate, defaultAppConfig := servercfg.AppConfig("")
+			defaultAppConfig.API.Enable = true
+			srvconfig.SetConfigTemplate(appConfigTemplate)
+			srvconfig.WriteConfigFile(filepath.Join(config.RootDir, "config/app.toml"), defaultAppConfig)
 			return displayInfo(toPrint)
 		},
 	}
 
-	cmd.Flags().String(cli.HomeFlag, defaultNodeHome, "node's home directory")
+	cmd.Flags().String(tmcli.HomeFlag, defaultNodeHome, "node's home directory")
 	cmd.Flags().BoolP(FlagOverwrite, "o", false, "overwrite the genesis.json file")
 	cmd.Flags().Bool(FlagRecover, false, "provide seed phrase to recover existing key instead of creating")
 	cmd.Flags().String(flags.FlagChainID, "", "genesis file chain-id, if left blank will be randomly created")
@@ -435,4 +464,17 @@ func displayInfo(info printInfo) error {
 	_, err = fmt.Fprintf(os.Stderr, "%s\n", string(sdk.MustSortJSON(out)))
 
 	return err
+}
+
+// accAddressesFromBech32 converts a slice of bech32 encoded addresses into a slice of address types.
+func accAddressesFromBech32(addresses ...string) ([]sdk.AccAddress, error) {
+	var decodedAddresses []sdk.AccAddress
+	for _, s := range addresses {
+		a, err := sdk.AccAddressFromBech32(s)
+		if err != nil {
+			return nil, err
+		}
+		decodedAddresses = append(decodedAddresses, a)
+	}
+	return decodedAddresses, nil
 }

@@ -2,7 +2,7 @@ version: '3.3'
 services:
   validator1:
     container_name: validator1
-    image: oraichain/foundation-orai:0.41.7-alpine-prod # one version lower so we can test the network upgrade
+    image: oraichain/foundation-orai:0.41.8-alpine-prod # one version lower so we can test the network upgrade
     working_dir: /workspace
     tty: true
     ulimits:
@@ -14,6 +14,7 @@ services:
       - 26656:26656
       - 26657:26657
       - 9090:9090
+      - 8545:8545
     cap_add:
       - SYS_PTRACE
     volumes:
@@ -21,7 +22,7 @@ services:
 
   validator2:
     container_name: validator2
-    image: oraichain/foundation-orai:0.41.7-alpine-prod
+    image: oraichain/foundation-orai:0.41.8-alpine-prod
     working_dir: /workspace
     tty: true
     ulimits:
@@ -40,7 +41,7 @@ services:
 
   validator3:
     container_name: validator3
-    image: oraichain/foundation-orai:0.41.7-alpine-prod
+    image: oraichain/foundation-orai:0.41.8-alpine-prod
     working_dir: /workspace
     tty: true
     ulimits:

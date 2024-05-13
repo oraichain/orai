@@ -4,8 +4,8 @@ set -ux
 # setup the network using the old binary
 
 ARGS="--chain-id testing -y --keyring-backend test --fees 200orai --gas 20000000 --gas-adjustment 1.5 -b block"
-NEW_VERSION=${NEW_VERSION:-"v0.41.8"}
-UPGRADE_INFO_VERSION=${UPGRADE_INFO_VERSION:-"v0.41.8"}
+NEW_VERSION=${NEW_VERSION:-"v0.42.0"}
+UPGRADE_INFO_VERSION=${UPGRADE_INFO_VERSION:-"v0.42.0"}
 MIGRATE_MSG=${MIGRATE_MSG:-'{}'}
 EXECUTE_MSG=${EXECUTE_MSG:-'{"ping":{}}'}
 docker_command="docker-compose -f $PWD/docker-compose-e2e-upgrade.yml exec"
@@ -29,26 +29,34 @@ contract_address=$(echo "$contract_address_res" | tr -d -c '[:alnum:]') # remove
 echo "contract address: $contract_address"
 
 # create new upgrade proposal
-UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-19}
+UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-90}
 $validator1_command "oraid tx gov submit-proposal software-upgrade $NEW_VERSION --title 'foobar' --description 'foobar' --from validator1 --upgrade-height $UPGRADE_HEIGHT --upgrade-info 'https://github.com/oraichain/orai/releases/download/$UPGRADE_INFO_VERSION/manifest.json' --deposit 10000000orai $ARGS --home $VALIDATOR_HOME"
 $validator1_command "oraid tx gov vote 1 yes --from validator1 --home $VALIDATOR_HOME $ARGS"
 $validator1_command "oraid tx gov vote 1 yes --from validator2 --home $oraid_dir/validator2 $ARGS"
 
 # sleep to wait til the proposal passes
 echo "Sleep til the proposal passes..."
-sleep 12
 
 # Check if latest height is less than the upgrade height
 latest_height=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 echo $latest_height
 while [ $latest_height -lt $UPGRADE_HEIGHT ];
 do
-   sleep 7
+   sleep 5
    ((latest_height=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')))
    echo $latest_height
 done
 
 $validator1_command "oraid tx wasm execute $contract_address $(echo $EXECUTE_MSG | jq '@json') --from validator1 $ARGS --home $VALIDATOR_HOME"
+
+# sleep about 5 secs to wait for the rest & json rpc server to be u
+echo "Waiting for the REST & JSONRPC servers to be up ..."
+sleep 5
+
+oraid_version=$($validator1_command "oraid version")
+if ! [[ $oraid_version =~ $NEW_VERSION ]] ; then
+   echo "The chain has not upgraded yet. There's something wrong!"; exit 1
+fi
 
 height_before=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 
@@ -57,7 +65,7 @@ if ! [[ $height_before =~ $re ]] ; then
    echo "error: Not a number" >&2; exit 1
 fi
 
-sleep 30
+sleep 5
 
 height_after=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 
@@ -75,6 +83,19 @@ fi
 inflation=$(curl --no-progress-meter http://localhost:1317/cosmos/mint/v1beta1/inflation | jq '.inflation | tonumber')
 if ! [[ $inflation =~ $re ]] ; then
    echo "Error: Cannot query inflation => Potentially missing Go GRPC backport" >&2;
+   echo "Tests Failed"; exit 1
+fi
+
+result=$(curl --no-progress-meter http://localhost:8545/ -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"net_listening","params":[],"id":1}' | jq '.result')
+
+if ! [[ $result =~ true ]] ; then
+   echo "Error: Cannot query JSONRPC" >&2;
+   echo "Tests Failed"; exit 1
+fi
+
+evm_denom=$(curl --no-progress-meter http://localhost:1317/ethermint/evm/v1/params | jq '.params.evm_denom')
+if ! [[ $evm_denom =~ "aorai" ]] ; then
+   echo "Error: EVM denom is not correct. The upgraded version is not the latest!" >&2;
    echo "Tests Failed"; exit 1
 fi
 

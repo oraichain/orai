@@ -43,7 +43,7 @@ update_genesis '.app_state["crisis"]["constant_fee"]["denom"]="orai"'
 update_genesis '.app_state["gov"]["deposit_params"]["min_deposit"][0]["denom"]="orai"'
 # update mint genesis
 update_genesis '.app_state["mint"]["params"]["mint_denom"]="orai"'
-update_genesis '.app_state["gov"]["voting_params"]["voting_period"]="30s"'
+update_genesis '.app_state["gov"]["voting_params"]["voting_period"]="5s"'
 # port key (validator1 uses default ports)
 # validator1 1317, 9090, 9091, 26658, 26657, 26656, 6060
 # validator2 1316, 9088, 9089, 26655, 26654, 26653, 6061

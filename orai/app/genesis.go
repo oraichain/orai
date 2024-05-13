@@ -11,6 +11,8 @@ import (
 	mint "github.com/cosmos/cosmos-sdk/x/mint/types"
 	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
 	appconfig "github.com/oraichain/orai/cmd/config"
+	evm "github.com/tharsis/ethermint/x/evm/types"
+	feemarket "github.com/tharsis/ethermint/x/feemarket/types"
 )
 
 // GenesisState default state for the application
@@ -24,6 +26,8 @@ func NewDefaultGenesisState(cdc codec.Codec) GenesisState {
 	mintGenesis := mint.DefaultGenesisState()
 	govGenesis := gov.DefaultGenesisState()
 	crisisGenesis := crisis.DefaultGenesisState()
+	evmGenesis := evm.DefaultGenesisState()
+	feemarketGenesis := feemarket.DefaultGenesisState()
 
 	stakingGenesis.Params.BondDenom = appconfig.Bech32Prefix
 	stakingGenesis.Params.HistoricalEntries = 1000
@@ -45,6 +49,15 @@ func NewDefaultGenesisState(cdc codec.Codec) GenesisState {
 	crisisGenesis.ConstantFee = sdk.NewCoin(appconfig.Bech32Prefix, sdk.TokensFromConsensusPower(10, sdk.NewInt(1000000)))
 	genesisState[crisis.ModuleName] = cdc.MustMarshalJSON(crisisGenesis)
 
+	// update default evm denom of evm module
+	evmGenesis.Params.EvmDenom = appconfig.EvmDenom
+	genesisState[evm.ModuleName] = cdc.MustMarshalJSON(evmGenesis)
+
+	feemarketGenesis.Params.BaseFee = sdk.NewInt(1)
+	feemarketGenesis.Params.BaseFeeChangeDenominator = 2
+	feemarketGenesis.Params.NoBaseFee = true
+	genesisState[feemarket.ModuleName] = cdc.MustMarshalJSON(feemarketGenesis)
+
 	// slashingGenesis.Params.SignedBlocksWindow = 30000                         // approximately 1 day
 	// slashingGenesis.Params.MinSignedPerWindow = sdk.NewDecWithPrec(5, 2)      // 5%
 	// slashingGenesis.Params.DowntimeJailDuration = 60 * 10 * time.Second       // 10 minutes
@@ -54,7 +67,7 @@ func NewDefaultGenesisState(cdc codec.Codec) GenesisState {
 
 	for _, b := range ModuleBasics {
 		name := b.Name()
-		if name == staking.ModuleName || name == mint.ModuleName || name == gov.ModuleName || name == crisis.ModuleName {
+		if name == staking.ModuleName || name == mint.ModuleName || name == gov.ModuleName || name == crisis.ModuleName || name == evm.ModuleName || name == feemarket.ModuleName {
 			continue
 		}
 		genesisState[b.Name()] = b.DefaultGenesis(cdc)
