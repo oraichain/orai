@@ -93,4 +93,10 @@ if ! [[ $result =~ true ]] ; then
    echo "Tests Failed"; exit 1
 fi
 
+evm_denom=$(curl --no-progress-meter http://localhost:1317/ethermint/evm/v1/params | jq '.params.evm_denom')
+if ! [[ $evm_denom =~ "aorai" ]] ; then
+   echo "Error: EVM denom is not correct. The upgraded version is not the latest!" >&2;
+   echo "Tests Failed"; exit 1
+fi
+
 echo "Tests Passed"

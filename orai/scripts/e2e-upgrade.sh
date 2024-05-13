@@ -133,6 +133,12 @@ if ! [[ $inflation =~ $re ]] ; then
    echo "Tests Failed"; exit 1
 fi
 
+evm_denom=$(curl --no-progress-meter http://localhost:1317/ethermint/evm/v1/params | jq '.params.evm_denom')
+if ! [[ $evm_denom =~ "aorai" ]] ; then
+   echo "Error: EVM denom is not correct. The upgraded version is not the latest!" >&2;
+   echo "Tests Failed"; exit 1
+fi
+
 sh $PWD/scripts/test_clock_counter_contract.sh
 
 # send some ORAI to test eth acc for tx fees
