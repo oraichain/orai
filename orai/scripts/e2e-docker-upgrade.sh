@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eux
+set -ux
 
 # setup the network using the old binary
 
