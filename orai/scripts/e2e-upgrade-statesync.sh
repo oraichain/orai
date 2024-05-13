@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eu
+
 # setup the network using the old binary
 
 ARGS="--chain-id testing -y --keyring-backend test --fees 200orai --gas auto --gas-adjustment 1.5 -b block"

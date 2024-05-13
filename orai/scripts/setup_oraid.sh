@@ -15,6 +15,7 @@ oraid keys unsafe-export-eth-key $USER-eth --keyring-backend test 2>&1 | tee pri
 # hardcode the validator account for this instance
 oraid add-genesis-account $USER "100000000000000orai" --keyring-backend test
 oraid add-genesis-account $USER-eth "100000000000000orai" --keyring-backend test
+oraid add-genesis-account orai1kzkf6gttxqar9yrkxfe34ye4vg5v4m588ew7c9 "100000000000000orai" --keyring-backend test
 
 # submit a genesis validator tx
 ## Workraround for https://github.com/cosmos/cosmos-sdk/issues/8251

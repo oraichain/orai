@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eu
+
 # setup the network using the old binary
 
 OLD_VERSION=${OLD_VERSION:-"v0.41.8"}
@@ -73,7 +75,7 @@ VALIDATOR3_APP_TOML=$HOME/.oraid/validator3/config/app.toml
 sed -i -E 's|0.0.0.0:8545|0.0.0.0:7545|g' $VALIDATOR2_APP_TOML
 sed -i -e "s%^ws-address *=.*%ws-address = \"0.0.0.0:7546\"%; " $VALIDATOR2_APP_TOML
 
-sed -i -E 's|0.0.0.0:8545|0.0.0.0:6545|g' $STATESYNC_APP_TOML $VALIDATOR3_APP_TOML
+sed -i -E 's|0.0.0.0:8545|0.0.0.0:6545|g' $VALIDATOR3_APP_TOML
 sed -i -e "s%^ws-address *=.*%ws-address = \"0.0.0.0:6546\"%; " $VALIDATOR3_APP_TOML
 
 # start again 3 validators
@@ -97,6 +99,11 @@ oraid tx wasm execute $contract_address $EXECUTE_MSG --from validator1 $ARGS --h
 # sleep about 5 secs to wait for the rest & json rpc server to be u
 echo "Waiting for the REST & JSONRPC servers to be up ..."
 sleep 5
+
+oraid_version=$(oraid version)
+if [[ $oraid_version =~ $OLD_VERSION ]] ; then
+   echo "The chain has not upgraded yet. There's something wrong!"; exit 1
+fi
 
 height_before=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 
@@ -127,3 +134,10 @@ if ! [[ $inflation =~ $re ]] ; then
 fi
 
 sh $PWD/scripts/test_clock_counter_contract.sh
+
+# send some ORAI to test eth acc for tx fees
+oraid tx send validator1 orai1kzkf6gttxqar9yrkxfe34ye4vg5v4m588ew7c9 100000000orai --from validator1 $ARGS --home $VALIDATOR_HOME
+# test private key. DO NOT USE IT!. orai1kzkf6gttxqar9yrkxfe34ye4vg5v4m588ew7c9 matches the priv key below
+sh $PWD/scripts/test-erc20-deploy.sh
+
+echo "Tests Passed!!"

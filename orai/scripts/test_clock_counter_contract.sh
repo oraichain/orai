@@ -39,7 +39,7 @@ echo "cw-clock counter_after: $counter_after"
 
 if [ $counter_after -gt $counter_before ]
 then
-echo "Test Passed"
+echo "Clock Counter Test Passed"
 else
-echo "Test Failed"
+echo "Clock Counter Test Failed"
 fi

@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ux
+set -eux
 
 # setup the network using the old binary
 
@@ -53,6 +53,11 @@ $validator1_command "oraid tx wasm execute $contract_address $(echo $EXECUTE_MSG
 echo "Waiting for the REST & JSONRPC servers to be up ..."
 sleep 5
 
+oraid_version=$($validator1_command "oraid version")
+if ! [[ $oraid_version =~ $NEW_VERSION ]] ; then
+   echo "The chain has not upgraded yet. There's something wrong!"; exit 1
+fi
+
 height_before=$(curl --no-progress-meter http://localhost:1317/blocks/latest | jq '.block.header.height | tonumber')
 
 re='^[0-9]+([.][0-9]+)?$'
@@ -78,6 +83,13 @@ fi
 inflation=$(curl --no-progress-meter http://localhost:1317/cosmos/mint/v1beta1/inflation | jq '.inflation | tonumber')
 if ! [[ $inflation =~ $re ]] ; then
    echo "Error: Cannot query inflation => Potentially missing Go GRPC backport" >&2;
+   echo "Tests Failed"; exit 1
+fi
+
+result=$(curl --no-progress-meter http://localhost:8545/ -X POST -H "Content-Type: application/json" --data '{"jsonrpc":"2.0","method":"net_listening","params":[],"id":1}' | jq '.result')
+
+if ! [[ $result =~ true ]] ; then
+   echo "Error: Cannot query JSONRPC" >&2;
    echo "Tests Failed"; exit 1
 fi
 
