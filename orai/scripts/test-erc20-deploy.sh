@@ -24,7 +24,7 @@ echo "ERC20 contract addr: $contract_addr"
 
 # validate
 contract_addr_len=${#contract_addr}
-if ! [[ $contract_addr_len =~ 42 ]]; then
+if [ $contract_addr_len -ne 42 ] ; then
    echo "ERC20 Test Failed"; 
    # clean up
    rm -rf ../../erc20-deploy/ && exit 1
