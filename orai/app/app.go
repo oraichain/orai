@@ -16,6 +16,11 @@ import (
 	packetforwardkeeper "github.com/strangelove-ventures/packet-forward-middleware/v4/router/keeper"
 	packetforwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
 
+	// Token Factory
+	"github.com/CosmWasm/token-factory/x/tokenfactory"
+	tokenfactorykeeper "github.com/CosmWasm/token-factory/x/tokenfactory/keeper"
+	tokenfactorytypes "github.com/CosmWasm/token-factory/x/tokenfactory/types"
+
 	nodeservice "github.com/cosmos/cosmos-sdk/client/grpc/node"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/gorilla/mux"
@@ -249,6 +254,7 @@ var (
 		ibchooks.AppModuleBasic{},
 		packetforward.AppModuleBasic{},
 		evmutil.AppModuleBasic{},
+		tokenfactory.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -265,6 +271,7 @@ var (
 		ibcfeetypes.ModuleName:         nil,
 		icatypes.ModuleName:            nil,
 		wasm.ModuleName:                {authtypes.Burner},
+		tokenfactorytypes.ModuleName:   {authtypes.Minter, authtypes.Burner},
 	}
 
 	// module accounts that are allowed to receive tokens
@@ -308,28 +315,29 @@ type OraichainApp struct {
 	memKeys map[string]*sdk.MemoryStoreKey
 
 	// keepers
-	accountKeeper    authkeeper.AccountKeeper
-	bankKeeper       bankkeeper.Keeper
-	capabilityKeeper *capabilitykeeper.Keeper
-	stakingKeeper    stakingkeeper.Keeper
-	slashingKeeper   slashingkeeper.Keeper
-	mintKeeper       mintkeeper.Keeper
-	distrKeeper      distrkeeper.Keeper
-	govKeeper        govkeeper.Keeper
-	crisisKeeper     crisiskeeper.Keeper
-	upgradeKeeper    upgradekeeper.Keeper
-	paramsKeeper     paramskeeper.Keeper
-	ibcKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	evmKeeper        *evmkeeper.Keeper
-	evmutilKeeper    evmutilkeeper.Keeper
-	feeMarketKeeper  feemarketkeeper.Keeper
-	evidenceKeeper   evidencekeeper.Keeper
-	transferKeeper   ibctransferkeeper.Keeper
-	wasmKeeper       wasm.Keeper
-	feeGrantKeeper   feegrantkeeper.Keeper
-	authzKeeper      authzkeeper.Keeper
-	ContractKeeper   *wasmkeeper.PermissionedKeeper
-	ClockKeeper      clockkeeper.Keeper
+	accountKeeper      authkeeper.AccountKeeper
+	bankKeeper         bankkeeper.Keeper
+	capabilityKeeper   *capabilitykeeper.Keeper
+	stakingKeeper      stakingkeeper.Keeper
+	slashingKeeper     slashingkeeper.Keeper
+	mintKeeper         mintkeeper.Keeper
+	distrKeeper        distrkeeper.Keeper
+	govKeeper          govkeeper.Keeper
+	crisisKeeper       crisiskeeper.Keeper
+	upgradeKeeper      upgradekeeper.Keeper
+	paramsKeeper       paramskeeper.Keeper
+	ibcKeeper          *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	evmKeeper          *evmkeeper.Keeper
+	evmutilKeeper      evmutilkeeper.Keeper
+	feeMarketKeeper    feemarketkeeper.Keeper
+	evidenceKeeper     evidencekeeper.Keeper
+	transferKeeper     ibctransferkeeper.Keeper
+	wasmKeeper         wasm.Keeper
+	feeGrantKeeper     feegrantkeeper.Keeper
+	authzKeeper        authzkeeper.Keeper
+	ContractKeeper     *wasmkeeper.PermissionedKeeper
+	ClockKeeper        clockkeeper.Keeper
+	TokenFactoryKeeper tokenfactorykeeper.Keeper
 
 	ibcFeeKeeper        ibcfeekeeper.Keeper
 	IBCHooksKeeper      *ibchookskeeper.Keeper
@@ -382,7 +390,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, evmtypes.StoreKey, feemarkettypes.StoreKey, capabilitytypes.StoreKey,
 		wasm.StoreKey, feegrant.StoreKey, authzkeeper.StoreKey, icahosttypes.StoreKey,
 		icacontrollertypes.StoreKey, intertxtypes.StoreKey, ibcfeetypes.StoreKey,
-		ibchookstypes.StoreKey, clocktypes.StoreKey, packetforwardtypes.StoreKey, evmutiltypes.StoreKey,
+		ibchookstypes.StoreKey, clocktypes.StoreKey, packetforwardtypes.StoreKey, evmutiltypes.StoreKey, tokenfactorytypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -558,6 +566,15 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	)
 	app.PacketForwardKeeper.SetTransferKeeper(app.transferKeeper)
 
+	tokenFactoryKeeper := tokenfactorykeeper.NewKeeper(
+		keys[tokenfactorytypes.StoreKey],
+		app.getSubspace(tokenfactorytypes.ModuleName),
+		app.accountKeeper,
+		app.bankKeeper,
+		app.distrKeeper,
+	)
+	app.TokenFactoryKeeper = tokenFactoryKeeper
+
 	// create evidence keeper with router
 	evidenceKeeper := evidencekeeper.NewKeeper(
 		appCodec, keys[evidencetypes.StoreKey], &app.stakingKeeper, app.slashingKeeper,
@@ -599,6 +616,8 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	}
 
 	validateKeeper(scopedWasmKeeper, app.transferKeeper)
+	// Setup wasm bindings
+	// wasmOpts = append(bindings.RegisterCustomPlugins(&app.bankKeeper, &app.TokenFactoryKeeper), wasmOpts...)
 	app.wasmKeeper = wasm.NewKeeper(
 		appCodec,
 		keys[wasm.StoreKey],
@@ -701,6 +720,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		&stakingKeeper,
 		govRouter,
 	)
+
 	/****  Module Options ****/
 
 	// NOTE: we may consider parsing `appOpts` inside module constructors. For the moment
@@ -741,6 +761,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		ibchooks.NewAppModule(app.accountKeeper),
 		packetforward.NewAppModule(app.PacketForwardKeeper),
 		evmutil.NewAppModule(app.evmutilKeeper, app.bankKeeper),
+		tokenfactory.NewAppModule(app.TokenFactoryKeeper, app.accountKeeper, app.bankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -777,6 +798,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		ibchookstypes.ModuleName,
 		clocktypes.ModuleName,
 		evmutiltypes.ModuleName,
+		tokenfactorytypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		crisistypes.ModuleName,
@@ -809,6 +831,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		ibchookstypes.ModuleName,
 		clocktypes.ModuleName,
 		evmutiltypes.ModuleName,
+		tokenfactorytypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -848,6 +871,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		wasm.ModuleName,
 		ibchookstypes.ModuleName,
 		clocktypes.ModuleName,
+		tokenfactorytypes.ModuleName,
 
 		// NOTE: crisis module must go at the end to check for invariants on each module
 		crisistypes.ModuleName,
@@ -881,6 +905,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		evidence.NewAppModule(app.evidenceKeeper),
 		ibc.NewAppModule(app.ibcKeeper),
 		transfer.NewAppModule(app.transferKeeper),
+		tokenfactory.NewAppModule(app.TokenFactoryKeeper, app.accountKeeper, app.bankKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()
@@ -1104,6 +1129,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(evmtypes.ModuleName)
 	paramsKeeper.Subspace(feemarkettypes.ModuleName)
 	paramsKeeper.Subspace(evmutiltypes.ModuleName)
+	paramsKeeper.Subspace(tokenfactorytypes.ModuleName)
 
 	return paramsKeeper
 }

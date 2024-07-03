@@ -63,6 +63,8 @@ github.com/ChainSafe/go-schnorrkel v1.0.0 h1:3aDA67lAykLaG1y3AOjs88dMxC88PgUuHRr
 github.com/ChainSafe/go-schnorrkel v1.0.0/go.mod h1:dpzHYVxLZcp8pjlV+O+UR8K0Hp/z7vcchBSbMBEhCw4=
 github.com/CloudyKit/fastprinter v0.0.0-20200109182630-33d98a066a53/go.mod h1:+3IMCy2vIlbG1XG/0ggNQv0SvxCAIpPM5b1nCz56Xno=
 github.com/CloudyKit/jet/v3 v3.0.0/go.mod h1:HKQPgSJmdK8hdoAbKUUWajkHyHo4RaU5rMdUywE7VMo=
+github.com/CosmosContracts/token-factory v1.2.0-juno h1:ArPEH/gg2zD3RwtB++JR4rMSgNINb5TgVJRcwbSm15g=
+github.com/CosmosContracts/token-factory v1.2.0-juno/go.mod h1:REKRfNe+zunKZitx2wGCPJBBmwu8qofOxGhsgV2h4cw=
 github.com/DATA-DOG/go-sqlmock v1.3.3/go.mod h1:f/Ixk793poVmq4qj/V1dPUg2JEAKC73Q5eFN3EC/SaM=
 github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3tL4fMGNddJ+vMq1mwgfaqoQ=
 github.com/DataDog/zstd v1.5.2 h1:vUG4lAyuPCXO0TLbXvPv7EB7cNK1QV/luu55UHLrrn8=
@@ -832,8 +834,8 @@ github.com/oraichain/juno/x/clock v0.0.0-20231104204142-9bedf967a294 h1:22CZITFk
 github.com/oraichain/juno/x/clock v0.0.0-20231104204142-9bedf967a294/go.mod h1:9bcy6YbLhOQ3IXqlOk1O5un+mFWUoSnCYTon5zANNkM=
 github.com/oraichain/kava v0.21.1-orai-v1.0.1 h1:vI4Zps2ZdzSMjnRVDXDdw0KG/QwFWx+yECdk1LubkLY=
 github.com/oraichain/kava v0.21.1-orai-v1.0.1/go.mod h1:3adeVmSpm8xejhI+v0qKZsLA8LNdMpkZSns1kXG9YiA=
-github.com/oraichain/wasmd v0.30.2-0.20230822113616-27ffe7fdd4d1 h1:zuyxYHrgoQ8+jkNj8VayWj4CLcvYS5zw2EFakBgDm7o=
-github.com/oraichain/wasmd v0.30.2-0.20230822113616-27ffe7fdd4d1/go.mod h1:DUWz5+p7h3BbDxXAt7IBovagwt5NRPCGVuQkweIixzM=
+github.com/oraichain/wasmd v0.30.2-0.20240701023743-e3d76c6757b5 h1:X8Edb1x06x3lEx1mRLHhKnQ3ZVNLsgdpmJskmShcrXk=
+github.com/oraichain/wasmd v0.30.2-0.20240701023743-e3d76c6757b5/go.mod h1:DUWz5+p7h3BbDxXAt7IBovagwt5NRPCGVuQkweIixzM=
 github.com/oraichain/wasmvm v1.5.2 h1:hN5Pa4EPlRb0BYKkNh2cgixd0+L6kPpzc+s30Il2W/Q=
 github.com/oraichain/wasmvm v1.5.2/go.mod h1:fXB+m2gyh4v9839zlIXdMZGeLAxqUdYdFQqYsTha2hc=
 github.com/ory/dockertest v3.3.5+incompatible h1:iLLK6SQwIhcbrG783Dghaaa3WPzGc+4Emza6EbVUUGA=

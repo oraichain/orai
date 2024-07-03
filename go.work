@@ -7,3 +7,5 @@ use (
 	./orai
 	./oraivisor
 )
+
+replace github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20240701023743-e3d76c6757b5
