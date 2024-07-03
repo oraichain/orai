@@ -462,14 +462,13 @@ github.com/oraichain/ethermint v0.14.0-orai-v1.0.0/go.mod h1:YpPNH17tOeZE9oP+bCQ
 github.com/oraichain/ethermint v0.14.0-orai-v1.0.2/go.mod h1:ry+tXrkYJOEE/ICMXSWOGgv4uuDkc6GjuHHln3oKatg=
 github.com/oraichain/ethermint v0.14.0-orai-v1.0.4 h1:/V5C5ud517uHdpKvMkd9qO5xl0GDSmRrs1mFCLN7xtI=
 github.com/oraichain/ethermint v0.14.0-orai-v1.0.4/go.mod h1:ry+tXrkYJOEE/ICMXSWOGgv4uuDkc6GjuHHln3oKatg=
-github.com/oraichain/ethermint v0.14.0-orai-v1.0.5/go.mod h1:ry+tXrkYJOEE/ICMXSWOGgv4uuDkc6GjuHHln3oKatg=
 github.com/oraichain/juno/x/clock v0.0.0-20231103100256-4c83cb3f8224 h1:bEt/DUaqXbvaRLp7/XWqvAFTJT7/3DdyVjdD2KL7Ioo=
 github.com/oraichain/juno/x/clock v0.0.0-20231103100256-4c83cb3f8224/go.mod h1:9bcy6YbLhOQ3IXqlOk1O5un+mFWUoSnCYTon5zANNkM=
 github.com/oraichain/kava v0.21.1-orai-v1.0.0/go.mod h1:3adeVmSpm8xejhI+v0qKZsLA8LNdMpkZSns1kXG9YiA=
-github.com/oraichain/kava v0.21.1-orai-v1.0.1 h1:vI4Zps2ZdzSMjnRVDXDdw0KG/QwFWx+yECdk1LubkLY=
-github.com/oraichain/kava v0.21.1-orai-v1.0.1/go.mod h1:3adeVmSpm8xejhI+v0qKZsLA8LNdMpkZSns1kXG9YiA=
 github.com/oraichain/kava v0.21.1 h1:d6PUnDEg2P3sWvcK45b9hLpMQNkz2TX3zN1v3IHZ09E=
 github.com/oraichain/kava v0.21.1/go.mod h1:3adeVmSpm8xejhI+v0qKZsLA8LNdMpkZSns1kXG9YiA=
+github.com/oraichain/wasmd v0.30.2-0.20240701025001-60163da93f49 h1:XUoC7dXDOiMdZTSHGF9Kta5XaiVuyKUp8ZaS3/sM1vA=
+github.com/oraichain/wasmd v0.30.2-0.20240701025001-60163da93f49/go.mod h1:DUWz5+p7h3BbDxXAt7IBovagwt5NRPCGVuQkweIixzM=
 github.com/otiai10/copy v1.2.0/go.mod h1:rrF5dJ5F0t/EWSYODDu4j9/vEeYHMkc8jt0zJChqQWw=
 github.com/otiai10/mint v1.3.1/go.mod h1:/yxELlJQ0ufhjUwhshSj+wFjZ78CnZ48/1wtmBH1OTc=
 github.com/oxyno-zeta/gomock-extra-matcher v1.1.0/go.mod h1:UMGTHYEmJ1dRq8LDZ7VTAYO4nqM3GD1UGC3RJEUxEz0=

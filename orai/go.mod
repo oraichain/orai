@@ -198,7 +198,7 @@ replace (
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
 
 	// fork wasmd so that we have legacy wasm types
-	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20230822113616-27ffe7fdd4d1
+	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20240701025001-60163da93f49
 	// go list -m -json github.com/oraichain/wasmvm@main | jq '.|"\(.Path) \(.Version)"' -r
 	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.5.2
 
