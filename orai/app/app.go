@@ -18,6 +18,7 @@ import (
 
 	// Token Factory
 	"github.com/CosmWasm/token-factory/x/tokenfactory"
+	// bindings "github.com/CosmWasm/token-factory/x/tokenfactory/bindings"
 	tokenfactorykeeper "github.com/CosmWasm/token-factory/x/tokenfactory/keeper"
 	tokenfactorytypes "github.com/CosmWasm/token-factory/x/tokenfactory/types"
 
