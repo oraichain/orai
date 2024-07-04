@@ -834,8 +834,8 @@ github.com/oraichain/juno/x/clock v0.0.0-20231104204142-9bedf967a294 h1:22CZITFk
 github.com/oraichain/juno/x/clock v0.0.0-20231104204142-9bedf967a294/go.mod h1:9bcy6YbLhOQ3IXqlOk1O5un+mFWUoSnCYTon5zANNkM=
 github.com/oraichain/kava v0.21.1-orai-v1.0.1 h1:vI4Zps2ZdzSMjnRVDXDdw0KG/QwFWx+yECdk1LubkLY=
 github.com/oraichain/kava v0.21.1-orai-v1.0.1/go.mod h1:3adeVmSpm8xejhI+v0qKZsLA8LNdMpkZSns1kXG9YiA=
-github.com/oraichain/wasmd v0.30.2-0.20240701023743-e3d76c6757b5 h1:X8Edb1x06x3lEx1mRLHhKnQ3ZVNLsgdpmJskmShcrXk=
-github.com/oraichain/wasmd v0.30.2-0.20240701023743-e3d76c6757b5/go.mod h1:DUWz5+p7h3BbDxXAt7IBovagwt5NRPCGVuQkweIixzM=
+github.com/oraichain/wasmd v0.30.2-0.20240701025001-60163da93f49 h1:XUoC7dXDOiMdZTSHGF9Kta5XaiVuyKUp8ZaS3/sM1vA=
+github.com/oraichain/wasmd v0.30.2-0.20240701025001-60163da93f49/go.mod h1:DUWz5+p7h3BbDxXAt7IBovagwt5NRPCGVuQkweIixzM=
 github.com/oraichain/wasmvm v1.5.2 h1:hN5Pa4EPlRb0BYKkNh2cgixd0+L6kPpzc+s30Il2W/Q=
 github.com/oraichain/wasmvm v1.5.2/go.mod h1:fXB+m2gyh4v9839zlIXdMZGeLAxqUdYdFQqYsTha2hc=
 github.com/ory/dockertest v3.3.5+incompatible h1:iLLK6SQwIhcbrG783Dghaaa3WPzGc+4Emza6EbVUUGA=

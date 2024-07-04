@@ -4,10 +4,10 @@ set -eu
 
 # setup the network using the old binary
 
-OLD_VERSION=${OLD_VERSION:-"v0.41.8"}
+OLD_VERSION=${OLD_VERSION:-"v0.42.0"}
 WASM_PATH=${WASM_PATH:-"$PWD/scripts/wasm_file/swapmap.wasm"}
 ARGS="--chain-id testing -y --keyring-backend test --fees 200orai --gas auto --gas-adjustment 1.5 -b block"
-NEW_VERSION=${NEW_VERSION:-"v0.42.0"}
+NEW_VERSION=${NEW_VERSION:-"v0.42.1"}
 VALIDATOR_HOME=${VALIDATOR_HOME:-"$HOME/.oraid/validator1"}
 MIGRATE_MSG=${MIGRATE_MSG:-'{}'}
 EXECUTE_MSG=${EXECUTE_MSG:-'{"ping":{}}'}
@@ -35,7 +35,7 @@ echo "contract address: $contract_address"
 # create new upgrade proposal
 UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-35}
 oraid tx gov submit-proposal software-upgrade $NEW_VERSION --title "foobar" --description "foobar"  --from validator1 --upgrade-height $UPGRADE_HEIGHT --upgrade-info "x" --deposit 10000000orai $ARGS --home $VALIDATOR_HOME
-oraid tx gov vote 1 yes --from validator1 --home "$HOME/.oraid/validator1" $ARGS && oraid tx gov vote 1 yes --from validator2 --home "$HOME/.oraid/validator2" $ARGS
+oraid tx gov vote 1 yes --from validator1 --home $VALIDATOR_HOME $ARGS && oraid tx gov vote 1 yes --from validator2 --home "$HOME/.oraid/validator2" $ARGS
 
 # sleep to wait til the proposal passes
 echo "Sleep til the proposal passes..."
@@ -64,28 +64,6 @@ screen -S validator3 -d -m oraid start --home=$HOME/.oraid/validator3 --minimum-
 # sleep a bit for the network to start 
 echo "Sleep to wait for the network to start..."
 sleep 3
-
-# kill oraid again to modify json rpc address for each validator (only for the ethermint upgrade)
-pkill oraid
-# change app.toml values
-VALIDATOR1_APP_TOML=$HOME/.oraid/validator1/config/app.toml
-VALIDATOR2_APP_TOML=$HOME/.oraid/validator2/config/app.toml
-VALIDATOR3_APP_TOML=$HOME/.oraid/validator3/config/app.toml
-
-sed -i -E 's|0.0.0.0:8545|0.0.0.0:7545|g' $VALIDATOR2_APP_TOML
-sed -i -e "s%^ws-address *=.*%ws-address = \"0.0.0.0:7546\"%; " $VALIDATOR2_APP_TOML
-
-sed -i -E 's|0.0.0.0:8545|0.0.0.0:6545|g' $VALIDATOR3_APP_TOML
-sed -i -e "s%^ws-address *=.*%ws-address = \"0.0.0.0:6546\"%; " $VALIDATOR3_APP_TOML
-
-# start again 3 validators
-screen -S validator1 -d -m oraid start --home=$HOME/.oraid/validator1 --minimum-gas-prices=0.00001orai
-screen -S validator2 -d -m oraid start --home=$HOME/.oraid/validator2 --minimum-gas-prices=0.00001orai
-screen -S validator3 -d -m oraid start --home=$HOME/.oraid/validator3 --minimum-gas-prices=0.00001orai
-
-# sleep a bit for the network to start 
-echo "Sleep to wait for the network to start..."
-sleep 5
 
 # test contract migration
 echo "Migrate the contract..."
@@ -145,5 +123,8 @@ sh $PWD/scripts/test_clock_counter_contract.sh
 oraid tx send validator1 orai1kzkf6gttxqar9yrkxfe34ye4vg5v4m588ew7c9 100000000orai --from validator1 $ARGS --home $VALIDATOR_HOME
 # test private key. DO NOT USE IT!. orai1kzkf6gttxqar9yrkxfe34ye4vg5v4m588ew7c9 matches the priv key below
 sh $PWD/scripts/test-erc20-deploy.sh
+
+# test gasless
+NODE_HOME=$VALIDATOR_HOME USER=validator1 sh $PWD/scripts/tests-0.42.1/test-gasless.sh
 
 echo "Tests Passed!!"

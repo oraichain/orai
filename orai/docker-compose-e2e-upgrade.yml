@@ -2,7 +2,7 @@ version: '3.3'
 services:
   validator1:
     container_name: validator1
-    image: oraichain/foundation-orai:0.41.8-alpine-prod # one version lower so we can test the network upgrade
+    image: oraichain/foundation-orai:0.42.0-alpine-prod # one version lower so we can test the network upgrade
     working_dir: /workspace
     tty: true
     ulimits:
@@ -22,7 +22,7 @@ services:
 
   validator2:
     container_name: validator2
-    image: oraichain/foundation-orai:0.41.8-alpine-prod
+    image: oraichain/foundation-orai:0.42.0-alpine-prod
     working_dir: /workspace
     tty: true
     ulimits:
@@ -41,7 +41,7 @@ services:
 
   validator3:
     container_name: validator3
-    image: oraichain/foundation-orai:0.41.8-alpine-prod
+    image: oraichain/foundation-orai:0.42.0-alpine-prod
     working_dir: /workspace
     tty: true
     ulimits:

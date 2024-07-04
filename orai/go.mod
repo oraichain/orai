@@ -201,7 +201,8 @@ replace (
 	github.com/CosmWasm/token-factory => github.com/CosmosContracts/token-factory v1.2.0-juno
 
 	// fork wasmd so that we have legacy wasm types
-	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20240701023743-e3d76c6757b5
+	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20240701025001-60163da93f49
+
 	// go list -m -json github.com/oraichain/wasmvm@main | jq '.|"\(.Path) \(.Version)"' -r
 	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.5.2
 

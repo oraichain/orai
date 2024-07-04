@@ -163,7 +163,7 @@ const appName = "Oraichain"
 var (
 	NodeDir = ".oraid"
 
-	BinaryVersion = "v0.42.0"
+	BinaryVersion = "v0.42.1"
 
 	// If EnabledSpecificProposals is "", and this is "true", then enable all x/wasm proposals.
 	// If EnabledSpecificProposals is "", and this is not "true", then disable all x/wasm proposals.
@@ -1138,12 +1138,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 func (app *OraichainApp) upgradeHandler() {
 	app.upgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		response, err := app.mm.RunMigrations(ctx, app.configurator, fromVM)
-		ctx.Logger().Info("Start updating evm params...")
-		defaultEvmParams := evmtypes.DefaultParams()
-		defaultEvmParams.EvmDenom = appconfig.EvmDenom // orai aka 10^-6
-		app.evmKeeper.SetParams(ctx, defaultEvmParams)
-
-		ctx.Logger().Info("Finished updating evm params...")
 		return response, err
 	})
 
@@ -1155,7 +1149,7 @@ func (app *OraichainApp) upgradeHandler() {
 	if upgradeInfo.Name == BinaryVersion && !app.upgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storetypes.StoreUpgrades{
-			Added: []string{evmtypes.StoreKey, feemarkettypes.StoreKey, evmutiltypes.StoreKey},
+			Added: []string{},
 		}))
 	}
 }
