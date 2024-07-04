@@ -49,7 +49,7 @@ update_genesis '.app_state["staking"]["params"]["unbonding_time"]="240s"'
 update_genesis '.app_state["crisis"]["constant_fee"]["denom"]="orai"'
 
 # udpate gov genesis
-update_genesis '.app_state["gov"]["voting_params"]["voting_period"]="15s"'
+update_genesis '.app_state["gov"]["voting_params"]["voting_period"]="5s"'
 update_genesis '.app_state["gov"]["deposit_params"]["min_deposit"][0]["denom"]="orai"'
 
 # update mint genesis
@@ -120,6 +120,13 @@ sed -i -E 's|tcp://127.0.0.1:26657|tcp://0.0.0.0:26657|g' $VALIDATOR3_CONFIG
 sed -i -E 's|tcp://0.0.0.0:26656|tcp://0.0.0.0:26656|g' $VALIDATOR3_CONFIG
 sed -i -E 's|allow_duplicate_ip = false|allow_duplicate_ip = true|g' $VALIDATOR3_CONFIG
 
+# modify jsonrpc ports to avoid clashing
+sed -i -E 's|0.0.0.0:8545|0.0.0.0:7545|g' $VALIDATOR2_APP_TOML
+sed -i -e "s%^ws-address *=.*%ws-address = \"0.0.0.0:7546\"%; " $VALIDATOR2_APP_TOML
+
+sed -i -E 's|0.0.0.0:8545|0.0.0.0:6545|g' $VALIDATOR3_APP_TOML
+sed -i -e "s%^ws-address *=.*%ws-address = \"0.0.0.0:6546\"%; " $VALIDATOR3_APP_TOML
+
 # copy validator1 genesis file to validator2-3
 cp $PWD/.oraid/validator1/config/genesis.json $PWD/.oraid/validator2/config/genesis.json
 cp $PWD/.oraid/validator1/config/genesis.json $PWD/.oraid/validator3/config/genesis.json
@@ -136,8 +143,8 @@ $docker_command -d validator2 bash -c "oraivisor start --home=$working_dir/valid
 $docker_command -d validator3 bash -c "oraivisor start --home=$working_dir/validator3 --minimum-gas-prices=0.00001orai"
 
 # send orai from first validator to second validator
-echo "Waiting 7 seconds to send funds to validators 2 and 3..."
-sleep 7
+echo "Waiting 5 seconds to send funds to validators 2 and 3..."
+sleep 5
 
 validator2_key_res=`$validator2_command "oraivisor keys show validator2 -a --keyring-backend=test --home=$working_dir/validator2"`
 validator2_key=$(echo "$validator2_key_res" | tr -d -c '[:alnum:]') # remove all special characters because of the command's result

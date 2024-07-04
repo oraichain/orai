@@ -19,17 +19,8 @@ WASM_PATH=${WASM_PATH:-"$working_dir/scripts/wasm_file/swapmap.wasm"}
 # setup local network
 sh $PWD/scripts/multinode-docker.sh
 
-# # deploy new contract
-store_ret=`$validator1_command "oraid tx wasm store $WASM_PATH --from validator1 --home $VALIDATOR_HOME $ARGS --output json"`
-code_id=$(echo $store_ret | jq -r '.logs[0].events[1].attributes[] | select(.key | contains("code_id")).value')
-$validator1_command "oraid tx wasm instantiate $code_id \"{}\" --label 'testing' --from validator1 --home $VALIDATOR_HOME -b block --no-admin $ARGS"
-contract_address_res=`$validator1_command "oraid query wasm list-contract-by-code $code_id --output json | jq -r '.contracts[0]'"`
-contract_address=$(echo "$contract_address_res" | tr -d -c '[:alnum:]') # remove all special characters because of the command's result
-
-echo "contract address: $contract_address"
-
 # create new upgrade proposal
-UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-90}
+UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-85}
 $validator1_command "oraid tx gov submit-proposal software-upgrade $NEW_VERSION --title 'foobar' --description 'foobar' --from validator1 --upgrade-height $UPGRADE_HEIGHT --upgrade-info 'https://github.com/oraichain/orai/releases/download/$UPGRADE_INFO_VERSION/manifest.json' --deposit 10000000orai $ARGS --home $VALIDATOR_HOME"
 $validator1_command "oraid tx gov vote 1 yes --from validator1 --home $VALIDATOR_HOME $ARGS"
 $validator1_command "oraid tx gov vote 1 yes --from validator2 --home $oraid_dir/validator2 $ARGS"
@@ -47,11 +38,9 @@ do
    echo $latest_height
 done
 
-$validator1_command "oraid tx wasm execute $contract_address $(echo $EXECUTE_MSG | jq '@json') --from validator1 $ARGS --home $VALIDATOR_HOME"
-
 # sleep about 5 secs to wait for the rest & json rpc server to be u
 echo "Waiting for the REST & JSONRPC servers to be up ..."
-sleep 5
+sleep 19
 
 oraid_version=$($validator1_command "oraid version")
 if ! [[ $oraid_version =~ $NEW_VERSION ]] ; then
@@ -98,5 +87,7 @@ if ! [[ $evm_denom =~ "aorai" ]] ; then
    echo "Error: EVM denom is not correct. The upgraded version is not the latest!" >&2;
    echo "Tests Failed"; exit 1
 fi
+
+NODE_HOME=$VALIDATOR_HOME USER=validator1 WASM_PATH=$WASM_PATH bash $PWD/scripts/tests-0.42.1/test-gasless-docker.sh
 
 echo "Tests Passed"
