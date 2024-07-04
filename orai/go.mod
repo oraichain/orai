@@ -198,7 +198,7 @@ replace (
 	// Use cosmos keyring
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
 	// token factory:
-	github.com/CosmWasm/token-factory => github.com/CosmosContracts/token-factory v1.2.0-juno
+	github.com/CosmWasm/token-factory => github.com/CosmosContracts/token-factory v1.2.1-juno.0.20230523144425-253f9b9df6a6
 
 	// fork wasmd so that we have legacy wasm types
 	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20240701025001-60163da93f49

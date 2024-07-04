@@ -61,6 +61,8 @@ github.com/CloudyKit/jet/v6 v6.1.0/go.mod h1:d3ypHeIRNo2+XyqnGA8s+aphtcVpjP5hPwP
 github.com/CloudyKit/jet/v6 v6.2.0/go.mod h1:d3ypHeIRNo2+XyqnGA8s+aphtcVpjP5hPwP/Lzo7Ro4=
 github.com/CosmosContracts/juno/v18 v18.0.0-20231011205927-62c4d7ee0a9b h1:8DKjTRdDyApBxUw1ukPEze1s3cFLy6NEQbmVCpgpXMo=
 github.com/CosmosContracts/juno/v18 v18.0.0-20231011205927-62c4d7ee0a9b/go.mod h1:HNd+UAOZwo5uTPc7Fxl7q9C6Bn16okI9g9C1T1KlMoQ=
+github.com/CosmosContracts/token-factory v1.2.1-juno.0.20230523144425-253f9b9df6a6 h1:2jL+sNaJoH+OMGYhOCcL6M5i3RaLGDDunZr+GeWy2xQ=
+github.com/CosmosContracts/token-factory v1.2.1-juno.0.20230523144425-253f9b9df6a6/go.mod h1:REKRfNe+zunKZitx2wGCPJBBmwu8qofOxGhsgV2h4cw=
 github.com/DataDog/zstd v1.4.1/go.mod h1:1jcaCB/ufaK+sKp1NBhlGmpz41jOoPQ35bpF36t7BBo=
 github.com/DataDog/zstd v1.4.5/go.mod h1:1jcaCB/ufaK+sKp1NBhlGmpz41jOoPQ35bpF36t7BBo=
 github.com/DataDog/zstd v1.5.0/go.mod h1:g4AWEaM3yOg3HYfnJ3YIawPnVdXJh9QME85blwSAmyw=

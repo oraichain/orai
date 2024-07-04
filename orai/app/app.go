@@ -143,6 +143,7 @@ import (
 	clockkeeper "github.com/CosmosContracts/juno/v18/x/clock/keeper"
 	clocktypes "github.com/CosmosContracts/juno/v18/x/clock/types"
 
+	"github.com/CosmWasm/token-factory/x/tokenfactory/bindings"
 	evmutil "github.com/kava-labs/kava/x/evmutil"
 	evmutilkeeper "github.com/kava-labs/kava/x/evmutil/keeper"
 	evmutiltypes "github.com/kava-labs/kava/x/evmutil/types"
@@ -172,6 +173,11 @@ var (
 	// of "EnableAllProposals" (takes precedence over ProposalsEnabled)
 	// https://github.com/oraichain/orai/blob/02a54d33ff2c064f3539ae12d75d027d9c665f05/x/wasm/internal/types/proposal.go#L28-L34
 	EnableSpecificProposals = ""
+	EnabledCapabilities     = []string{
+		tokenfactorytypes.EnableBurnFrom,
+		tokenfactorytypes.EnableForceTransfer,
+		tokenfactorytypes.EnableSetMetadata,
+	}
 )
 
 // GetEnabledProposals parses the ProposalsEnabled / EnableSpecificProposals values to
@@ -317,7 +323,7 @@ type OraichainApp struct {
 
 	// keepers
 	accountKeeper      authkeeper.AccountKeeper
-	bankKeeper         bankkeeper.Keeper
+	bankKeeper         bankkeeper.BaseKeeper
 	capabilityKeeper   *capabilitykeeper.Keeper
 	stakingKeeper      stakingkeeper.Keeper
 	slashingKeeper     slashingkeeper.Keeper
@@ -573,6 +579,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		app.accountKeeper,
 		app.bankKeeper,
 		app.distrKeeper,
+		EnabledCapabilities,
 	)
 	app.TokenFactoryKeeper = tokenFactoryKeeper
 
@@ -618,7 +625,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 
 	validateKeeper(scopedWasmKeeper, app.transferKeeper)
 	// Setup wasm bindings
-	// wasmOpts = append(bindings.RegisterCustomPlugins(&app.bankKeeper, &app.TokenFactoryKeeper), wasmOpts...)
+	wasmOpts = append(bindings.RegisterCustomPlugins(&app.bankKeeper, &app.TokenFactoryKeeper), wasmOpts...)
 	app.wasmKeeper = wasm.NewKeeper(
 		appCodec,
 		keys[wasm.StoreKey],
@@ -1138,6 +1145,12 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 func (app *OraichainApp) upgradeHandler() {
 	app.upgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		response, err := app.mm.RunMigrations(ctx, app.configurator, fromVM)
+		ctx.Logger().Info("Start updating tokenfactory params...")
+		tokenfactoryParams := tokenfactorytypes.DefaultParams()
+		tokenfactoryParams.DenomCreationFee = sdk.NewCoins(sdk.NewInt64Coin(appconfig.MinimalDenom, 10_000_000))
+		app.TokenFactoryKeeper.SetParams(ctx, tokenfactoryParams)
+		ctx.Logger().Info("Finished updating tokenfactory params...")
+
 		return response, err
 	})
 
@@ -1149,7 +1162,7 @@ func (app *OraichainApp) upgradeHandler() {
 	if upgradeInfo.Name == BinaryVersion && !app.upgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storetypes.StoreUpgrades{
-			Added: []string{},
+			Added: []string{tokenfactorytypes.ModuleName},
 		}))
 	}
 }
