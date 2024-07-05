@@ -38,4 +38,5 @@ screen -S test-gasless -d -m oraid start --json-rpc.address="0.0.0.0:8545" --jso
 # wait for the node to start
 sleep 2
 
-sh $PWD/scripts/gasless-contract-tests/test-gasless.sh
+sh $PWD/scripts/tests-0.42.1/test-gasless.sh
+sh $PWD/scripts/tests-0.42.1/test-tokenfactory.sh
