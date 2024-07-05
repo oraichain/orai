@@ -89,5 +89,6 @@ if ! [[ $evm_denom =~ "aorai" ]] ; then
 fi
 
 NODE_HOME=$VALIDATOR_HOME USER=validator1 WASM_PATH=$WASM_PATH bash $PWD/scripts/tests-0.42.1/test-gasless-docker.sh
+NODE_HOME=$VALIDATOR_HOME USER=validator1 WASM_PATH=$WASM_PATH bash $PWD/scripts/tests-0.42.1/test-tokenfactory-docker.sh
 
 echo "Tests Passed"
