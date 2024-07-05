@@ -126,5 +126,6 @@ sh $PWD/scripts/test-erc20-deploy.sh
 
 # test gasless
 NODE_HOME=$VALIDATOR_HOME USER=validator1 sh $PWD/scripts/tests-0.42.1/test-gasless.sh
+NODE_HOME=$VALIDATOR_HOME USER=validator1 sh $PWD/scripts/tests-0.42.1/test-tokenfactory.sh
 
 echo "Tests Passed!!"

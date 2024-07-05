@@ -18,7 +18,7 @@ denom_name="usdt"
 oraid tx tokenfactory create-denom $denom_name $ARGS
 
 # try querying list denoms afterwards
-user_address=$(oraid keys show $USER --keyring-backend test -a)
+user_address=$(oraid keys show $USER --home $NODE_HOME --keyring-backend test -a)
 first_denom=$(oraid query tokenfactory denoms-from-creator $user_address --output json | jq '.denoms[0]' | tr -d '"')
 echo "first denom: $first_denom"
 
