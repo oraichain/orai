@@ -20,9 +20,10 @@ denom_name="usdt"
 $validator1_command "oraid tx tokenfactory create-denom $denom_name $ARGS"
 
 # try querying list denoms afterwards
-user_address=`$validator1_command "oraid keys show $USER --home $NODE_HOME --keyring-backend test -a"`
-first_denom_before_trim=`$validator1_command "oraid query tokenfactory denoms-from-creator $user_address --output json | jq '.denoms[0]'"`
-first_denom=$(echo $first_denom_before_trim | tr -d '"')
+user_address_result=`$validator1_command "oraid keys show $USER --home $NODE_HOME --keyring-backend test --output json"`
+user_address=$(echo $user_address_result | jq '.address' | tr -d '"')
+first_denom_before_trim=`$validator1_command "oraid query tokenfactory denoms-from-creator $user_address --output json"`
+first_denom=$(echo $first_denom_before_trim | jq '.denoms[0]' | tr -d '"')
 echo "first denom: $first_denom"
 
 if ! [[ $first_denom =~ "factory/$user_address/$denom_name" ]] ; then
@@ -40,14 +41,17 @@ fi
 $validator1_command "oraid tx tokenfactory mint 10$first_denom $ARGS"
 
 # query balance after mint
-tokenfactory_balance=`$validator1_command "oraid query bank balances $user_address --denom=$first_denom --output json | jq '.amount | tonumber'"`
+tokenfactory_balance_result=`$validator1_command "oraid query bank balances $user_address --denom=$first_denom --output json"`
+tokenfactory_balance=$(echo $tokenfactory_balance_result | jq '.amount | tonumber')
+echo "token factory balance: $tokenfactory_balance"
 if [[ $tokenfactory_balance -ne 10 ]] ; then
    echo "The tokenfactory balance does not increase after mint"; exit 1
 fi
 
 # try burn
 $validator1_command "oraid tx tokenfactory burn 10$first_denom $ARGS"
-tokenfactory_balance=`$validator1_command "oraid query bank balances $user_address --denom=$first_denom --output json | jq '.amount | tonumber')"`
+tokenfactory_balance_result=`$validator1_command "oraid query bank balances $user_address --denom=$first_denom --output json"`
+tokenfactory_balance=$(echo $tokenfactory_balance_result | jq '.amount | tonumber')
 if [[ $tokenfactory_balance -ne 0 ]] ; then
    echo "The tokenfactory balance does not decrease after burn"; exit 1
 fi
