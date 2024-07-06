@@ -40,3 +40,4 @@ sleep 2
 
 sh $PWD/scripts/tests-0.42.1/test-gasless.sh
 sh $PWD/scripts/tests-0.42.1/test-tokenfactory.sh
+sh $PWD/scripts/tests-0.42.1/test-tokenfactory-bindings.sh
