@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ux
+set -u
 
 # # always returns true so set -e doesn't exit if it is not running.
 rm -rf $PWD/.oraid/

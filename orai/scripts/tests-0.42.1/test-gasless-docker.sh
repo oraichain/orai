@@ -14,7 +14,6 @@ HIDE_LOGS="/dev/null"
 
 # prepare a new contract for gasless
 store_ret=`$validator1_command "oraid tx wasm store $WASM_PATH --from validator1 --home $NODE_HOME $ARGS --output json"`
-echo "store ret: $store_ret"
 code_id=$(echo $store_ret | jq -r '.logs[0].events[1].attributes[] | select(.key | contains("code_id")).value')
 $validator1_command "oraid tx wasm instantiate $code_id \"{}\" --label 'testing' --from validator1 --home $NODE_HOME -b block --no-admin $ARGS > $HIDE_LOGS"
 contract_address_res=`$validator1_command "oraid query wasm list-contract-by-code $code_id --output json | jq -r '.contracts[0]'"`
