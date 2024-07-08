@@ -6,6 +6,7 @@ CHAIN_ID=${CHAIN_ID:-testing}
 USER=${USER:-tupt}
 NODE_HOME=${NODE_HOME:-"$PWD/.oraid"}
 ARGS="--from $USER --chain-id testing -y --keyring-backend test --fees 200orai --gas auto --gas-adjustment 1.5 -b block --home $NODE_HOME"
+HIDE_LOGS="/dev/null"
 
 # prepare a new contract for gasless
 fee_params=$(oraid query tokenfactory params --output json | jq '.params.denom_creation_fee[0].denom')
@@ -15,7 +16,7 @@ fi
 
 # try creating a new denom
 denom_name="usdt"
-oraid tx tokenfactory create-denom $denom_name $ARGS
+oraid tx tokenfactory create-denom $denom_name $ARGS > $HIDE_LOGS
 
 # try querying list denoms afterwards
 user_address=$(oraid keys show $USER --home $NODE_HOME --keyring-backend test -a)
@@ -34,7 +35,7 @@ if ! [[ $admin =~ $user_address ]] ; then
 fi
 
 # try mint
-oraid tx tokenfactory mint 10$first_denom $ARGS
+oraid tx tokenfactory mint 10$first_denom $ARGS > $HIDE_LOGS
 
 # query balance after mint
 tokenfactory_balance=$(oraid query bank balances $user_address --denom=$first_denom --output json | jq '.amount | tonumber')
@@ -43,7 +44,7 @@ if [[ $tokenfactory_balance -ne 10 ]] ; then
 fi
 
 # try burn
-oraid tx tokenfactory burn 10$first_denom $ARGS
+oraid tx tokenfactory burn 10$first_denom $ARGS > $HIDE_LOGS
 tokenfactory_balance=$(oraid query bank balances $user_address --denom=$first_denom --output json | jq '.amount | tonumber')
 if [[ $tokenfactory_balance -ne 0 ]] ; then
    echo "The tokenfactory balance does not decrease after burn"; exit 1

@@ -15,15 +15,16 @@ working_dir=/workspace
 oraid_dir=$working_dir/.oraid
 VALIDATOR_HOME=${VALIDATOR_HOME:-"$oraid_dir/validator1"}
 WASM_PATH=${WASM_PATH:-"$working_dir/scripts/wasm_file/swapmap.wasm"}
+HIDE_LOGS="/dev/null"
 
 # setup local network
 sh $PWD/scripts/multinode-docker.sh
 
 # create new upgrade proposal
 UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-85}
-$validator1_command "oraid tx gov submit-proposal software-upgrade $NEW_VERSION --title 'foobar' --description 'foobar' --from validator1 --upgrade-height $UPGRADE_HEIGHT --upgrade-info 'https://github.com/oraichain/orai/releases/download/$UPGRADE_INFO_VERSION/manifest.json' --deposit 10000000orai $ARGS --home $VALIDATOR_HOME"
-$validator1_command "oraid tx gov vote 1 yes --from validator1 --home $VALIDATOR_HOME $ARGS"
-$validator1_command "oraid tx gov vote 1 yes --from validator2 --home $oraid_dir/validator2 $ARGS"
+$validator1_command "oraid tx gov submit-proposal software-upgrade $NEW_VERSION --title 'foobar' --description 'foobar' --from validator1 --upgrade-height $UPGRADE_HEIGHT --upgrade-info 'https://github.com/oraichain/orai/releases/download/$UPGRADE_INFO_VERSION/manifest.json' --deposit 10000000orai $ARGS --home $VALIDATOR_HOME > $HIDE_LOGS"
+$validator1_command "oraid tx gov vote 1 yes --from validator1 --home $VALIDATOR_HOME $ARGS > $HIDE_LOGS"
+$validator1_command "oraid tx gov vote 1 yes --from validator2 --home $oraid_dir/validator2 $ARGS > $HIDE_LOGS"
 
 # sleep to wait til the proposal passes
 echo "Sleep til the proposal passes..."

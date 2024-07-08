@@ -8,6 +8,7 @@ NODE_HOME=${NODE_HOME:-"$PWD/.oraid"}
 ARGS="--from $USER --chain-id testing -y --keyring-backend test --fees 200orai --gas auto --gas-adjustment 1.5 -b block --home $NODE_HOME"
 docker_command="docker-compose -f $PWD/docker-compose-e2e-upgrade.yml exec"
 validator1_command="$docker_command validator1 bash -c"
+HIDE_LOGS="/dev/null"
 
 # prepare a new contract for gasless
 fee_params=`$validator1_command "oraid query tokenfactory params --output json | jq '.params.denom_creation_fee[0].denom'"`
@@ -17,7 +18,7 @@ fi
 
 # try creating a new denom
 denom_name="usdt"
-$validator1_command "oraid tx tokenfactory create-denom $denom_name $ARGS"
+$validator1_command "oraid tx tokenfactory create-denom $denom_name $ARGS > $HIDE_LOGS"
 
 # try querying list denoms afterwards
 user_address_result=`$validator1_command "oraid keys show $USER --home $NODE_HOME --keyring-backend test --output json"`
@@ -38,7 +39,7 @@ if ! [[ $admin =~ $user_address ]] ; then
 fi
 
 # try mint
-$validator1_command "oraid tx tokenfactory mint 10$first_denom $ARGS"
+$validator1_command "oraid tx tokenfactory mint 10$first_denom $ARGS > $HIDE_LOGS"
 
 # query balance after mint
 tokenfactory_balance_result=`$validator1_command "oraid query bank balances $user_address --denom=$first_denom --output json"`
@@ -49,7 +50,7 @@ if [[ $tokenfactory_balance -ne 10 ]] ; then
 fi
 
 # try burn
-$validator1_command "oraid tx tokenfactory burn 10$first_denom $ARGS"
+$validator1_command "oraid tx tokenfactory burn 10$first_denom $ARGS > $HIDE_LOGS"
 tokenfactory_balance_result=`$validator1_command "oraid query bank balances $user_address --denom=$first_denom --output json"`
 tokenfactory_balance=$(echo $tokenfactory_balance_result | jq '.amount | tonumber')
 if [[ $tokenfactory_balance -ne 0 ]] ; then

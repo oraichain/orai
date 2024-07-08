@@ -8,11 +8,12 @@ NODE_HOME=${NODE_HOME:-"$PWD/.oraid"}
 WASM_PATH=${WASM_PATH:-"$PWD/scripts/wasm_file/tokenfactory.wasm"}
 ARGS="--from $USER --chain-id testing -y --keyring-backend test --fees 200orai --gas auto --gas-adjustment 1.5 -b block --home $NODE_HOME"
 user_address=$(oraid keys show $USER --keyring-backend test --home $NODE_HOME -a)
+HIDE_LOGS="/dev/null"
 
 # deploy cw-bindings contract
 store_ret=$(oraid tx wasm store $WASM_PATH $ARGS --output json)
 code_id=$(echo $store_ret | jq -r '.logs[0].events[1].attributes[] | select(.key | contains("code_id")).value')
-oraid tx wasm instantiate $code_id '{}' --label 'tokenfactory cw bindings testing' --admin $user_address $ARGS
+oraid tx wasm instantiate $code_id '{}' --label 'tokenfactory cw bindings testing' --admin $user_address $ARGS > $HIDE_LOGS
 contract_address=$(oraid query wasm list-contract-by-code $code_id --output json | jq -r '.contracts[0]')
 echo $contract_address
 
@@ -24,10 +25,10 @@ echo "create denom msg: $CREATE_DENOM_MSG"
 echo "query denom msg: $QUERY_DENOM_MSG"
 
 # send to the contract some funds to create denom
-oraid tx send $user_address $contract_address 100000000orai $ARGS
+oraid tx send $user_address $contract_address 100000000orai $ARGS > $HIDE_LOGS
 
 # create denom
-oraid tx wasm execute $contract_address $CREATE_DENOM_MSG $ARGS --output json | jq '.gas_used | tonumber'
+oraid tx wasm execute $contract_address $CREATE_DENOM_MSG $ARGS > $HIDE_LOGS 
 
 # query created denom
 created_denom=$(oraid query wasm contract-state smart $contract_address $QUERY_DENOM_MSG --output json | jq '.data.denom' | tr -d '"')
