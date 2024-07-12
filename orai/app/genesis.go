@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
+	tokenfactorytypes "github.com/CosmWasm/token-factory/x/tokenfactory/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	crisis "github.com/cosmos/cosmos-sdk/x/crisis/types"
@@ -28,8 +29,9 @@ func NewDefaultGenesisState(cdc codec.Codec) GenesisState {
 	crisisGenesis := crisis.DefaultGenesisState()
 	evmGenesis := evm.DefaultGenesisState()
 	feemarketGenesis := feemarket.DefaultGenesisState()
+	tokenFactoryGenesis := tokenfactorytypes.DefaultGenesis()
 
-	stakingGenesis.Params.BondDenom = appconfig.Bech32Prefix
+	stakingGenesis.Params.BondDenom = appconfig.MinimalDenom
 	stakingGenesis.Params.HistoricalEntries = 1000
 
 	// TODO: testnet figures only
@@ -38,15 +40,15 @@ func NewDefaultGenesisState(cdc codec.Codec) GenesisState {
 	genesisState[staking.ModuleName] = cdc.MustMarshalJSON(stakingGenesis)
 
 	mintGenesis.Params.BlocksPerYear = 6311200 // target 5-second block time
-	mintGenesis.Params.MintDenom = appconfig.Bech32Prefix
+	mintGenesis.Params.MintDenom = appconfig.MinimalDenom
 	genesisState[mint.ModuleName] = cdc.MustMarshalJSON(mintGenesis)
 
-	govGenesis.DepositParams.MinDeposit = sdk.NewCoins(sdk.NewCoin(appconfig.Bech32Prefix, sdk.TokensFromConsensusPower(10, sdk.NewInt(1000000))))
+	govGenesis.DepositParams.MinDeposit = sdk.NewCoins(sdk.NewCoin(appconfig.MinimalDenom, sdk.TokensFromConsensusPower(10, sdk.NewInt(1000000))))
 	// TODO: testing
 	govGenesis.VotingParams.VotingPeriod = time.Second * 30 // test for 10 mins voting period
 	genesisState[gov.ModuleName] = cdc.MustMarshalJSON(govGenesis)
 
-	crisisGenesis.ConstantFee = sdk.NewCoin(appconfig.Bech32Prefix, sdk.TokensFromConsensusPower(10, sdk.NewInt(1000000)))
+	crisisGenesis.ConstantFee = sdk.NewCoin(appconfig.MinimalDenom, sdk.TokensFromConsensusPower(10, sdk.NewInt(1000000)))
 	genesisState[crisis.ModuleName] = cdc.MustMarshalJSON(crisisGenesis)
 
 	// update default evm denom of evm module
@@ -58,6 +60,10 @@ func NewDefaultGenesisState(cdc codec.Codec) GenesisState {
 	feemarketGenesis.Params.NoBaseFee = true
 	genesisState[feemarket.ModuleName] = cdc.MustMarshalJSON(feemarketGenesis)
 
+	// fix tokenfactory params denom creation denom
+	tokenFactoryGenesis.Params.DenomCreationFee = sdk.NewCoins(sdk.NewInt64Coin(appconfig.MinimalDenom, 10_000_000)) // 10 ORAI
+	genesisState[tokenfactorytypes.ModuleName] = cdc.MustMarshalJSON(tokenFactoryGenesis)
+
 	// slashingGenesis.Params.SignedBlocksWindow = 30000                         // approximately 1 day
 	// slashingGenesis.Params.MinSignedPerWindow = sdk.NewDecWithPrec(5, 2)      // 5%
 	// slashingGenesis.Params.DowntimeJailDuration = 60 * 10 * time.Second       // 10 minutes
@@ -67,7 +73,7 @@ func NewDefaultGenesisState(cdc codec.Codec) GenesisState {
 
 	for _, b := range ModuleBasics {
 		name := b.Name()
-		if name == staking.ModuleName || name == mint.ModuleName || name == gov.ModuleName || name == crisis.ModuleName || name == evm.ModuleName || name == feemarket.ModuleName {
+		if name == staking.ModuleName || name == mint.ModuleName || name == gov.ModuleName || name == crisis.ModuleName || name == evm.ModuleName || name == feemarket.ModuleName || name == tokenfactorytypes.ModuleName {
 			continue
 		}
 		genesisState[b.Name()] = b.DefaultGenesis(cdc)

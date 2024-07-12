@@ -14,14 +14,14 @@ Cosmos based blockchain integrated with Smart Contracts [Orai](https://orai.io).
 
 ```bash
 # dev
-docker build -t <image-tag> -f orai/Dockerfile --build-arg WASMVM_VERSION=v1.5.2 --build-arg VERSION=v0.42.0 .
+docker build -t <image-tag> -f orai/Dockerfile --build-arg WASMVM_VERSION=v1.5.2 --build-arg VERSION=v0.42.1 .
 
 # prod
-docker build -t <image-tag> -f orai/Dockerfile.prod --build-arg WASMVM_VERSION=v1.5.2 --build-arg VERSION=v0.42.0 .
+docker build -t <image-tag> -f orai/Dockerfile.prod --build-arg WASMVM_VERSION=v1.5.2 --build-arg VERSION=v0.42.1 .
 ```
 
 ## Upgrade command
 
 ```bash
-oraid tx gov submit-proposal software-upgrade "v0.42.0" --title "upgrade Oraichain network to v0.42.0" --description "Please visit https://github.com/oraichain/orai/releases/tag/v0.42.0 to view the CHANGELOG for this upgrade" --from wallet --upgrade-height 21627705 --upgrade-info "https://github.com/oraichain/orai/releases/download/v0.42.0/manifest.json" --deposit 10000000orai --chain-id Oraichain -y -b block --gas-prices 0.001orai --gas 20000000 --node https://rpc.orai.io:443
+oraid tx gov submit-proposal software-upgrade "v0.42.1" --title "upgrade Oraichain network to v0.42.1" --description "Please visit https://github.com/oraichain/orai/releases/tag/v0.42.1 to view the CHANGELOG for this upgrade" --from wallet --upgrade-height 21627705 --upgrade-info "https://github.com/oraichain/orai/releases/download/v0.42.1/manifest.json" --deposit 10000000orai --chain-id Oraichain -y -b block --gas-prices 0.001orai --gas 20000000 --node https://rpc.orai.io:443
 ```

@@ -139,7 +139,7 @@ func WaitForUpgradeOrExit(cmd *exec.Cmd, scanOut, scanErr *bufio.Scanner) (*Upgr
 	}
 
 	// wait for the scanners, which can trigger upgrade and kill cmd
-	go waitScan(scanOut)
+	// go waitScan(scanOut)
 	go waitScan(scanErr)
 
 	// if the command exits normally (eg. short command like `gaiad version`), just return (nil, nil)

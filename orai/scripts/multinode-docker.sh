@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ux
+set -u
 
 # # always returns true so set -e doesn't exit if it is not running.
 rm -rf $PWD/.oraid/
@@ -17,6 +17,7 @@ validator1_command="$docker_command validator1 bash -c"
 validator2_command="$docker_command validator2 bash -c"
 validator3_command="$docker_command validator3 bash -c"
 working_dir=/workspace/.oraid
+HIDE_LOGS="/dev/null"
 
 # init all three validators
 $validator1_command "oraid init --chain-id=testing validator1 --home=$working_dir/validator1"
@@ -49,7 +50,7 @@ update_genesis '.app_state["staking"]["params"]["unbonding_time"]="240s"'
 update_genesis '.app_state["crisis"]["constant_fee"]["denom"]="orai"'
 
 # udpate gov genesis
-update_genesis '.app_state["gov"]["voting_params"]["voting_period"]="15s"'
+update_genesis '.app_state["gov"]["voting_params"]["voting_period"]="5s"'
 update_genesis '.app_state["gov"]["deposit_params"]["min_deposit"][0]["denom"]="orai"'
 
 # update mint genesis
@@ -120,6 +121,13 @@ sed -i -E 's|tcp://127.0.0.1:26657|tcp://0.0.0.0:26657|g' $VALIDATOR3_CONFIG
 sed -i -E 's|tcp://0.0.0.0:26656|tcp://0.0.0.0:26656|g' $VALIDATOR3_CONFIG
 sed -i -E 's|allow_duplicate_ip = false|allow_duplicate_ip = true|g' $VALIDATOR3_CONFIG
 
+# modify jsonrpc ports to avoid clashing
+sed -i -E 's|0.0.0.0:8545|0.0.0.0:7545|g' $VALIDATOR2_APP_TOML
+sed -i -e "s%^ws-address *=.*%ws-address = \"0.0.0.0:7546\"%; " $VALIDATOR2_APP_TOML
+
+sed -i -E 's|0.0.0.0:8545|0.0.0.0:6545|g' $VALIDATOR3_APP_TOML
+sed -i -e "s%^ws-address *=.*%ws-address = \"0.0.0.0:6546\"%; " $VALIDATOR3_APP_TOML
+
 # copy validator1 genesis file to validator2-3
 cp $PWD/.oraid/validator1/config/genesis.json $PWD/.oraid/validator2/config/genesis.json
 cp $PWD/.oraid/validator1/config/genesis.json $PWD/.oraid/validator3/config/genesis.json
@@ -131,21 +139,21 @@ sed -i -E "s|persistent_peers = \"\"|persistent_peers = \"$validator1_id@validat
 sed -i -E "s|persistent_peers = \"\"|persistent_peers = \"$validator1_id@validator1:26656\"|g" $VALIDATOR3_CONFIG
 
 # start all three validators
-$docker_command -d validator1 bash -c "oraivisor start --home=$working_dir/validator1 --minimum-gas-prices=0.00001orai"
-$docker_command -d validator2 bash -c "oraivisor start --home=$working_dir/validator2 --minimum-gas-prices=0.00001orai"
-$docker_command -d validator3 bash -c "oraivisor start --home=$working_dir/validator3 --minimum-gas-prices=0.00001orai"
+$docker_command -d validator1 bash -c "oraivisor start --home=$working_dir/validator1"
+$docker_command -d validator2 bash -c "oraivisor start --home=$working_dir/validator2"
+$docker_command -d validator3 bash -c "oraivisor start --home=$working_dir/validator3"
 
 # send orai from first validator to second validator
-echo "Waiting 7 seconds to send funds to validators 2 and 3..."
-sleep 7
+echo "Waiting 5 seconds to send funds to validators 2 and 3..."
+sleep 5
 
 validator2_key_res=`$validator2_command "oraivisor keys show validator2 -a --keyring-backend=test --home=$working_dir/validator2"`
 validator2_key=$(echo "$validator2_key_res" | tr -d -c '[:alnum:]') # remove all special characters because of the command's result
 validator3_key_res=`$validator3_command "oraivisor keys show validator3 -a --keyring-backend=test --home=$working_dir/validator3"`
 validator3_key=$(echo "$validator3_key_res" | tr -d -c '[:alnum:]') # remove all special characters because of the command's result
 
-$validator1_command "oraid tx send validator1 $validator2_key 5000000000orai --keyring-backend=test --home=$working_dir/validator1 --chain-id=testing --broadcast-mode block --gas 200000 --fees 2orai --yes"
-$validator1_command "oraid tx send validator1 $validator3_key 4000000000orai --keyring-backend=test --home=$working_dir/validator1 --chain-id=testing --broadcast-mode block --gas 200000 --fees 2orai --yes"
+$validator1_command "oraid tx send validator1 $validator2_key 5000000000orai --keyring-backend=test --home=$working_dir/validator1 --chain-id=testing --broadcast-mode block --gas 200000 --fees 2orai --yes > $HIDE_LOGS"
+$validator1_command "oraid tx send validator1 $validator3_key 4000000000orai --keyring-backend=test --home=$working_dir/validator1 --chain-id=testing --broadcast-mode block --gas 200000 --fees 2orai --yes > $HIDE_LOGS"
 # send test orai to a test account
 # oraid tx send $(oraid keys show validator1 -a --keyring-backend=test --home=$PWD/.oraid/validator1) orai14n3tx8s5ftzhlxvq0w5962v60vd82h30rha573 5000000000orai --keyring-backend=test --home=$PWD/.oraid/validator1 --chain-id=testing --broadcast-mode block --gas 200000 --fees 2orai --node http://localhost:26657 --yes
 
@@ -154,7 +162,7 @@ validator2_pubkey_res=`$validator2_command "oraid tendermint show-validator --ho
 validator2_pubkey=$(echo "$validator2_pubkey_res" | jq '@json') # remove all special characters because of the command's result
 validator3_pubkey_res=`$validator3_command "oraid tendermint show-validator --home=$working_dir/validator3"`
 validator3_pubkey=$(echo "$validator3_pubkey_res" | jq '@json') # remove all special characters because of the command's result
-$validator2_command "oraid tx staking create-validator --amount=500000000orai --from=validator2 --pubkey=$validator2_pubkey --moniker=validator2 --chain-id=testing --commission-rate=0.1 --commission-max-rate=0.2 --commission-max-change-rate=0.05 --min-self-delegation=500000000 --keyring-backend=test --home=$working_dir/validator2 --broadcast-mode block --gas 200000 --fees 2orai --yes"
-$validator3_command "oraid tx staking create-validator --amount=400000000orai --from=validator3 --pubkey=$validator3_pubkey --moniker=validator3 --chain-id=testing --commission-rate=0.1 --commission-max-rate=0.2 --commission-max-change-rate=0.05 --min-self-delegation=400000000 --keyring-backend=test --home=$working_dir/validator3 --broadcast-mode block --gas 200000 --fees 2orai --yes"
+$validator2_command "oraid tx staking create-validator --amount=500000000orai --from=validator2 --pubkey=$validator2_pubkey --moniker=validator2 --chain-id=testing --commission-rate=0.1 --commission-max-rate=0.2 --commission-max-change-rate=0.05 --min-self-delegation=500000000 --keyring-backend=test --home=$working_dir/validator2 --broadcast-mode block --gas 200000 --fees 2orai --yes > $HIDE_LOGS"
+$validator3_command "oraid tx staking create-validator --amount=400000000orai --from=validator3 --pubkey=$validator3_pubkey --moniker=validator3 --chain-id=testing --commission-rate=0.1 --commission-max-rate=0.2 --commission-max-change-rate=0.05 --min-self-delegation=400000000 --keyring-backend=test --home=$working_dir/validator3 --broadcast-mode block --gas 200000 --fees 2orai --yes > $HIDE_LOGS"
 
 echo "All 3 Validators are up and running!"
