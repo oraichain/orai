@@ -139,9 +139,9 @@ sed -i -E "s|persistent_peers = \"\"|persistent_peers = \"$validator1_id@validat
 sed -i -E "s|persistent_peers = \"\"|persistent_peers = \"$validator1_id@validator1:26656\"|g" $VALIDATOR3_CONFIG
 
 # start all three validators
-$docker_command -d validator1 bash -c "oraivisor start --home=$working_dir/validator1
-$docker_command -d validator2 bash -c "oraivisor start --home=$working_dir/validator2
-$docker_command -d validator3 bash -c "oraivisor start --home=$working_dir/validator3
+$docker_command -d validator1 bash -c "oraivisor start --home=$working_dir/validator1"
+$docker_command -d validator2 bash -c "oraivisor start --home=$working_dir/validator2"
+$docker_command -d validator3 bash -c "oraivisor start --home=$working_dir/validator3"
 
 # send orai from first validator to second validator
 echo "Waiting 5 seconds to send funds to validators 2 and 3..."
