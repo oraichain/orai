@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -eu
-
 CHAIN_ID=${CHAIN_ID:-testing}
 USER=${USER:-tupt}
 MONIKER=${MONIKER:-node001}
