@@ -7,7 +7,7 @@ USER=${USER:-tupt}
 WASM_PATH=${WASM_PATH:-"$PWD/scripts/wasm_file/swapmap.wasm"}
 EXECUTE_MSG=${EXECUTE_MSG:-'{"ping":{}}'}
 NODE_HOME=${NODE_HOME:-"$PWD/.oraid"}
-ARGS="--from $USER --chain-id testing -y --keyring-backend test --fees 200orai --gas auto --gas-adjustment 1.5 -b block --home $NODE_HOME"
+ARGS="--from $USER --chain-id $CHAIN_ID -y --keyring-backend test --gas auto --gas-adjustment 1.5 -b block --home $NODE_HOME"
 HIDE_LOGS="/dev/null"
 
 # prepare a new contract for gasless

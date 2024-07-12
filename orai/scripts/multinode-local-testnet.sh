@@ -137,9 +137,9 @@ sed -i -E "s|persistent_peers = \"\"|persistent_peers = \"$(oraid tendermint sho
 sed -i -E "s|persistent_peers = \"\"|persistent_peers = \"$(oraid tendermint show-node-id --home=$HOME/.oraid/validator1)@localhost:26656\"|g" $VALIDATOR3_CONFIG
 
 # start all three validators
-screen -S validator1 -d -m oraid start --home=$HOME/.oraid/validator1 --minimum-gas-prices=0.00001orai
-screen -S validator2 -d -m oraid start --home=$HOME/.oraid/validator2 --minimum-gas-prices=0.00001orai
-screen -S validator3 -d -m oraid start --home=$HOME/.oraid/validator3 --minimum-gas-prices=0.00001orai
+screen -S validator1 -d -m oraid start --home=$HOME/.oraid/validator1
+screen -S validator2 -d -m oraid start --home=$HOME/.oraid/validator2
+screen -S validator3 -d -m oraid start --home=$HOME/.oraid/validator3
 
 # send orai from first validator to second validator
 echo "Waiting 7 seconds to send funds to validators 2 and 3..."

@@ -6,7 +6,7 @@ CHAIN_ID=${CHAIN_ID:-testing}
 USER=${USER:-tupt}
 NODE_HOME=${NODE_HOME:-"$PWD/.oraid"}
 WASM_PATH=${WASM_PATH:-"$PWD/scripts/wasm_file/tokenfactory.wasm"}
-ARGS="--from $USER --chain-id testing -y --keyring-backend test --fees 200orai --gas auto --gas-adjustment 1.5 -b block --home $NODE_HOME"
+ARGS="--from $USER --chain-id $CHAIN_ID -y --keyring-backend test --gas auto --gas-adjustment 1.5 -b block --home $NODE_HOME"
 user_address=$(oraid keys show $USER --keyring-backend test --home $NODE_HOME -a)
 HIDE_LOGS="/dev/null"
 

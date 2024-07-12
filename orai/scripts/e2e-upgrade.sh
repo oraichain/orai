@@ -6,7 +6,7 @@ set -eu
 
 OLD_VERSION=${OLD_VERSION:-"v0.42.0"}
 WASM_PATH=${WASM_PATH:-"$PWD/scripts/wasm_file/swapmap.wasm"}
-ARGS="--chain-id testing -y --keyring-backend test --fees 200orai --gas auto --gas-adjustment 1.5 -b block"
+ARGS="--chain-id testing -y --keyring-backend test --gas auto --gas-adjustment 1.5 -b block"
 NEW_VERSION=${NEW_VERSION:-"v0.42.1"}
 VALIDATOR_HOME=${VALIDATOR_HOME:-"$HOME/.oraid/validator1"}
 MIGRATE_MSG=${MIGRATE_MSG:-'{}'}
@@ -58,9 +58,9 @@ echo "install new binary"
 GOTOOLCHAIN=go1.21.4 make install
 
 # re-run all validators. All should run
-screen -S validator1 -d -m oraid start --home=$HOME/.oraid/validator1 --minimum-gas-prices=0.00001orai
-screen -S validator2 -d -m oraid start --home=$HOME/.oraid/validator2 --minimum-gas-prices=0.00001orai
-screen -S validator3 -d -m oraid start --home=$HOME/.oraid/validator3 --minimum-gas-prices=0.00001orai
+screen -S validator1 -d -m oraid start --home=$HOME/.oraid/validator1
+screen -S validator2 -d -m oraid start --home=$HOME/.oraid/validator2
+screen -S validator3 -d -m oraid start --home=$HOME/.oraid/validator3
 
 # sleep a bit for the network to start 
 echo "Sleep to wait for the network to start..."
@@ -120,14 +120,11 @@ fi
 
 sh $PWD/scripts/test_clock_counter_contract.sh
 
-# send some ORAI to test eth acc for tx fees
-oraid tx send validator1 orai1kzkf6gttxqar9yrkxfe34ye4vg5v4m588ew7c9 100000000orai --from validator1 $ARGS --home $VALIDATOR_HOME > $HIDE_LOGS
-# test private key. DO NOT USE IT!. orai1kzkf6gttxqar9yrkxfe34ye4vg5v4m588ew7c9 matches the priv key below
-sh $PWD/scripts/test-erc20-deploy.sh
-
 # test gasless
 NODE_HOME=$VALIDATOR_HOME USER=validator1 sh $PWD/scripts/tests-0.42.1/test-gasless.sh
 NODE_HOME=$VALIDATOR_HOME USER=validator1 sh $PWD/scripts/tests-0.42.1/test-tokenfactory.sh
 NODE_HOME=$VALIDATOR_HOME USER=validator1 sh $PWD/scripts/tests-0.42.1/test-tokenfactory-bindings.sh
+NODE_HOME=$VALIDATOR_HOME USER=validator1 sh $PWD/scripts/tests-0.42.1/test-evm-cosmos-mapping.sh
+NODE_HOME=$VALIDATOR_HOME USER=validator1 sh $PWD/scripts/tests-0.42.1/test-evm-cosmos-mapping-complex.sh
 
 echo "Tests Passed!!"

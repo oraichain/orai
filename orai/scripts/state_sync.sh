@@ -87,7 +87,7 @@ s|^(trust_hash[[:space:]]+=[[:space:]]+).*$|\1\"$TRUST_HASH\"| ; \
 
 s|^(seeds[[:space:]]+=[[:space:]]+).*$|\1\"\"|" $STATESYNC_CONFIG
 
-screen -S state_sync -d -m oraid start --home=.oraid/state_sync --minimum-gas-prices=0.00001orai
+screen -S state_sync -d -m oraid start --home=.oraid/state_sync
 
 echo "Waiting 5 seconds to start state sync"
 sleep 5

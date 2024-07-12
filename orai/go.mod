@@ -219,7 +219,7 @@ replace (
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
 	// use kava fork to change evm denom & cosmos denom of evmutil module to aorai and orai
-	github.com/kava-labs/kava => github.com/oraichain/kava v0.21.1-orai-v1.0.1
+	github.com/kava-labs/kava => github.com/oraichain/kava v0.21.2-0.20240712210740-04e37a257e4c
 	// downgrade of goleveldb to avoid issues: see https://github.com/cosmos/cosmos-sdk/issues/14949
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 
@@ -229,7 +229,8 @@ replace (
 
 	// Use ethermint fork that respects min-gas-price with NoBaseFee true and london enabled, and includes eip712 support
 	// also add params query, fix proto account & ibc v3 to v4 compatibility, and get first 4 bytes of sha256(chain_id) when not eip159 compatible
-	github.com/tharsis/ethermint => github.com/oraichain/ethermint v0.14.0-orai-v1.0.5
+	// also add evm & cosmos mapping
+	github.com/tharsis/ethermint => github.com/oraichain/ethermint v0.14.1-0.20240712211341-3a9a2f2dabad
 
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )

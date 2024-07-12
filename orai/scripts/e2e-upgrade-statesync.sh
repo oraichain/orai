@@ -4,7 +4,7 @@ set -eu
 
 # setup the network using the old binary
 
-ARGS="--chain-id testing -y --keyring-backend test --fees 200orai --gas auto --gas-adjustment 1.5 -b block"
+ARGS="--chain-id testing -y --keyring-backend test --gas auto --gas-adjustment 1.5 -b block"
 VALIDATOR_HOME=${VALIDATOR_HOME:-"$HOME/.oraid/validator1"}
 EXECUTE_MSG=${EXECUTE_MSG:-'{"ping":{}}'}
 STATE_SYNC_HOME=${STATE_SYNC_HOME:-".oraid/state_sync"}

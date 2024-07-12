@@ -3,7 +3,7 @@ set -ux
 
 # setup the network using the old binary
 
-ARGS="--chain-id testing -y --keyring-backend test --fees 200orai --gas 20000000 --gas-adjustment 1.5 -b block"
+ARGS="--chain-id testing -y --keyring-backend test --gas 20000000 --gas-adjustment 1.5 -b block"
 NEW_VERSION=${NEW_VERSION:-"v0.42.1"}
 UPGRADE_INFO_VERSION=${UPGRADE_INFO_VERSION:-"v0.42.1"}
 MIGRATE_MSG=${MIGRATE_MSG:-'{}'}

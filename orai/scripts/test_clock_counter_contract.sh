@@ -3,7 +3,7 @@
 # sh $PWD/scripts/multinode-local-testnet.sh
 
 WASM_PATH=${WASM_PATH:-"$PWD/scripts/wasm_file/cw-clock-example.wasm"}
-ARGS="--chain-id testing -y --keyring-backend test --fees 200orai --gas auto --gas-adjustment 1.5 -b block"
+ARGS="--chain-id testing -y --keyring-backend test --gas auto --gas-adjustment 1.5 -b block"
 VALIDATOR_HOME=${VALIDATOR_HOME:-"$HOME/.oraid/validator1"}
 QUERY_MSG=${QUERY_MSG:-'{"get_config":{}}'}
 
@@ -23,7 +23,7 @@ add_contract_result=$(oraid tx clock add-contract $contract_address $CONTRACT_GA
 proposal_id=$(echo $add_contract_result | jq -r '.logs[0].events[4].attributes[] | select(.key | contains("proposal_id")).value')
 echo "proposal id: $proposal_id"
 
-oraid tx gov vote $proposal_id yes --from validator1 --home "$HOME/.oraid/validator1" $ARGS && oraid tx gov vote $proposal_id yes --from validator2 --home "$HOME/.oraid/validator2" $ARGS > $HIDE_LOGS
+oraid tx gov vote $proposal_id yes --from validator1 --home "$HOME/.oraid/validator1" $ARGS > $HIDE_LOGS && oraid tx gov vote $proposal_id yes --from validator2 --home "$HOME/.oraid/validator2" $ARGS > $HIDE_LOGS
 
 # sleep to wait til the proposal passes
 echo "Sleep til the proposal passes..."
