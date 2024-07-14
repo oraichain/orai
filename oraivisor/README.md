@@ -51,9 +51,9 @@ _Note: the `name` variable in `upgrades/<name>` holds the URI-encoded name of th
 
 Please note that `$DAEMON_HOME/oraivisor` just stores the _binaries_ and associated _program code_.
 The `oraivisor` binary can be stored in any typical location (eg `/usr/local/bin`). The actual blockchain
-program will store it's data under their default data directory (e.g. `$HOME/.oraid`) which is independent of
+program will store its data under their default data directory (e.g. `$HOME/.oraid`) which is independent of
 the `$DAEMON_HOME`. You can choose to set `$DAEMON_HOME` to the actual binary's home directory and then end up
-with a configuation like the following, but this is left as a choice to the system admininstrator for best
+with a configuration like the following, but this is left as a choice to the system administrator for best
 directory layout:
 
 ```bash
@@ -141,7 +141,7 @@ then rebuild it with `make build`
 Submit a software upgrade proposal:
 
 ```bash
-# check orai.env for allowing auto download and upgrade form a URL
+# check orai.env for allowing auto download and upgrade from a URL
 # DAEMON_ALLOW_DOWNLOAD_BINARIES=true
 # DAEMON_RESTART_AFTER_UPGRADE=true
 
