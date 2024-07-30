@@ -35,7 +35,7 @@ setup <your passphrase>
 
 After running, there will be three .txt files generated.
 
-One file, which is account.txt, stores your genesis account information as well as its mnemonic. Please keep it safe, and remove the file when you finish storing your account infromation.
+One file, which is account.txt, stores your genesis account information as well as its mnemonic. Please keep it safe, and remove the file when you finish storing your account information.
 
 Please upload the .oraid/config/gentx/gentx-\*.json file to the following google form:
 
