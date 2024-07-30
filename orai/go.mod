@@ -230,7 +230,7 @@ replace (
 	// Use ethermint fork that respects min-gas-price with NoBaseFee true and london enabled, and includes eip712 support
 	// also add params query, fix proto account & ibc v3 to v4 compatibility, and get first 4 bytes of sha256(chain_id) when not eip159 compatible
 	// also add evm & cosmos mapping
-	github.com/tharsis/ethermint => github.com/oraichain/ethermint v0.14.1-0.20240712211341-3a9a2f2dabad
+	github.com/tharsis/ethermint => github.com/oraichain/ethermint v0.14.1-0.20240730173417-7e4df27e54fd
 
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )
