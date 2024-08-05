@@ -1,4 +1,3 @@
-version: "3.3"
 services:
   validator1:
     container_name: validator1

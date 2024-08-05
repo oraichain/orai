@@ -147,9 +147,9 @@ $docker_command -d validator3 bash -c "oraivisor start --home=$working_dir/valid
 echo "Waiting 5 seconds to send funds to validators 2 and 3..."
 sleep 5
 
-validator2_key_res=`$validator2_command "oraivisor keys show validator2 -a --keyring-backend=test --home=$working_dir/validator2"`
+validator2_key_res=`$validator2_command "oraid keys show validator2 -a --keyring-backend=test --home=$working_dir/validator2"`
 validator2_key=$(echo "$validator2_key_res" | tr -d -c '[:alnum:]') # remove all special characters because of the command's result
-validator3_key_res=`$validator3_command "oraivisor keys show validator3 -a --keyring-backend=test --home=$working_dir/validator3"`
+validator3_key_res=`$validator3_command "oraid keys show validator3 -a --keyring-backend=test --home=$working_dir/validator3"`
 validator3_key=$(echo "$validator3_key_res" | tr -d -c '[:alnum:]') # remove all special characters because of the command's result
 
 $validator1_command "oraid tx send validator1 $validator2_key 5000000000orai --keyring-backend=test --home=$working_dir/validator1 --chain-id=testing --broadcast-mode block --gas 200000 --fees 2orai --yes > $HIDE_LOGS"

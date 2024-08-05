@@ -12,12 +12,12 @@ HIDE_LOGS="/dev/null"
 
 # add a signer wallet
 signer="signer"
-echo "y" | $validator1_command "oraid keys add $signer --home $NODE_HOME --keyring-backend test"
+$validator1_command "echo y | oraid keys add $signer --home $NODE_HOME --keyring-backend test"
 signer_address=`$validator1_command "oraid keys show $signer --home $NODE_HOME --keyring-backend test -a"`
 
 # add a multisig wallet
 multisig="multisig"
-echo "y" | $validator1_command "oraid keys add $multisig --multisig $USER,$signer --multisig-threshold 1 --home $NODE_HOME --keyring-backend test"
+$validator1_command "echo y | oraid keys add $multisig --multisig $USER,$signer --multisig-threshold 1 --home $NODE_HOME --keyring-backend test"
 multisig_address=`$validator1_command "oraid keys show $multisig --home $NODE_HOME --keyring-backend test -a"`
 user_address=`$validator1_command "oraid keys show $USER --home $NODE_HOME --keyring-backend test -a"`
 

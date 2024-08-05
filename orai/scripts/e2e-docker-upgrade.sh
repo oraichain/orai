@@ -44,8 +44,9 @@ done
 echo "Waiting for the REST & JSONRPC servers to be up ..."
 sleep 19
 
-oraid_version=$($validator1_command "oraid version")
-if ! [[ $oraid_version =~ $NEW_VERSION ]] ; then
+oraid_version=$(curl --no-progress-meter http://localhost:36657/abci_info | jq '.result.response.version' | tr -d '"')
+echo "oraid version: $oraid_version"
+if [[ $oraid_version != $NEW_VERSION ]] ; then
    echo "The chain has not upgraded yet. There's something wrong!"; exit 1
 fi
 
@@ -92,6 +93,7 @@ fi
 
 NODE_HOME=$VALIDATOR_HOME USER=validator1 WASM_PATH=$WASM_PATH bash $PWD/scripts/tests-0.42.1/test-gasless-docker.sh
 NODE_HOME=$VALIDATOR_HOME USER=validator1 WASM_PATH=$WASM_PATH bash $PWD/scripts/tests-0.42.1/test-tokenfactory-docker.sh
-NODE_HOME=$VALIDATOR_HOME USER=validator1 WASM_PATH=$WASM_PATH bash $PWD/scripts/tests-0.42.1/test-evm-cosmos-mapping-docker.sh
+NODE_HOME=$VALIDATOR_HOME USER=validator1 bash $PWD/scripts/tests-0.42.1/test-evm-cosmos-mapping-docker.sh
+NODE_HOME=$VALIDATOR_HOME USER=validator1 bash $PWD/scripts/tests-0.42.2/test-multi-sig-docker.sh
 
 echo "Tests Passed"
