@@ -4,8 +4,8 @@ set -u
 # setup the network using the old binary
 
 ARGS="--chain-id testing -y --keyring-backend test --gas 20000000 --gas-adjustment 1.5 -b block"
-NEW_VERSION=${NEW_VERSION:-"v0.42.1"}
-UPGRADE_INFO_VERSION=${UPGRADE_INFO_VERSION:-"v0.42.1"}
+NEW_VERSION=${NEW_VERSION:-"v0.42.2"}
+UPGRADE_INFO_VERSION=${UPGRADE_INFO_VERSION:-"v0.42.2"}
 MIGRATE_MSG=${MIGRATE_MSG:-'{}'}
 EXECUTE_MSG=${EXECUTE_MSG:-'{"ping":{}}'}
 docker_command="docker-compose -f $PWD/docker-compose-e2e-upgrade.yml exec"

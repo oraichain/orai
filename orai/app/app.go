@@ -164,7 +164,7 @@ const appName = "Oraichain"
 var (
 	NodeDir = ".oraid"
 
-	BinaryVersion = "v0.42.1"
+	BinaryVersion = "v0.42.2"
 
 	// If EnabledSpecificProposals is "", and this is "true", then enable all x/wasm proposals.
 	// If EnabledSpecificProposals is "", and this is not "true", then disable all x/wasm proposals.
@@ -1145,12 +1145,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 func (app *OraichainApp) upgradeHandler() {
 	app.upgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		response, err := app.mm.RunMigrations(ctx, app.configurator, fromVM)
-		ctx.Logger().Info("Start updating tokenfactory params...")
-		tokenfactoryParams := tokenfactorytypes.DefaultParams()
-		tokenfactoryParams.DenomCreationFee = sdk.NewCoins(sdk.NewInt64Coin(appconfig.MinimalDenom, 10_000_000))
-		app.TokenFactoryKeeper.SetParams(ctx, tokenfactoryParams)
-		ctx.Logger().Info("Finished updating tokenfactory params...")
-
 		return response, err
 	})
 
@@ -1162,7 +1156,7 @@ func (app *OraichainApp) upgradeHandler() {
 	if upgradeInfo.Name == BinaryVersion && !app.upgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storetypes.StoreUpgrades{
-			Added: []string{tokenfactorytypes.ModuleName},
+			Added: []string{},
 		}))
 	}
 }
