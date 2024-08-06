@@ -4,8 +4,9 @@ set -u
 # setup the network using the old binary
 
 ARGS="--chain-id testing -y --keyring-backend test --gas 20000000 --gas-adjustment 1.5 -b block"
-NEW_VERSION=${NEW_VERSION:-"v0.42.1"}
-UPGRADE_INFO_VERSION=${UPGRADE_INFO_VERSION:-"v0.42.1"}
+NEW_VERSION=${NEW_VERSION:-"v0.42.2"}
+UPGRADE_INFO_VERSION=${UPGRADE_INFO_VERSION:-"v0.42.2"}
+UPGRADE_INFO=${UPGRADE_INFO:-"https://github.com/oraichain/orai/releases/download/$UPGRADE_INFO_VERSION/manifest.json"}
 MIGRATE_MSG=${MIGRATE_MSG:-'{}'}
 EXECUTE_MSG=${EXECUTE_MSG:-'{"ping":{}}'}
 docker_command="docker-compose -f $PWD/docker-compose-e2e-upgrade.yml exec"
@@ -22,7 +23,7 @@ sh $PWD/scripts/multinode-docker.sh
 
 # create new upgrade proposal
 UPGRADE_HEIGHT=${UPGRADE_HEIGHT:-85}
-$validator1_command "oraid tx gov submit-proposal software-upgrade $NEW_VERSION --title 'foobar' --description 'foobar' --from validator1 --upgrade-height $UPGRADE_HEIGHT --upgrade-info 'https://github.com/oraichain/orai/releases/download/$UPGRADE_INFO_VERSION/manifest.json' --deposit 10000000orai $ARGS --home $VALIDATOR_HOME > $HIDE_LOGS"
+$validator1_command "oraid tx gov submit-proposal software-upgrade $NEW_VERSION --title 'foobar' --description 'foobar' --from validator1 --upgrade-height $UPGRADE_HEIGHT --upgrade-info $UPGRADE_INFO --deposit 10000000orai $ARGS --home $VALIDATOR_HOME > $HIDE_LOGS"
 $validator1_command "oraid tx gov vote 1 yes --from validator1 --home $VALIDATOR_HOME $ARGS > $HIDE_LOGS"
 $validator1_command "oraid tx gov vote 1 yes --from validator2 --home $oraid_dir/validator2 $ARGS > $HIDE_LOGS"
 
@@ -43,8 +44,9 @@ done
 echo "Waiting for the REST & JSONRPC servers to be up ..."
 sleep 19
 
-oraid_version=$($validator1_command "oraid version")
-if ! [[ $oraid_version =~ $NEW_VERSION ]] ; then
+oraid_version=$(curl --no-progress-meter http://localhost:36657/abci_info | jq '.result.response.version' | tr -d '"')
+echo "oraid version: $oraid_version"
+if [[ $oraid_version != $NEW_VERSION ]] ; then
    echo "The chain has not upgraded yet. There's something wrong!"; exit 1
 fi
 
@@ -91,6 +93,7 @@ fi
 
 NODE_HOME=$VALIDATOR_HOME USER=validator1 WASM_PATH=$WASM_PATH bash $PWD/scripts/tests-0.42.1/test-gasless-docker.sh
 NODE_HOME=$VALIDATOR_HOME USER=validator1 WASM_PATH=$WASM_PATH bash $PWD/scripts/tests-0.42.1/test-tokenfactory-docker.sh
-NODE_HOME=$VALIDATOR_HOME USER=validator1 WASM_PATH=$WASM_PATH bash $PWD/scripts/tests-0.42.1/test-evm-cosmos-mapping-docker.sh
+NODE_HOME=$VALIDATOR_HOME USER=validator1 bash $PWD/scripts/tests-0.42.1/test-evm-cosmos-mapping-docker.sh
+NODE_HOME=$VALIDATOR_HOME USER=validator1 bash $PWD/scripts/tests-0.42.2/test-multi-sig-docker.sh
 
 echo "Tests Passed"
