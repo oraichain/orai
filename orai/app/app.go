@@ -322,35 +322,35 @@ type OraichainApp struct {
 	memKeys map[string]*sdk.MemoryStoreKey
 
 	// keepers
-	accountKeeper      authkeeper.AccountKeeper
-	bankKeeper         bankkeeper.BaseKeeper
-	capabilityKeeper   *capabilitykeeper.Keeper
-	stakingKeeper      stakingkeeper.Keeper
-	slashingKeeper     slashingkeeper.Keeper
-	mintKeeper         mintkeeper.Keeper
-	distrKeeper        distrkeeper.Keeper
-	govKeeper          govkeeper.Keeper
-	crisisKeeper       crisiskeeper.Keeper
-	upgradeKeeper      upgradekeeper.Keeper
-	paramsKeeper       paramskeeper.Keeper
-	ibcKeeper          *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-	evmKeeper          *evmkeeper.Keeper
-	evmutilKeeper      evmutilkeeper.Keeper
-	feeMarketKeeper    feemarketkeeper.Keeper
-	evidenceKeeper     evidencekeeper.Keeper
-	transferKeeper     ibctransferkeeper.Keeper
-	wasmKeeper         wasm.Keeper
-	feeGrantKeeper     feegrantkeeper.Keeper
-	authzKeeper        authzkeeper.Keeper
+	AccountKeeper      authkeeper.AccountKeeper
+	BankKeeper         bankkeeper.BaseKeeper
+	CapabilityKeeper   *capabilitykeeper.Keeper
+	StakingKeeper      stakingkeeper.Keeper
+	SlashingKeeper     slashingkeeper.Keeper
+	MintKeeper         mintkeeper.Keeper
+	DistrKeeper        distrkeeper.Keeper
+	GovKeeper          govkeeper.Keeper
+	CrisisKeeper       crisiskeeper.Keeper
+	UpgradeKeeper      upgradekeeper.Keeper
+	ParamsKeeper       paramskeeper.Keeper
+	IbcKeeper          *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	EvmKeeper          *evmkeeper.Keeper
+	EvmutilKeeper      evmutilkeeper.Keeper
+	FeeMarketKeeper    feemarketkeeper.Keeper
+	EvidenceKeeper     evidencekeeper.Keeper
+	TransferKeeper     ibctransferkeeper.Keeper
+	WasmKeeper         wasm.Keeper
+	FeeGrantKeeper     feegrantkeeper.Keeper
+	AuthzKeeper        authzkeeper.Keeper
 	ContractKeeper     *wasmkeeper.PermissionedKeeper
 	ClockKeeper        clockkeeper.Keeper
 	TokenFactoryKeeper tokenfactorykeeper.Keeper
 
-	ibcFeeKeeper        ibcfeekeeper.Keeper
+	IbcFeeKeeper        ibcfeekeeper.Keeper
 	IBCHooksKeeper      *ibchookskeeper.Keeper
-	icaControllerKeeper icacontrollerkeeper.Keeper
-	icaHostKeeper       icahostkeeper.Keeper
-	interTxKeeper       intertxkeeper.Keeper
+	IcaControllerKeeper icacontrollerkeeper.Keeper
+	IcaHostKeeper       icahostkeeper.Keeper
+	InterTxKeeper       intertxkeeper.Keeper
 	// Middleware wrapper
 	Ics20WasmHooks      *ibchooks.WasmHooks
 	HooksICS4Wrapper    ibchooks.ICS4Middleware
@@ -359,13 +359,13 @@ type OraichainApp struct {
 	// custom modules here
 
 	// make scoped keepers public for test purposes
-	scopedIBCKeeper      capabilitykeeper.ScopedKeeper
-	scopedTransferKeeper capabilitykeeper.ScopedKeeper
-	scopedWasmKeeper     capabilitykeeper.ScopedKeeper
+	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
+	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
+	ScopedWasmKeeper     capabilitykeeper.ScopedKeeper
 	// scopedIBCFeeKeeper        capabilitykeeper.ScopedKeeper
-	scopedICAHostKeeper       capabilitykeeper.ScopedKeeper
-	scopedICAControllerKeeper capabilitykeeper.ScopedKeeper
-	scopedInterTxKeeper       capabilitykeeper.ScopedKeeper
+	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
+	ScopedICAControllerKeeper capabilitykeeper.ScopedKeeper
+	ScopedInterTxKeeper       capabilitykeeper.ScopedKeeper
 
 	// the module manager
 	mm *module.Manager
@@ -413,112 +413,112 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		memKeys:           memKeys,
 	}
 
-	app.paramsKeeper = initParamsKeeper(appCodec, legacyAmino, keys[paramstypes.StoreKey], tkeys[paramstypes.TStoreKey])
+	app.ParamsKeeper = initParamsKeeper(appCodec, legacyAmino, keys[paramstypes.StoreKey], tkeys[paramstypes.TStoreKey])
 
 	// set the BaseApp's parameter store
-	bApp.SetParamStore(app.paramsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramskeeper.ConsensusParamsKeyTable()))
+	bApp.SetParamStore(app.ParamsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramskeeper.ConsensusParamsKeyTable()))
 
 	// add capability keeper and ScopeToModule for ibc module
-	app.capabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
-	scopedIBCKeeper := app.capabilityKeeper.ScopeToModule(ibchost.ModuleName)
-	scopedTransferKeeper := app.capabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
-	scopedWasmKeeper := app.capabilityKeeper.ScopeToModule(wasm.ModuleName)
-	scopedICAHostKeeper := app.capabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
-	scopedICAControllerKeeper := app.capabilityKeeper.ScopeToModule(icacontrollertypes.SubModuleName)
-	scopedInterTxKeeper := app.capabilityKeeper.ScopeToModule(intertxtypes.ModuleName)
-	app.capabilityKeeper.Seal()
+	app.CapabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
+	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
+	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
+	scopedWasmKeeper := app.CapabilityKeeper.ScopeToModule(wasm.ModuleName)
+	scopedICAHostKeeper := app.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
+	scopedICAControllerKeeper := app.CapabilityKeeper.ScopeToModule(icacontrollertypes.SubModuleName)
+	scopedInterTxKeeper := app.CapabilityKeeper.ScopeToModule(intertxtypes.ModuleName)
+	app.CapabilityKeeper.Seal()
 
 	// add keepers
-	app.accountKeeper = authkeeper.NewAccountKeeper(
+	app.AccountKeeper = authkeeper.NewAccountKeeper(
 		appCodec, keys[authtypes.StoreKey], app.getSubspace(authtypes.ModuleName), authtypes.ProtoBaseAccount, maccPerms,
 	)
-	app.bankKeeper = bankkeeper.NewBaseKeeper(
-		appCodec, keys[banktypes.StoreKey], app.accountKeeper, app.getSubspace(banktypes.ModuleName), app.BlockedAddrs(),
+	app.BankKeeper = bankkeeper.NewBaseKeeper(
+		appCodec, keys[banktypes.StoreKey], app.AccountKeeper, app.getSubspace(banktypes.ModuleName), app.BlockedAddrs(),
 	)
-	validateKeeper(app.accountKeeper, app.bankKeeper)
+	validateKeeper(app.AccountKeeper, app.BankKeeper)
 	stakingKeeper := stakingkeeper.NewKeeper(
-		appCodec, keys[stakingtypes.StoreKey], app.accountKeeper, app.bankKeeper, app.getSubspace(stakingtypes.ModuleName),
+		appCodec, keys[stakingtypes.StoreKey], app.AccountKeeper, app.BankKeeper, app.getSubspace(stakingtypes.ModuleName),
 	)
 	validateKeeper(stakingKeeper)
-	app.mintKeeper = mintkeeper.NewKeeper(
+	app.MintKeeper = mintkeeper.NewKeeper(
 		appCodec, keys[minttypes.StoreKey], app.getSubspace(minttypes.ModuleName), &stakingKeeper,
-		app.accountKeeper, app.bankKeeper, authtypes.FeeCollectorName,
+		app.AccountKeeper, app.BankKeeper, authtypes.FeeCollectorName,
 	)
-	app.distrKeeper = distrkeeper.NewKeeper(
+	app.DistrKeeper = distrkeeper.NewKeeper(
 		appCodec,
 		keys[distrtypes.StoreKey],
 		app.getSubspace(distrtypes.ModuleName),
-		app.accountKeeper,
-		app.bankKeeper,
+		app.AccountKeeper,
+		app.BankKeeper,
 		stakingKeeper,
 		authtypes.FeeCollectorName,
 		app.ModuleAccountAddrs(),
 	)
-	app.slashingKeeper = slashingkeeper.NewKeeper(
+	app.SlashingKeeper = slashingkeeper.NewKeeper(
 		appCodec, keys[slashingtypes.StoreKey], &stakingKeeper, app.getSubspace(slashingtypes.ModuleName),
 	)
-	app.crisisKeeper = crisiskeeper.NewKeeper(
-		app.getSubspace(crisistypes.ModuleName), invCheckPeriod, app.bankKeeper, authtypes.FeeCollectorName,
+	app.CrisisKeeper = crisiskeeper.NewKeeper(
+		app.getSubspace(crisistypes.ModuleName), invCheckPeriod, app.BankKeeper, authtypes.FeeCollectorName,
 	)
-	app.upgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, bApp)
+	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath, bApp)
 
-	app.authzKeeper = authzkeeper.NewKeeper(
+	app.AuthzKeeper = authzkeeper.NewKeeper(
 		keys[authzkeeper.StoreKey],
 		appCodec,
 		app.BaseApp.MsgServiceRouter(),
 	)
 
-	app.feeGrantKeeper = feegrantkeeper.NewKeeper(
+	app.FeeGrantKeeper = feegrantkeeper.NewKeeper(
 		appCodec,
 		keys[feegrant.StoreKey],
-		app.accountKeeper,
+		app.AccountKeeper,
 	)
 
 	// NOTE: upgrade feature comment out for new build after proposal done
-	// app.upgradeKeeper.SetUpgradeHandler("ai-oracle", func(ctx sdk.Context, plan upgradetypes.Plan) {
+	// app.UpgradeKeeper.SetUpgradeHandler("ai-oracle", func(ctx sdk.Context, plan upgradetypes.Plan) {
 	// 	// TODO: Add some modification logic here
 	// })
 
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
-	validateKeeper(app.distrKeeper, app.slashingKeeper)
-	app.stakingKeeper = *stakingKeeper.SetHooks(
-		stakingtypes.NewMultiStakingHooks(app.distrKeeper.Hooks(), app.slashingKeeper.Hooks()),
+	validateKeeper(app.DistrKeeper, app.SlashingKeeper)
+	app.StakingKeeper = *stakingKeeper.SetHooks(
+		stakingtypes.NewMultiStakingHooks(app.DistrKeeper.Hooks(), app.SlashingKeeper.Hooks()),
 	)
 
 	// Create IBC Keeper
-	validateKeeper(scopedIBCKeeper, app.upgradeKeeper)
-	app.ibcKeeper = ibckeeper.NewKeeper(
+	validateKeeper(scopedIBCKeeper, app.UpgradeKeeper)
+	app.IbcKeeper = ibckeeper.NewKeeper(
 		appCodec,
 		keys[ibchost.StoreKey],
 		app.getSubspace(ibchost.ModuleName),
 		stakingKeeper,
-		app.upgradeKeeper,
+		app.UpgradeKeeper,
 		scopedIBCKeeper,
 	)
 
 	// Create Ethermint keepers
-	app.feeMarketKeeper = feemarketkeeper.NewKeeper(
+	app.FeeMarketKeeper = feemarketkeeper.NewKeeper(
 		appCodec, keys[feemarkettypes.StoreKey], app.getSubspace(feemarkettypes.ModuleName),
 	)
 
-	app.evmutilKeeper = evmutilkeeper.NewKeeper(
+	app.EvmutilKeeper = evmutilkeeper.NewKeeper(
 		appCodec,
 		keys[evmutiltypes.StoreKey],
 		app.getSubspace(evmutiltypes.ModuleName),
-		app.bankKeeper,
-		app.accountKeeper,
+		app.BankKeeper,
+		app.AccountKeeper,
 	)
 
-	validateKeeper(app.feeMarketKeeper)
-	validateKeeper(app.evmutilKeeper)
-	evmBankKeeper := evmutilkeeper.NewEvmBankKeeperWithDenoms(app.evmutilKeeper, app.bankKeeper, app.accountKeeper, appconfig.EvmDenom, appconfig.CosmosDenom)
-	app.evmKeeper = evmkeeper.NewKeeper(
+	validateKeeper(app.FeeMarketKeeper)
+	validateKeeper(app.EvmutilKeeper)
+	evmBankKeeper := evmutilkeeper.NewEvmBankKeeperWithDenoms(app.EvmutilKeeper, app.BankKeeper, app.AccountKeeper, appconfig.EvmDenom, appconfig.CosmosDenom)
+	app.EvmKeeper = evmkeeper.NewKeeper(
 		appCodec, keys[evmtypes.StoreKey], tkeys[evmtypes.TransientKey], app.getSubspace(evmtypes.ModuleName),
-		app.accountKeeper, evmBankKeeper, app.stakingKeeper, app.feeMarketKeeper,
+		app.AccountKeeper, evmBankKeeper, app.StakingKeeper, app.FeeMarketKeeper,
 		options.EVMTrace,
 	)
-	app.evmutilKeeper.SetEvmKeeper(app.evmKeeper)
+	app.EvmutilKeeper.SetEvmKeeper(app.EvmKeeper)
 
 	// Configure the hooks keeper
 	hooksKeeper := ibchookskeeper.NewKeeper(
@@ -530,91 +530,91 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	validateKeeper(app.IBCHooksKeeper)
 	wasmHooks := ibchooks.NewWasmHooks(app.IBCHooksKeeper, nil, sdk.GetConfig().GetBech32AccountAddrPrefix()) // The contract keeper needs to be set later
 	app.Ics20WasmHooks = &wasmHooks
-	validateKeeper(app.ibcKeeper, app.ibcKeeper.ChannelKeeper, app.Ics20WasmHooks)
+	validateKeeper(app.IbcKeeper, app.IbcKeeper.ChannelKeeper, app.Ics20WasmHooks)
 	app.HooksICS4Wrapper = ibchooks.NewICS4Middleware(
-		app.ibcKeeper.ChannelKeeper,
+		app.IbcKeeper.ChannelKeeper,
 		app.Ics20WasmHooks,
 	)
 
 	// IBC Fee Module keeper
-	validateKeeper(app.HooksICS4Wrapper, app.ibcKeeper.PortKeeper)
-	app.ibcFeeKeeper = ibcfeekeeper.NewKeeper(
+	validateKeeper(app.HooksICS4Wrapper, app.IbcKeeper.PortKeeper)
+	app.IbcFeeKeeper = ibcfeekeeper.NewKeeper(
 		appCodec, keys[ibcfeetypes.StoreKey], app.getSubspace(ibcfeetypes.ModuleName),
 		app.HooksICS4Wrapper, // may be replaced with IBC middleware
-		app.ibcKeeper.ChannelKeeper,
-		&app.ibcKeeper.PortKeeper,
-		app.accountKeeper,
-		app.bankKeeper,
+		app.IbcKeeper.ChannelKeeper,
+		&app.IbcKeeper.PortKeeper,
+		app.AccountKeeper,
+		app.BankKeeper,
 	)
 
 	// Initialize packet forward middleware router
-	validateKeeper(app.ibcFeeKeeper)
+	validateKeeper(app.IbcFeeKeeper)
 	app.PacketForwardKeeper = packetforwardkeeper.NewKeeper(
 		appCodec, app.keys[packetforwardtypes.StoreKey],
 		app.getSubspace(packetforwardtypes.ModuleName),
-		app.transferKeeper, // Will be zero-value here. Reference is set later on with SetTransferKeeper.
-		app.ibcKeeper.ChannelKeeper,
-		app.distrKeeper,
-		app.bankKeeper,
+		nil, // Will be zero-value here. Reference is set later on with SetTransferKeeper.
+		app.IbcKeeper.ChannelKeeper,
+		app.DistrKeeper,
+		app.BankKeeper,
 		// The ICS4Wrapper is replaced by the IBCFeeKeeper instead of the channel so that sending can be overridden by the middleware
-		&app.ibcFeeKeeper,
+		&app.IbcFeeKeeper,
 	)
 
 	// Create Transfer Keepers
 	validateKeeper(app.PacketForwardKeeper, scopedTransferKeeper)
-	app.transferKeeper = ibctransferkeeper.NewKeeper(
+	app.TransferKeeper = ibctransferkeeper.NewKeeper(
 		appCodec, keys[ibctransfertypes.StoreKey], app.getSubspace(ibctransfertypes.ModuleName),
 		app.PacketForwardKeeper,
-		app.ibcKeeper.ChannelKeeper,
-		&app.ibcKeeper.PortKeeper,
-		app.accountKeeper,
-		app.bankKeeper,
+		app.IbcKeeper.ChannelKeeper,
+		&app.IbcKeeper.PortKeeper,
+		app.AccountKeeper,
+		app.BankKeeper,
 		scopedTransferKeeper,
 	)
-	app.PacketForwardKeeper.SetTransferKeeper(app.transferKeeper)
+	app.PacketForwardKeeper.SetTransferKeeper(app.TransferKeeper)
 
 	tokenFactoryKeeper := tokenfactorykeeper.NewKeeper(
 		keys[tokenfactorytypes.StoreKey],
 		app.getSubspace(tokenfactorytypes.ModuleName),
-		app.accountKeeper,
-		app.bankKeeper,
-		app.distrKeeper,
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.DistrKeeper,
 		EnabledCapabilities,
 	)
 	app.TokenFactoryKeeper = tokenFactoryKeeper
 
 	// create evidence keeper with router
 	evidenceKeeper := evidencekeeper.NewKeeper(
-		appCodec, keys[evidencetypes.StoreKey], &app.stakingKeeper, app.slashingKeeper,
+		appCodec, keys[evidencetypes.StoreKey], &app.StakingKeeper, app.SlashingKeeper,
 	)
-	app.evidenceKeeper = *evidenceKeeper
+	app.EvidenceKeeper = *evidenceKeeper
 
 	validateKeeper(scopedICAHostKeeper)
-	app.icaHostKeeper = icahostkeeper.NewKeeper(
+	app.IcaHostKeeper = icahostkeeper.NewKeeper(
 		appCodec,
 		keys[icahosttypes.StoreKey],
 		app.getSubspace(icahosttypes.SubModuleName),
-		app.ibcKeeper.ChannelKeeper,
-		&app.ibcKeeper.PortKeeper,
-		app.accountKeeper,
+		app.IbcKeeper.ChannelKeeper,
+		&app.IbcKeeper.PortKeeper,
+		app.AccountKeeper,
 		scopedICAHostKeeper,
 		app.MsgServiceRouter(),
 	)
 	validateKeeper(scopedICAControllerKeeper)
-	app.icaControllerKeeper = icacontrollerkeeper.NewKeeper(
+	app.IcaControllerKeeper = icacontrollerkeeper.NewKeeper(
 		appCodec,
 		keys[icacontrollertypes.StoreKey],
 		app.getSubspace(icacontrollertypes.SubModuleName),
-		app.ibcFeeKeeper, // use ics29 fee as ics4Wrapper in middleware stack
-		app.ibcKeeper.ChannelKeeper,
-		&app.ibcKeeper.PortKeeper,
+		app.IbcFeeKeeper, // use ics29 fee as ics4Wrapper in middleware stack
+		app.IbcKeeper.ChannelKeeper,
+		&app.IbcKeeper.PortKeeper,
 		scopedICAControllerKeeper,
 		app.MsgServiceRouter(),
 	)
 
-	validateKeeper(app.icaControllerKeeper, scopedInterTxKeeper)
+	validateKeeper(app.IcaControllerKeeper, scopedInterTxKeeper)
 	// For wasmd we use the demo controller from https://github.com/cosmos/interchain-accounts but see notes below
-	app.interTxKeeper = intertxkeeper.NewKeeper(appCodec, keys[intertxtypes.StoreKey], app.icaControllerKeeper, scopedInterTxKeeper)
+	app.InterTxKeeper = intertxkeeper.NewKeeper(appCodec, keys[intertxtypes.StoreKey], app.IcaControllerKeeper, scopedInterTxKeeper)
 
 	// set the contract keeper for the Ics20WasmHooks
 	// just re-use the full router - do we want to limit this more?
@@ -623,21 +623,21 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		panic("error while reading wasm config: " + err.Error())
 	}
 
-	validateKeeper(scopedWasmKeeper, app.transferKeeper)
+	validateKeeper(scopedWasmKeeper, app.TransferKeeper)
 	// Setup wasm bindings
-	wasmOpts = append(bindings.RegisterCustomPlugins(&app.bankKeeper, &app.TokenFactoryKeeper), wasmOpts...)
-	app.wasmKeeper = wasm.NewKeeper(
+	wasmOpts = append(bindings.RegisterCustomPlugins(&app.BankKeeper, &app.TokenFactoryKeeper), wasmOpts...)
+	app.WasmKeeper = wasm.NewKeeper(
 		appCodec,
 		keys[wasm.StoreKey],
 		app.getSubspace(wasm.ModuleName),
-		app.accountKeeper,
-		app.bankKeeper,
-		app.stakingKeeper,
-		app.distrKeeper,
-		app.ibcKeeper.ChannelKeeper,
-		&app.ibcKeeper.PortKeeper,
+		app.AccountKeeper,
+		app.BankKeeper,
+		app.StakingKeeper,
+		app.DistrKeeper,
+		app.IbcKeeper.ChannelKeeper,
+		&app.IbcKeeper.PortKeeper,
 		scopedWasmKeeper,
-		app.transferKeeper,
+		app.TransferKeeper,
 		app.MsgServiceRouter(),
 		app.GRPCQueryRouter(),
 		filepath.Join(homePath, "wasm"),
@@ -647,8 +647,8 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	)
 
 	// set the contract keeper for the Ics20WasmHooks
-	validateKeeper(app.wasmKeeper)
-	app.ContractKeeper = wasmkeeper.NewDefaultPermissionKeeper(app.wasmKeeper)
+	validateKeeper(app.WasmKeeper)
+	app.ContractKeeper = wasmkeeper.NewDefaultPermissionKeeper(app.WasmKeeper)
 	validateKeeper(app.ContractKeeper)
 	app.Ics20WasmHooks.ContractKeeper = app.ContractKeeper
 
@@ -661,20 +661,20 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	// register the proposal types
 	govRouter := govtypes.NewRouter()
 	govRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
-		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.paramsKeeper)).
-		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.distrKeeper)).
-		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.upgradeKeeper)).
-		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.ibcKeeper.ClientKeeper)).
+		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
+		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
+		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
+		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IbcKeeper.ClientKeeper)).
 		AddRoute(clocktypes.RouterKey, clockkeeper.NewClockProposalHandler(app.ClockKeeper))
 
 	// The gov proposal types can be individually enabled
 	if len(enabledProposals) != 0 {
-		govRouter.AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.wasmKeeper, enabledProposals))
+		govRouter.AddRoute(wasm.RouterKey, wasm.NewWasmProposalHandler(app.WasmKeeper, enabledProposals))
 	}
 
 	// Create Transfer Stack
 	var transferStack porttypes.IBCModule
-	transferStack = transfer.NewIBCModule(app.transferKeeper)
+	transferStack = transfer.NewIBCModule(app.TransferKeeper)
 	transferStack = packetforward.NewIBCMiddleware(
 		transferStack,
 		app.PacketForwardKeeper,
@@ -682,7 +682,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		packetforwardkeeper.DefaultForwardTransferPacketTimeoutTimestamp,
 		packetforwardkeeper.DefaultRefundTransferPacketTimeoutTimestamp,
 	)
-	transferStack = ibcfee.NewIBCMiddleware(transferStack, app.ibcFeeKeeper)
+	transferStack = ibcfee.NewIBCMiddleware(transferStack, app.IbcFeeKeeper)
 	transferStack = ibchooks.NewIBCMiddleware(transferStack, &app.HooksICS4Wrapper)
 
 	// Create Interchain Accounts Stack
@@ -693,20 +693,20 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	// supported IBC team implementation. Do your own research before using it.
 	var icaControllerStack porttypes.IBCModule
 	// You will likely want to use your own reviewed and maintained ica auth module
-	icaControllerStack = intertx.NewIBCModule(app.interTxKeeper)
-	icaControllerStack = icacontroller.NewIBCMiddleware(icaControllerStack, app.icaControllerKeeper)
-	icaControllerStack = ibcfee.NewIBCMiddleware(icaControllerStack, app.ibcFeeKeeper)
+	icaControllerStack = intertx.NewIBCModule(app.InterTxKeeper)
+	icaControllerStack = icacontroller.NewIBCMiddleware(icaControllerStack, app.IcaControllerKeeper)
+	icaControllerStack = ibcfee.NewIBCMiddleware(icaControllerStack, app.IbcFeeKeeper)
 
 	// RecvPacket, message that originates from core IBC and goes down to app, the flow is:
 	// channel.RecvPacket -> fee.OnRecvPacket -> icaHost.OnRecvPacket
 	var icaHostStack porttypes.IBCModule
-	icaHostStack = icahost.NewIBCModule(app.icaHostKeeper)
-	icaHostStack = ibcfee.NewIBCMiddleware(icaHostStack, app.ibcFeeKeeper)
+	icaHostStack = icahost.NewIBCModule(app.IcaHostKeeper)
+	icaHostStack = ibcfee.NewIBCMiddleware(icaHostStack, app.IbcFeeKeeper)
 
 	// Create fee enabled wasm ibc Stack
 	var wasmStack porttypes.IBCModule
-	wasmStack = wasm.NewIBCHandler(app.wasmKeeper, app.ibcKeeper.ChannelKeeper, app.ibcFeeKeeper)
-	wasmStack = ibcfee.NewIBCMiddleware(wasmStack, app.ibcFeeKeeper)
+	wasmStack = wasm.NewIBCHandler(app.WasmKeeper, app.IbcKeeper.ChannelKeeper, app.IbcFeeKeeper)
+	wasmStack = ibcfee.NewIBCMiddleware(wasmStack, app.IbcFeeKeeper)
 
 	// create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter().
@@ -716,15 +716,15 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		AddRoute(icacontrollertypes.SubModuleName, icaControllerStack).
 		AddRoute(icahosttypes.SubModuleName, icaHostStack)
 
-	app.ibcKeeper.SetRouter(ibcRouter)
+	app.IbcKeeper.SetRouter(ibcRouter)
 
 	validateKeeper(govRouter)
-	app.govKeeper = govkeeper.NewKeeper(
+	app.GovKeeper = govkeeper.NewKeeper(
 		appCodec,
 		keys[govtypes.StoreKey],
 		app.getSubspace(govtypes.ModuleName),
-		app.accountKeeper,
-		app.bankKeeper,
+		app.AccountKeeper,
+		app.BankKeeper,
 		&stakingKeeper,
 		govRouter,
 	)
@@ -739,37 +739,37 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	// must be passed by reference here.
 	app.mm = module.NewManager(
 		genutil.NewAppModule(
-			app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx,
+			app.AccountKeeper, app.StakingKeeper, app.BaseApp.DeliverTx,
 			encodingConfig.TxConfig,
 		),
-		auth.NewAppModule(appCodec, app.accountKeeper, authsims.RandomGenesisAccounts),
-		vesting.NewAppModule(app.accountKeeper, app.bankKeeper),
-		bank.NewAppModule(appCodec, app.bankKeeper, app.accountKeeper),
-		capability.NewAppModule(appCodec, *app.capabilityKeeper),
-		crisis.NewAppModule(&app.crisisKeeper, skipGenesisInvariants),
-		gov.NewAppModule(appCodec, app.govKeeper, app.accountKeeper, app.bankKeeper),
-		mint.NewAppModule(appCodec, app.mintKeeper, app.accountKeeper),
-		slashing.NewAppModule(appCodec, app.slashingKeeper, app.accountKeeper, app.bankKeeper, app.stakingKeeper),
-		distr.NewAppModule(appCodec, app.distrKeeper, app.accountKeeper, app.bankKeeper, app.stakingKeeper),
-		staking.NewAppModule(appCodec, app.stakingKeeper, app.accountKeeper, app.bankKeeper),
-		upgrade.NewAppModule(app.upgradeKeeper),
-		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.stakingKeeper, app.accountKeeper, app.bankKeeper),
-		evidence.NewAppModule(app.evidenceKeeper),
-		ibc.NewAppModule(app.ibcKeeper),
-		evm.NewAppModule(app.evmKeeper, app.accountKeeper),
-		feemarket.NewAppModule(app.feeMarketKeeper),
-		params.NewAppModule(app.paramsKeeper),
-		feegrantmodule.NewAppModule(appCodec, app.accountKeeper, app.bankKeeper, app.feeGrantKeeper, app.interfaceRegistry),
-		authzmodule.NewAppModule(appCodec, app.authzKeeper, app.accountKeeper, app.bankKeeper, app.interfaceRegistry),
-		transfer.NewAppModule(app.transferKeeper),
-		ibcfee.NewAppModule(app.ibcFeeKeeper),
-		ica.NewAppModule(&app.icaControllerKeeper, &app.icaHostKeeper),
-		intertx.NewAppModule(appCodec, app.interTxKeeper),
+		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts),
+		vesting.NewAppModule(app.AccountKeeper, app.BankKeeper),
+		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper),
+		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
+		crisis.NewAppModule(&app.CrisisKeeper, skipGenesisInvariants),
+		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper),
+		mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper),
+		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
+		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
+		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
+		upgrade.NewAppModule(app.UpgradeKeeper),
+		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
+		evidence.NewAppModule(app.EvidenceKeeper),
+		ibc.NewAppModule(app.IbcKeeper),
+		evm.NewAppModule(app.EvmKeeper, app.AccountKeeper),
+		feemarket.NewAppModule(app.FeeMarketKeeper),
+		params.NewAppModule(app.ParamsKeeper),
+		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
+		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
+		transfer.NewAppModule(app.TransferKeeper),
+		ibcfee.NewAppModule(app.IbcFeeKeeper),
+		ica.NewAppModule(&app.IcaControllerKeeper, &app.IcaHostKeeper),
+		intertx.NewAppModule(appCodec, app.InterTxKeeper),
 		clock.NewAppModule(appCodec, app.ClockKeeper),
-		ibchooks.NewAppModule(app.accountKeeper),
+		ibchooks.NewAppModule(app.AccountKeeper),
 		packetforward.NewAppModule(app.PacketForwardKeeper),
-		evmutil.NewAppModule(app.evmutilKeeper, app.bankKeeper),
-		tokenfactory.NewAppModule(app.TokenFactoryKeeper, app.accountKeeper, app.bankKeeper),
+		evmutil.NewAppModule(app.EvmutilKeeper, app.BankKeeper),
+		tokenfactory.NewAppModule(app.TokenFactoryKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -885,7 +885,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		crisistypes.ModuleName,
 	)
 
-	app.mm.RegisterInvariants(&app.crisisKeeper)
+	app.mm.RegisterInvariants(&app.CrisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
 	app.configurator = module.NewConfigurator(app.appCodec, app.MsgServiceRouter(), app.GRPCQueryRouter())
 	app.mm.RegisterServices(app.configurator)
@@ -898,22 +898,22 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	// NOTE: this is not required apps that don't use the simulator for fuzz testing
 	// transactions
 	app.sm = module.NewSimulationManager(
-		auth.NewAppModule(appCodec, app.accountKeeper, authsims.RandomGenesisAccounts),
-		bank.NewAppModule(appCodec, app.bankKeeper, app.accountKeeper),
-		capability.NewAppModule(appCodec, *app.capabilityKeeper),
-		feegrantmodule.NewAppModule(appCodec, app.accountKeeper, app.bankKeeper, app.feeGrantKeeper, app.interfaceRegistry),
-		authzmodule.NewAppModule(appCodec, app.authzKeeper, app.accountKeeper, app.bankKeeper, app.interfaceRegistry),
-		gov.NewAppModule(appCodec, app.govKeeper, app.accountKeeper, app.bankKeeper),
-		mint.NewAppModule(appCodec, app.mintKeeper, app.accountKeeper),
-		staking.NewAppModule(appCodec, app.stakingKeeper, app.accountKeeper, app.bankKeeper),
-		distr.NewAppModule(appCodec, app.distrKeeper, app.accountKeeper, app.bankKeeper, app.stakingKeeper),
-		slashing.NewAppModule(appCodec, app.slashingKeeper, app.accountKeeper, app.bankKeeper, app.stakingKeeper),
-		params.NewAppModule(app.paramsKeeper),
-		wasm.NewAppModule(appCodec, &app.wasmKeeper, app.stakingKeeper, app.accountKeeper, app.bankKeeper),
-		evidence.NewAppModule(app.evidenceKeeper),
-		ibc.NewAppModule(app.ibcKeeper),
-		transfer.NewAppModule(app.transferKeeper),
-		tokenfactory.NewAppModule(app.TokenFactoryKeeper, app.accountKeeper, app.bankKeeper),
+		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts),
+		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper),
+		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
+		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
+		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
+		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper),
+		mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper),
+		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
+		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
+		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
+		params.NewAppModule(app.ParamsKeeper),
+		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
+		evidence.NewAppModule(app.EvidenceKeeper),
+		ibc.NewAppModule(app.IbcKeeper),
+		transfer.NewAppModule(app.TransferKeeper),
+		tokenfactory.NewAppModule(app.TokenFactoryKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()
@@ -929,15 +929,15 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 
 	anteHandler, err := NewAnteHandler(
 		HandlerOptions{
-			AccountKeeper:     app.accountKeeper,
-			BankKeeper:        app.bankKeeper,
-			EvmKeeper:         app.evmKeeper,
-			FeegrantKeeper:    app.feeGrantKeeper,
-			FeeMarketKeeper:   app.feeMarketKeeper,
+			AccountKeeper:     app.AccountKeeper,
+			BankKeeper:        app.BankKeeper,
+			EvmKeeper:         app.EvmKeeper,
+			FeegrantKeeper:    app.FeeGrantKeeper,
+			FeeMarketKeeper:   app.FeeMarketKeeper,
 			SignModeHandler:   encodingConfig.TxConfig.SignModeHandler(),
 			SigGasConsumer:    evmante.DefaultSigVerificationGasConsumer,
 			MaxTxGasWanted:    options.EVMMaxGasWanted,
-			IBCKeeper:         app.ibcKeeper,
+			IBCKeeper:         app.IbcKeeper,
 			TxCounterStoreKey: keys[wasm.StoreKey],
 			WasmConfig:        wasmConfig,
 			Cdc:               appCodec,
@@ -952,7 +952,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	// handle statesync for cosmwasm
 	if manager := app.SnapshotManager(); manager != nil {
 		err = manager.RegisterExtensions(
-			wasmkeeper.NewWasmSnapshotter(app.CommitMultiStore(), &app.wasmKeeper),
+			wasmkeeper.NewWasmSnapshotter(app.CommitMultiStore(), &app.WasmKeeper),
 		)
 		if err != nil {
 			panic("failed to register snapshot extension: " + err.Error())
@@ -969,17 +969,17 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		ctx := app.BaseApp.NewUncachedContext(true, tmproto.Header{})
 
 		// Initialize pinned codes in wasmvm as they are not persisted there
-		if err := app.wasmKeeper.InitializePinnedCodes(ctx); err != nil {
+		if err := app.WasmKeeper.InitializePinnedCodes(ctx); err != nil {
 			tmos.Exit(fmt.Sprintf("failed initialize pinned codes %s", err))
 		}
 	}
 
-	app.scopedIBCKeeper = scopedIBCKeeper
-	app.scopedTransferKeeper = scopedTransferKeeper
-	app.scopedWasmKeeper = scopedWasmKeeper
-	app.scopedICAHostKeeper = scopedICAHostKeeper
-	app.scopedICAControllerKeeper = scopedICAControllerKeeper
-	app.scopedInterTxKeeper = scopedInterTxKeeper
+	app.ScopedIBCKeeper = scopedIBCKeeper
+	app.ScopedTransferKeeper = scopedTransferKeeper
+	app.ScopedWasmKeeper = scopedWasmKeeper
+	app.ScopedICAHostKeeper = scopedICAHostKeeper
+	app.ScopedICAControllerKeeper = scopedICAControllerKeeper
+	app.ScopedInterTxKeeper = scopedInterTxKeeper
 	clockkeeper.RegisterProposalTypes()
 	return app
 }
@@ -1004,7 +1004,7 @@ func (app *OraichainApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain)
 		panic(err)
 	}
 
-	app.upgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
+	app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
 
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
 }
@@ -1052,7 +1052,7 @@ func (app *OraichainApp) SimulationManager() *module.SimulationManager {
 //
 // NOTE: This is solely to be used for testing purposes.
 func (app *OraichainApp) getSubspace(moduleName string) paramstypes.Subspace {
-	subspace, _ := app.paramsKeeper.GetSubspace(moduleName)
+	subspace, _ := app.ParamsKeeper.GetSubspace(moduleName)
 	return subspace
 }
 
@@ -1143,17 +1143,17 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 }
 
 func (app *OraichainApp) upgradeHandler() {
-	app.upgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+	app.UpgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		response, err := app.mm.RunMigrations(ctx, app.configurator, fromVM)
 		return response, err
 	})
 
-	upgradeInfo, err := app.upgradeKeeper.ReadUpgradeInfoFromDisk()
+	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
 	if err != nil {
 		panic(err)
 	}
 
-	if upgradeInfo.Name == BinaryVersion && !app.upgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+	if upgradeInfo.Name == BinaryVersion && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storetypes.StoreUpgrades{
 			Added: []string{},
