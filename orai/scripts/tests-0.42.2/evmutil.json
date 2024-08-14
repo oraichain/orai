@@ -1,0 +1,15 @@
+{
+  "title": "Enable erc20 mapping",
+  "description": "Enable erc20 mapping",
+  "changes": [
+      {
+          "subspace": "evmutil",
+          "key": "EnabledConversionPairs",
+          "value": [{
+            "kava_erc20_address": "0x54A225e958b09C214973D428956A61bBe882e027",
+            "denom": "factory/orai1233lg4s0t390pfskfcdy6gkraedtxrs2r9va3y/usdt"
+          }]
+      }
+  ],
+  "deposit": "10000000orai"
+}
