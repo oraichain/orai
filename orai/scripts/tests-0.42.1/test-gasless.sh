@@ -34,12 +34,13 @@ if ! [[ $proposal_status =~ "PROPOSAL_STATUS_PASSED" ]] ; then
 fi
 
 # try executing something, gas should equal 0
-gas_used_after=$(oraid tx wasm execute $contract_address $EXECUTE_MSG $ARGS --output json --gas 20000000 | jq '.gas_used | tonumber')
+gas_used_after=$(oraid tx wasm execute $contract_address $EXECUTE_MSG $ARGS --output json | jq '.gas_used | tonumber')
 echo "gas used after gasless: $gas_used_after"
 
 # 1.9 is a magic number chosen to check that if the gas used after gasless has dropped significantly or not
-gas_used_compare=$(echo "$gas_used_before / 1.9" | bc -l)
-if [[ $gas_used_compare < $gas_used_after ]] ; then
+gas_used_compare=$(echo "$gas_used_before / 1.9 / 1" | bc)
+echo "gas_used_compare: $gas_used_compare"
+if [[ $gas_used_compare -lt $gas_used_after ]] ; then
    echo "Gas used after is not small enough!"; exit 1
 fi
 
