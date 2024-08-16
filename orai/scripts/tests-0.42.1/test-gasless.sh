@@ -33,15 +33,35 @@ if ! [[ $proposal_status =~ "PROPOSAL_STATUS_PASSED" ]] ; then
    echo "The proposal has not passed yet"; exit 1
 fi
 
-# try executing something, gas should equal 0
-gas_used_after=$(oraid tx wasm execute $contract_address $EXECUTE_MSG $ARGS --output json | jq '.gas_used | tonumber')
+result=$(oraid tx wasm execute $contract_address $EXECUTE_MSG $ARGS --output json)
+gas_used_after=$(echo $result | jq '.gas_used | tonumber')
+code=$(echo $result | jq '.code | tonumber')
 echo "gas used after gasless: $gas_used_after"
+if ! [[ $code == 0 ]] ; then
+   echo "Contract gasless execution failed"; exit 1
+fi
 
 # 1.9 is a magic number chosen to check that if the gas used after gasless has dropped significantly or not
 gas_used_compare=$(echo "$gas_used_before / 1.9 / 1" | bc)
 echo "gas_used_compare: $gas_used_compare"
 if [[ $gas_used_compare -lt $gas_used_after ]] ; then
    echo "Gas used after is not small enough!"; exit 1
+fi
+
+# try testing with non-gasless contract with the same logic, should have much higher gas
+oraid tx wasm instantiate $code_id '{}' --label 'testing' --admin $(oraid keys show $USER --keyring-backend test --home $NODE_HOME -a) $ARGS > $HIDE_LOGS
+non_gasless_contract_address=$(oraid query wasm list-contract-by-code $code_id --output json | jq -r '.contracts[1]')
+echo $non_gasless_contract_address
+result=$(oraid tx wasm execute $non_gasless_contract_address $EXECUTE_MSG $ARGS --output json)
+gas_used_non_gasless=$(echo $result | jq '.gas_used | tonumber')
+code=$(echo $result | jq '.code | tonumber')
+echo "gas used of non gasless: $gas_used_non_gasless"
+if ! [[ $code == 0 ]] ; then
+   echo "Contract gasless execution failed"; exit 1
+fi
+
+if [[ $gas_used_non_gasless -le $gas_used_after ]] ; then
+   echo "Gas used non gas less is not large enough!"; exit 1
 fi
 
 echo "Gasless tests passed!"
