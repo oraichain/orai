@@ -498,6 +498,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	)
 
 	validateKeeper(app.feeMarketKeeper)
+	// TODO: override app bankKeeper of evmKeeper with a custom one to convert native balance
 	app.evmKeeper = evmkeeper.NewKeeper(
 		appCodec, keys[evmtypes.StoreKey], tkeys[evmtypes.TransientKey], app.getSubspace(evmtypes.ModuleName),
 		app.accountKeeper, app.bankKeeper, app.stakingKeeper, app.feeMarketKeeper,
