@@ -13,5 +13,5 @@ Cosmos based blockchain integrated with Smart Contracts [Orai](https://orai.io).
 ## Upgrade command
 
 ```bash
-oraid tx gov submit-proposal software-upgrade "v0.42.2" --title "upgrade Oraichain network to v0.42.2" --description "Please visit https://github.com/oraichain/orai/releases/tag/v0.42.2 to view the CHANGELOG for this upgrade" --from wallet --upgrade-height 21627705 --upgrade-info "https://github.com/oraichain/orai/releases/download/v0.42.2/manifest.json" --deposit 10000000orai --chain-id Oraichain -y -b block --gas-prices 0.001orai --gas 20000000 --node https://rpc.orai.io:443
+oraid tx gov submit-proposal software-upgrade "v0.42.3" --title "upgrade Oraichain network to v0.42.3" --description "Please visit https://github.com/oraichain/orai/releases/tag/v0.42.3 to view the CHANGELOG for this upgrade" --from wallet --upgrade-height 21627705 --upgrade-info "https://github.com/oraichain/orai/releases/download/v0.42.3/manifest.json" --deposit 10000000orai --chain-id Oraichain -y -b block --gas-prices 0.001orai --gas 20000000 --node https://rpc.orai.io:443
 ```
