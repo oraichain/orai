@@ -144,6 +144,8 @@ import (
 	clocktypes "github.com/CosmosContracts/juno/v18/x/clock/types"
 
 	"github.com/CosmWasm/token-factory/x/tokenfactory/bindings"
+	evmutil "github.com/kava-labs/kava/x/evmutil"
+	evmutilkeeper "github.com/kava-labs/kava/x/evmutil/keeper"
 	evmutiltypes "github.com/kava-labs/kava/x/evmutil/types"
 	evmante "github.com/tharsis/ethermint/app/ante"
 	ethermintconfig "github.com/tharsis/ethermint/server/config"
@@ -258,6 +260,7 @@ var (
 		clock.AppModuleBasic{},
 		ibchooks.AppModuleBasic{},
 		packetforward.AppModuleBasic{},
+		evmutil.AppModuleBasic{},
 		tokenfactory.AppModuleBasic{},
 	)
 
@@ -271,6 +274,7 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		evmtypes.ModuleName:            {authtypes.Minter, authtypes.Burner}, // used for secure addition and subtraction of balance using module account
+		evmutiltypes.ModuleName:        {authtypes.Minter, authtypes.Burner},
 		ibcfeetypes.ModuleName:         nil,
 		icatypes.ModuleName:            nil,
 		wasm.ModuleName:                {authtypes.Burner},
@@ -331,6 +335,7 @@ type OraichainApp struct {
 	paramsKeeper       paramskeeper.Keeper
 	ibcKeeper          *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	evmKeeper          *evmkeeper.Keeper
+	evmutilKeeper      evmutilkeeper.Keeper
 	feeMarketKeeper    feemarketkeeper.Keeper
 	evidenceKeeper     evidencekeeper.Keeper
 	transferKeeper     ibctransferkeeper.Keeper
@@ -392,7 +397,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, evmtypes.StoreKey, feemarkettypes.StoreKey, capabilitytypes.StoreKey,
 		wasm.StoreKey, feegrant.StoreKey, authzkeeper.StoreKey, icahosttypes.StoreKey,
 		icacontrollertypes.StoreKey, intertxtypes.StoreKey, ibcfeetypes.StoreKey,
-		ibchookstypes.StoreKey, clocktypes.StoreKey, packetforwardtypes.StoreKey, tokenfactorytypes.StoreKey,
+		ibchookstypes.StoreKey, clocktypes.StoreKey, packetforwardtypes.StoreKey, evmutiltypes.StoreKey, tokenfactorytypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -497,13 +502,23 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		appCodec, keys[feemarkettypes.StoreKey], app.getSubspace(feemarkettypes.ModuleName),
 	)
 
+	app.evmutilKeeper = evmutilkeeper.NewKeeper(
+		appCodec,
+		keys[evmutiltypes.StoreKey],
+		app.getSubspace(evmutiltypes.ModuleName),
+		app.bankKeeper,
+		app.accountKeeper,
+	)
+
 	validateKeeper(app.feeMarketKeeper)
-	// TODO: override app bankKeeper of evmKeeper with a custom one to convert native balance
+	validateKeeper(app.evmutilKeeper)
+	evmBankKeeper := evmutilkeeper.NewEvmBankKeeperWithDenoms(app.evmutilKeeper, app.bankKeeper, app.accountKeeper, appconfig.EvmDenom, appconfig.CosmosDenom)
 	app.evmKeeper = evmkeeper.NewKeeper(
 		appCodec, keys[evmtypes.StoreKey], tkeys[evmtypes.TransientKey], app.getSubspace(evmtypes.ModuleName),
-		app.accountKeeper, app.bankKeeper, app.stakingKeeper, app.feeMarketKeeper,
+		app.accountKeeper, evmBankKeeper, app.stakingKeeper, app.feeMarketKeeper,
 		options.EVMTrace,
 	)
+	app.evmutilKeeper.SetEvmKeeper(app.evmKeeper)
 
 	// Configure the hooks keeper
 	hooksKeeper := ibchookskeeper.NewKeeper(
@@ -753,6 +768,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		clock.NewAppModule(appCodec, app.ClockKeeper),
 		ibchooks.NewAppModule(app.accountKeeper),
 		packetforward.NewAppModule(app.PacketForwardKeeper),
+		evmutil.NewAppModule(app.evmutilKeeper, app.bankKeeper),
 		tokenfactory.NewAppModule(app.TokenFactoryKeeper, app.accountKeeper, app.bankKeeper),
 	)
 
@@ -789,6 +805,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		wasm.ModuleName,
 		ibchookstypes.ModuleName,
 		clocktypes.ModuleName,
+		evmutiltypes.ModuleName,
 		tokenfactorytypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
@@ -821,6 +838,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		wasm.ModuleName,
 		ibchookstypes.ModuleName,
 		clocktypes.ModuleName,
+		evmutiltypes.ModuleName,
 		tokenfactorytypes.ModuleName,
 	)
 
@@ -856,6 +874,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		intertxtypes.ModuleName,
 		evmtypes.ModuleName,
 		feemarkettypes.ModuleName,
+		evmutiltypes.ModuleName,
 		// wasm after ibc transfer
 		wasm.ModuleName,
 		ibchookstypes.ModuleName,
@@ -1117,6 +1136,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(clocktypes.ModuleName)
 	paramsKeeper.Subspace(evmtypes.ModuleName)
 	paramsKeeper.Subspace(feemarkettypes.ModuleName)
+	paramsKeeper.Subspace(evmutiltypes.ModuleName)
 	paramsKeeper.Subspace(tokenfactorytypes.ModuleName)
 
 	return paramsKeeper
@@ -1136,8 +1156,7 @@ func (app *OraichainApp) upgradeHandler() {
 	if upgradeInfo.Name == BinaryVersion && !app.upgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storetypes.StoreUpgrades{
-			Added:   []string{},
-			Deleted: []string{evmutiltypes.StoreKey},
+			Added: []string{},
 		}))
 	}
 }
