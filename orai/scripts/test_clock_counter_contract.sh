@@ -1,6 +1,7 @@
 #!/bin/bash
 # Before running this script, you must setup local network:
 # sh $PWD/scripts/multinode-local-testnet.sh
+# cw-clock-example.wasm source code: https://github.com/oraichain/cw-plus.git
 
 WASM_PATH=${WASM_PATH:-"$PWD/scripts/wasm_file/cw-clock-example.wasm"}
 ARGS="--chain-id testing -y --keyring-backend test --gas auto --gas-adjustment 1.5 -b block"
@@ -38,9 +39,7 @@ counter_after=$(oraid query wasm contract-state smart $contract_address $QUERY_M
 sleep 2
 echo "cw-clock counter_after: $counter_after"
 
-if [ $counter_after -gt $counter_before ]
-then
-echo "Clock Counter Test Passed"
-else
-echo "Clock Counter Test Failed"
+if [[ $counter_after == $counter_before ]]; then
+  echo "Clock Counter Test Failed"; exit 1
 fi
+echo "Clock Counter Test Passed"

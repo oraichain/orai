@@ -6,14 +6,12 @@ toolchain go1.21.4
 
 replace (
 	// fork wasmd so that we have legacy wasm types
-	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20240701025001-60163da93f49
 	// go list -m -json github.com/oraichain/wasmvm@main | jq '.|"\(.Path) \(.Version)"' -r
 	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.5.2
 	// interchaintest supports ICS features so we need this for now
-	github.com/cosmos/cosmos-sdk => github.com/oraichain/cosmos-sdk v0.45.16-ics-epi-191
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
-	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20240329015336-24dcc6856c88
+	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20240822152340-79f7b8278984
 	// github.com/tidwall/btree => github.com/tidwall/btree v1.5.0
 	github.com/vedhavyas/go-subkey => github.com/strangelove-ventures/go-subkey v1.0.7
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2

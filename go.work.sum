@@ -286,7 +286,6 @@ github.com/cosmos/btcutil v1.0.4/go.mod h1:Ffqc8Hn6TJUdDgHBwIZLtrLQC1KdJ9jGJl/Tv
 github.com/cosmos/cosmos-db v0.0.0-20221226095112-f3c38ecb5e32/go.mod h1:kwMlEC4wWvB48zAShGKVqboJL6w4zCLesaNQ3YLU2BQ=
 github.com/cosmos/cosmos-proto v1.0.0-beta.1/go.mod h1:8k2GNZghi5sDRFw/scPL8gMSowT1vDA+5ouxL8GjaUE=
 github.com/cosmos/cosmos-proto v1.0.0-beta.2/go.mod h1:+XRCLJ14pr5HFEHIUcn51IKXD1Fy3rkEQqt4WqmN4V0=
-github.com/cosmos/cosmos-sdk v0.45.16 h1:5ba/Bh5/LE55IwHQuCU4fiG4eXeDKtSWzehXRpaKDcw=
 github.com/cosmos/cosmos-sdk v0.45.16/go.mod h1:bScuNwWAP0TZJpUf+SHXRU3xGoUPp+X9nAzfeIXts40=
 github.com/cosmos/gogoproto v1.4.3/go.mod h1:0hLIG5TR7IvV1fme1HCFKjfzW9X2x0Mo+RooWXCnOWU=
 github.com/cosmos/gogoproto v1.4.4/go.mod h1:/yl6/nLwsZcZ2JY3OrqjRqvqCG9InUMcXRfRjQiF9DU=
@@ -591,6 +590,11 @@ github.com/opencontainers/runtime-spec v1.0.3-0.20210326190908-1c3f411f0417/go.m
 github.com/opencontainers/selinux v1.10.0/go.mod h1:2i0OySw99QjzBBQByd1Gr9gSjvuho1lHsJxIJ3gGbJI=
 github.com/opentracing/opentracing-go v1.2.0/go.mod h1:GxEUsuufX4nBwe+T+Wl9TAgYrxe9dPLANfrWvHYVTgc=
 github.com/openzipkin/zipkin-go v0.2.5/go.mod h1:KpXfKdgRDnnhsxw4pNIH9Md5lyFqKUa4YDFlwRYAMyE=
+github.com/oraichain/cometbft v0.34.30-0.20240425173150-09d3515b75aa h1:VYk/7NyyDIjiSPhTZJVjF4xbidyxikD/C1EH+ZXSzo0=
+github.com/oraichain/cometbft v0.34.30-0.20240425173150-09d3515b75aa/go.mod h1:L9shMfbkZ8B+7JlwANEr+NZbBcn+hBpwdbeYvA5rLCw=
+github.com/oraichain/cosmos-sdk v0.45.16-ics-epi-191/go.mod h1:bScuNwWAP0TZJpUf+SHXRU3xGoUPp+X9nAzfeIXts40=
+github.com/oraichain/cosmos-sdk v0.45.17-0.20240822154747-4cc2e82d6f68 h1:zXer3jRPWbrC9jl7w2cEx4nCY19QWKNRdQ7l8xF7/+U=
+github.com/oraichain/cosmos-sdk v0.45.17-0.20240822154747-4cc2e82d6f68/go.mod h1:bScuNwWAP0TZJpUf+SHXRU3xGoUPp+X9nAzfeIXts40=
 github.com/oraichain/ethermint v0.14.0-kava-v21.1 h1:JOOHoQqURFMRhBXhLxiU4ey4fLwtsIXE8j0eMre9Oow=
 github.com/oraichain/ethermint v0.14.0-kava-v21.1/go.mod h1:L4wqbHHORlqm04t6Qmv7CYHzqnOAl8jbkJF0yNm9LH4=
 github.com/oraichain/ethermint v0.14.0-orai-v1.0.0 h1:8bnCJO0fyPLT+ASoPs1+PYPQLVZt80N31p6UFFq2rmY=
@@ -607,6 +611,8 @@ github.com/oraichain/kava v0.21.1 h1:d6PUnDEg2P3sWvcK45b9hLpMQNkz2TX3zN1v3IHZ09E
 github.com/oraichain/kava v0.21.1/go.mod h1:3adeVmSpm8xejhI+v0qKZsLA8LNdMpkZSns1kXG9YiA=
 github.com/oraichain/wasmd v0.30.2-0.20240701023743-e3d76c6757b5 h1:X8Edb1x06x3lEx1mRLHhKnQ3ZVNLsgdpmJskmShcrXk=
 github.com/oraichain/wasmd v0.30.2-0.20240701023743-e3d76c6757b5/go.mod h1:DUWz5+p7h3BbDxXAt7IBovagwt5NRPCGVuQkweIixzM=
+github.com/oraichain/wasmd v0.30.2-0.20240729102409-91ec1f5fdc6c h1:M9XoVJ0EgBPBfuNUMxXGpa5AitznA27m59J0j651opk=
+github.com/oraichain/wasmd v0.30.2-0.20240729102409-91ec1f5fdc6c/go.mod h1:DUWz5+p7h3BbDxXAt7IBovagwt5NRPCGVuQkweIixzM=
 github.com/otiai10/copy v1.2.0/go.mod h1:rrF5dJ5F0t/EWSYODDu4j9/vEeYHMkc8jt0zJChqQWw=
 github.com/otiai10/mint v1.3.1/go.mod h1:/yxELlJQ0ufhjUwhshSj+wFjZ78CnZ48/1wtmBH1OTc=
 github.com/oxyno-zeta/gomock-extra-matcher v1.1.0/go.mod h1:UMGTHYEmJ1dRq8LDZ7VTAYO4nqM3GD1UGC3RJEUxEz0=
