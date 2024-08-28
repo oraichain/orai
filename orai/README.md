@@ -67,14 +67,6 @@ sudo wget https://github.com/CosmWasm/wasmvm/releases/download/v0.13.0/libwasmvm
 
 `oraid version`
 
-## Deployment
-
-We recommend using Docker to deploy the network. To do so, please type:
-
-```bash
-docker build -t <image:tag> -f Dockerfile.prod .
-```
-
 ## Protobuf & protobuf swagger generation
 
 * [Install Docker](https://docs.docker.com/engine/install)
