@@ -42,4 +42,18 @@ echo "cw-clock counter_after: $counter_after"
 if [[ $counter_after == $counter_before ]]; then
   echo "Clock Counter Test Failed"; exit 1
 fi
+
+QUERY_MSG='{"get_after_sudo":{}}'
+after_sudo_before=$(oraid query wasm contract-state smart $contract_address $QUERY_MSG --node "tcp://localhost:26657" --output json | jq -r '.data | tonumber')
+sleep 2
+echo "cw-clock after sudo before: $after_sudo_before"
+
+after_sudo_after=$(oraid query wasm contract-state smart $contract_address $QUERY_MSG --node "tcp://localhost:26657" --output json | jq -r '.data | tonumber')
+sleep 2
+echo "cw-clock after sudo after: $after_sudo_after"
+
+if [[ $after_sudo_before == $after_sudo_after ]]; then
+  echo "Clock Counter After Sudo Test Failed"; exit 1
+fi
+
 echo "Clock Counter Test Passed"
