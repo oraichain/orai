@@ -741,8 +741,8 @@ github.com/oraichain/ethermint v0.14.1-0.20240911110219-d0e5ac8cacd1 h1:0Vo3NtpN
 github.com/oraichain/ethermint v0.14.1-0.20240911110219-d0e5ac8cacd1/go.mod h1:cTuxZmV5H31kxB1lIYTSSTX4zIxioQQvVuU6yZR/ZZs=
 github.com/oraichain/juno/x/clock v0.0.0-20240730041913-b862021c6b14 h1:VF0heTRI6XI364bctsIXe5UNQctryVVU+qvGSdHax18=
 github.com/oraichain/juno/x/clock v0.0.0-20240730041913-b862021c6b14/go.mod h1:A2bZN9cK0mV34BBtcZx+vnWf1Zj7yiZHT5e88BXczcI=
-github.com/oraichain/kava v0.21.2-0.20240911173152-1b3a97a3f32d h1:fSHolOh+IAGBdCrodtE/gBcPDetMoYmEVbft5tRLyC4=
-github.com/oraichain/kava v0.21.2-0.20240911173152-1b3a97a3f32d/go.mod h1:rzsEf+BEcXxRpOoJCUMZUFFRy49/3g0uEpyckxOFe5I=
+github.com/oraichain/kava v0.21.2-0.20240911173813-3c80581ac515 h1:jmAuVbeEUzJ3h6bqMVB+GRyzY6xxjdLiKh6W3xUtznw=
+github.com/oraichain/kava v0.21.2-0.20240911173813-3c80581ac515/go.mod h1:rzsEf+BEcXxRpOoJCUMZUFFRy49/3g0uEpyckxOFe5I=
 github.com/oraichain/wasmvm v1.5.2 h1:hN5Pa4EPlRb0BYKkNh2cgixd0+L6kPpzc+s30Il2W/Q=
 github.com/oraichain/wasmvm v1.5.2/go.mod h1:fXB+m2gyh4v9839zlIXdMZGeLAxqUdYdFQqYsTha2hc=
 github.com/ory/dockertest v3.3.5+incompatible h1:iLLK6SQwIhcbrG783Dghaaa3WPzGc+4Emza6EbVUUGA=
