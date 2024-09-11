@@ -629,8 +629,8 @@ github.com/oraichain/juno/x/clock v0.0.0-20231103100256-4c83cb3f8224/go.mod h1:9
 github.com/oraichain/kava v0.21.1-orai-v1.0.0/go.mod h1:3adeVmSpm8xejhI+v0qKZsLA8LNdMpkZSns1kXG9YiA=
 github.com/oraichain/kava v0.21.1 h1:d6PUnDEg2P3sWvcK45b9hLpMQNkz2TX3zN1v3IHZ09E=
 github.com/oraichain/kava v0.21.1/go.mod h1:3adeVmSpm8xejhI+v0qKZsLA8LNdMpkZSns1kXG9YiA=
-github.com/oraichain/kava v0.21.2-0.20240911144548-04ed946a6442 h1:Q2wwaQXJpwVC9oy//OcnLzeZ/JUGpaeGid73Sty4hwU=
-github.com/oraichain/kava v0.21.2-0.20240911144548-04ed946a6442/go.mod h1:HI7CMM4bjeO0D8KntO9FlU4mH/VRX0XCyVDr/hkEZBc=
+github.com/oraichain/kava v0.21.2-0.20240911173152-1b3a97a3f32d h1:fSHolOh+IAGBdCrodtE/gBcPDetMoYmEVbft5tRLyC4=
+github.com/oraichain/kava v0.21.2-0.20240911173152-1b3a97a3f32d/go.mod h1:rzsEf+BEcXxRpOoJCUMZUFFRy49/3g0uEpyckxOFe5I=
 github.com/oraichain/wasmd v0.30.2-0.20240701023743-e3d76c6757b5 h1:X8Edb1x06x3lEx1mRLHhKnQ3ZVNLsgdpmJskmShcrXk=
 github.com/oraichain/wasmd v0.30.2-0.20240701023743-e3d76c6757b5/go.mod h1:DUWz5+p7h3BbDxXAt7IBovagwt5NRPCGVuQkweIixzM=
 github.com/oraichain/wasmd v0.30.2-0.20240729102409-91ec1f5fdc6c h1:M9XoVJ0EgBPBfuNUMxXGpa5AitznA27m59J0j651opk=

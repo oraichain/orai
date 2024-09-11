@@ -208,8 +208,6 @@ github.com/cosmos/gorocksdb v1.2.0 h1:d0l3jJG8M4hBouIZq0mDUHZ+zjOx044J3nGRskwTb4
 github.com/cosmos/gorocksdb v1.2.0/go.mod h1:aaKvKItm514hKfNJpUJXnnOWeBnk2GL4+Qw9NHizILw=
 github.com/cosmos/iavl v0.19.5 h1:rGA3hOrgNxgRM5wYcSCxgQBap7fW82WZgY78V9po/iY=
 github.com/cosmos/iavl v0.19.5/go.mod h1:X9PKD3J0iFxdmgNLa7b2LYWdsGd90ToV5cAONApkEPw=
-github.com/cosmos/ibc-go/v3 v3.4.0 h1:ha3cqEG36pqMWqA1D+kxDWBTZXpeFMd/aZIQF7I0xro=
-github.com/cosmos/ibc-go/v3 v3.4.0/go.mod h1:VwB/vWu4ysT5DN2aF78d17LYmx3omSAdq6gpKvM7XRA=
 github.com/cosmos/ibc-go/v4 v4.6.0 h1:G7kiD4Zf8Wrxc8BXWIKuFnzI0W4wpvRPrl5HwdfTIsA=
 github.com/cosmos/ibc-go/v4 v4.6.0/go.mod h1:ksiZHUypws0NVP50E3ea0ivVFO/bfS8q8yLg8yZ2ATQ=
 github.com/cosmos/interchain-accounts v0.2.6 h1:TV2M2g1/Rb9MCNw1YePdBKE0rcEczNj1RGHT+2iRYas=
@@ -743,8 +741,8 @@ github.com/oraichain/ethermint v0.14.1-0.20240911110219-d0e5ac8cacd1 h1:0Vo3NtpN
 github.com/oraichain/ethermint v0.14.1-0.20240911110219-d0e5ac8cacd1/go.mod h1:cTuxZmV5H31kxB1lIYTSSTX4zIxioQQvVuU6yZR/ZZs=
 github.com/oraichain/juno/x/clock v0.0.0-20240730041913-b862021c6b14 h1:VF0heTRI6XI364bctsIXe5UNQctryVVU+qvGSdHax18=
 github.com/oraichain/juno/x/clock v0.0.0-20240730041913-b862021c6b14/go.mod h1:A2bZN9cK0mV34BBtcZx+vnWf1Zj7yiZHT5e88BXczcI=
-github.com/oraichain/kava v0.21.2-0.20240911144548-04ed946a6442 h1:Q2wwaQXJpwVC9oy//OcnLzeZ/JUGpaeGid73Sty4hwU=
-github.com/oraichain/kava v0.21.2-0.20240911144548-04ed946a6442/go.mod h1:HI7CMM4bjeO0D8KntO9FlU4mH/VRX0XCyVDr/hkEZBc=
+github.com/oraichain/kava v0.21.2-0.20240911173152-1b3a97a3f32d h1:fSHolOh+IAGBdCrodtE/gBcPDetMoYmEVbft5tRLyC4=
+github.com/oraichain/kava v0.21.2-0.20240911173152-1b3a97a3f32d/go.mod h1:rzsEf+BEcXxRpOoJCUMZUFFRy49/3g0uEpyckxOFe5I=
 github.com/oraichain/wasmvm v1.5.2 h1:hN5Pa4EPlRb0BYKkNh2cgixd0+L6kPpzc+s30Il2W/Q=
 github.com/oraichain/wasmvm v1.5.2/go.mod h1:fXB+m2gyh4v9839zlIXdMZGeLAxqUdYdFQqYsTha2hc=
 github.com/ory/dockertest v3.3.5+incompatible h1:iLLK6SQwIhcbrG783Dghaaa3WPzGc+4Emza6EbVUUGA=
