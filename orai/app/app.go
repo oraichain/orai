@@ -144,6 +144,7 @@ import (
 	clocktypes "github.com/CosmosContracts/juno/v18/x/clock/types"
 
 	"github.com/CosmWasm/token-factory/x/tokenfactory/bindings"
+	"github.com/kava-labs/kava/precompile/registry"
 	evmutil "github.com/kava-labs/kava/x/evmutil"
 	evmutilkeeper "github.com/kava-labs/kava/x/evmutil/keeper"
 	evmutiltypes "github.com/kava-labs/kava/x/evmutil/types"
@@ -981,6 +982,10 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	app.scopedICAControllerKeeper = scopedICAControllerKeeper
 	app.scopedInterTxKeeper = scopedInterTxKeeper
 	clockkeeper.RegisterProposalTypes()
+
+	// register wasm keeper
+	registry.InitializePrecompiles(app.ContractKeeper, app.wasmKeeper, app.evmKeeper)
+
 	return app
 }
 

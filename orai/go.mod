@@ -75,11 +75,13 @@ require (
 	github.com/dgraph-io/badger/v3 v3.2103.2 // indirect
 	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dgryski/go-farm v0.0.0-20200201041132-a6ae2369ad13 // indirect
+	github.com/dlclark/regexp2 v1.4.1-0.20201116162257-a2a8dda75c91 // indirect
 	github.com/docker/distribution v2.8.2+incompatible // indirect
+	github.com/dop251/goja v0.0.0-20220405120441-9037c2b61cbf // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/dvsekhvalnov/jose2go v1.5.0 // indirect
 	github.com/edsrzf/mmap-go v1.0.0 // indirect
-	github.com/ethereum/go-ethereum v1.10.21 // indirect
+	github.com/ethereum/go-ethereum v1.10.26 // indirect
 	github.com/felixge/httpsnoop v1.0.2 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/gballet/go-libpcsclite v0.0.0-20190607065134-2772fd86a8ff // indirect
@@ -88,6 +90,7 @@ require (
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/go-ole/go-ole v1.2.5 // indirect
+	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/gobwas/ws v1.1.0 // indirect
 	github.com/godbus/dbus v0.0.0-20190726142602-4481cbc300e2 // indirect
@@ -187,7 +190,6 @@ require (
 	google.golang.org/protobuf v1.32.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
-	gopkg.in/olebedev/go-duktape.v3 v3.0.0-20200619000410-60c24ae608a6 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	nhooyr.io/websocket v1.8.7 // indirect
@@ -209,12 +211,13 @@ replace (
 
 	// backport iavl and go-ethereum to matching version with cosmos sdk & kava v0.14.0-kava-v21.1
 	github.com/cosmos/iavl => github.com/cosmos/iavl v0.19.5
-	github.com/ethereum/go-ethereum => github.com/ethereum/go-ethereum v1.10.17
+	// use go-ethereum with precompile
+	github.com/ethereum/go-ethereum => github.com/Kava-Labs/go-ethereum v1.10.27-0.20240308184817-2a5324cb7ce7
 
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
 	// use kava fork to change evm denom & cosmos denom of evmutil module to aorai and orai
-	github.com/kava-labs/kava => github.com/oraichain/kava v0.21.2-0.20240712210740-04e37a257e4c
+	github.com/kava-labs/kava => github.com/oraichain/kava v0.21.2-0.20240911144548-04ed946a6442
 	// downgrade of goleveldb to avoid issues: see https://github.com/cosmos/cosmos-sdk/issues/14949
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 
@@ -226,7 +229,7 @@ replace (
 	// Use ethermint fork that respects min-gas-price with NoBaseFee true and london enabled, and includes eip712 support
 	// also add params query, fix proto account & ibc v3 to v4 compatibility, and get first 4 bytes of sha256(chain_id) when not eip159 compatible
 	// also add evm & cosmos mapping
-	github.com/tharsis/ethermint => github.com/oraichain/ethermint v0.14.1-0.20240730173417-7e4df27e54fd
+	github.com/tharsis/ethermint => github.com/oraichain/ethermint v0.14.1-0.20240911110219-d0e5ac8cacd1
 
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )
