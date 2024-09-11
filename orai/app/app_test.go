@@ -36,6 +36,7 @@ func TestWasmdExport(t *testing.T) {
 	// Initialize the chain
 	gapp.InitChain(
 		abci.RequestInitChain{
+			ChainId:       appName,
 			Validators:    []abci.ValidatorUpdate{},
 			AppStateBytes: stateBytes,
 		},
