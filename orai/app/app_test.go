@@ -28,7 +28,6 @@ func (ao EmptyAppOptions) Get(o string) interface{} {
 func TestWasmdExport(t *testing.T) {
 	db := db.NewMemDB()
 	gapp := NewOraichainApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, MakeEncodingConfig(), wasm.EnableAllProposals, EmptyAppOptions{}, emptyWasmOpts, EvmOptions{})
-
 	genesisState := NewDefaultGenesisState(gapp.appCodec)
 	stateBytes, err := json.MarshalIndent(genesisState, "", "  ")
 	require.NoError(t, err)

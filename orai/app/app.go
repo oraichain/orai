@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/kava-labs/kava/precompile/registry"
 	ibchooks "github.com/osmosis-labs/osmosis/x/ibc-hooks"
 	ibchookskeeper "github.com/osmosis-labs/osmosis/x/ibc-hooks/keeper"
 	ibchookstypes "github.com/osmosis-labs/osmosis/x/ibc-hooks/types"
@@ -144,7 +145,6 @@ import (
 	clocktypes "github.com/CosmosContracts/juno/v18/x/clock/types"
 
 	"github.com/CosmWasm/token-factory/x/tokenfactory/bindings"
-	"github.com/kava-labs/kava/precompile/registry"
 	evmutil "github.com/kava-labs/kava/x/evmutil"
 	evmutilkeeper "github.com/kava-labs/kava/x/evmutil/keeper"
 	evmutiltypes "github.com/kava-labs/kava/x/evmutil/types"
@@ -627,6 +627,8 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	validateKeeper(scopedWasmKeeper, app.transferKeeper)
 	// Setup wasm bindings
 	wasmOpts = append(bindings.RegisterCustomPlugins(&app.bankKeeper, &app.TokenFactoryKeeper), wasmOpts...)
+	wasmOpts = append(RegisterStargateQueries(*bApp.GRPCQueryRouter(), appCodec), wasmOpts...)
+
 	app.wasmKeeper = wasm.NewKeeper(
 		appCodec,
 		keys[wasm.StoreKey],
@@ -983,9 +985,6 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	app.scopedInterTxKeeper = scopedInterTxKeeper
 	clockkeeper.RegisterProposalTypes()
 
-	// register wasm keeper
-	registry.InitializePrecompiles(app.ContractKeeper, app.wasmKeeper, app.evmKeeper)
-
 	return app
 }
 
@@ -1010,6 +1009,9 @@ func (app *OraichainApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain)
 	}
 
 	app.upgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
+
+	// register wasm keeper
+	registry.InitializePrecompiles(app.ContractKeeper, app.wasmKeeper, app.evmKeeper)
 
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
 }
