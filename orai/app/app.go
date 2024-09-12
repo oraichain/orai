@@ -985,6 +985,9 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	app.ScopedInterTxKeeper = scopedInterTxKeeper
 	clockkeeper.RegisterProposalTypes()
 
+	// register wasm keeper
+	registry.InitializePrecompiles(app.ContractKeeper, app.WasmKeeper, app.EvmKeeper)
+
 	return app
 }
 
@@ -1009,9 +1012,6 @@ func (app *OraichainApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain)
 	}
 
 	app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
-
-	// register wasm keeper
-	registry.InitializePrecompiles(app.ContractKeeper, app.WasmKeeper, app.EvmKeeper)
 
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
 }
