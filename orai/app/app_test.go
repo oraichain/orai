@@ -57,7 +57,7 @@ func TestBlockedAddrs(t *testing.T) {
 	gapp := NewOraichainApp(log.NewTMLogger(log.NewSyncWriter(os.Stdout)), db, nil, true, map[int64]bool{}, DefaultNodeHome, 0, MakeEncodingConfig(), wasm.EnableAllProposals, EmptyAppOptions{}, emptyWasmOpts, EvmOptions{})
 
 	for acc := range maccPerms {
-		require.Equal(t, !allowedReceivingModAcc[acc], gapp.bankKeeper.BlockedAddr(gapp.accountKeeper.GetModuleAddress(acc)))
+		require.Equal(t, !allowedReceivingModAcc[acc], gapp.BankKeeper.BlockedAddr(gapp.AccountKeeper.GetModuleAddress(acc)))
 	}
 }
 
