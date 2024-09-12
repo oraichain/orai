@@ -103,12 +103,7 @@ func StargateQuerier(queryRouter baseapp.GRPCQueryRouter, cdc codec.Codec) func(
 			return nil, fmt.Errorf("res returned from abci query route is nil")
 		}
 
-		bz, err := convertProtoToJSONMarshal(protoResponseType, res.Value, cdc)
-		if err != nil {
-			return nil, err
-		}
-
-		return bz, nil
+		return res.Value, nil
 	}
 }
 
@@ -120,21 +115,4 @@ func RegisterStargateQueries(queryRouter baseapp.GRPCQueryRouter, codec codec.Co
 	return []wasmkeeper.Option{
 		queryPluginOpt,
 	}
-}
-
-func convertProtoToJSONMarshal(protoResponseType proto.Message, bz []byte, cdc codec.Codec) ([]byte, error) {
-	// unmarshal binary into stargate response data structure
-	err := cdc.UnmarshalJSON(bz, protoResponseType)
-	if err != nil {
-		return nil, wasmvmtypes.Unknown{}
-	}
-
-	bz, err = cdc.MarshalJSON(protoResponseType)
-	if err != nil {
-		return nil, wasmvmtypes.Unknown{}
-	}
-
-	protoResponseType.Reset()
-
-	return bz, nil
 }
