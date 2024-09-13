@@ -7,6 +7,8 @@ require (
 	github.com/CosmWasm/wasmd v0.33.0
 	github.com/CosmWasm/wasmvm v1.3.0
 	github.com/CosmosContracts/juno/v18/x/clock v0.0.0-00010101000000-000000000000
+	github.com/Gravity-Bridge/Gravity-Bridge/module v0.0.0-00010101000000-000000000000
+	github.com/althea-net/bech32-ibc v0.4.5
 	github.com/cosmos/cosmos-sdk v0.45.16
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/cosmos/ibc-go/v4 v4.6.0
@@ -90,10 +92,9 @@ require (
 	github.com/go-kit/kit v0.12.0 // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
-	github.com/go-ole/go-ole v1.2.5 // indirect
+	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
-	github.com/gobwas/ws v1.1.0 // indirect
 	github.com/godbus/dbus v0.0.0-20190726142602-4481cbc300e2 // indirect
 	github.com/gogo/gateway v1.1.0 // indirect
 	github.com/golang/glog v1.1.0 // indirect
@@ -168,8 +169,8 @@ require (
 	github.com/syndtr/goleveldb v1.0.1-0.20220721030215-126854af5e6d // indirect
 	github.com/tendermint/go-amino v0.16.0 // indirect
 	github.com/tidwall/btree v1.5.0 // indirect
-	github.com/tklauser/go-sysconf v0.3.7 // indirect
-	github.com/tklauser/numcpus v0.2.3 // indirect
+	github.com/tklauser/go-sysconf v0.3.10 // indirect
+	github.com/tklauser/numcpus v0.4.0 // indirect
 	github.com/tyler-smith/go-bip39 v1.1.0 // indirect
 	github.com/zondax/hid v0.9.1 // indirect
 	github.com/zondax/ledger-go v0.14.1 // indirect
@@ -208,6 +209,8 @@ replace (
 	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.5.2
 
 	github.com/CosmosContracts/juno/v18/x/clock => github.com/oraichain/juno/x/clock v0.0.0-20240730041913-b862021c6b14
+
+	github.com/Gravity-Bridge/Gravity-Bridge/module => github.com/oraichain/Gravity-Bridge/module v0.0.0-20240913051654-26bb3ec97fb5
 	// same version as cosmos-sdk
 	github.com/btcsuite/btcd => github.com/btcsuite/btcd v0.22.2
 
@@ -217,6 +220,9 @@ replace (
 	github.com/cosmos/iavl => github.com/cosmos/iavl v0.19.5
 	// use go-ethereum with precompile
 	github.com/ethereum/go-ethereum => github.com/Kava-Labs/go-ethereum v1.10.27-0.20240308184817-2a5324cb7ce7
+
+	// Althea-net fork removes ibc-go v3 dep, tendermint->cometbft issue
+	github.com/evmos/ethermint => github.com/althea-net/ethermint v0.19.5
 
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
