@@ -201,6 +201,8 @@ replace (
 	// token factory:
 	github.com/CosmWasm/token-factory => github.com/CosmosContracts/token-factory v1.2.1-juno.0.20230523144425-253f9b9df6a6
 
+	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20240729102409-91ec1f5fdc6c
+
 	// fork wasmd so that we have legacy wasm types
 	// go list -m -json github.com/oraichain/wasmvm@main | jq '.|"\(.Path) \(.Version)"' -r
 	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.5.2
@@ -208,6 +210,8 @@ replace (
 	github.com/CosmosContracts/juno/v18/x/clock => github.com/oraichain/juno/x/clock v0.0.0-20240730041913-b862021c6b14
 	// same version as cosmos-sdk
 	github.com/btcsuite/btcd => github.com/btcsuite/btcd v0.22.2
+
+	github.com/cosmos/cosmos-sdk => github.com/oraichain/cosmos-sdk v0.45.17-0.20240822154747-4cc2e82d6f68
 
 	// backport iavl and go-ethereum to matching version with cosmos sdk & kava v0.14.0-kava-v21.1
 	github.com/cosmos/iavl => github.com/cosmos/iavl v0.19.5
