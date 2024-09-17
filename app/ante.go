@@ -19,15 +19,25 @@ import (
 	vesting "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	evmante "github.com/tharsis/ethermint/app/ante"
 	evmtypes "github.com/tharsis/ethermint/x/evm/types"
+
+	globalfeeante "github.com/CosmosContracts/juno/v15/x/globalfee/ante"
+	globalfeekeeper "github.com/CosmosContracts/juno/v15/x/globalfee/keeper"
+	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 )
+
+const maxBypassMinFeeMsgGasUsage = 1_000_000
 
 // HandlerOptions extends the SDK's AnteHandler options by requiring the IBC
 // channel keeper.
 type HandlerOptions struct {
-	AccountKeeper   evmtypes.AccountKeeper
-	BankKeeper      evmtypes.BankKeeper
-	EvmKeeper       evmante.EVMKeeper
-	FeegrantKeeper  ante.FeegrantKeeper
+	AccountKeeper  evmtypes.AccountKeeper
+	BankKeeper     evmtypes.BankKeeper
+	EvmKeeper      evmante.EVMKeeper
+	FeegrantKeeper ante.FeegrantKeeper
+
+	GlobalFeeKeeper globalfeekeeper.Keeper
+	StakingKeeper   stakingkeeper.Keeper
+
 	SignModeHandler authsigning.SignModeHandler
 	SigGasConsumer  ante.SignatureVerificationGasConsumer
 	FeeMarketKeeper evmtypes.FeeMarketKeeper
@@ -37,6 +47,8 @@ type HandlerOptions struct {
 	TxCounterStoreKey sdk.StoreKey
 	WasmConfig        wasmTypes.WasmConfig
 	Cdc               codec.BinaryCodec
+
+	BypassMinFeeMsgTypes []string
 }
 
 func (options HandlerOptions) Validate() error {
@@ -177,6 +189,7 @@ func newCosmosAnteHandler(options cosmosHandlerOptions) sdk.AnteHandler {
 		ante.NewTxTimeoutHeightDecorator(),
 		ante.NewValidateMemoDecorator(options.AccountKeeper),
 		ante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
+		globalfeeante.NewFeeDecorator(options.BypassMinFeeMsgTypes, options.GlobalFeeKeeper, options.StakingKeeper, maxBypassMinFeeMsgGasUsage),
 		ante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper),
 		// SetPubKeyDecorator must be called before all signature verification decorators
 		evmante.NewSetPubKeyDecorator(options.AccountKeeper, options.EvmKeeper),
