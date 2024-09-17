@@ -1,7 +1,7 @@
 #!/bin/bash
 # Before running this script, you must setup local network:
 # sh $PWD/scripts/multinode-local-testnet.sh
-# cw-stargate-staking-query.wasm source code: https://github.com/oraichain/cw-plus.git
+# oraiswap-token.wasm source code: https://github.com/oraichain/oraiswap.git
 
 set -ux
 

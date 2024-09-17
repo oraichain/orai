@@ -221,7 +221,7 @@ replace (
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
 	// use kava fork to change evm denom & cosmos denom of evmutil module to aorai and orai
-	github.com/kava-labs/kava => github.com/oraichain/kava v0.21.2-0.20240913101802-65739d37634e
+	github.com/kava-labs/kava => github.com/oraichain/kava v0.21.2-0.20240917014428-85b3d5030452
 	// downgrade of goleveldb to avoid issues: see https://github.com/cosmos/cosmos-sdk/issues/14949
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 
