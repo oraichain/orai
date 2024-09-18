@@ -140,9 +140,13 @@ import (
 	appparams "github.com/oraichain/orai/app/params"
 	appconfig "github.com/oraichain/orai/cmd/config"
 
-	"github.com/CosmosContracts/juno/v18/x/clock"
-	clockkeeper "github.com/CosmosContracts/juno/v18/x/clock/keeper"
-	clocktypes "github.com/CosmosContracts/juno/v18/x/clock/types"
+	"github.com/CosmosContracts/juno/v15/x/clock"
+	clockkeeper "github.com/CosmosContracts/juno/v15/x/clock/keeper"
+	clocktypes "github.com/CosmosContracts/juno/v15/x/clock/types"
+
+	"github.com/CosmosContracts/juno/v15/x/globalfee"
+	globalfeekeeper "github.com/CosmosContracts/juno/v15/x/globalfee/keeper"
+	globalfeetypes "github.com/CosmosContracts/juno/v15/x/globalfee/types"
 
 	"github.com/CosmWasm/token-factory/x/tokenfactory/bindings"
 	evmutil "github.com/kava-labs/kava/x/evmutil"
@@ -259,6 +263,7 @@ var (
 		intertx.AppModuleBasic{},
 		ibcfee.AppModuleBasic{},
 		clock.AppModuleBasic{},
+		globalfee.AppModuleBasic{},
 		ibchooks.AppModuleBasic{},
 		packetforward.AppModuleBasic{},
 		evmutil.AppModuleBasic{},
@@ -345,6 +350,7 @@ type OraichainApp struct {
 	AuthzKeeper        authzkeeper.Keeper
 	ContractKeeper     *wasmkeeper.PermissionedKeeper
 	ClockKeeper        clockkeeper.Keeper
+	GlobalFeeKeeper    globalfeekeeper.Keeper
 	TokenFactoryKeeper tokenfactorykeeper.Keeper
 
 	IbcFeeKeeper        ibcfeekeeper.Keeper
@@ -397,7 +403,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, evmtypes.StoreKey, feemarkettypes.StoreKey, capabilitytypes.StoreKey,
 		wasm.StoreKey, feegrant.StoreKey, authzkeeper.StoreKey, icahosttypes.StoreKey,
-		icacontrollertypes.StoreKey, intertxtypes.StoreKey, ibcfeetypes.StoreKey,
+		icacontrollertypes.StoreKey, intertxtypes.StoreKey, ibcfeetypes.StoreKey, globalfeetypes.StoreKey,
 		ibchookstypes.StoreKey, clocktypes.StoreKey, packetforwardtypes.StoreKey, evmutiltypes.StoreKey, tokenfactorytypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey, evmtypes.TransientKey)
@@ -661,6 +667,11 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		*app.ContractKeeper,
 	)
 
+	app.GlobalFeeKeeper = globalfeekeeper.NewKeeper(
+		appCodec,
+		app.keys[globalfeetypes.StoreKey],
+	)
+
 	// register the proposal types
 	govRouter := govtypes.NewRouter()
 	govRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
@@ -769,6 +780,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		ica.NewAppModule(&app.IcaControllerKeeper, &app.IcaHostKeeper),
 		intertx.NewAppModule(appCodec, app.InterTxKeeper),
 		clock.NewAppModule(appCodec, app.ClockKeeper),
+		globalfee.NewAppModule(appCodec, app.GlobalFeeKeeper, appconfig.MinimalDenom),
 		ibchooks.NewAppModule(app.AccountKeeper),
 		packetforward.NewAppModule(app.PacketForwardKeeper),
 		evmutil.NewAppModule(app.EvmutilKeeper, app.BankKeeper),
@@ -808,6 +820,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		wasm.ModuleName,
 		ibchookstypes.ModuleName,
 		clocktypes.ModuleName,
+		globalfee.ModuleName,
 		evmutiltypes.ModuleName,
 		tokenfactorytypes.ModuleName,
 	)
@@ -841,6 +854,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		wasm.ModuleName,
 		ibchookstypes.ModuleName,
 		clocktypes.ModuleName,
+		globalfee.ModuleName,
 		evmutiltypes.ModuleName,
 		tokenfactorytypes.ModuleName,
 	)
@@ -882,6 +896,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		wasm.ModuleName,
 		ibchookstypes.ModuleName,
 		clocktypes.ModuleName,
+		globalfee.ModuleName,
 		tokenfactorytypes.ModuleName,
 
 		// NOTE: crisis module must go at the end to check for invariants on each module
@@ -932,18 +947,23 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 
 	anteHandler, err := NewAnteHandler(
 		HandlerOptions{
-			AccountKeeper:     app.AccountKeeper,
-			BankKeeper:        app.BankKeeper,
-			EvmKeeper:         app.EvmKeeper,
-			FeegrantKeeper:    app.FeeGrantKeeper,
-			FeeMarketKeeper:   app.FeeMarketKeeper,
-			SignModeHandler:   encodingConfig.TxConfig.SignModeHandler(),
-			SigGasConsumer:    evmante.DefaultSigVerificationGasConsumer,
-			MaxTxGasWanted:    options.EVMMaxGasWanted,
-			IBCKeeper:         app.IbcKeeper,
-			TxCounterStoreKey: keys[wasm.StoreKey],
-			WasmConfig:        wasmConfig,
-			Cdc:               appCodec,
+			AccountKeeper: app.AccountKeeper,
+			BankKeeper:    app.BankKeeper,
+			EvmKeeper:     app.EvmKeeper,
+
+			GlobalFeeKeeper: app.GlobalFeeKeeper,
+			StakingKeeper:   app.StakingKeeper,
+
+			FeegrantKeeper:       app.FeeGrantKeeper,
+			FeeMarketKeeper:      app.FeeMarketKeeper,
+			SignModeHandler:      encodingConfig.TxConfig.SignModeHandler(),
+			SigGasConsumer:       evmante.DefaultSigVerificationGasConsumer,
+			MaxTxGasWanted:       options.EVMMaxGasWanted,
+			IBCKeeper:            app.IbcKeeper,
+			TxCounterStoreKey:    keys[wasm.StoreKey],
+			WasmConfig:           wasmConfig,
+			Cdc:                  appCodec,
+			BypassMinFeeMsgTypes: []string{},
 		},
 	)
 	if err != nil {
@@ -1141,6 +1161,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(wasm.ModuleName)
 	paramsKeeper.Subspace(ibchookstypes.ModuleName)
 	paramsKeeper.Subspace(clocktypes.ModuleName)
+	paramsKeeper.Subspace(globalfeetypes.ModuleName)
 	paramsKeeper.Subspace(evmtypes.ModuleName)
 	paramsKeeper.Subspace(feemarkettypes.ModuleName)
 	paramsKeeper.Subspace(evmutiltypes.ModuleName)
@@ -1151,6 +1172,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 
 func (app *OraichainApp) upgradeHandler() {
 	app.UpgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		app.GlobalFeeKeeper.SetParams(ctx, globalfeetypes.Params{MinimumGasPrices: sdk.NewDecCoins(sdk.NewDecCoin(appconfig.MinimalDenom, sdk.NewInt(100)))})
 		response, err := app.mm.RunMigrations(ctx, app.configurator, fromVM)
 		return response, err
 	})
@@ -1163,7 +1185,7 @@ func (app *OraichainApp) upgradeHandler() {
 	if upgradeInfo.Name == BinaryVersion && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storetypes.StoreUpgrades{
-			Added: []string{},
+			Added: []string{globalfeetypes.StoreKey},
 		}))
 	}
 }
