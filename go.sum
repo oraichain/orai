@@ -60,8 +60,6 @@ github.com/DataDog/datadog-go v3.2.0+incompatible/go.mod h1:LButxg5PwREeZtORoXG3
 github.com/DataDog/zstd v1.5.2 h1:vUG4lAyuPCXO0TLbXvPv7EB7cNK1QV/luu55UHLrrn8=
 github.com/DataDog/zstd v1.5.2/go.mod h1:g4AWEaM3yOg3HYfnJ3YIawPnVdXJh9QME85blwSAmyw=
 github.com/Joker/hpp v1.0.0/go.mod h1:8x5n+M1Hp5hC0g8okX3sR3vFQwynaX/UgSOM9MeBKzY=
-github.com/Kava-Labs/go-ethereum v1.10.27-0.20240308184817-2a5324cb7ce7 h1:upwbx4E9Bt1YdlTmfSpPvPNPFT1x4vcwc+E1bho7FH8=
-github.com/Kava-Labs/go-ethereum v1.10.27-0.20240308184817-2a5324cb7ce7/go.mod h1:/6CsT5Ceen2WPLI/oCA3xMcZ5sWMF/D46SjM/ayY0Oo=
 github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible/go.mod h1:r7JcOSlj0wfOMncg0iLm8Leh48TZaKVeNIfJntJ2wa0=
 github.com/Microsoft/go-winio v0.6.0 h1:slsWYD/zyx7lCXoZVlvQrj0hPTM1HI4+v1sIda2yDvg=
 github.com/Microsoft/go-winio v0.6.0/go.mod h1:cTAf44im0RAYeL23bpB+fzCyDH2MJiz2BO69KH/soAE=
@@ -733,12 +731,14 @@ github.com/oraichain/cometbft v0.34.30-0.20240822152340-79f7b8278984 h1:6bnkvlyG
 github.com/oraichain/cometbft v0.34.30-0.20240822152340-79f7b8278984/go.mod h1:L9shMfbkZ8B+7JlwANEr+NZbBcn+hBpwdbeYvA5rLCw=
 github.com/oraichain/cosmos-sdk v0.45.17-0.20240822154747-4cc2e82d6f68 h1:zXer3jRPWbrC9jl7w2cEx4nCY19QWKNRdQ7l8xF7/+U=
 github.com/oraichain/cosmos-sdk v0.45.17-0.20240822154747-4cc2e82d6f68/go.mod h1:bScuNwWAP0TZJpUf+SHXRU3xGoUPp+X9nAzfeIXts40=
-github.com/oraichain/ethermint v0.14.1-0.20240918011717-15939233e177 h1:3OPZfUijDGWzLJEQJ8c7L82pVJrP7w2vzfwkvo44d3k=
-github.com/oraichain/ethermint v0.14.1-0.20240918011717-15939233e177/go.mod h1:cTuxZmV5H31kxB1lIYTSSTX4zIxioQQvVuU6yZR/ZZs=
+github.com/oraichain/ethermint v0.14.1-0.20240918072557-f5263be1acb3 h1:21lLXI+p0tpdKrijfK4HEox/uk+UjL42AoHicpb8GDM=
+github.com/oraichain/ethermint v0.14.1-0.20240918072557-f5263be1acb3/go.mod h1:cTuxZmV5H31kxB1lIYTSSTX4zIxioQQvVuU6yZR/ZZs=
+github.com/oraichain/go-ethereum v0.0.0-20240919025041-184f816b9d65 h1:oumbt8qiUC1AAt9MgHHnn/deseV5oYdg3T/PoYqsGeM=
+github.com/oraichain/go-ethereum v0.0.0-20240919025041-184f816b9d65/go.mod h1:/6CsT5Ceen2WPLI/oCA3xMcZ5sWMF/D46SjM/ayY0Oo=
 github.com/oraichain/juno/v15 v15.0.0-20240917111319-f17c267a5c95 h1:Pz+0Jg+Dd2v9IZyFT6P9CDFN1QQdlaJbTANA7es31Fo=
 github.com/oraichain/juno/v15 v15.0.0-20240917111319-f17c267a5c95/go.mod h1:HuWFy53h3l7DzKXkFOYY/V8Eb4cXG1tekL/HlSqlPmM=
-github.com/oraichain/kava v0.21.2-0.20240917014428-85b3d5030452 h1:oexXEkpJubHO7MGQsnpqB7iQTFvEwh+yD5d1j7M/mgc=
-github.com/oraichain/kava v0.21.2-0.20240917014428-85b3d5030452/go.mod h1:rzsEf+BEcXxRpOoJCUMZUFFRy49/3g0uEpyckxOFe5I=
+github.com/oraichain/kava v0.21.2-0.20240920010755-522762952e53 h1:19qEVoSALPjgqy1dWiWsrHbe7HEP27WVbSUrPMMXqkw=
+github.com/oraichain/kava v0.21.2-0.20240920010755-522762952e53/go.mod h1:NNialHtI4NsaUBtRbW3lcXARLYRAfyOJgKoSdQMm6do=
 github.com/oraichain/wasmd v0.30.2-0.20240729102409-91ec1f5fdc6c h1:M9XoVJ0EgBPBfuNUMxXGpa5AitznA27m59J0j651opk=
 github.com/oraichain/wasmd v0.30.2-0.20240729102409-91ec1f5fdc6c/go.mod h1:DUWz5+p7h3BbDxXAt7IBovagwt5NRPCGVuQkweIixzM=
 github.com/oraichain/wasmvm v1.5.2 h1:hN5Pa4EPlRb0BYKkNh2cgixd0+L6kPpzc+s30Il2W/Q=

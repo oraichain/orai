@@ -1005,8 +1005,8 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	app.ScopedInterTxKeeper = scopedInterTxKeeper
 	clockkeeper.RegisterProposalTypes()
 
-	// register wasm keeper
-	registry.InitializePrecompiles(app.ContractKeeper, app.WasmKeeper, app.EvmKeeper)
+	// register precompile keepers
+	registry.InitializePrecompiles(app.ContractKeeper, app.WasmKeeper, app.EvmKeeper, app.BankKeeper, app.AccountKeeper)
 
 	return app
 }
