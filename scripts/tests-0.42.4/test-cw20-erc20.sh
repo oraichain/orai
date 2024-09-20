@@ -3,7 +3,7 @@
 # sh $PWD/scripts/multinode-local-testnet.sh
 # oraiswap-token.wasm source code: https://github.com/oraichain/oraiswap.git
 
-set -eux
+set -eu
 
 # hard-coded test private key. DO NOT USE!!
 PRIVATE_KEY_ETH=${PRIVATE_KEY_ETH:-"021646C7F742C743E60CC460C56242738A3951667E71C803929CB84B6FA4B0D6"}
@@ -67,13 +67,19 @@ if ! [ $balance_of == "1000000000" ] ; then
 fi
 
 # try querying decimals -> get decimals from cosmwasm contract
+orai_balance_before_transfer=$(oraid query bank balances orai1kzkf6gttxqar9yrkxfe34ye4vg5v4m588ew7c9 --denom orai --output json | jq '.amount')
 ERC20_ADDRESS=$contract_addr yarn hardhat run scripts/cw20erc20-transfer.ts --network testing
+orai_balance_after_transfer=$(oraid query bank balances orai1kzkf6gttxqar9yrkxfe34ye4vg5v4m588ew7c9 --denom orai --output json | jq '.amount')
 
 # try querying balance of owner after transfer -> should drop
 output=$(ERC20_ADDRESS=$contract_addr yarn hardhat run scripts/cw20erc20-query-balance-of.ts --network testing)
 balance_of=$(echo "$output" | awk '/^[0-9]+$/ { print $1 }')
 if [ $balance_of == "1000000000" ] ; then
-   echo "CW20-ERC20 Test Failed"; exit 1
+   echo "Could not transfer CW20 token from ERC20 contract. CW20-ERC20 Test Failed"; exit 1
+fi 
+
+if [ $orai_balance_before_transfer == $orai_balance_after_transfer ] ; then
+   echo "Could not transfer native ORAI token from ERC20 contract. CW20-ERC20 Test Failed"; exit 1
 fi 
 
 echo "CW20-ERC20 Test Passed"; cd $current_dir

@@ -215,12 +215,12 @@ replace (
 	// backport iavl and go-ethereum to matching version with cosmos sdk & kava v0.14.0-kava-v21.1
 	github.com/cosmos/iavl => github.com/cosmos/iavl v0.19.5
 	// use go-ethereum with precompile
-	github.com/ethereum/go-ethereum => ../go-ethereum
+	github.com/ethereum/go-ethereum => github.com/oraichain/go-ethereum v0.0.0-20240919025041-184f816b9d65
 
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
 	// use kava fork to change evm denom & cosmos denom of evmutil module to aorai and orai
-	github.com/kava-labs/kava => github.com/oraichain/kava v0.21.2-0.20240918200904-e2a8860dea0d
+	github.com/kava-labs/kava => github.com/oraichain/kava v0.21.2-0.20240920010755-522762952e53
 	// downgrade of goleveldb to avoid issues: see https://github.com/cosmos/cosmos-sdk/issues/14949
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
 

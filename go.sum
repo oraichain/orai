@@ -733,10 +733,12 @@ github.com/oraichain/cosmos-sdk v0.45.17-0.20240822154747-4cc2e82d6f68 h1:zXer3j
 github.com/oraichain/cosmos-sdk v0.45.17-0.20240822154747-4cc2e82d6f68/go.mod h1:bScuNwWAP0TZJpUf+SHXRU3xGoUPp+X9nAzfeIXts40=
 github.com/oraichain/ethermint v0.14.1-0.20240918072557-f5263be1acb3 h1:21lLXI+p0tpdKrijfK4HEox/uk+UjL42AoHicpb8GDM=
 github.com/oraichain/ethermint v0.14.1-0.20240918072557-f5263be1acb3/go.mod h1:cTuxZmV5H31kxB1lIYTSSTX4zIxioQQvVuU6yZR/ZZs=
+github.com/oraichain/go-ethereum v0.0.0-20240919025041-184f816b9d65 h1:oumbt8qiUC1AAt9MgHHnn/deseV5oYdg3T/PoYqsGeM=
+github.com/oraichain/go-ethereum v0.0.0-20240919025041-184f816b9d65/go.mod h1:/6CsT5Ceen2WPLI/oCA3xMcZ5sWMF/D46SjM/ayY0Oo=
 github.com/oraichain/juno/v15 v15.0.0-20240917111319-f17c267a5c95 h1:Pz+0Jg+Dd2v9IZyFT6P9CDFN1QQdlaJbTANA7es31Fo=
 github.com/oraichain/juno/v15 v15.0.0-20240917111319-f17c267a5c95/go.mod h1:HuWFy53h3l7DzKXkFOYY/V8Eb4cXG1tekL/HlSqlPmM=
-github.com/oraichain/kava v0.21.2-0.20240918200904-e2a8860dea0d h1:MCXC3Q9SYcUC44hoVUnVi439SrQHU7B0/xzfONPvRc0=
-github.com/oraichain/kava v0.21.2-0.20240918200904-e2a8860dea0d/go.mod h1:NNialHtI4NsaUBtRbW3lcXARLYRAfyOJgKoSdQMm6do=
+github.com/oraichain/kava v0.21.2-0.20240920010755-522762952e53 h1:19qEVoSALPjgqy1dWiWsrHbe7HEP27WVbSUrPMMXqkw=
+github.com/oraichain/kava v0.21.2-0.20240920010755-522762952e53/go.mod h1:NNialHtI4NsaUBtRbW3lcXARLYRAfyOJgKoSdQMm6do=
 github.com/oraichain/wasmd v0.30.2-0.20240729102409-91ec1f5fdc6c h1:M9XoVJ0EgBPBfuNUMxXGpa5AitznA27m59J0j651opk=
 github.com/oraichain/wasmd v0.30.2-0.20240729102409-91ec1f5fdc6c/go.mod h1:DUWz5+p7h3BbDxXAt7IBovagwt5NRPCGVuQkweIixzM=
 github.com/oraichain/wasmvm v1.5.2 h1:hN5Pa4EPlRb0BYKkNh2cgixd0+L6kPpzc+s30Il2W/Q=
