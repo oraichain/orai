@@ -18,7 +18,7 @@ pkill oraid && sleep 2
 
 # download current production binary
 current_dir=$PWD
-rm -rf ../../orai-old/ && git clone https://github.com/oraichain/orai.git ../../orai-old && cd ../../orai-old/orai && git checkout $OLD_VERSION && go mod tidy && GOTOOLCHAIN=go1.21.4 make install
+rm -rf ../../orai-old/ && git clone --branch $OLD_VERSION --single-branch https://github.com/oraichain/orai.git ../../orai-old && cd ../../orai-old/orai && go mod tidy && GOTOOLCHAIN=go1.21.4 make install
 
 cd $current_dir
 
