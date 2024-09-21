@@ -64,7 +64,7 @@ screen -S validator3 -d -m oraid start --home=$HOME/.oraid/validator3
 
 # sleep a bit for the network to start 
 echo "Sleep to wait for the network to start..."
-sleep 3
+sleep 5
 
 # test contract migration
 echo "Migrate the contract..."
@@ -130,5 +130,6 @@ NODE_HOME=$VALIDATOR_HOME USER=validator1 sh $PWD/scripts/tests-0.42.2/test-mult
 NODE_HOME=$VALIDATOR_HOME sh $PWD/scripts/tests-0.42.3/test-commit-timeout.sh
 NODE_HOME=$VALIDATOR_HOME sh $PWD/scripts/tests-0.42.4/test-cw-stargate-staking-query.sh
 NODE_HOME=$VALIDATOR_HOME USER=validator1 sh $PWD/scripts/tests-0.42.4/test-cw20-erc20.sh
+NODE_HOME=$VALIDATOR_HOME USER=validator1 sh $PWD/scripts/tests-0.42.4/test-globalfee.sh
 
 echo "Tests Passed!!"

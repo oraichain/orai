@@ -679,7 +679,8 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
 		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(app.IbcKeeper.ClientKeeper)).
-		AddRoute(clocktypes.RouterKey, clockkeeper.NewClockProposalHandler(app.ClockKeeper))
+		AddRoute(clocktypes.RouterKey, clockkeeper.NewClockProposalHandler(app.ClockKeeper)).
+		AddRoute(globalfeetypes.RouterKey, globalfeekeeper.NewGlobalFeeProposalHandler(app.GlobalFeeKeeper))
 
 	// The gov proposal types can be individually enabled
 	if len(enabledProposals) != 0 {
@@ -1004,6 +1005,7 @@ func NewOraichainApp(logger log.Logger, db dbm.DB, traceStore io.Writer, loadLat
 	app.ScopedICAControllerKeeper = scopedICAControllerKeeper
 	app.ScopedInterTxKeeper = scopedInterTxKeeper
 	clockkeeper.RegisterProposalTypes()
+	globalfeekeeper.RegisterProposalTypes()
 
 	// register precompile keepers
 	registry.InitializePrecompiles(app.ContractKeeper, app.WasmKeeper, app.EvmKeeper, app.BankKeeper, app.AccountKeeper)
@@ -1172,7 +1174,10 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 
 func (app *OraichainApp) upgradeHandler() {
 	app.UpgradeKeeper.SetUpgradeHandler(BinaryVersion, func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-		app.GlobalFeeKeeper.SetParams(ctx, globalfeetypes.Params{MinimumGasPrices: sdk.NewDecCoins(sdk.NewDecCoin(appconfig.MinimalDenom, sdk.NewInt(100)))})
+		err := app.GlobalFeeKeeper.SetParams(ctx, globalfeetypes.DefaultParams())
+		if err != nil {
+			return nil, err
+		}
 		response, err := app.mm.RunMigrations(ctx, app.configurator, fromVM)
 		return response, err
 	})

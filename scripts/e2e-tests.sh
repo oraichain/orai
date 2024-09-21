@@ -37,7 +37,7 @@ if ! [[ $evm_denom =~ "aorai" ]] ; then
    echo "Tests Failed"; exit 1
 fi
 
-# sh $PWD/scripts/test_clock_counter_contract.sh
+sh $PWD/scripts/test_clock_counter_contract.sh
 
 NODE_HOME=$VALIDATOR_HOME USER=validator1 WASM_PATH="$PWD/scripts/wasm_file/counter_high_gas_cost.wasm" sh $PWD/scripts/tests-0.42.1/test-gasless.sh
 NODE_HOME=$VALIDATOR_HOME USER=validator1 sh $PWD/scripts/tests-0.42.1/test-tokenfactory.sh
@@ -48,5 +48,6 @@ NODE_HOME=$VALIDATOR_HOME USER=validator1 sh $PWD/scripts/tests-0.42.2/test-mult
 NODE_HOME=$VALIDATOR_HOME sh $PWD/scripts/tests-0.42.3/test-commit-timeout.sh
 NODE_HOME=$VALIDATOR_HOME sh $PWD/scripts/tests-0.42.4/test-cw-stargate-staking-query.sh
 NODE_HOME=$VALIDATOR_HOME USER=validator1 sh $PWD/scripts/tests-0.42.4/test-cw20-erc20.sh
+NODE_HOME=$VALIDATOR_HOME USER=validator1 sh $PWD/scripts/tests-0.42.4/test-globalfee.sh
 
 echo "Tests Passed!!"
