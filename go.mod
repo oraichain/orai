@@ -200,9 +200,8 @@ replace (
 	// token factory:
 	github.com/CosmWasm/token-factory => github.com/CosmosContracts/token-factory v1.2.1-juno.0.20230523144425-253f9b9df6a6
 
-	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20240729102409-91ec1f5fdc6c
-
 	// fork wasmd so that we have legacy wasm types
+	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20241011025015-7f784aca01b7
 	// go list -m -json github.com/oraichain/wasmvm@main | jq '.|"\(.Path) \(.Version)"' -r
 	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.5.2
 
@@ -210,7 +209,7 @@ replace (
 	// same version as cosmos-sdk
 	github.com/btcsuite/btcd => github.com/btcsuite/btcd v0.22.2
 
-	github.com/cosmos/cosmos-sdk => github.com/oraichain/cosmos-sdk v0.45.17-0.20240822154747-4cc2e82d6f68
+	github.com/cosmos/cosmos-sdk => github.com/oraichain/cosmos-sdk v0.45.17-0.20241011025107-6b7cb6406e33
 
 	// backport iavl and go-ethereum to matching version with cosmos sdk & kava v0.14.0-kava-v21.1
 	github.com/cosmos/iavl => github.com/cosmos/iavl v0.19.5
@@ -226,13 +225,11 @@ replace (
 
 	// use Oraichain fork of cometbft
 	// go list -m -json github.com/oraichain/cometbft@482cde0c4e04479d4164b1b4f7a0b90071c58b7f | jq '.|"\(.Path) \(.Version)"' -r
-	// github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20240425173150-09d3515b75aa
-	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20240822152340-79f7b8278984
+	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20241014021336-e7c88c724a78
 
 	// Use ethermint fork that respects min-gas-price with NoBaseFee true and london enabled, and includes eip712 support
 	// also add params query, fix proto account & ibc v3 to v4 compatibility, and get first 4 bytes of sha256(chain_id) when not eip159 compatible
-	// also add evm & cosmos mapping
-	github.com/tharsis/ethermint => github.com/oraichain/ethermint v0.14.1-0.20240918072557-f5263be1acb3
+	github.com/tharsis/ethermint => github.com/oraichain/ethermint v0.14.1-0.20241013045002-22b9e0ec4e0e
 
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )

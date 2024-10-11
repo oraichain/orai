@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -29,7 +30,6 @@ import (
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
 	abci "github.com/tendermint/tendermint/abci/types"
-	tmjson "github.com/tendermint/tendermint/libs/json"
 	"github.com/tendermint/tendermint/libs/log"
 	tmos "github.com/tendermint/tendermint/libs/os"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
@@ -1028,10 +1028,14 @@ func (app *OraichainApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) a
 
 // InitChainer application update at chain initialization
 func (app *OraichainApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
-	var genesisState GenesisState
-	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
+	var genesisState map[string]json.RawMessage
+	ctx.Logger().Debug("Before unmarshalling genesis state InitChainer")
+	if err := json.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		panic(err)
 	}
+	// free up AppStateBytes since we don't need it anymore. Allow GC to do its job
+	req.AppStateBytes = nil
+	ctx.Logger().Debug("After freeing genesis state InitChainer")
 
 	app.UpgradeKeeper.SetModuleVersionMap(ctx, app.mm.GetVersionMap())
 
