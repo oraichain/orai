@@ -7,3 +7,10 @@ use (
 	./orai
 	./oraivisor
 )
+
+replace (
+	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20241015013819-c3755349c5c6
+	github.com/cosmos/cosmos-sdk => github.com/oraichain/cosmos-sdk v0.45.17-0.20241011025107-6b7cb6406e33
+	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20241014232152-b48396fbb52e
+	github.com/tharsis/ethermint => github.com/oraichain/ethermint v0.14.1-0.20241014021615-a7676a78cace
+)
