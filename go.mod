@@ -201,7 +201,7 @@ replace (
 	github.com/CosmWasm/token-factory => github.com/CosmosContracts/token-factory v1.2.1-juno.0.20230523144425-253f9b9df6a6
 
 	// fork wasmd so that we have legacy wasm types
-	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20241011025015-7f784aca01b7
+	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20241015013819-c3755349c5c6
 	// go list -m -json github.com/oraichain/wasmvm@main | jq '.|"\(.Path) \(.Version)"' -r
 	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.5.2
 
@@ -229,7 +229,7 @@ replace (
 
 	// Use ethermint fork that respects min-gas-price with NoBaseFee true and london enabled, and includes eip712 support
 	// also add params query, fix proto account & ibc v3 to v4 compatibility, and get first 4 bytes of sha256(chain_id) when not eip159 compatible
-	github.com/tharsis/ethermint => github.com/oraichain/ethermint v0.14.1-0.20241013045002-22b9e0ec4e0e
+	github.com/tharsis/ethermint => github.com/oraichain/ethermint v0.14.1-0.20241015015122-5c0db9f09f54
 
 	google.golang.org/grpc => google.golang.org/grpc v1.33.2
 )
