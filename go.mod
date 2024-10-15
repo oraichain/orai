@@ -201,7 +201,7 @@ replace (
 	github.com/CosmWasm/token-factory => github.com/CosmosContracts/token-factory v1.2.1-juno.0.20230523144425-253f9b9df6a6
 
 	// fork wasmd so that we have legacy wasm types
-	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20241015013819-c3755349c5c6
+	github.com/CosmWasm/wasmd => github.com/oraichain/wasmd v0.30.2-0.20241015215414-00da23859917
 	// go list -m -json github.com/oraichain/wasmvm@main | jq '.|"\(.Path) \(.Version)"' -r
 	github.com/CosmWasm/wasmvm => github.com/oraichain/wasmvm v1.5.2
 
@@ -225,7 +225,7 @@ replace (
 
 	// use Oraichain fork of cometbft
 	// go list -m -json github.com/oraichain/cometbft@482cde0c4e04479d4164b1b4f7a0b90071c58b7f | jq '.|"\(.Path) \(.Version)"' -r
-	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20241014021336-e7c88c724a78
+	github.com/tendermint/tendermint => github.com/oraichain/cometbft v0.34.30-0.20241015223008-ffe29af8a0bf
 
 	// Use ethermint fork that respects min-gas-price with NoBaseFee true and london enabled, and includes eip712 support
 	// also add params query, fix proto account & ibc v3 to v4 compatibility, and get first 4 bytes of sha256(chain_id) when not eip159 compatible

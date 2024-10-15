@@ -727,8 +727,8 @@ github.com/openzipkin-contrib/zipkin-go-opentracing v0.4.5/go.mod h1:/wsWhb9smxS
 github.com/openzipkin/zipkin-go v0.1.6/go.mod h1:QgAqvLzwWbR/WpD4A3cGpPtJrZXNIiJc5AZX7/PBEpw=
 github.com/openzipkin/zipkin-go v0.2.1/go.mod h1:NaW6tEwdmWMaCDZzg8sh+IBNOxHMPnhQw8ySjnjRyN4=
 github.com/openzipkin/zipkin-go v0.2.2/go.mod h1:NaW6tEwdmWMaCDZzg8sh+IBNOxHMPnhQw8ySjnjRyN4=
-github.com/oraichain/cometbft v0.34.30-0.20241014021336-e7c88c724a78 h1:lzuu9sNbLR/dP9log2ItEHDzEl8OhtlbLtBsGlsVyO4=
-github.com/oraichain/cometbft v0.34.30-0.20241014021336-e7c88c724a78/go.mod h1:L9shMfbkZ8B+7JlwANEr+NZbBcn+hBpwdbeYvA5rLCw=
+github.com/oraichain/cometbft v0.34.30-0.20241015223008-ffe29af8a0bf h1:HBN5QU9LjSW73uzV9ErKKhLg7O2mj0Y3wWoriMzOYfY=
+github.com/oraichain/cometbft v0.34.30-0.20241015223008-ffe29af8a0bf/go.mod h1:L9shMfbkZ8B+7JlwANEr+NZbBcn+hBpwdbeYvA5rLCw=
 github.com/oraichain/cosmos-sdk v0.45.17-0.20241011025107-6b7cb6406e33 h1:5pPwS/7HxmNB0VorvlwN2+/wE575ta+IFhsffWHYWYc=
 github.com/oraichain/cosmos-sdk v0.45.17-0.20241011025107-6b7cb6406e33/go.mod h1:bScuNwWAP0TZJpUf+SHXRU3xGoUPp+X9nAzfeIXts40=
 github.com/oraichain/ethermint v0.14.1-0.20241015015122-5c0db9f09f54 h1:kAKMfIpvKRvFEnEqK2o+/4bWvFZeRDMy4qM1jDdT19w=
@@ -739,8 +739,8 @@ github.com/oraichain/juno/v15 v15.0.0-20240921063720-cc9b8a9f6ee3 h1:dLUKdDPr2NU
 github.com/oraichain/juno/v15 v15.0.0-20240921063720-cc9b8a9f6ee3/go.mod h1:r6MzrPIG9JEmP1Jh94Ar996Rn8GCA/+Eb/wdsx4bY80=
 github.com/oraichain/kava v0.21.2-0.20240920010755-522762952e53 h1:19qEVoSALPjgqy1dWiWsrHbe7HEP27WVbSUrPMMXqkw=
 github.com/oraichain/kava v0.21.2-0.20240920010755-522762952e53/go.mod h1:NNialHtI4NsaUBtRbW3lcXARLYRAfyOJgKoSdQMm6do=
-github.com/oraichain/wasmd v0.30.2-0.20241015013819-c3755349c5c6 h1:jM2FrPJsHaJeW4i50N/6YBlwk5ZtljmqYaiYmU7JVrY=
-github.com/oraichain/wasmd v0.30.2-0.20241015013819-c3755349c5c6/go.mod h1:DUWz5+p7h3BbDxXAt7IBovagwt5NRPCGVuQkweIixzM=
+github.com/oraichain/wasmd v0.30.2-0.20241015215414-00da23859917 h1:bRoLT62z2sTytoIiIl0Bf7o4X7yOyOuqdQKtkkChCuE=
+github.com/oraichain/wasmd v0.30.2-0.20241015215414-00da23859917/go.mod h1:DUWz5+p7h3BbDxXAt7IBovagwt5NRPCGVuQkweIixzM=
 github.com/oraichain/wasmvm v1.5.2 h1:hN5Pa4EPlRb0BYKkNh2cgixd0+L6kPpzc+s30Il2W/Q=
 github.com/oraichain/wasmvm v1.5.2/go.mod h1:fXB+m2gyh4v9839zlIXdMZGeLAxqUdYdFQqYsTha2hc=
 github.com/ory/dockertest v3.3.5+incompatible h1:iLLK6SQwIhcbrG783Dghaaa3WPzGc+4Emza6EbVUUGA=
