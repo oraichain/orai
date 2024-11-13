@@ -6,9 +6,12 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 > [!WARNING] 
-> Oraichain Labs, the team behind Oraichain and this repo orai, has fully shifted its focus to [Our Wasmd fork repository](https://github.com/oraichain/wasmd), where we
-> continue to build interoperability solutions for the future! Please read our [Upgrade guideline](https://github.com/oraichain/wasmd/blob/release/v0.50.x/UPGRADE_V050.md) to understand the reasons for the change.
+> Oraichain Labs, the team behind Oraichain and this repo orai, has fully shifted its focus to [Our Wasmd fork repository](https://github.com/oraichain/wasmd), where we continue to build interoperability solutions for the future! 
+>
+> Please read our [Upgrade guideline](https://github.com/oraichain/wasmd/blob/release/v0.50.x/UPGRADE_V050.md) to understand the reasons for the change.
+>
 > As a result, this repository is no longer maintained, and all relevant code has been migrated.
+>
 > The last production version of this repo is [v0.42.4](https://github.com/oraichain/orai/releases/tag/v0.42.4).
 >
 
